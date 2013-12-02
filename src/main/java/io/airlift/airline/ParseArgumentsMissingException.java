@@ -18,18 +18,21 @@
 
 package io.airlift.airline;
 
+import com.google.common.base.Joiner;
+
+
 public class ParseArgumentsMissingException extends ParseException
 {
-    private final String argumentTitle;
+    private final List<String> argumentTitles;
 
-    ParseArgumentsMissingException(String argumentTitle)
+    ParseArgumentsMissingException(List<String> argumentTitles)
     {
-        super("Required parameters are missing: %s", argumentTitle);
-        this.argumentTitle = argumentTitle;
+        super("Required arguments are missing: '%s'", Joiner.on(',').join(argumentTitles));
+        this.argumentTitles = argumentTitles;
     }
 
-    public String getArgumentTitle()
+    public List<String> getArgumentTitle()
     {
-        return argumentTitle;
+        return argumentTitles;
     }
 }

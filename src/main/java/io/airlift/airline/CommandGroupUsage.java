@@ -7,9 +7,7 @@ import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.airline.UsageHelper.DEFAULT_COMMAND_COMPARATOR;
@@ -87,29 +85,99 @@ public class CommandGroupUsage
         List<CommandMetadata> commands = newArrayList(group.getCommands());
         Collections.sort(commands, commandComparator);
 
+        // Populate group info via an extra for loop through commands
+        String defaultCommand = "";
         if (group.getDefaultCommand() != null) {
-            CommandMetadata command = group.getDefaultCommand();
-            if (global != null) {
-                synopsis.append(global.getName());
-                if (!hideGlobalOptions) {
-                    synopsis.appendWords(UsageHelper.toSynopsisUsage(command.getGlobalOptions()));
-                }
-            }
-            synopsis.append(group.getName()).appendWords(UsageHelper.toSynopsisUsage(command.getGroupOptions()));
-            synopsis.newline();
+            defaultCommand = group.getDefaultCommand().getName();
         }
+        List<OptionMetadata> commonGroupOptions = null;
+        String commonGroupArgs = null;
+        List<String> allCommandNames = newArrayList();
+        boolean hasCommandSpecificOptions = false, hasCommandSpecificArgs = false;
         for (CommandMetadata command : commands) {
-            if (global != null) {
-                synopsis.append(global.getName());
-                if (!hideGlobalOptions) {
-                    synopsis.appendWords(UsageHelper.toSynopsisUsage(command.getGlobalOptions()));
-                }
+            if (command.getName().equals(defaultCommand)) {
+                allCommandNames.add(command.getName() + "*");
             }
-            synopsis.append(group.getName()).appendWords(UsageHelper.toSynopsisUsage(command.getGroupOptions()));
-            synopsis.append(command.getName()).appendWords(UsageHelper.toSynopsisUsage(command.getCommandOptions()));
-            synopsis.newline();
+            else {
+                allCommandNames.add(command.getName());
+            }
+            if (commonGroupOptions == null) {
+                commonGroupOptions = newArrayList(command.getCommandOptions());
+            }
+            if (commonGroupArgs == null) {
+                commonGroupArgs = (command.getArguments() != null ? UsageHelper.toUsage(command.getArguments()) : "");
+            }
+
+            commonGroupOptions.retainAll(command.getCommandOptions());
+            if (command.getCommandOptions().size() > commonGroupOptions.size()) {
+                hasCommandSpecificOptions = true;
+            }
+            if (commonGroupArgs != (command.getArguments() != null ? UsageHelper.toUsage(command.getArguments()) : "")) {
+                hasCommandSpecificArgs = true;
+            }
+        }
+        // Print group summary line
+        if (global != null) {
+            synopsis.append(global.getName());
+            if (!hideGlobalOptions) {
+                synopsis.appendWords(UsageHelper.toSynopsisUsage(commands.get(0).getGlobalOptions()));
+            }
+        }
+        synopsis.append(group.getName()).appendWords(UsageHelper.toSynopsisUsage(commands.get(0).getGroupOptions()));
+        synopsis.append(" {").append(allCommandNames.get(0));
+        for (int i = 1; i < allCommandNames.size(); i++) {
+            synopsis.append(" | ").append(allCommandNames.get(i));
+        }
+        synopsis.append("} [--]");
+        if (commonGroupOptions.size() > 0) {
+            synopsis.appendWords(UsageHelper.toSynopsisUsage(commonGroupOptions));
+        }
+        if (hasCommandSpecificOptions) {
+            synopsis.append(" [cmd-options]");
+        }
+        if (hasCommandSpecificArgs) {
+            synopsis.append(" <cmd-args>");
         }
         synopsis.newline();
+        Map<String, String> cmdOptions = newTreeMap();
+        Map<String, String> cmdArguments = newTreeMap();
+
+        for (CommandMetadata command : commands) {
+
+            if(!command.isHidden())
+            {
+                if (hasCommandSpecificOptions) {
+                    List<OptionMetadata> thisCmdOptions = newArrayList(command.getCommandOptions());
+                    thisCmdOptions.removeAll(commonGroupOptions);
+                    StringBuilder optSB = new StringBuilder();
+                    for (String s : UsageHelper.toSynopsisUsage(thisCmdOptions)) {
+                        optSB.append(s + " ");
+                    }
+                    cmdOptions.put(command.getName(), optSB.toString());
+                }
+                if (hasCommandSpecificArgs) {
+                    cmdArguments.put(command.getName(), (command.getArguments() != null ? UsageHelper.toUsage(command.getArguments()) : ""));
+                }
+            }
+        }
+        if (hasCommandSpecificOptions) {
+            synopsis.newline().append("Where command-specific options [cmd-options] are:").newline();
+            UsagePrinter opts = synopsis.newIndentedPrinter(4);
+            for (String cmd : cmdOptions.keySet()) {
+                opts.append(cmd + ": " + cmdOptions.get(cmd)).newline();
+            }
+        }
+        if (hasCommandSpecificArgs) {
+            synopsis.newline().append("Where command-specific arguments <cmd-args> are:").newline();
+            UsagePrinter args = synopsis.newIndentedPrinter(4);
+            for (String arg : cmdArguments.keySet()) {
+                args.append(arg + ": " + cmdArguments.get(arg)).newline();
+            }
+        }
+        if (defaultCommand != "") {
+            synopsis.newline().append(String.format("* %s is the default command", defaultCommand));
+        }
+        synopsis.newline().append("See").append("'" + global.getName()).append("help ").append(group.getName()).appendOnOneLine(" <command>' for more information on a specific command.").newline();
 
         //
         // OPTIONS
@@ -127,6 +195,12 @@ public class CommandGroupUsage
             out.append("OPTIONS").newline();
 
             for (OptionMetadata option : options) {
+                
+                if(option.isHidden())
+                {
+                    continue;
+                }
+
                 // option names
                 UsagePrinter optionPrinter = out.newIndentedPrinter(8);
                 optionPrinter.append(UsageHelper.toDescription(option)).newline();
@@ -136,39 +210,6 @@ public class CommandGroupUsage
                 descriptionPrinter.append(option.getDescription()).newline();
 
                 descriptionPrinter.newline();
-            }
-        }
-
-        //
-        // COMMANDS
-        //
-        if (commands.size() > 0 || group.getDefaultCommand() != null) {
-            out.append("COMMANDS").newline();
-            UsagePrinter commandPrinter = out.newIndentedPrinter(8);
-
-            if (group.getDefaultCommand() != null && group.getDefaultCommand().getDescription() != null) {
-                commandPrinter.append("With no arguments,")
-                        .append(group.getDefaultCommand().getDescription())
-                        .newline()
-                        .newline();
-            }
-
-            for (CommandMetadata command : group.getCommands()) {
-                commandPrinter.append(command.getName()).newline();
-                UsagePrinter descriptionPrinter = commandPrinter.newIndentedPrinter(4);
-
-                descriptionPrinter.append(command.getDescription()).newline().newline();
-
-                for (OptionMetadata option : command.getCommandOptions()) {
-                    if (!option.isHidden() && option.getDescription() != null) {
-                        descriptionPrinter.append("With")
-                                .append(longest(option.getOptions()))
-                                .append("option,")
-                                .append(option.getDescription())
-                                .newline()
-                                .newline();
-                    }
-                }
             }
         }
     }

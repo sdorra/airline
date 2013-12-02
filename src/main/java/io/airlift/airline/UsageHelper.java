@@ -2,6 +2,7 @@ package io.airlift.airline;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -83,13 +84,55 @@ public class UsageHelper
         return stringBuilder.toString();
     }
 
+    public static String toRonnDescription(OptionMetadata option)
+    {
+        Set<String> options = option.getOptions();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        final String argumentString;
+        if (option.getArity() > 0) {
+            argumentString = Joiner.on(" ").join(Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>()
+            {
+                public String apply(@Nullable String argument)
+                {
+                    return "<" + argument + ">";
+                }
+            }));
+        } else {
+            argumentString = null;
+        }
+
+        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>()
+        {
+            public String apply(@Nullable String option)
+            {
+                if (argumentString != null) {
+                    return "`" + option + "` " + argumentString;
+                }
+                return "`" + option + "`";
+            }
+        }));
+
+        return stringBuilder.toString();
+    }
+
     public static String toDescription(ArgumentsMetadata arguments)
     {
         if (!arguments.getUsage().isEmpty()) {
             return arguments.getUsage();
         }
+        List<String> descriptionTitles = arguments.getTitle();
+        StringBuilder stringBuilder = new StringBuilder();
+    	for (String title : descriptionTitles) {
+    		if (stringBuilder.length() > 0) {
+    			stringBuilder.append(" ");
+    		}
+    		stringBuilder.append("<");
+        	stringBuilder.append(title);
+        	stringBuilder.append(">");
+    	}
 
-        return "<" + arguments.getTitle() + ">";
+        return stringBuilder.toString();
 
     }
 
@@ -99,11 +142,11 @@ public class UsageHelper
         boolean required = option.isRequired();
         StringBuilder stringBuilder = new StringBuilder();
         if (!required) {
-            stringBuilder.append('[');
+            stringBuilder.append("[ ");
         }
 
         if (options.size() > 1) {
-            stringBuilder.append('(');
+            stringBuilder.append('{');
         }
 
         final String argumentString;
@@ -124,17 +167,21 @@ public class UsageHelper
         {
             public String apply(@Nullable String option)
             {
-                if (argumentString != null) {
-                    return option + " " + argumentString;
-                }
-                else {
+//                if (argumentString != null) {
+//                    return option + " " + argumentString;
+//                }
+//                else {
                     return option;
-                }
+//                }
             }
         }));
 
         if (options.size() > 1) {
-            stringBuilder.append(')');
+            stringBuilder.append('}');
+        }
+
+        if (argumentString != null) {
+            stringBuilder.append(" " + argumentString);
         }
 
         if (option.isMultiValued()) {
@@ -142,7 +189,7 @@ public class UsageHelper
         }
 
         if (!required) {
-            stringBuilder.append(']');
+            stringBuilder.append(" ]");
         }
         return stringBuilder.toString();
     }
@@ -156,17 +203,18 @@ public class UsageHelper
         boolean required = arguments.isRequired();
         StringBuilder stringBuilder = new StringBuilder();
         if (!required) {
-            stringBuilder.append('[');
+        	// TODO: be able to handle required arguments individually, like arity for the options
+            stringBuilder.append("[ ");
         }
-
-        stringBuilder.append("<").append(arguments.getTitle()).append(">");
+        
+        stringBuilder.append(toDescription(arguments));
 
         if (arguments.isMultiValued()) {
             stringBuilder.append("...");
         }
 
         if (!required) {
-            stringBuilder.append(']');
+            stringBuilder.append(" ]");
         }
         return stringBuilder.toString();
     }
@@ -177,8 +225,26 @@ public class UsageHelper
         {
             public String apply(OptionMetadata option)
             {
+                if (option.isHidden())
+                {
+                    return "";
+                }
+                
                 return toUsage(option);
             }
         }));
+    }
+    
+    public static String toDefaultCommand(String command) 
+    {
+    	if (Strings.isNullOrEmpty(command)) {
+    		return "";
+    	}
+    	StringBuilder stringBuilder = new StringBuilder();
+    	stringBuilder.append("[ ");
+    	stringBuilder.append(command);
+    	stringBuilder.append(" ]");
+    	
+    	return stringBuilder.toString();
     }
 }
