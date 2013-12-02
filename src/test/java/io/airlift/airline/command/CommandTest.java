@@ -19,6 +19,8 @@
 package io.airlift.airline.command;
 
 import io.airlift.airline.Cli;
+import io.airlift.airline.model.CommandMetadata;
+
 import com.google.common.collect.Lists;
 import org.testng.Assert;
 import org.testng.annotations.Test;

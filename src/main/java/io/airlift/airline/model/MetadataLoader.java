@@ -11,6 +11,8 @@ import com.google.common.collect.ListMultimap;
 import io.airlift.airline.Accessor;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
+import io.airlift.airline.Group;
+import io.airlift.airline.Groups;
 import io.airlift.airline.Option;
 import io.airlift.airline.OptionType;
 import io.airlift.airline.Suggester;

@@ -1,12 +1,12 @@
-package io.airlift.command.command;
+package io.airlift.airline.command;
+
+import io.airlift.airline.Cli;
+import io.airlift.airline.ParseCommandUnrecognizedException;
 
 import java.util.Arrays;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import io.airlift.command.Cli;
-import io.airlift.command.ParseCommandUnrecognizedException;
 
 public class CommandGroupAnnotationTest
 {

@@ -1,5 +1,4 @@
 package io.airlift.airline;
-package io.airlift.command;
 
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;

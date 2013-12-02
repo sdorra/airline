@@ -1,4 +1,4 @@
-package io.airlift.command;
+package io.airlift.airline;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;

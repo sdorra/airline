@@ -1,4 +1,4 @@
-package io.airlift.command;
+package io.airlift.airline;
 
 public class CommandFactoryDefault<T> implements CommandFactory<T> {
 

@@ -3,6 +3,7 @@ package io.airlift.airline.model;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import io.airlift.airline.Accessor;
+import io.airlift.airline.Group;
 
 import java.util.List;
 

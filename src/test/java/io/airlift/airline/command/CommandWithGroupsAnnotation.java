@@ -1,8 +1,10 @@
-package io.airlift.command.command;
+package io.airlift.airline.command;
 
 import java.util.List;
 
-import io.airlift.command.*;
+import io.airlift.airline.Group;
+import io.airlift.airline.Groups;
+import io.airlift.airline.*;
 
 @Groups({
         @Group(name = "groupInsideOfGroups", description = "my nested group", defaultCommand = CommandWithGroupsAnnotation.class,commands = {CommandAdd.class})

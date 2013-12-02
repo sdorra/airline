@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newTreeMap;
 import static io.airlift.airline.UsageHelper.DEFAULT_COMMAND_COMPARATOR;
 import static io.airlift.airline.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 

@@ -1,6 +1,9 @@
 package io.airlift.airline;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -9,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.airline.UsageHelper.DEFAULT_OPTION_COMPARATOR;

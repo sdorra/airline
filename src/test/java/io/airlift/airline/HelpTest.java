@@ -29,8 +29,11 @@ import io.airlift.airline.args.ArgsBooleanArity;
 import io.airlift.airline.args.ArgsInherited;
 import io.airlift.airline.args.ArgsRequired;
 import io.airlift.airline.args.CommandHidden;
+import io.airlift.airline.args.GlobalOptionsHidden;
 import io.airlift.airline.args.OptionsHidden;
 import io.airlift.airline.args.OptionsRequired;
+import io.airlift.airline.command.CommandRemove;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -443,7 +446,7 @@ public class HelpTest
     @Test
     public void testGlobalOptionsHidden()
     {
-        CliBuilder<Object> builder = buildCli("test", Object.class)
+        CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
                 .withCommands(Help.class,

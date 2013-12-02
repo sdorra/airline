@@ -1,8 +1,8 @@
-package io.airlift.command.args;
+package io.airlift.airline.args;
 
-import io.airlift.command.Command;
-import io.airlift.command.Option;
-import io.airlift.command.OptionType;
+import io.airlift.airline.Command;
+import io.airlift.airline.Option;
+import io.airlift.airline.OptionType;
 
 @Command(name="GlobalOptionsHidden")
 public class GlobalOptionsHidden
