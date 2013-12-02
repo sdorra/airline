@@ -16,7 +16,7 @@ Latest release is 0.6, available from Maven Central.
 Build Status
 ============
 
-CI builds are run on [Travis CI](http://travis-ci.org/) ![Build Status](https://travis-ci.org/rvesse/airline.png)
+CI builds are run on [Travis CI](http://travis-ci.org/) ![Build Status](https://travis-ci.org/rvesse/airline.png), see build information and history at https://travis-ci.org/rvesse/airline
 
 Example Usage
 =============
