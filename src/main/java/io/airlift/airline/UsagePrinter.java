@@ -2,7 +2,7 @@ package io.airlift.airline;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -114,10 +114,32 @@ public class UsagePrinter
 
     public UsagePrinter append(String value, boolean avoidNewlines)
     {
-        if (value == null) {
-            return this;
+        if (value == null) return this;
+        if (avoidNewlines) {
+            return appendWords(Splitter.onPattern("\\s+").trimResults().split(value), avoidNewlines);
+        } else {
+            return appendLines(Splitter.on('\n').split(value), avoidNewlines);
         }
-        return appendWords(Splitter.onPattern("\\s+").omitEmptyStrings().trimResults().split(String.valueOf(value)), avoidNewlines);
+    }
+    
+    public UsagePrinter appendLines(Iterable<String> lines)
+    {
+        return appendLines(lines, false);
+    }
+    
+    public UsagePrinter appendLines(Iterable<String> lines, boolean avoidNewlines)
+    {
+        Iterator<String> iter = lines.iterator();
+        while (iter.hasNext()) { 
+            String line = iter.next();
+            if (line == null || line.isEmpty()) 
+                continue;
+            appendWords(Splitter.onPattern("\\s+").trimResults().split(String.valueOf(line)), avoidNewlines);
+            if (iter.hasNext()) {
+                this.newline();
+            }
+        }
+        return this;
     }
 
     public UsagePrinter appendWords(Iterable<String> words, boolean avoidNewlines)

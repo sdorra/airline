@@ -49,15 +49,15 @@ public @interface Command
     boolean hidden() default false;
 
     /**
-     * An array of lines of text to provide a series of example usages of the command.
+     * An array of lines of text to provide a series of example usages of the command e.g.
      *
-     * {@code
+     * <pre>
     examples = {"* Explain what the command example does",
     "    $ cli group cmd foo.txt file.json",
     "",
     "* Explain what this command example does",
     "    $ cli group cmd --non-standard-option value foo.txt"}
-     }
+     * </pre>
      * Formatting and blank lines are preserved to give users leverage over how the examples are displayed in the usage.
      */
     String[] examples() default {};

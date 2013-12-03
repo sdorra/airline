@@ -27,6 +27,7 @@ import io.airlift.airline.args.Args2;
 import io.airlift.airline.args.ArgsArityString;
 import io.airlift.airline.args.ArgsBooleanArity;
 import io.airlift.airline.args.ArgsInherited;
+import io.airlift.airline.args.ArgsMultiLineDescription;
 import io.airlift.airline.args.ArgsRequired;
 import io.airlift.airline.args.CommandHidden;
 import io.airlift.airline.args.GlobalOptionsHidden;
@@ -42,6 +43,27 @@ import static io.airlift.airline.SingleCommand.singleCommand;
 @Test
 public class HelpTest
 {
+    public void testMultiLineDescriptions()
+    {
+        SingleCommand<ArgsMultiLineDescription> cmd = singleCommand(ArgsMultiLineDescription.class);
+        
+        StringBuilder out = new StringBuilder();
+        Help.help(cmd.getCommandMetadata(), out);
+        Assert.assertEquals(out.toString(), "NAME\n" +
+                "        ArgsMultiLineDescription - Has\n" +
+                "        some\n" +
+                "        new lines\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsMultiLineDescription [ -v ]\n" +
+                "\n" +
+                "OPTIONS\n" + 
+                "        -v\n" +
+                "            Verbose descriptions\n" +
+                "            have new lines\n" +
+                "\n");
+    }
+    
 	@SuppressWarnings("unchecked")
 	public void testGit()
     {
@@ -116,19 +138,6 @@ public class HelpTest
                 "        -v\n" +
                 "            Verbose mode\n" +
                 "\n");
-//                "COMMANDS\n" +
-//                "        By default, Gives some information about the remote <name>\n" +
-//                "\n" +
-//                "        show\n" +
-//                "            Gives some information about the remote <name>\n" +
-//                "\n" +
-//                "            With -n option, Do not query remote heads\n" +
-//                "\n" +
-//                "        add\n" +
-//                "            Adds a remote\n" +
-//                "\n" +
-//                "            With -t option, Track only a specific branch\n" +
-//                "\n");
         
         out = new StringBuilder();
         Help.help(gitParser.getMetadata(), ImmutableList.of("remote", "add"), out);
@@ -155,6 +164,39 @@ public class HelpTest
                 "\n"
                 );
     }
+	
+	/**
+	 * Helper method for if you're trying to determine the differences between actual and expected output when debugging a new test and can't visually see the difference e.g. differing white space
+	 * @param actual Actual
+	 * @param expected Expected
+	 */
+	@SuppressWarnings("unused")
+    private void testStringAssert(String actual, String expected) {
+	    if (!actual.equals(expected)) {
+	        if (actual.length() != expected.length()) {
+	            System.err.println("Different lengths, expected " + expected.length() + " but got " + actual.length());
+	        }
+	        for (int i = 0; i < expected.length(); i++) {
+	            char e = expected.charAt(i);
+	            if (i >= actual.length()) {
+	                System.err.println("Expected character '" + e + "' (Code " + (int)e + ") is at position " + i + " which is beyond the length of the actual string");
+	                break;
+	            }
+                char a = actual.charAt(i);
+	            if (e != a) {
+	                System.err.println("Expected character '" + e + "' (Code " + (int)e + ") at position " + i + " does not match actual character '" + a + "' (Code " + (int)a + ")");
+	                int start = Math.max(0, i - 10);
+	                int end = Math.min(expected.length(), i + 10);
+	                System.err.println("Expected Context:");
+	                System.err.println(expected.substring(start, end));
+	                System.err.println("Actual Context:");
+	                System.err.println(actual.substring(start, end));
+	                break;
+	            }
+	        }
+	    }
+        Assert.assertEquals(actual, expected);
+	}
 
     @Test
     public void testArgs1()
@@ -213,7 +255,7 @@ public class HelpTest
     }
 
    @Test
-   public void testArgs2()
+    public void testArgs2()
     {
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")

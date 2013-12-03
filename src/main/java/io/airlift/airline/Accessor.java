@@ -150,7 +150,7 @@ public class Accessor
     // Private reflection helper methods
     //
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static Collection<Object> newCollection(Class<?> type)
     {
         if (Collection.class.equals(type) || List.class.equals(type)) {
@@ -172,6 +172,7 @@ public class Accessor
         throw new ParseException("Parameters of Collection type '%s' are not supported. Please use List or Set instead.", type.getSimpleName());
     }
 
+    @SuppressWarnings("unchecked")
     private static Collection<Object> getOrCreateCollectionField(String name, Object object, Field field)
     {
         Collection<Object> collection;
