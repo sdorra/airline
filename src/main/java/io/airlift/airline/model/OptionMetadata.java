@@ -10,6 +10,7 @@ import io.airlift.airline.OptionType;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.Iterator;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -20,9 +21,7 @@ public class OptionMetadata {
     private final String title;
     private final String description;
     private final int arity;
-    private final boolean required;
-    private final boolean hidden;
-    private final boolean overrides;
+    private final boolean required, hidden, overrides, sealed;
     private final Set<String> allowedValues;
     private Set<Accessor> accessors;
 
@@ -35,6 +34,7 @@ public class OptionMetadata {
                           boolean required, 
                           boolean hidden, 
                           boolean overrides, 
+                          boolean sealed,
                           Iterable<String> allowedValues, 
                           Iterable<Field> path) {
     //@formatter:on
@@ -51,6 +51,7 @@ public class OptionMetadata {
         this.required = required;
         this.hidden = hidden;
         this.overrides = overrides;
+        this.sealed = sealed;
 
         if (allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(allowedValues);
@@ -67,6 +68,7 @@ public class OptionMetadata {
         Preconditions.checkNotNull(options, "options is null");
         Preconditions.checkArgument(!Iterables.isEmpty(options), "options is empty");
 
+        Preconditions.checkArgument(options.iterator().hasNext());
         OptionMetadata option = options.iterator().next();
 
         this.optionType = option.optionType;
@@ -77,6 +79,7 @@ public class OptionMetadata {
         this.required = option.required;
         this.hidden = option.hidden;
         this.overrides = option.overrides;
+        this.sealed = option.sealed;
         if (option.allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(option.allowedValues);
         } else {
@@ -124,6 +127,10 @@ public class OptionMetadata {
         return overrides;
     }
 
+    public boolean isSealed() {
+        return sealed;
+    }
+
     public boolean isMultiValued() {
         return accessors.iterator().next().isMultiValued();
     }
@@ -163,6 +170,12 @@ public class OptionMetadata {
         if (required != that.required) {
             return false;
         }
+        if (overrides != that.overrides) {
+            return false;
+        }
+        if (sealed != that.overrides) {
+            return false;
+        }
         if (allowedValues != null ? !allowedValues.equals(that.allowedValues) : that.allowedValues != null) {
             return false;
         }
@@ -186,11 +199,12 @@ public class OptionMetadata {
     public int hashCode() {
         int result = optionType.hashCode();
         result = 31 * result + options.hashCode();
-        result = 31 * result + title.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + arity;
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (required ? 1 : 0);
         result = 31 * result + (hidden ? 1 : 0);
+        result = 31 * result + (overrides ? 1 : 0);
+        result = 31 * result + (sealed ? 1 : 0);
         result = 31 * result + (allowedValues != null ? allowedValues.hashCode() : 0);
         return result;
     }
@@ -206,6 +220,21 @@ public class OptionMetadata {
         sb.append(", arity=").append(arity);
         sb.append(", required=").append(required);
         sb.append(", hidden=").append(hidden);
+        sb.append(", override=").append(overrides);
+        sb.append(", sealed=").append(sealed);
+        sb.append(", allowedValues=");
+        if (allowedValues != null) {
+            sb.append("{");
+            Iterator<String> iter = allowedValues.iterator();
+            while (iter.hasNext()) {
+                sb.append("'").append(iter.next()).append("'");
+                if (iter.hasNext())
+                    sb.append(", ");
+            }
+            sb.append("}");
+        } else {
+            sb.append("{}");
+        }
         sb.append(", accessors=").append(accessors);
         sb.append('}');
         return sb.toString();
@@ -238,6 +267,10 @@ public class OptionMetadata {
         if (parent.arity != child.arity)
             throw new IllegalArgumentException(String.format("Cannot change arity when overriding option %s", name));
 
+        if (parent.sealed)
+            throw new IllegalArgumentException(String.format(
+                    "Cannot override option %s as parent option declares it to be sealed", name));
+
         if (!child.overrides)
             throw new IllegalArgumentException(String.format(
                     "Cannot override option %s unless child option sets overrides to true", name));
@@ -252,6 +285,7 @@ public class OptionMetadata {
                                     child.required,
                                     child.hidden, 
                                     child.overrides,
+                                    child.sealed,
                                     child.allowedValues != null ? child.allowedValues : parent.allowedValues, null);
         //@formatter:on
 

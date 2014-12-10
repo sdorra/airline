@@ -16,7 +16,9 @@ import io.airlift.airline.Suggester;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -146,13 +148,25 @@ public class MetadataLoader {
                     boolean required = optionAnnotation.required();
                     boolean hidden = optionAnnotation.hidden();
                     boolean override = optionAnnotation.override();
+                    boolean sealed = optionAnnotation.sealed();
                     List<String> allowedValues = ImmutableList.copyOf(optionAnnotation.allowedValues());
                     if (allowedValues.isEmpty()) {
                         allowedValues = null;
                     }
 
-                    OptionMetadata optionMetadata = new OptionMetadata(optionType, options, name, description, arity,
-                            required, hidden, override, allowedValues, path);
+                    //@formatter:off
+                    OptionMetadata optionMetadata = new OptionMetadata(optionType, 
+                                                                       options,
+                                                                       name, 
+                                                                       description, 
+                                                                       arity,
+                                                                       required, 
+                                                                       hidden, 
+                                                                       override, 
+                                                                       sealed, 
+                                                                       allowedValues,
+                                                                       path);
+                    //@formatter:on
                     switch (optionType) {
                     case GLOBAL:
                         injectionMetadata.globalOptions.add(optionMetadata);
@@ -184,7 +198,7 @@ public class MetadataLoader {
             }
         }
     }
-
+    
     private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options) {
         ListMultimap<OptionMetadata, OptionMetadata> metadataIndex = ArrayListMultimap.create();
         for (OptionMetadata option : options) {
@@ -215,6 +229,25 @@ public class MetadataLoader {
         return options;
     }
 
+    private static List<OptionMetadata> overrideOptionSet(List<OptionMetadata> options) {
+        options = ImmutableList.copyOf(options);
+
+        Map<String, OptionMetadata> optionIndex = newHashMap();
+        for (OptionMetadata option : options) {
+            for (String optionName : option.getOptions()) {
+                if (optionIndex.containsKey(optionName)) {
+                    // Multiple classes in the hierarchy define this option
+                    // Determine if we can successfully override this option
+                    tryOverrideOptions(optionIndex, optionName, option);
+                } else {
+                    optionIndex.put(optionName, option);
+                }
+            }
+        }
+
+        return options;
+    }
+
     private static void tryOverrideOptions(Map<String, OptionMetadata> optionIndex, String optionName,
             OptionMetadata option) {
 
@@ -223,14 +256,27 @@ public class MetadataLoader {
         // the pre-existing option definition as the child
         OptionMetadata child = optionIndex.get(optionName);
 
+        Accessor parentField = option.getAccessors().iterator().next();
+        Accessor childField = child.getAccessors().iterator().next();
+
+        // May be equal in some cases in which case no need to merge
+        if (option == child || option.equals(child))
+            return;
+
+        // Parent must not state it is sealed
+        if (option.isSealed())
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Fields %s and %s have conflicting definitions of option %s - parent field %s declares itself as sealed and cannot be overridden",
+                            parentField, childField, optionName, parentField));
+
         // Child must explicitly state that it overrides otherwise we cannot
         // override
         if (!child.isOverride())
             throw new IllegalArgumentException(
                     String.format(
-                            "Fields %s and %s have conflicting definitions of option %s - if you wanted to override this option you must explicitly specify override = true in your annotation",
-                            optionIndex.get(optionName).getAccessors().iterator().next(), option.getAccessors()
-                                    .iterator().next(), optionName));
+                            "Fields %s and %s have conflicting definitions of option %s - if you wanted to override this option you must explicitly specify override = true in your child field annotation",
+                            parentField, childField, optionName));
 
         // Attempt overriding, this will error if the overriding is not possible
         OptionMetadata merged = OptionMetadata.override(optionName, option, child);
@@ -249,9 +295,9 @@ public class MetadataLoader {
         private List<Accessor> metadataInjections = newArrayList();
 
         private void compact() {
-            globalOptions = mergeOptionSet(globalOptions);
-            groupOptions = mergeOptionSet(groupOptions);
-            commandOptions = mergeOptionSet(commandOptions);
+            globalOptions = overrideOptionSet(globalOptions);
+            groupOptions = overrideOptionSet(groupOptions);
+            commandOptions = overrideOptionSet(commandOptions);
 
             if (arguments.size() > 1) {
                 arguments = ImmutableList.of(new ArgumentsMetadata(arguments));

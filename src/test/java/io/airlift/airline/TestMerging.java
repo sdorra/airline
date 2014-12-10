@@ -20,6 +20,8 @@ package io.airlift.airline;
 
 import io.airlift.airline.args.ArgsMergeAddition;
 import io.airlift.airline.args.ArgsMergeOverride;
+import io.airlift.airline.args.ArgsMergeSealed;
+import io.airlift.airline.args.ArgsMergeSealedOverride;
 import io.airlift.airline.args.ArgsMergeUndeclaredOverride;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
@@ -83,7 +85,9 @@ public class TestMerging {
         
         OptionMetadata hiddenOption = findByName(metadata, "--hidden");
         assertNotNull(hiddenOption);
+        assertTrue(hiddenOption.isOverride());
         assertFalse(hiddenOption.isHidden());
+        assertFalse(hiddenOption.isSealed());
         
         ArgumentsMetadata argsData = metadata.getArguments();
         assertNotNull(argsData);
@@ -92,6 +96,28 @@ public class TestMerging {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void merging_undeclared_override() {
         Cli<ArgsMergeUndeclaredOverride> parser = singleCommandParser(ArgsMergeUndeclaredOverride.class);
+        parser.getMetadata().getDefaultGroupCommands().get(0);
+    }
+    
+    @Test
+    public void merging_sealed() {
+        Cli<ArgsMergeSealed> parser = singleCommandParser(ArgsMergeSealed.class);
+        CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
+
+        OptionMetadata verboseOption = findByName(metadata, "-v");
+        assertNotNull(verboseOption);
+        assertFalse(verboseOption.isHidden());
+        
+        OptionMetadata hiddenOption = findByName(metadata, "--hidden");
+        assertNotNull(hiddenOption);
+        assertTrue(hiddenOption.isOverride());
+        assertFalse(hiddenOption.isHidden());
+        assertTrue(hiddenOption.isSealed());
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void merging_sealed_override() {
+        Cli<ArgsMergeSealedOverride> parser = singleCommandParser(ArgsMergeSealedOverride.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
     }
 }

@@ -67,17 +67,27 @@ public @interface Option {
     boolean hidden() default false;
 
     /**
-     * If true this parameter can override parameters of the same name declared
-     * by parent classes assuming the option definitions are compatible.
+     * If true this parameter can override parameters of the same name (set via
+     * the {@link Option#name()} property) declared by parent classes assuming
+     * the option definitions are compatible.
      * <p>
      * See
      * {@link OptionMetadata#override(String, OptionMetadata, OptionMetadata)}
      * for legal overrides
      * </p>
      * 
-     * @return
+     * @return True if an override, false otherwise
      */
     boolean override() default false;
+
+    /**
+     * If true this parameter cannot be overridden by parameters of the same
+     * name declared in child classes regardless of whether the child class
+     * declares the {@link #override()} property to be true
+     * 
+     * @return True if sealed, false otherwise
+     */
+    boolean sealed() default false;
 
     /**
      * If provided restricts the values for the option to the given set of
