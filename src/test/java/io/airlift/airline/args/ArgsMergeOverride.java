@@ -6,6 +6,9 @@ import io.airlift.airline.Option;
 @Command(name = "ArgsMergeOverride")
 public class ArgsMergeOverride extends ArgsMergeAddition {
 
-    @Option(name = "--hidden", description = "A now visible option")
+    /**
+     * This is a legal option override because we explicitly stated that override is true
+     */
+    @Option(name = "--hidden", description = "A now visible option", override = true)
     private boolean hidden = false;
 }

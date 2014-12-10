@@ -14,8 +14,7 @@ import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 
-public class OptionMetadata
-{
+public class OptionMetadata {
     private final OptionType optionType;
     private final Set<String> options;
     private final String title;
@@ -23,25 +22,26 @@ public class OptionMetadata
     private final int arity;
     private final boolean required;
     private final boolean hidden;
+    private final boolean overrides;
     private final Set<String> allowedValues;
-    private final Set<Accessor> accessors;
+    private Set<Accessor> accessors;
 
-    public OptionMetadata(OptionType optionType,
-            Iterable<String> options,
-            String title,
-            String description,
-            int arity,
-            boolean required,
-            boolean hidden,
-            Iterable<String> allowedValues,
-            Iterable<Field> path)
-    {
+    //@formatter:off
+    public OptionMetadata(OptionType optionType, 
+                          Iterable<String> options, 
+                          String title, 
+                          String description, 
+                          int arity,
+                          boolean required, 
+                          boolean hidden, 
+                          boolean overrides, 
+                          Iterable<String> allowedValues, 
+                          Iterable<Field> path) {
+    //@formatter:on
         Preconditions.checkNotNull(optionType, "optionType is null");
         Preconditions.checkNotNull(options, "options is null");
         Preconditions.checkArgument(!Iterables.isEmpty(options), "options is empty");
         Preconditions.checkNotNull(title, "title is null");
-        Preconditions.checkNotNull(path, "path is null");
-        Preconditions.checkArgument(!Iterables.isEmpty(path), "path is empty");
 
         this.optionType = optionType;
         this.options = ImmutableSet.copyOf(options);
@@ -50,19 +50,20 @@ public class OptionMetadata
         this.arity = arity;
         this.required = required;
         this.hidden = hidden;
+        this.overrides = overrides;
 
         if (allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(allowedValues);
-        }
-        else {
+        } else {
             this.allowedValues = null;
         }
 
-        this.accessors = ImmutableSet.of(new Accessor(path));
+        if (path != null) {
+            this.accessors = ImmutableSet.of(new Accessor(path));
+        }
     }
 
-    public OptionMetadata(Iterable<OptionMetadata> options)
-    {
+    public OptionMetadata(Iterable<OptionMetadata> options) {
         Preconditions.checkNotNull(options, "options is null");
         Preconditions.checkArgument(!Iterables.isEmpty(options), "options is empty");
 
@@ -75,81 +76,75 @@ public class OptionMetadata
         this.arity = option.arity;
         this.required = option.required;
         this.hidden = option.hidden;
+        this.overrides = option.overrides;
         if (option.allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(option.allowedValues);
-        }
-        else {
+        } else {
             this.allowedValues = null;
         }
 
         Set<Accessor> accessors = newHashSet();
         for (OptionMetadata other : options) {
-            Preconditions.checkArgument(option.equals(other),
-                    "Conflicting options definitions: %s, %s", option, other);
+            Preconditions.checkArgument(option.equals(other), "Conflicting options definitions: %s, %s", option, other);
 
             accessors.addAll(other.getAccessors());
         }
         this.accessors = ImmutableSet.copyOf(accessors);
     }
 
-    public OptionType getOptionType()
-    {
+    public OptionType getOptionType() {
         return optionType;
     }
 
-    public Set<String> getOptions()
-    {
+    public Set<String> getOptions() {
         return options;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public int getArity()
-    {
+    public int getArity() {
         return arity;
     }
 
-    public boolean isRequired()
-    {
+    public boolean isRequired() {
         return required;
     }
 
-    public boolean isHidden()
-    {
+    public boolean isHidden() {
         return hidden;
     }
 
-    public boolean isMultiValued()
-    {
+    public boolean isOverride() {
+        return overrides;
+    }
+
+    public boolean isMultiValued() {
         return accessors.iterator().next().isMultiValued();
     }
 
-    public Class<?> getJavaType()
-    {
+    public Class<?> getJavaType() {
         return accessors.iterator().next().getJavaType();
     }
 
-    public Set<Accessor> getAccessors()
-    {
+    public Set<Accessor> getAccessors() {
+        if (accessors == null) {
+            throw new NullPointerException("No accessors defined for option");
+        }
         return accessors;
     }
 
-    public Set<String> getAllowedValues()
-    {
+    public Set<String> getAllowedValues() {
         return allowedValues;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -188,8 +183,7 @@ public class OptionMetadata
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = optionType.hashCode();
         result = 31 * result + options.hashCode();
         result = 31 * result + title.hashCode();
@@ -202,8 +196,7 @@ public class OptionMetadata
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("OptionMetadata");
         sb.append("{optionType=").append(optionType);
@@ -218,23 +211,66 @@ public class OptionMetadata
         return sb.toString();
     }
 
-    public static Function<OptionMetadata, Set<String>> optionsGetter()
-    {
-        return new Function<OptionMetadata, Set<String>>()
-        {
-            public Set<String> apply(OptionMetadata input)
-            {
+    /**
+     * Tries to merge the option metadata together such that the child metadata
+     * takes precedence. Not all options can be successfully overridden and an
+     * error may be thrown in cases where merging is not possible
+     * <p>
+     * The following pieces of metadata may be overridden:
+     * </p>
+     * <ul>
+     * <li>Title</li>
+     * <li>Description</li>
+     * <li>Required</li>
+     * <li>Hidden</li>
+     * </ul>
+     * 
+     * @param parent
+     *            Parent
+     * @param child
+     *            Child
+     * @return Merged metadata
+     */
+    public static OptionMetadata override(String name, OptionMetadata parent, OptionMetadata child) {
+        if (parent.optionType != child.optionType)
+            throw new IllegalArgumentException(
+                    String.format("Cannot change optionType when overriding option %s", name));
+        if (parent.arity != child.arity)
+            throw new IllegalArgumentException(String.format("Cannot change arity when overriding option %s", name));
+
+        if (!child.overrides)
+            throw new IllegalArgumentException(String.format(
+                    "Cannot override option %s unless child option sets overrides to true", name));
+
+        OptionMetadata merged;
+        //@formatter:off
+        merged = new OptionMetadata(child.optionType, 
+                                    child.options, 
+                                    child.title != null ? child.title : parent.title,
+                                    child.description != null ? child.description : parent.description, 
+                                    child.arity, 
+                                    child.required,
+                                    child.hidden, 
+                                    child.overrides,
+                                    child.allowedValues != null ? child.allowedValues : parent.allowedValues, null);
+        //@formatter:on
+
+        merged.accessors = ImmutableSet.copyOf(child.accessors);
+        return merged;
+    }
+
+    public static Function<OptionMetadata, Set<String>> optionsGetter() {
+        return new Function<OptionMetadata, Set<String>>() {
+            public Set<String> apply(OptionMetadata input) {
                 return input.getOptions();
             }
         };
     }
 
-    public static Predicate<OptionMetadata> isHiddenPredicate()
-    {
+    public static Predicate<OptionMetadata> isHiddenPredicate() {
         return new Predicate<OptionMetadata>() {
             @Override
-            public boolean apply(@Nullable OptionMetadata input)
-            {
+            public boolean apply(@Nullable OptionMetadata input) {
                 return !input.isHidden();
             }
         };

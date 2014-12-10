@@ -20,17 +20,14 @@ package io.airlift.airline;
 
 import io.airlift.airline.args.ArgsMergeAddition;
 import io.airlift.airline.args.ArgsMergeOverride;
+import io.airlift.airline.args.ArgsMergeUndeclaredOverride;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
 import org.testng.annotations.Test;
 
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
 import static io.airlift.airline.TestingUtil.singleCommandParser;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertNotNull;
@@ -76,7 +73,7 @@ public class TestMerging {
     }
     
     @Test
-    public void merging_override() {
+    public void merging_declared_override() {
         Cli<ArgsMergeOverride> parser = singleCommandParser(ArgsMergeOverride.class);
         CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
 
@@ -90,5 +87,11 @@ public class TestMerging {
         
         ArgumentsMetadata argsData = metadata.getArguments();
         assertNotNull(argsData);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void merging_undeclared_override() {
+        Cli<ArgsMergeUndeclaredOverride> parser = singleCommandParser(ArgsMergeUndeclaredOverride.class);
+        parser.getMetadata().getDefaultGroupCommands().get(0);
     }
 }
