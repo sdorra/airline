@@ -4,12 +4,12 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>13</version>
+        <version>28</version>
     </parent>
 
     <artifactId>airline</artifactId>
     <packaging>jar</packaging>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.8-SNAPSHOT</version>
 
     <name>airline</name>
     <description>Java annotation-based framework for parsing Git like command line structures</description>

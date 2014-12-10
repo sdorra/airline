@@ -34,14 +34,15 @@ import io.airlift.airline.args.GlobalOptionsHidden;
 import io.airlift.airline.args.OptionsHidden;
 import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandRemove;
-
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static io.airlift.airline.SingleCommand.singleCommand;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 @Test
-public class HelpTest
+public class TestHelp
 {
     public void testMultiLineDescriptions()
     {
@@ -49,7 +50,7 @@ public class HelpTest
         
         StringBuilder out = new StringBuilder();
         Help.help(cmd.getCommandMetadata(), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        ArgsMultiLineDescription - Has\n" +
                 "        some\n" +
                 "        new lines\n" +
@@ -70,20 +71,20 @@ public class HelpTest
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
                 .withDescription("the stupid content tracker")
                 .withDefaultCommand(Help.class)
-                .withCommands(Help.class,
-                        Add.class);
+                .withCommand(Help.class)
+                .withCommand(Add.class);
 
         builder.withGroup("remote")
                 .withDescription("Manage set of tracked repositories")
                 .withDefaultCommand(RemoteShow.class)
-                .withCommands(RemoteShow.class,
-                        RemoteAdd.class);
+                .withCommand(RemoteShow.class)
+                .withCommand(RemoteAdd.class);
 
         Cli<Runnable> gitParser = builder.build();
 
         StringBuilder out = new StringBuilder();
         Help.help(gitParser.getMetadata(), ImmutableList.<String>of(), out);
-        Assert.assertEquals(out.toString(), "usage: git [ -v ] <command> [ <args> ]\n" +
+        assertEquals(out.toString(), "usage: git [ -v ] <command> [ <args> ]\n" +
                 "\n" +
                 "Commands are:\n" +
                 "    add      Add file contents to the index\n" +
@@ -94,7 +95,7 @@ public class HelpTest
 
         out = new StringBuilder();
         Help.help(gitParser.getMetadata(), ImmutableList.of("add"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        git add - Add file contents to the index\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -118,7 +119,7 @@ public class HelpTest
 
         out = new StringBuilder();
         Help.help(gitParser.getMetadata(), ImmutableList.of("remote"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        git remote - Manage set of tracked repositories\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -141,7 +142,7 @@ public class HelpTest
         
         out = new StringBuilder();
         Help.help(gitParser.getMetadata(), ImmutableList.of("remote", "add"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        git remote add - Adds a remote\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -195,7 +196,7 @@ public class HelpTest
 	            }
 	        }
 	    }
-        Assert.assertEquals(actual, expected);
+        assertEquals(actual, expected);
 	}
 
     @Test
@@ -211,7 +212,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("Args1"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test Args1 - args1 description\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -254,7 +255,7 @@ public class HelpTest
                 "\n");
     }
 
-   @Test
+    @Test
     public void testArgs2()
     {
         CliBuilder<Object> builder = Cli.builder("test")
@@ -267,7 +268,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("Args2"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test Args2 -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -310,7 +311,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsArityString"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test ArgsArityString -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -343,7 +344,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsBooleanArity"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test ArgsBooleanArity -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -368,7 +369,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsInherited"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test ArgsInherited -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -414,7 +415,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsRequired"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test ArgsRequired -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -444,7 +445,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("OptionsRequired"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test OptionsRequired -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -473,7 +474,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("OptionsHidden"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test OptionsHidden -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -498,7 +499,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("GlobalOptionsHidden"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test GlobalOptionsHidden -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -523,7 +524,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
-        Assert.assertEquals(out.toString(), "usage: test <command> [ <args> ]\n" +
+        assertEquals(out.toString(), "usage: test <command> [ <args> ]\n" +
                 "\n" +
                 "Commands are:\n" +
                 "    ArgsRequired\n" +
@@ -533,7 +534,7 @@ public class HelpTest
 
         out = new StringBuilder();
         Help.help(parser.getMetadata(), ImmutableList.of("CommandHidden"), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test CommandHidden -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -543,7 +544,6 @@ public class HelpTest
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
-
     }
 
     @Test
@@ -563,8 +563,8 @@ public class HelpTest
         "        * The following is a usage example:\n" +
         "        \t$ git remove -i myfile.java\n";
 
-        Assert.assertTrue(out.toString().contains(discussion), "Expected the discussion section to be present in the help");
-        Assert.assertTrue(out.toString().contains(examples), "Expected the examples section to be present in the help");
+        assertTrue(out.toString().contains(discussion), "Expected the discussion section to be present in the help");
+        assertTrue(out.toString().contains(examples), "Expected the examples section to be present in the help");
     }
     
     @Test
@@ -574,7 +574,7 @@ public class HelpTest
 
         StringBuilder out = new StringBuilder();
         new CommandUsage().usage(null, null, "test", command.getCommandMetadata(), out);
-        Assert.assertEquals(out.toString(), "NAME\n" +
+        assertEquals(out.toString(), "NAME\n" +
                 "        test - args1 description\n" +
                 "\n" +
                 "SYNOPSIS\n" +

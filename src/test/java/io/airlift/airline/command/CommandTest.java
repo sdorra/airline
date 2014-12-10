@@ -22,13 +22,15 @@ import io.airlift.airline.Cli;
 import io.airlift.airline.model.CommandMetadata;
 
 import com.google.common.collect.Lists;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static io.airlift.airline.TestUtil.singleCommandParser;
+import static io.airlift.airline.TestingUtil.singleCommandParser;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 public class CommandTest
 {
@@ -41,11 +43,11 @@ public class CommandTest
                 .build();
 
         Object command = parser.parse("add", "-i", "A.java");
-        Assert.assertNotNull(command, "command is null");
-        Assert.assertTrue(command instanceof CommandAdd);
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandAdd);
         CommandAdd add = (CommandAdd) command;
-        Assert.assertEquals(add.interactive.booleanValue(), true);
-        Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+        assertEquals(add.interactive.booleanValue(), true);
+        assertEquals(add.patterns, Arrays.asList("A.java"));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -64,14 +66,14 @@ public class CommandTest
         parser.parse("-v", "commit", "--amend", "--author", "cbeust", "A.java", "B.java");
 
         Object command = parser.parse("-v", "commit", "--amend", "--author", "cbeust", "A.java", "B.java");
-        Assert.assertNotNull(command, "command is null");
-        Assert.assertTrue(command instanceof CommandCommit);
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandCommit);
         CommandCommit commit = (CommandCommit) command;
 
-        Assert.assertTrue(commit.commandMain.verbose);
-        Assert.assertTrue(commit.amend);
-        Assert.assertEquals(commit.author, "cbeust");
-        Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+        assertTrue(commit.commandMain.verbose);
+        assertTrue(commit.amend);
+        assertEquals(commit.author, "cbeust");
+        assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
     }
 
     @Test
@@ -82,13 +84,13 @@ public class CommandTest
 
         final List<CommandMetadata> commandParsers = parser.getMetadata().getDefaultGroupCommands();
 
-        Assert.assertEquals(1, commandParsers.size());
+        assertEquals(1, commandParsers.size());
 
         CommandMetadata aMeta = commandParsers.get(0);
 
-        Assert.assertEquals("remove", aMeta.getName());
+        assertEquals("remove", aMeta.getName());
 
-        Assert.assertEquals(Lists.newArrayList("* The following is a usage example:",
+        assertEquals(Lists.newArrayList("* The following is a usage example:",
                                                "\t$ git remove -i myfile.java"), aMeta.getExamples());
     }
 
@@ -100,13 +102,13 @@ public class CommandTest
 
         final List<CommandMetadata> commandParsers = parser.getMetadata().getDefaultGroupCommands();
 
-        Assert.assertEquals(1, commandParsers.size());
+        assertEquals(1, commandParsers.size());
 
         CommandMetadata aMeta = commandParsers.get(0);
 
-        Assert.assertEquals("remove", aMeta.getName());
+        assertEquals("remove", aMeta.getName());
 
-        Assert.assertEquals("More details about how this removes files from the index.", aMeta.getDiscussion());
+        assertEquals("More details about how this removes files from the index.", aMeta.getDiscussion());
     }
 
     @Test
@@ -119,11 +121,11 @@ public class CommandTest
 
         Object command = parser.parse("-i", "A.java");
 
-        Assert.assertNotNull(command, "command is null");
-        Assert.assertTrue(command instanceof CommandAdd);
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandAdd);
         CommandAdd add = (CommandAdd) command;
-        Assert.assertEquals(add.interactive.booleanValue(), true);
-        Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+        assertEquals(add.interactive.booleanValue(), true);
+        assertEquals(add.patterns, Arrays.asList("A.java"));
     }
     
     @Test
@@ -133,13 +135,13 @@ public class CommandTest
     	                .build();
 
         Object command = parser.parse("-v", "cmd", "--option", "val1", "val2", "val3", "val4", "--", "arg1", "arg2", "arg3");
-        Assert.assertNotNull(command, "command is null");
-        Assert.assertTrue(command instanceof CommandHighArityOption);
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandHighArityOption);
         CommandHighArityOption cmdHighArity = (CommandHighArityOption) command;
 
-        Assert.assertTrue(cmdHighArity.commandMain.verbose);
-        Assert.assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
-        Assert.assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
+        assertTrue(cmdHighArity.commandMain.verbose);
+        assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
+        assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
     }
     
     @Test
@@ -150,13 +152,13 @@ public class CommandTest
     	
     	// it should be able to stop parsing option values for --option if it finds another valid option (--option2)
         Object command = parser.parse("-v", "cmd", "--option", "val1", "val2", "val3", "val4", "--option2", "val5", "arg1", "arg2", "arg3");
-        Assert.assertNotNull(command, "command is null");
-        Assert.assertTrue(command instanceof CommandHighArityOption);
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandHighArityOption);
         CommandHighArityOption cmdHighArity = (CommandHighArityOption) command;
 
-        Assert.assertTrue(cmdHighArity.commandMain.verbose);
-        Assert.assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
-        Assert.assertEquals(cmdHighArity.option2, "val5");
-        Assert.assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
+        assertTrue(cmdHighArity.commandMain.verbose);
+        assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
+        assertEquals(cmdHighArity.option2, "val5");
+        assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
     }
 }
