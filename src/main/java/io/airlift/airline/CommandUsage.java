@@ -178,8 +178,7 @@ public class CommandUsage
 
         aBuilder.append(programName).append("_");
         aBuilder.append(groupName).append("_");
-        // stardog-admin commands go in section 8 (sysadmin commands), all others in section 1 (user commands)
-        aBuilder.append(command.getName()).append(programName != null && programName.equals("stardog-admin") ? "(8) -" : "(1) -");
+        aBuilder.append(command.getName()).append("(1) -");
         aBuilder.append(command.getDescription()).append("\n");
         aBuilder.append("==========");
 
