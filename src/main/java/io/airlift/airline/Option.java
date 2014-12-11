@@ -18,27 +18,30 @@
 
 package io.airlift.airline;
 
+import io.airlift.airline.model.OptionMetadata;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target({FIELD})
-public @interface Option
-{
+@Target({ FIELD })
+public @interface Option {
     /**
      * Is this a command, group or global option
      */
     OptionType type() default OptionType.COMMAND;
 
     /**
-     * Name use to identify the option value in documentation and error messages.
+     * Name use to identify the option value in documentation and error
+     * messages.
      */
     String title() default "";
 
     /**
-     * An array of allowed command line parameters (e.g. "-n", "--name", etc...).
+     * An array of allowed command line parameters (e.g. "-n", "--name",
+     * etc...).
      */
     String[] name();
 
@@ -53,8 +56,8 @@ public @interface Option
     boolean required() default false;
 
     /**
-     * How many parameter values this option will consume. For example,
-     * an arity of 2 will allow "-pair value1 value2".
+     * How many parameter values this option will consume. For example, an arity
+     * of 2 will allow "-pair value1 value2".
      */
     int arity() default Integer.MIN_VALUE;
 
@@ -63,6 +66,34 @@ public @interface Option
      */
     boolean hidden() default false;
 
-    
+    /**
+     * If true this parameter can override parameters of the same name (set via
+     * the {@link Option#name()} property) declared by parent classes assuming
+     * the option definitions are compatible.
+     * <p>
+     * See
+     * {@link OptionMetadata#override(String, OptionMetadata, OptionMetadata)}
+     * for legal overrides
+     * </p>
+     * 
+     * @return True if an override, false otherwise
+     */
+    boolean override() default false;
+
+    /**
+     * If true this parameter cannot be overridden by parameters of the same
+     * name declared in child classes regardless of whether the child class
+     * declares the {@link #override()} property to be true
+     * 
+     * @return True if sealed, false otherwise
+     */
+    boolean sealed() default false;
+
+    /**
+     * If provided restricts the values for the option to the given set of
+     * values
+     * 
+     * @return Allowed values
+     */
     String[] allowedValues() default {};
 }
