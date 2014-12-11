@@ -3,13 +3,29 @@ Airline
 
 Airline is a Java annotation-based framework for parsing Git like command line structures.
 
-Latest release is 0.6, available from Maven Central.
+This fork contains several improvements over the upstream fork created both by myself and taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork:
+
+- Annotation improvements
+    - `allowedValues` on `Option` annotations is enforced
+    - `override` and `sealed` on `Option` annotations allowing derived commands to change some properties of the annotation
+    - Overridden options may change the type when it is a narrowing conversion
+    - `Group` annotation for specifying groups
+    - `Command` annotation supports discussion and examples
+- Help system improvements
+    - Help printing respects new lines to be used in descriptions
+    - Additional examples and discussion sections in command help
+- Support for Command Factories
+
+Latest Release
+=============
+
+This fork has not been formally released anywhere, you can get the latest upstream release from Maven Central.
 
 ```xml
 <dependency>
     <groupId>io.airlift</groupId>
     <artifactId>airline</artifactId>
-    <version>0.6</version>
+    <version>0.7</version>
 </dependency>
 ```
 
@@ -302,3 +318,5 @@ License
 =======
 
 Airline is licensed under the Apache Software License Version 2.0, see provided License.txt
+
+See provided Notice.md for Copyright Holders
