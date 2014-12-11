@@ -279,11 +279,21 @@ public class OptionMetadata {
         Class<?> parentType = parent.getJavaType();
         Class<?> childType = child.getJavaType();
         if (!parentType.equals(childType)) {
-            if (!parentType.isAssignableFrom(childType))
-                throw new IllegalArgumentException(
-                        String.format(
-                                "Cannot change the Java type from %s to %s when overriding option %s - only narrowing type changes where a valid cast exists are permitted",
-                                names, parentType, childType));
+            if (!parentType.isAssignableFrom(childType)) {
+                if (childType.isAssignableFrom(parentType)) {
+                    // A widening conversion exists but this is illegal however we can give a slightly more informative error in this case
+                    throw new IllegalArgumentException(
+                            String.format(
+                                    "Cannot change the Java type from %s to %s when overriding option %s as this is a widening type change - only narrowing type changes are permitted",
+                                    parentType, childType, names));
+                } else {
+                    // No conversion exists
+                    throw new IllegalArgumentException(
+                            String.format(
+                                    "Cannot change the Java type from %s to %s when overriding option %s - only narrowing type changes where a valid cast exists are permitted",
+                                    parentType, childType, names));
+                }
+            }
         }
 
         // Check for duplicates

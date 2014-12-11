@@ -19,9 +19,15 @@ public class ArgsMergeTypeParent extends ArgsMergeParent {
             super(value);
         }
     }
+    
+    public static class C extends B {
+        public C(String value) {
+            super(value);
+        }
+    }
 
     @Option(name = "--test", arity = 1)
-    public A test;
+    public B test;
     
     @Option(name = "--string", arity = 1)
     public String s;

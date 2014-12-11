@@ -7,5 +7,5 @@ import io.airlift.airline.Option;
 public class ArgsMergeNarrowingTypeChange extends ArgsMergeTypeParent {
 
     @Option(name = "--test", arity = 1, override = true)
-    public B test;
+    public C test;
 }

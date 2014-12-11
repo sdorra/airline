@@ -7,7 +7,7 @@ import io.airlift.airline.Option;
 public class ArgsMergeInvalidTypeChange extends ArgsMergeTypeParent {
 
     /**
-     * Illegal override since we can't change the effective type of an option
+     * Illegal override since we can't change the effective type of an option to something completely different
      */
     @Option(name = "--string", arity = 1, override = true)
     public double s;

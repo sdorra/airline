@@ -95,7 +95,7 @@ public class TestOverrides {
         assertTrue(((ArgsMergeParent)cmd).hidden);
     }
     
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*must explicitly specify override.*")
     public void merging_undeclared_override() {
         // Should fail as the override is not explicitly declared in the child class
         Cli<ArgsMergeUndeclaredOverride> parser = singleCommandParser(ArgsMergeUndeclaredOverride.class);
@@ -123,24 +123,31 @@ public class TestOverrides {
         assertTrue(((ArgsMergeParent)cmd).hidden);
     }
     
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*sealed.*")
     public void merging_sealed_override() {
         // Should fail as cannot override an option declared sealed in the parent class
         Cli<ArgsMergeSealedOverride> parser = singleCommandParser(ArgsMergeSealedOverride.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
     }
     
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*overlapping.*")
     public void merging_overlapping_names() {
         // Should fail as cannot change the names of an option when overriding
         Cli<ArgsMergeNameChange> parser = singleCommandParser(ArgsMergeNameChange.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
     }
     
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Cannot change the Java type.*")
     public void merging_invalid_type_change() {
-        // Should fail as cannot change the Java type of an option when overriding
+        // Should fail as cannot change the Java type of an option when overriding unless there is a legal narrowing change
         Cli<ArgsMergeInvalidTypeChange> parser = singleCommandParser(ArgsMergeInvalidTypeChange.class);
+        parser.getMetadata().getDefaultGroupCommands().get(0);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*widening type change.*")
+    public void merging_widening_type_change() {
+        // Should fail as cannot change the Java type of an option when overriding
+        Cli<ArgsMergeWideningTypeChange> parser = singleCommandParser(ArgsMergeWideningTypeChange.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
     }
     
@@ -153,7 +160,7 @@ public class TestOverrides {
         OptionMetadata testOption = findByName(metadata, "--test");
         assertNotNull(testOption);
         assertEquals(testOption.getArity(), 1);
-        assertEquals(testOption.getJavaType(), ArgsMergeTypeParent.B.class);
+        assertEquals(testOption.getJavaType(), ArgsMergeTypeParent.C.class);
         
         // Check that the overridden option gets propagated to all classes in the hierarchy
         ArgsMergeNarrowingTypeChange cmd = parser.parse("ArgsMergeNarrowingTypeChange", "--test", "12345");
@@ -161,8 +168,8 @@ public class TestOverrides {
         assertEquals(((ArgsMergeTypeParent)cmd).test.value, 12345);
         
         // Note that everything in the hierarchy receives an instance in the narrowest class
-        assertEquals(cmd.test.getClass(), ArgsMergeTypeParent.B.class);
-        assertEquals(((ArgsMergeTypeParent)cmd).test.getClass(), ArgsMergeTypeParent.B.class);
+        assertEquals(cmd.test.getClass(), ArgsMergeTypeParent.C.class);
+        assertEquals(((ArgsMergeTypeParent)cmd).test.getClass(), ArgsMergeTypeParent.C.class);
         assertTrue(cmd.test.getClass().equals(((ArgsMergeTypeParent)cmd).test.getClass()));
     }
 }
