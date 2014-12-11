@@ -19,7 +19,9 @@
 package io.airlift.airline;
 
 import io.airlift.airline.args.ArgsMergeAddition;
+import io.airlift.airline.args.ArgsMergeNameChange;
 import io.airlift.airline.args.ArgsMergeOverride;
+import io.airlift.airline.args.ArgsMergeParent;
 import io.airlift.airline.args.ArgsMergeSealed;
 import io.airlift.airline.args.ArgsMergeSealedOverride;
 import io.airlift.airline.args.ArgsMergeUndeclaredOverride;
@@ -35,10 +37,10 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertNotNull;
 
 /**
- * Tests behaviours with regards to merging options from class hierarchies
+ * Tests behaviours with regards to overriding options from class hierarchies
  * 
  */
-public class TestMerging {
+public class TestOverrides {
 
     /**
      * Finds an option by name
@@ -91,10 +93,16 @@ public class TestMerging {
         
         ArgumentsMetadata argsData = metadata.getArguments();
         assertNotNull(argsData);
+        
+        // Check that the overridden option gets propagated to all classes in the hierarchy
+        ArgsMergeOverride cmd = parser.parse("ArgsMergeOverride", "--hidden");
+        assertTrue(cmd.hidden);
+        assertTrue(((ArgsMergeParent)cmd).hidden);
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void merging_undeclared_override() {
+        // Should fail as the override is not explicitly declared in the child class
         Cli<ArgsMergeUndeclaredOverride> parser = singleCommandParser(ArgsMergeUndeclaredOverride.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
     }
@@ -113,11 +121,24 @@ public class TestMerging {
         assertTrue(hiddenOption.isOverride());
         assertFalse(hiddenOption.isHidden());
         assertTrue(hiddenOption.isSealed());
+        
+        // Check that the overridden option gets propagated to all classes in the hierarchy
+        ArgsMergeSealed cmd = parser.parse("ArgsMergeSealed", "--hidden");
+        assertTrue(cmd.hidden);
+        assertTrue(((ArgsMergeParent)cmd).hidden);
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void merging_sealed_override() {
+        // Should fail as cannot override an option declared sealed in the parent class
         Cli<ArgsMergeSealedOverride> parser = singleCommandParser(ArgsMergeSealedOverride.class);
+        parser.getMetadata().getDefaultGroupCommands().get(0);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void merging_overlapping_names() {
+        // Should fail as cannot change the names of an option when overriding
+        Cli<ArgsMergeNameChange> parser = singleCommandParser(ArgsMergeNameChange.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
     }
 }

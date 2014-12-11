@@ -10,6 +10,7 @@ import io.airlift.airline.OptionType;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -173,7 +174,7 @@ public class OptionMetadata {
         if (overrides != that.overrides) {
             return false;
         }
-        if (sealed != that.overrides) {
+        if (sealed != that.sealed) {
             return false;
         }
         if (allowedValues != null ? !allowedValues.equals(that.allowedValues) : that.allowedValues != null) {
@@ -199,8 +200,9 @@ public class OptionMetadata {
     public int hashCode() {
         int result = optionType.hashCode();
         result = 31 * result + options.hashCode();
-        result = 31 * result + arity;
+        result = 31 * result + title.hashCode();
         result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + arity;
         result = 31 * result + (required ? 1 : 0);
         result = 31 * result + (hidden ? 1 : 0);
         result = 31 * result + (overrides ? 1 : 0);
@@ -260,20 +262,31 @@ public class OptionMetadata {
      *            Child
      * @return Merged metadata
      */
-    public static OptionMetadata override(String name, OptionMetadata parent, OptionMetadata child) {
+    public static OptionMetadata override(Set<String> names, OptionMetadata parent, OptionMetadata child) {
         if (parent.optionType != child.optionType)
-            throw new IllegalArgumentException(
-                    String.format("Cannot change optionType when overriding option %s", name));
+            throw new IllegalArgumentException(String.format("Cannot change optionType when overriding option %s",
+                    names));
         if (parent.arity != child.arity)
-            throw new IllegalArgumentException(String.format("Cannot change arity when overriding option %s", name));
+            throw new IllegalArgumentException(String.format("Cannot change arity when overriding option %s", names));
+        if (!parent.options.equals(child.options))
+            throw new IllegalArgumentException(String.format("Cannot change option names when overriding option %s",
+                    names));
 
-        if (parent.sealed)
-            throw new IllegalArgumentException(String.format(
-                    "Cannot override option %s as parent option declares it to be sealed", name));
+        // Check for duplicates
+        boolean isDuplicate = parent == child || parent.equals(child);
 
-        if (!child.overrides)
+        // Parent must not state it is sealed UNLESS it is a duplicate which can
+        // happen when using @Inject to inject options via delegates
+        if (parent.sealed && !isDuplicate)
             throw new IllegalArgumentException(String.format(
-                    "Cannot override option %s unless child option sets overrides to true", name));
+                    "Cannot override option %s as parent option declares it to be sealed", names));
+
+        // Child must explicitly state that it overrides otherwise we cannot
+        // override UNLESS it is the case that this is a duplicate which
+        // can happen when using @Inject to inject options via delegates
+        if (!child.overrides && !isDuplicate)
+            throw new IllegalArgumentException(String.format(
+                    "Cannot override option %s unless child option sets overrides to true", names));
 
         OptionMetadata merged;
         //@formatter:off
@@ -289,7 +302,11 @@ public class OptionMetadata {
                                     child.allowedValues != null ? child.allowedValues : parent.allowedValues, null);
         //@formatter:on
 
-        merged.accessors = ImmutableSet.copyOf(child.accessors);
+        // Combine both child and parent accessors - this is necessary so the
+        // parsed value propagates to all classes in the hierarchy
+        Set<Accessor> accessors = new HashSet<>(child.accessors);
+        accessors.addAll(parent.accessors);
+        merged.accessors = ImmutableSet.copyOf(accessors);
         return merged;
     }
 

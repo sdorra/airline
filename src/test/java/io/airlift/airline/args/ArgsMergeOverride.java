@@ -10,5 +10,5 @@ public class ArgsMergeOverride extends ArgsMergeAddition {
      * This is a legal option override because we explicitly stated that override is true
      */
     @Option(name = "--hidden", description = "A now visible option", override = true)
-    private boolean hidden = false;
+    public boolean hidden = false;
 }

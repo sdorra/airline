@@ -12,5 +12,5 @@ public class ArgsMergeSealed extends ArgsMergeParent {
      * be further overridden
      */
     @Option(name = "--hidden", description = "A now visible option", override = true, sealed = true)
-    private boolean hidden = false;
+    public boolean hidden = false;
 }

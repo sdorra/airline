@@ -6,6 +6,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Sets;
+
 import io.airlift.airline.Accessor;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
@@ -21,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -198,7 +201,7 @@ public class MetadataLoader {
             }
         }
     }
-    
+
     private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options) {
         ListMultimap<OptionMetadata, OptionMetadata> metadataIndex = ArrayListMultimap.create();
         for (OptionMetadata option : options) {
@@ -217,12 +220,12 @@ public class MetadataLoader {
         for (OptionMetadata option : options) {
             for (String optionName : option.getOptions()) {
                 if (optionIndex.containsKey(optionName)) {
-                    // Multiple classes define this option
-                    // Determine if we can successfully override this option
-                    tryOverrideOptions(optionIndex, optionName, option);
-                } else {
-                    optionIndex.put(optionName, option);
+                    throw new IllegalArgumentException(String.format(
+                            "Fields %s and %s have conflicting definitions of option %s", optionIndex.get(optionName)
+                                    .getAccessors().iterator().next(), option.getAccessors().iterator().next(),
+                            optionName));
                 }
+                optionIndex.put(optionName, option);
             }
         }
 
@@ -232,55 +235,68 @@ public class MetadataLoader {
     private static List<OptionMetadata> overrideOptionSet(List<OptionMetadata> options) {
         options = ImmutableList.copyOf(options);
 
-        Map<String, OptionMetadata> optionIndex = newHashMap();
+        Map<Set<String>, OptionMetadata> optionIndex = newHashMap();
         for (OptionMetadata option : options) {
-            for (String optionName : option.getOptions()) {
-                if (optionIndex.containsKey(optionName)) {
-                    // Multiple classes in the hierarchy define this option
-                    // Determine if we can successfully override this option
-                    tryOverrideOptions(optionIndex, optionName, option);
-                } else {
-                    optionIndex.put(optionName, option);
+            Set<String> names = option.getOptions();
+            if (optionIndex.containsKey(names)) {
+                // Multiple classes in the hierarchy define this option
+                // Determine if we can successfully override this option
+                tryOverrideOptions(optionIndex, names, option);
+            } else {
+                // Need to check there isn't another option with partial overlap
+                // of names, this is considered an illegal override
+                for (Set<String> existingNames : optionIndex.keySet()) {
+                    Set<String> intersection = Sets.intersection(names, existingNames);
+                    if (intersection.size() > 0) {
+                        throw new IllegalArgumentException(
+                                String.format(
+                                        "Fields %s and %s have overlapping definitions of option %s, options can only be overridden if they have precisely the same set of option names",
+                                        option.getAccessors().iterator().next(), optionIndex.get(existingNames)
+                                                .getAccessors().iterator().next(), intersection));
+                    }
                 }
+
+                optionIndex.put(names, option);
             }
         }
 
-        return options;
+        return ImmutableList.copyOf(optionIndex.values());
     }
 
-    private static void tryOverrideOptions(Map<String, OptionMetadata> optionIndex, String optionName,
-            OptionMetadata option) {
+    private static void tryOverrideOptions(Map<Set<String>, OptionMetadata> optionIndex, Set<String> names,
+            OptionMetadata parent) {
 
         // As the metadata is extracted from the deepest class in the hierarchy
         // going upwards we need to treat the passed option as the parent and
         // the pre-existing option definition as the child
-        OptionMetadata child = optionIndex.get(optionName);
+        OptionMetadata child = optionIndex.get(names);
 
-        Accessor parentField = option.getAccessors().iterator().next();
+        Accessor parentField = parent.getAccessors().iterator().next();
         Accessor childField = child.getAccessors().iterator().next();
 
-        // May be equal in some cases in which case no need to merge
-        if (option == child || option.equals(child))
-            return;
+        // Check for duplicates
+        boolean isDuplicate = parent == child || parent.equals(child);
 
-        // Parent must not state it is sealed
-        if (option.isSealed())
+        // Parent must not state it is sealed UNLESS it is a duplicate which can
+        // happen when using @Inject to inject options via delegates
+        if (parent.isSealed() && !isDuplicate)
             throw new IllegalArgumentException(
                     String.format(
                             "Fields %s and %s have conflicting definitions of option %s - parent field %s declares itself as sealed and cannot be overridden",
-                            parentField, childField, optionName, parentField));
+                            parentField, childField, names, parentField));
 
         // Child must explicitly state that it overrides otherwise we cannot
-        // override
-        if (!child.isOverride())
+        // override UNLESS it is the case that this is a duplicate which
+        // can happen when using @Inject to inject options via delegates
+        if (!child.isOverride() && !isDuplicate)
             throw new IllegalArgumentException(
                     String.format(
                             "Fields %s and %s have conflicting definitions of option %s - if you wanted to override this option you must explicitly specify override = true in your child field annotation",
-                            parentField, childField, optionName));
+                            parentField, childField, names));
 
         // Attempt overriding, this will error if the overriding is not possible
-        OptionMetadata merged = OptionMetadata.override(optionName, option, child);
-        optionIndex.put(optionName, merged);
+        OptionMetadata merged = OptionMetadata.override(names, parent, child);
+        optionIndex.put(names, merged);
     }
 
     private static <T> ImmutableList<T> concat(Iterable<T> iterable, T item) {
