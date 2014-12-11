@@ -9,6 +9,7 @@ import io.airlift.airline.Accessor;
 import io.airlift.airline.OptionType;
 
 import javax.annotation.Nullable;
+
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -263,6 +264,7 @@ public class OptionMetadata {
      * @return Merged metadata
      */
     public static OptionMetadata override(Set<String> names, OptionMetadata parent, OptionMetadata child) {
+        // Cannot change option type, arity or names
         if (parent.optionType != child.optionType)
             throw new IllegalArgumentException(String.format("Cannot change optionType when overriding option %s",
                     names));
@@ -271,6 +273,18 @@ public class OptionMetadata {
         if (!parent.options.equals(child.options))
             throw new IllegalArgumentException(String.format("Cannot change option names when overriding option %s",
                     names));
+
+        // Also cannot change the type of the option unless the change is a
+        // narrowing conversion
+        Class<?> parentType = parent.getJavaType();
+        Class<?> childType = child.getJavaType();
+        if (!parentType.equals(childType)) {
+            if (!parentType.isAssignableFrom(childType))
+                throw new IllegalArgumentException(
+                        String.format(
+                                "Cannot change the Java type from %s to %s when overriding option %s - only narrowing type changes where a valid cast exists are permitted",
+                                names, parentType, childType));
+        }
 
         // Check for duplicates
         boolean isDuplicate = parent == child || parent.equals(child);

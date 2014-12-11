@@ -16,15 +16,9 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.args.overrides;
 
-import io.airlift.airline.args.ArgsMergeAddition;
-import io.airlift.airline.args.ArgsMergeNameChange;
-import io.airlift.airline.args.ArgsMergeOverride;
-import io.airlift.airline.args.ArgsMergeParent;
-import io.airlift.airline.args.ArgsMergeSealed;
-import io.airlift.airline.args.ArgsMergeSealedOverride;
-import io.airlift.airline.args.ArgsMergeUndeclaredOverride;
+import io.airlift.airline.Cli;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -34,6 +28,7 @@ import org.testng.annotations.Test;
 import static io.airlift.airline.TestingUtil.singleCommandParser;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
@@ -140,5 +135,34 @@ public class TestOverrides {
         // Should fail as cannot change the names of an option when overriding
         Cli<ArgsMergeNameChange> parser = singleCommandParser(ArgsMergeNameChange.class);
         parser.getMetadata().getDefaultGroupCommands().get(0);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void merging_invalid_type_change() {
+        // Should fail as cannot change the Java type of an option when overriding
+        Cli<ArgsMergeInvalidTypeChange> parser = singleCommandParser(ArgsMergeInvalidTypeChange.class);
+        parser.getMetadata().getDefaultGroupCommands().get(0);
+    }
+    
+    @Test
+    public void merging_narrowing_type_change() {
+        // It is legal to make a narrowing type change
+        Cli<ArgsMergeNarrowingTypeChange> parser = singleCommandParser(ArgsMergeNarrowingTypeChange.class);
+        CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
+        
+        OptionMetadata testOption = findByName(metadata, "--test");
+        assertNotNull(testOption);
+        assertEquals(testOption.getArity(), 1);
+        assertEquals(testOption.getJavaType(), ArgsMergeTypeParent.B.class);
+        
+        // Check that the overridden option gets propagated to all classes in the hierarchy
+        ArgsMergeNarrowingTypeChange cmd = parser.parse("ArgsMergeNarrowingTypeChange", "--test", "12345");
+        assertEquals(cmd.test.value, 12345);
+        assertEquals(((ArgsMergeTypeParent)cmd).test.value, 12345);
+        
+        // Note that everything in the hierarchy receives an instance in the narrowest class
+        assertEquals(cmd.test.getClass(), ArgsMergeTypeParent.B.class);
+        assertEquals(((ArgsMergeTypeParent)cmd).test.getClass(), ArgsMergeTypeParent.B.class);
+        assertTrue(cmd.test.getClass().equals(((ArgsMergeTypeParent)cmd).test.getClass()));
     }
 }
