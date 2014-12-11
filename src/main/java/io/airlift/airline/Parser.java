@@ -54,19 +54,29 @@ public class Parser
         }
 
         if (tokens.hasNext()) {
-            CommandMetadata command = find(expectedCommands, compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()), null);
+            CommandMetadata command = find(expectedCommands,
+                                           compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()),
+                                           state.getGroup() != null ? state.getGroup().getDefaultCommand() : null);
+
+            if (command == null && state.getGroup() == null && metadata.getDefaultCommand() != null) {
+                command = metadata.getDefaultCommand();
+            }
+
             if (command == null) {
                 while (tokens.hasNext()) {
                     state = state.withUnparsedInput(tokens.next());
                 }
             }
             else {
-                tokens.next();
+                if (tokens.peek().equals(command.getName())) {
+                    tokens.next();
+                }
+
                 state = state.withCommand(command).pushContext(Context.COMMAND);
 
                 while (tokens.hasNext()) {
                     state = parseOptions(tokens, state, command.getCommandOptions());
-
+                    
                     state = parseArgs(state, tokens, command.getArguments());
                 }
             }
@@ -149,14 +159,22 @@ public class Parser
             ImmutableList.Builder<Object> values = ImmutableList.builder();
 
             int count = 0;
-            while (count < option.getArity() && tokens.hasNext()) {
+
+            boolean hasSeparator = false;
+            boolean foundNextOption = false;
+            while (count < option.getArity() && tokens.hasNext() && !hasSeparator) {
+            	String peekedToken = tokens.peek();
+            	hasSeparator = peekedToken.equals("--");
+            	foundNextOption = findOption(allowedOptions, peekedToken) != null;
+            	
+            	if (hasSeparator || foundNextOption) break;
                 String tokenStr = tokens.next();
                 checkValidValue(option, tokenStr);
                 values.add(TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokenStr));
                 ++count;
             }
 
-            if (count == option.getArity()) {
+            if (count == option.getArity() || hasSeparator || foundNextOption) {
                 state = state.withOptionValue(option, values.build()).popContext();
             }
         }
@@ -281,7 +299,9 @@ public class Parser
     private ParseState parseArg(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments)
     {
         if (arguments != null) {
-            state = state.withArgument(TypeConverter.newInstance().convert(arguments.getTitle(), arguments.getJavaType(), tokens.next()));
+        	// TODO: check each title one by one? see: https://github.com/airlift/airline/issues/6
+            state = state.withArgument(TypeConverter.newInstance()
+            				.convert(arguments.getTitle().get(0), arguments.getJavaType(), tokens.next())); 
         }
         else {
             state = state.withUnparsedInput(tokens.next());

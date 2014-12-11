@@ -19,9 +19,13 @@
 package io.airlift.airline.command;
 
 import io.airlift.airline.Cli;
+import io.airlift.airline.model.CommandMetadata;
+
+import com.google.common.collect.Lists;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static io.airlift.airline.TestingUtil.singleCommandParser;
 import static org.testng.Assert.assertEquals;
@@ -70,5 +74,91 @@ public class CommandTest
         assertTrue(commit.amend);
         assertEquals(commit.author, "cbeust");
         assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+    }
+
+    @Test
+    public void testExample() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemove.class)
+            .build();
+
+        final List<CommandMetadata> commandParsers = parser.getMetadata().getDefaultGroupCommands();
+
+        assertEquals(1, commandParsers.size());
+
+        CommandMetadata aMeta = commandParsers.get(0);
+
+        assertEquals("remove", aMeta.getName());
+
+        assertEquals(Lists.newArrayList("* The following is a usage example:",
+                                               "\t$ git remove -i myfile.java"), aMeta.getExamples());
+    }
+
+    @Test
+    public void testDiscussion() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemove.class)
+            .build();
+
+        final List<CommandMetadata> commandParsers = parser.getMetadata().getDefaultGroupCommands();
+
+        assertEquals(1, commandParsers.size());
+
+        CommandMetadata aMeta = commandParsers.get(0);
+
+        assertEquals("remove", aMeta.getName());
+
+        assertEquals("More details about how this removes files from the index.", aMeta.getDiscussion());
+    }
+
+    @Test
+    public void testDefaultCommandInGroup() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandAdd.class)
+            .withCommand(CommandCommit.class)
+            .withDefaultCommand(CommandAdd.class)
+            .build();
+
+        Object command = parser.parse("-i", "A.java");
+
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandAdd);
+        CommandAdd add = (CommandAdd) command;
+        assertEquals(add.interactive.booleanValue(), true);
+        assertEquals(add.patterns, Arrays.asList("A.java"));
+    }
+    
+    @Test
+    public void testCommandWithArgsSeparator() {
+    	Cli<?> parser = Cli.builder("git")
+    	                .withCommand(CommandHighArityOption.class)
+    	                .build();
+
+        Object command = parser.parse("-v", "cmd", "--option", "val1", "val2", "val3", "val4", "--", "arg1", "arg2", "arg3");
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandHighArityOption);
+        CommandHighArityOption cmdHighArity = (CommandHighArityOption) command;
+
+        assertTrue(cmdHighArity.commandMain.verbose);
+        assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
+        assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
+    }
+    
+    @Test
+    public void testCommandHighArityOptionNoSeparator() {
+    	Cli<?> parser = Cli.builder("git")
+    	                .withCommand(CommandHighArityOption.class)
+    	                .build();
+    	
+    	// it should be able to stop parsing option values for --option if it finds another valid option (--option2)
+        Object command = parser.parse("-v", "cmd", "--option", "val1", "val2", "val3", "val4", "--option2", "val5", "arg1", "arg2", "arg3");
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandHighArityOption);
+        CommandHighArityOption cmdHighArity = (CommandHighArityOption) command;
+
+        assertTrue(cmdHighArity.commandMain.verbose);
+        assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
+        assertEquals(cmdHighArity.option2, "val5");
+        assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
     }
 }

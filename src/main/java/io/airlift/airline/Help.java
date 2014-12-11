@@ -4,6 +4,7 @@ import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -11,9 +12,12 @@ import java.util.concurrent.Callable;
 import static com.google.common.collect.Lists.newArrayList;
 
 @Command(name = "help", description = "Display help information")
-public class Help implements Runnable, Callable<Void>
-{
+public class Help implements Runnable, Callable<Void> {
+    public static boolean USAGE_AS_HTML = false;
+    public static boolean USAGE_AS_RONN = false;
+
     @Inject
+    @Nullable
     public GlobalMetadata global;
 
     @Arguments
@@ -69,7 +73,15 @@ public class Help implements Runnable, Callable<Void>
         // command in the default group?
         for (CommandMetadata command : global.getDefaultGroupCommands()) {
             if (name.equals(command.getName())) {
-                new CommandUsage().usage(global.getName(), null, command.getName(), command, out);
+                if (USAGE_AS_HTML) {
+                    out.append(new CommandUsage().usageHTML(global.getName(), null, command));
+                }
+                else if (USAGE_AS_RONN) {
+                    out.append(new CommandUsage().usageRonn(global.getName(), null, command));
+                }
+                else {
+                    new CommandUsage().usage(global.getName(), null, command.getName(), command, out);
+                }
                 return;
             }
         }
@@ -86,7 +98,16 @@ public class Help implements Runnable, Callable<Void>
                     String commandName = commandNames.get(1);
                     for (CommandMetadata command : group.getCommands()) {
                         if (commandName.equals(command.getName())) {
-                            new CommandUsage().usage(global.getName(), group.getName(), command.getName(), command, out);
+                            if (USAGE_AS_HTML) {
+                                out.append(new CommandUsage().usageHTML(global.getName(), group.getName(), command));
+                            }
+                            else if (USAGE_AS_RONN) {
+                                out.append(new CommandUsage().usageRonn(global.getName(), group.getName(), command));
+                            }
+                            else {
+                                new CommandUsage().usage(global.getName(), group.getName(), command.getName(), command, out);
+                            }
+
                             return;
                         }
                     }

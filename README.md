@@ -13,6 +13,14 @@ Latest release is 0.6, available from Maven Central.
 </dependency>
 ```
 
+Build Status
+============
+
+CI builds are run on [Travis CI](http://travis-ci.org/) ![Build Status](https://travis-ci.org/rvesse/airline.png), see build information and history at https://travis-ci.org/rvesse/airline
+
+Example Usage
+=============
+
 Here is a quick example:
 
 ```java
@@ -289,3 +297,8 @@ OPTIONS
         -h, --help
             Display help information
 ```
+
+License
+=======
+
+Airline is licensed under the Apache Software License Version 2.0, see provided License.txt

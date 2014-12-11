@@ -11,6 +11,7 @@ import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,21 +61,24 @@ public class GlobalUsageSummary
 
         // build arguments
         List<String> commandArguments = newArrayList();
-        commandArguments.addAll(Collections2.transform(global.getOptions(), new Function<OptionMetadata, String>()
+        Collection<String> args = Collections2.transform(global.getOptions(), new Function<OptionMetadata, String>()
         {
             public String apply(OptionMetadata option)
             {
-                if (option.isHidden()) {
-                    return null;
+                if (option.isHidden())
+                {
+                    return "";
                 }
                 return toUsage(option);
             }
-        }));
+        });
+        
+        commandArguments.addAll(args);
         out.newPrinterWithHangingIndent(8)
                 .append("usage:")
                 .append(global.getName())
                 .appendWords(commandArguments)
-                .append("<command> [<args>]")
+                .append("<command> [ <args> ]")
                 .newline()
                 .newline();
 
@@ -92,7 +96,7 @@ public class GlobalUsageSummary
             commands.put(commandGroupMetadata.getName(), commandGroupMetadata.getDescription());
         }
 
-        out.append("The most commonly used ").append(global.getName()).append(" commands are:").newline();
+        out.append("Commands are:").newline();
         out.newIndentedPrinter(4).appendTable(Iterables.transform(commands.entrySet(), new Function<Entry<String, String>, Iterable<String>>()
         {
             public Iterable<String> apply(Entry<String, String> entry)

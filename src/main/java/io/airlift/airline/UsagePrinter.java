@@ -1,7 +1,8 @@
 package io.airlift.airline;
 
 import com.google.common.base.Splitter;
-
+import com.google.common.base.Strings;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -80,29 +81,81 @@ public class UsagePrinter
                 line.append("   ");
                 column++;
             }
-            out.append(spaces(indent)).append(line.toString().trim()).append("\n");
+            out.append(spaces(indent)).append(trimEnd(line.toString())).append("\n");
         }
 
         return this;
     }
 
-    public UsagePrinter append(String value)
-    {
-        if (value == null) {
-            return this;
+    public static String trimEnd(final String str) {
+        if (Strings.isNullOrEmpty(str)) {
+            return str;
         }
-        return appendWords(Splitter.onPattern("\\s+").omitEmptyStrings().trimResults().split(String.valueOf(value)));
+
+        int end = str.length();
+        while ((end != 0) && Character.isWhitespace(str.charAt(end - 1))) {
+            end--;
+        }
+
+        return str.substring(0, end);
     }
 
-    public UsagePrinter appendWords(Iterable<String> words)
+    public UsagePrinter append(String value) {
+        return append(value, false);
+    }
+
+    public UsagePrinter appendOnOneLine(String value) {
+        return append(value, true);
+    }
+
+    public UsagePrinter appendWords(Iterable<String> words) {
+        return appendWords(words, false);
+    }
+
+    public UsagePrinter append(String value, boolean avoidNewlines)
     {
+        if (value == null) return this;
+        if (avoidNewlines) {
+            return appendWords(Splitter.onPattern("\\s+").trimResults().split(value), avoidNewlines);
+        } else {
+            return appendLines(Splitter.on('\n').split(value), avoidNewlines);
+        }
+    }
+    
+    public UsagePrinter appendLines(Iterable<String> lines)
+    {
+        return appendLines(lines, false);
+    }
+    
+    public UsagePrinter appendLines(Iterable<String> lines, boolean avoidNewlines)
+    {
+        Iterator<String> iter = lines.iterator();
+        while (iter.hasNext()) { 
+            String line = iter.next();
+            if (line == null || line.isEmpty()) 
+                continue;
+            appendWords(Splitter.onPattern("\\s+").trimResults().split(String.valueOf(line)), avoidNewlines);
+            if (iter.hasNext()) {
+                this.newline();
+            }
+        }
+        return this;
+    }
+
+    public UsagePrinter appendWords(Iterable<String> words, boolean avoidNewlines)
+    {
+        int bracketCount = 0;
         for (String word : words) {
+            if(null == word || "".equals(word))
+            {
+                continue;
+            }
             if (currentPosition.get() == 0) {
                 // beginning of line
                 out.append(spaces(indent));
                 currentPosition.getAndAdd((indent));
             }
-            else if (word.length() > maxSize || currentPosition.get() + word.length() <= maxSize) {
+            else if (word.length() > maxSize || currentPosition.get() + word.length() <= maxSize || bracketCount > 0 || avoidNewlines) {
                 // between words
                 out.append(" ");
                 currentPosition.getAndIncrement();
@@ -115,6 +168,12 @@ public class UsagePrinter
 
             out.append(word);
             currentPosition.getAndAdd((word.length()));
+            if (word.contains("{") || word.contains("[") || word.contains("<")) {
+                bracketCount++;
+            }
+            if (word.contains("}") || word.contains("]") || word.contains(">")) {
+                bracketCount--;
+            }
         }
         return this;
     }

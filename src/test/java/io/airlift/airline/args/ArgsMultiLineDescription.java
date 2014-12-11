@@ -16,25 +16,14 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.args;
 
-import java.util.List;
+import io.airlift.airline.Command;
+import io.airlift.airline.Option;
 
-import com.google.common.base.Joiner;
+@Command(name="ArgsMultiLineDescription", description="Has\nsome\nnew lines")
+public class ArgsMultiLineDescription {
 
-
-public class ParseArgumentsMissingException extends ParseException
-{
-    private final List<String> argumentTitles;
-
-    ParseArgumentsMissingException(List<String> argumentTitles)
-    {
-        super("Required arguments are missing: '%s'", Joiner.on(',').join(argumentTitles));
-        this.argumentTitles = argumentTitles;
-    }
-
-    public List<String> getArgumentTitle()
-    {
-        return argumentTitles;
-    }
+    @Option(name = "-v", description = "Verbose descriptions\nhave new lines")
+    public boolean verbose = false;
 }
