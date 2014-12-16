@@ -17,6 +17,10 @@
  */
 package io.airlift.airline;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 import com.google.common.collect.ImmutableList;
 import io.airlift.airline.Cli.CliBuilder;
 import io.airlift.airline.Git.Add;
@@ -34,26 +38,28 @@ import io.airlift.airline.args.GlobalOptionsHidden;
 import io.airlift.airline.args.OptionsHidden;
 import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandRemove;
-import io.airlift.airline.help.CommandUsage;
 import io.airlift.airline.help.Help;
+import io.airlift.airline.help.cli.CliCommandUsageGenerator;
 
 import org.testng.annotations.Test;
 
 import static io.airlift.airline.SingleCommand.singleCommand;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @Test
-public class TestHelp
-{
-    public void testMultiLineDescriptions()
-    {
+@SuppressWarnings("unchecked")
+public class TestHelp {
+    private final Charset utf8 = Charset.forName("utf-8");
+
+    public void testMultiLineDescriptions() throws IOException {
         SingleCommand<ArgsMultiLineDescription> cmd = singleCommand(ArgsMultiLineDescription.class);
-        
-        StringBuilder out = new StringBuilder();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(cmd.getCommandMetadata(), out);
-        assertEquals(out.toString(), "NAME\n" +
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
                 "        ArgsMultiLineDescription - Has\n" +
                 "        some\n" +
                 "        new lines\n" +
@@ -66,11 +72,11 @@ public class TestHelp
                 "            Verbose descriptions\n" +
                 "            have new lines\n" +
                 "\n");
+        //@formatter:on
     }
-    
-	@SuppressWarnings("unchecked")
-	public void testGit()
-    {
+
+    public void testGit() throws IOException {
+        //@formatter:off
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
                 .withDescription("the stupid content tracker")
                 .withDefaultCommand(Help.class)
@@ -85,9 +91,10 @@ public class TestHelp
 
         Cli<Runnable> gitParser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(gitParser.getMetadata(), ImmutableList.<String>of(), out);
-        assertEquals(out.toString(), "usage: git [ -v ] <command> [ <args> ]\n" +
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "usage: git [ -v ] <command> [ <args> ]\n" +
                 "\n" +
                 "Commands are:\n" +
                 "    add      Add file contents to the index\n" +
@@ -96,9 +103,10 @@ public class TestHelp
                 "\n" +
                 "See 'git help <command>' for more information on a specific command.\n");
 
-        out = new StringBuilder();
+        out = new ByteArrayOutputStream();
         Help.help(gitParser.getMetadata(), ImmutableList.of("add"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
                 "        git add - Add file contents to the index\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -120,9 +128,10 @@ public class TestHelp
                 "            Patterns of files to be added\n" +
                 "\n");
 
-        out = new StringBuilder();
+        out = new ByteArrayOutputStream();
         Help.help(gitParser.getMetadata(), ImmutableList.of("remote"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
                 "        git remote - Manage set of tracked repositories\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -143,9 +152,10 @@ public class TestHelp
                 "            Verbose mode\n" +
                 "\n");
         
-        out = new StringBuilder();
+        out = new ByteArrayOutputStream();
         Help.help(gitParser.getMetadata(), ImmutableList.of("remote", "add"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
                 "        git remote add - Adds a remote\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -167,44 +177,52 @@ public class TestHelp
                 "            Name and URL of remote repository to add\n" +
                 "\n"
                 );
+        //@formatter:on
     }
-	
-	/**
-	 * Helper method for if you're trying to determine the differences between actual and expected output when debugging a new test and can't visually see the difference e.g. differing white space
-	 * @param actual Actual
-	 * @param expected Expected
-	 */
-	@SuppressWarnings("unused")
+
+    /**
+     * Helper method for if you're trying to determine the differences between
+     * actual and expected output when debugging a new test and can't visually
+     * see the difference e.g. differing white space
+     * 
+     * @param actual
+     *            Actual
+     * @param expected
+     *            Expected
+     */
+    @SuppressWarnings("unused")
     private void testStringAssert(String actual, String expected) {
-	    if (!actual.equals(expected)) {
-	        if (actual.length() != expected.length()) {
-	            System.err.println("Different lengths, expected " + expected.length() + " but got " + actual.length());
-	        }
-	        for (int i = 0; i < expected.length(); i++) {
-	            char e = expected.charAt(i);
-	            if (i >= actual.length()) {
-	                System.err.println("Expected character '" + e + "' (Code " + (int)e + ") is at position " + i + " which is beyond the length of the actual string");
-	                break;
-	            }
+        if (!actual.equals(expected)) {
+            if (actual.length() != expected.length()) {
+                System.err.println("Different lengths, expected " + expected.length() + " but got " + actual.length());
+            }
+            for (int i = 0; i < expected.length(); i++) {
+                char e = expected.charAt(i);
+                if (i >= actual.length()) {
+                    System.err.println("Expected character '" + e + "' (Code " + (int) e + ") is at position " + i
+                            + " which is beyond the length of the actual string");
+                    break;
+                }
                 char a = actual.charAt(i);
-	            if (e != a) {
-	                System.err.println("Expected character '" + e + "' (Code " + (int)e + ") at position " + i + " does not match actual character '" + a + "' (Code " + (int)a + ")");
-	                int start = Math.max(0, i - 10);
-	                int end = Math.min(expected.length(), i + 10);
-	                System.err.println("Expected Context:");
-	                System.err.println(expected.substring(start, end));
-	                System.err.println("Actual Context:");
-	                System.err.println(actual.substring(start, end));
-	                break;
-	            }
-	        }
-	    }
+                if (e != a) {
+                    System.err.println("Expected character '" + e + "' (Code " + (int) e + ") at position " + i
+                            + " does not match actual character '" + a + "' (Code " + (int) a + ")");
+                    int start = Math.max(0, i - 10);
+                    int end = Math.min(expected.length(), i + 10);
+                    System.err.println("Expected Context:");
+                    System.err.println(expected.substring(start, end));
+                    System.err.println("Actual Context:");
+                    System.err.println(actual.substring(start, end));
+                    break;
+                }
+            }
+        }
         assertEquals(actual, expected);
-	}
+    }
 
     @Test
-    public void testArgs1()
-    {
+    public void testArgs1() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -213,9 +231,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("Args1"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test Args1 - args1 description\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -256,11 +275,12 @@ public class TestHelp
                 "        <parameters>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testArgs2()
-    {
+    public void testArgs2() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -269,9 +289,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("Args2"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
                 "        test Args2 -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -299,11 +320,12 @@ public class TestHelp
                 "        <parameters>\n" +
                 "            List of parameters\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testArgsAritySting()
-    {
+    public void testArgsAritySting() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -312,9 +334,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsArityString"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test ArgsArityString -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -332,11 +355,12 @@ public class TestHelp
                 "        <rest>\n" +
                 "            Rest\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testArgsBooleanArity()
-    {
+    public void testArgsBooleanArity() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -345,9 +369,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsBooleanArity"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test ArgsBooleanArity -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -357,11 +382,12 @@ public class TestHelp
                 "        -debug <debug>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testArgsInherited()
-    {
+    public void testArgsInherited() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -370,9 +396,9 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsInherited"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8), "NAME\n" +
                 "        test ArgsInherited -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -403,11 +429,12 @@ public class TestHelp
                 "        <parameters>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testArgsRequired()
-    {
+    public void testArgsRequired() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -416,9 +443,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("ArgsRequired"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test ArgsRequired -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -433,11 +461,12 @@ public class TestHelp
                 "        <parameters>\n" +
                 "            List of files\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testOptionsRequired()
-    {
+    public void testOptionsRequired() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -446,9 +475,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("OptionsRequired"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test OptionsRequired -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -462,11 +492,12 @@ public class TestHelp
                 "        --required <requiredOption>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testOptionsHidden()
-    {
+    public void testOptionsHidden() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -475,9 +506,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("OptionsHidden"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
                 "        test OptionsHidden -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -487,11 +519,12 @@ public class TestHelp
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testGlobalOptionsHidden()
-    {
+    public void testGlobalOptionsHidden() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -500,9 +533,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("GlobalOptionsHidden"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test GlobalOptionsHidden -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -512,11 +546,12 @@ public class TestHelp
                 "        -op, --optional\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testCommandHidden()
-    {
+    public void testCommandHidden() throws IOException {
+        //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
                 .withDefaultCommand(Help.class)
@@ -525,9 +560,10 @@ public class TestHelp
 
         Cli<Object> parser = builder.build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
-        assertEquals(out.toString(), "usage: test <command> [ <args> ]\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
                 "\n" +
                 "Commands are:\n" +
                 "    ArgsRequired\n" +
@@ -535,9 +571,10 @@ public class TestHelp
                 "\n" +
                 "See 'test help <command>' for more information on a specific command.\n");
 
-        out = new StringBuilder();
+        out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("CommandHidden"), out);
-        assertEquals(out.toString(), "NAME\n" +
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test CommandHidden -\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -547,15 +584,17 @@ public class TestHelp
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 
     @Test
-    public void testExamplesAndDiscussion() {
+    public void testExamplesAndDiscussion() throws IOException {
+        //@formatter:off
         Cli<?> parser = Cli.builder("git")
             .withCommand(CommandRemove.class)
             .build();
 
-        StringBuilder out = new StringBuilder();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.<String>of("remove"), out);
 
         String discussion = "DISCUSSION\n" +
@@ -566,18 +605,21 @@ public class TestHelp
         "        * The following is a usage example:\n" +
         "        \t$ git remove -i myfile.java\n";
 
-        assertTrue(out.toString().contains(discussion), "Expected the discussion section to be present in the help");
-        assertTrue(out.toString().contains(examples), "Expected the examples section to be present in the help");
+        String usage = new String(out.toByteArray(), utf8);
+        assertTrue(usage.contains(discussion), "Expected the discussion section to be present in the help");
+        assertTrue(usage.contains(examples), "Expected the examples section to be present in the help");
+        //@formatter:on
     }
-    
+
     @Test
-    public void testSingleCommandArgs1()
-    {
+    public void testSingleCommandArgs1() throws IOException {
+        //@formatter:off
         SingleCommand<Args1> command = singleCommand(Args1.class);
 
-        StringBuilder out = new StringBuilder();
-        new CommandUsage().usage(null, null, "test", command.getCommandMetadata(), out);
-        assertEquals(out.toString(), "NAME\n" +
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
                 "        test - args1 description\n" +
                 "\n" +
                 "SYNOPSIS\n" +
@@ -618,5 +660,6 @@ public class TestHelp
                 "        <parameters>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
     }
 }

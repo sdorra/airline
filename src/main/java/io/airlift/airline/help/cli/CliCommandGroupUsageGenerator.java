@@ -1,13 +1,15 @@
-package io.airlift.airline.help;
+package io.airlift.airline.help.cli;
 
-import com.google.common.base.Preconditions;
-
+import io.airlift.airline.help.AbstractPrintedCommandGroupUsageGenerator;
+import io.airlift.airline.help.UsagePrinter;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
 import javax.annotation.Nullable;
+
+import java.io.IOException;
 import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -15,68 +17,38 @@ import static com.google.common.collect.Maps.newTreeMap;
 import static io.airlift.airline.help.UsageHelper.DEFAULT_COMMAND_COMPARATOR;
 import static io.airlift.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
-public class CommandGroupUsage
-{
-    private final int columnSize;
+public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUsageGenerator {
     private final boolean hideGlobalOptions;
-    private final Comparator<? super OptionMetadata> optionComparator;
-    private final Comparator<? super CommandMetadata> commandComparator = DEFAULT_COMMAND_COMPARATOR;
 
-    public CommandGroupUsage()
-    {
-        this(79, false, DEFAULT_OPTION_COMPARATOR);
+    public CliCommandGroupUsageGenerator() {
+        this(79, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR);
     }
 
-    public CommandGroupUsage(int columnSize)
-    {
-        this(columnSize, false, DEFAULT_OPTION_COMPARATOR);
+    public CliCommandGroupUsageGenerator(int columnSize) {
+        this(columnSize, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR);
     }
 
-    public CommandGroupUsage(int columnSize, boolean hideGlobalOptions)
-    {
-        this(columnSize, hideGlobalOptions, DEFAULT_OPTION_COMPARATOR);
+    public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions) {
+        this(columnSize, hideGlobalOptions, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR);
     }
 
-    public CommandGroupUsage(int columnSize, boolean hideGlobalOptions, @Nullable Comparator<? super OptionMetadata> optionComparator)
-    {
-        Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
-        this.columnSize = columnSize;
+    public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions,
+            @Nullable Comparator<? super OptionMetadata> optionComparator,
+            @Nullable Comparator<? super CommandMetadata> commandComparator) {
+        super(columnSize, optionComparator, commandComparator);
         this.hideGlobalOptions = hideGlobalOptions;
-        this.optionComparator = optionComparator;
     }
 
-    /**
-     * Display the help on System.out.
-     */
-    public void usage(@Nullable GlobalMetadata global, CommandGroupMetadata group)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-        usage(global, group, stringBuilder);
-        System.out.println(stringBuilder.toString());
-    }
-
-    /**
-     * Store the help in the passed string builder.
-     */
-    public void usage(@Nullable GlobalMetadata global, CommandGroupMetadata group, StringBuilder out)
-    {
-        usage(global, group, new UsagePrinter(out, columnSize));
-    }
-
-    public void usage(@Nullable GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
-    {
+    @Override
+    protected void usage(@Nullable GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
+            throws IOException {
         //
         // NAME
         //
         out.append("NAME").newline();
 
-        out.newIndentedPrinter(8)
-                .append(global.getName())
-                .append(group.getName())
-                .append("-")
-                .append(group.getDescription())
-                .newline()
-                .newline();
+        out.newIndentedPrinter(8).append(global.getName()).append(group.getName()).append("-")
+                .append(group.getDescription()).newline().newline();
 
         //
         // SYNOPSIS
@@ -84,8 +56,7 @@ public class CommandGroupUsage
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
 
-        List<CommandMetadata> commands = newArrayList(group.getCommands());
-        Collections.sort(commands, commandComparator);
+        List<CommandMetadata> commands = sortCommands(group.getCommands());
 
         // Populate group info via an extra for loop through commands
         String defaultCommand = "";
@@ -99,22 +70,21 @@ public class CommandGroupUsage
         for (CommandMetadata command : commands) {
             if (command.getName().equals(defaultCommand)) {
                 allCommandNames.add(command.getName() + "*");
-            }
-            else {
+            } else {
                 allCommandNames.add(command.getName());
             }
             if (commonGroupOptions == null) {
                 commonGroupOptions = newArrayList(command.getCommandOptions());
             }
             if (commonGroupArgs == null) {
-                commonGroupArgs = (command.getArguments() != null ? UsageHelper.toUsage(command.getArguments()) : "");
+                commonGroupArgs = (command.getArguments() != null ? toUsage(command.getArguments()) : "");
             }
 
             commonGroupOptions.retainAll(command.getCommandOptions());
             if (command.getCommandOptions().size() > commonGroupOptions.size()) {
                 hasCommandSpecificOptions = true;
             }
-            if (commonGroupArgs != (command.getArguments() != null ? UsageHelper.toUsage(command.getArguments()) : "")) {
+            if (commonGroupArgs != (command.getArguments() != null ? toUsage(command.getArguments()) : "")) {
                 hasCommandSpecificArgs = true;
             }
         }
@@ -122,17 +92,17 @@ public class CommandGroupUsage
         if (global != null) {
             synopsis.append(global.getName());
             if (!hideGlobalOptions) {
-                synopsis.appendWords(UsageHelper.toSynopsisUsage(commands.get(0).getGlobalOptions()));
+                synopsis.appendWords(toSynopsisUsage(commands.get(0).getGlobalOptions()));
             }
         }
-        synopsis.append(group.getName()).appendWords(UsageHelper.toSynopsisUsage(commands.get(0).getGroupOptions()));
+        synopsis.append(group.getName()).appendWords(toSynopsisUsage(commands.get(0).getGroupOptions()));
         synopsis.append(" {").append(allCommandNames.get(0));
         for (int i = 1; i < allCommandNames.size(); i++) {
             synopsis.append(" | ").append(allCommandNames.get(i));
         }
         synopsis.append("} [--]");
         if (commonGroupOptions.size() > 0) {
-            synopsis.appendWords(UsageHelper.toSynopsisUsage(commonGroupOptions));
+            synopsis.appendWords(toSynopsisUsage(commonGroupOptions));
         }
         if (hasCommandSpecificOptions) {
             synopsis.append(" [cmd-options]");
@@ -146,19 +116,19 @@ public class CommandGroupUsage
 
         for (CommandMetadata command : commands) {
 
-            if(!command.isHidden())
-            {
+            if (!command.isHidden()) {
                 if (hasCommandSpecificOptions) {
                     List<OptionMetadata> thisCmdOptions = newArrayList(command.getCommandOptions());
                     thisCmdOptions.removeAll(commonGroupOptions);
                     StringBuilder optSB = new StringBuilder();
-                    for (String s : UsageHelper.toSynopsisUsage(thisCmdOptions)) {
+                    for (String s : toSynopsisUsage(thisCmdOptions)) {
                         optSB.append(s + " ");
                     }
                     cmdOptions.put(command.getName(), optSB.toString());
                 }
                 if (hasCommandSpecificArgs) {
-                    cmdArguments.put(command.getName(), (command.getArguments() != null ? UsageHelper.toUsage(command.getArguments()) : ""));
+                    cmdArguments.put(command.getName(),
+                            (command.getArguments() != null ? toUsage(command.getArguments()) : ""));
                 }
             }
         }
@@ -179,7 +149,8 @@ public class CommandGroupUsage
         if (defaultCommand != "") {
             synopsis.newline().append(String.format("* %s is the default command", defaultCommand));
         }
-        synopsis.newline().append("See").append("'" + global.getName()).append("help ").append(group.getName()).appendOnOneLine(" <command>' for more information on a specific command.").newline();
+        synopsis.newline().append("See").append("'" + global.getName()).append("help ").append(group.getName())
+                .appendOnOneLine(" <command>' for more information on a specific command.").newline();
 
         //
         // OPTIONS
@@ -190,22 +161,19 @@ public class CommandGroupUsage
             options.addAll(global.getOptions());
         }
         if (options.size() > 0) {
-            if (optionComparator != null) {
-                Collections.sort(options, optionComparator);
-            }
+            options = sortOptions(options);
 
             out.append("OPTIONS").newline();
 
             for (OptionMetadata option : options) {
-                
-                if(option.isHidden())
-                {
+
+                if (option.isHidden()) {
                     continue;
                 }
 
                 // option names
                 UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-                optionPrinter.append(UsageHelper.toDescription(option)).newline();
+                optionPrinter.append(toDescription(option)).newline();
 
                 // description
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
@@ -214,17 +182,5 @@ public class CommandGroupUsage
                 descriptionPrinter.newline();
             }
         }
-    }
-
-    @SuppressWarnings("unused")
-    private static String longest(Iterable<String> iterable)
-    {
-        String longest = "";
-        for (String value : iterable) {
-            if (value.length() > longest.length()) {
-                longest = value;
-            }
-        }
-        return longest;
     }
 }

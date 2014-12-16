@@ -1,8 +1,6 @@
 package io.airlift.airline.help.html;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.airlift.airline.help.UsageHelper.toSynopsisUsage;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -114,7 +112,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         // command arguments (optional)
         ArgumentsMetadata arguments = command.getArguments();
         if (arguments != null) {
-            writer.append(" [--] ").append(htmlize(UsageHelper.toUsage(arguments)));
+            writer.append(" [--] ").append(htmlize(toUsage(arguments)));
         }
 
         writer.append("</div>\n");
@@ -138,7 +136,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 // option names
                 writer.append("<div class=\"row\">\n");
                 writer.append("<div class=\"span8 offset1\">\n");
-                writer.append(htmlize(UsageHelper.toDescription(option)));
+                writer.append(htmlize(toDescription(option)));
                 writer.append("</div>\n");
                 writer.append("</div>\n");
 
@@ -174,7 +172,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 writer.append("<div class=\"row\">\n");
                 writer.append("<div class=\"span8 offset1\">\n");
 
-                writer.append(htmlize(UsageHelper.toDescription(arguments)));
+                writer.append(htmlize(toDescription(arguments)));
 
                 writer.append("</div>\n");
                 writer.append("</div>\n");

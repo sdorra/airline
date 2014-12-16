@@ -3,6 +3,9 @@ package io.airlift.airline.help;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
 import io.airlift.airline.help.cli.CliCommandUsageGenerator;
+import io.airlift.airline.help.cli.CliGlobalUsageGenerator;
+import io.airlift.airline.help.cli.CliGlobalUsageSummaryGenerator;
+import io.airlift.airline.help.cli.CliCommandGroupUsageGenerator;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
@@ -28,7 +31,11 @@ public class Help implements Runnable, Callable<Void> {
 
     @Override
     public void run() {
-        help(global, command);
+        try {
+            help(global, command);
+        } catch (IOException e) {
+            throw new RuntimeException("Error generating usage documentation", e);
+        }
     }
 
     @Override
@@ -45,13 +52,13 @@ public class Help implements Runnable, Callable<Void> {
         new CliCommandUsageGenerator().usage(null, null, command.getName(), command, out);
     }
 
-    public static void help(GlobalMetadata global, List<String> commandNames) {
+    public static void help(GlobalMetadata global, List<String> commandNames) throws IOException {
         help(global, commandNames, System.out);
     }
 
-    public static void help(GlobalMetadata global, List<String> commandNames, OutputStream out) {
+    public static void help(GlobalMetadata global, List<String> commandNames, OutputStream out) throws IOException {
         if (commandNames.isEmpty()) {
-            new GlobalUsageSummary().usage(global, out);
+            new CliGlobalUsageSummaryGenerator().usage(global, out);
             return;
         }
 
@@ -59,7 +66,7 @@ public class Help implements Runnable, Callable<Void> {
 
         // main program?
         if (name.equals(global.getName())) {
-            new GlobalUsage().usage(global, out);
+            new CliGlobalUsageGenerator().usage(global, out);
             return;
         }
 
@@ -76,7 +83,7 @@ public class Help implements Runnable, Callable<Void> {
             if (name.endsWith(group.getName())) {
                 // general group help or specific command help?
                 if (commandNames.size() == 1) {
-                    new CommandGroupUsage().usage(global, group, out);
+                    new CliCommandGroupUsageGenerator().usage(global, group, out);
                     return;
                 } else {
                     String commandName = commandNames.get(1);

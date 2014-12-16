@@ -2,14 +2,11 @@ package io.airlift.airline.help.cli;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
-import static io.airlift.airline.help.UsageHelper.toSynopsisUsage;
-
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
 import io.airlift.airline.help.AbstractPrintedCommandUsageGenerator;
-import io.airlift.airline.help.UsageHelper;
 import io.airlift.airline.help.UsagePrinter;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
@@ -34,7 +31,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     }
 
     @Override
-    public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    protected void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, UsagePrinter out) throws IOException {
         //
         // NAME
@@ -64,7 +61,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         // command arguments (optional)
         ArgumentsMetadata arguments = command.getArguments();
         if (arguments != null) {
-            synopsis.append("[--]").append(UsageHelper.toUsage(arguments));
+            synopsis.append("[--]").append(toUsage(arguments));
         }
         synopsis.newline();
         synopsis.newline();
@@ -85,7 +82,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
 
                 // option names
                 UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-                optionPrinter.append(UsageHelper.toDescription(option)).newline();
+                optionPrinter.append(toDescription(option)).newline();
 
                 // description
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
@@ -108,7 +105,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
                 descriptionPrinter.newline();
 
                 // arguments name(s)
-                optionPrinter.append(UsageHelper.toDescription(arguments)).newline();
+                optionPrinter.append(toDescription(arguments)).newline();
 
                 // description
                 descriptionPrinter.append(arguments.getDescription()).newline();

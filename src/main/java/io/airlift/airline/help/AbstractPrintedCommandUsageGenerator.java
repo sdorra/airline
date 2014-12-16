@@ -3,7 +3,6 @@ package io.airlift.airline.help;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -16,9 +15,6 @@ import com.google.common.base.Preconditions;
 /**
  * Abstract command usage generator for generators that use a
  * {@link UsagePrinter} to generate the documentation
- * 
- * @author rvesse
- * 
  */
 public abstract class AbstractPrintedCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
@@ -46,7 +42,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Usage printer to output with
      * @throws IOException 
      */
-    public abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    protected abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, UsagePrinter out) throws IOException;
 
     /**
@@ -57,16 +53,17 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      * @return Usage Printer
      */
     protected UsagePrinter createUsagePrinter(OutputStream out) {
-        Preconditions.checkNotNull(out, "StringBuilder cannot be null");
-        return new UsagePrinter(new OutputStreamWriter(out), columnSize);
+        Preconditions.checkNotNull(out, "OutputStream cannot be null");
+        OutputStreamWriter writer = new OutputStreamWriter(out);
+        return new UsagePrinter(writer, columnSize);
     }
 
     @Override
     public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, OutputStream out) throws IOException {
-        out = new BufferedOutputStream(out);
-        usage(programName, groupName, commandName, command, createUsagePrinter(out));
-        out.flush();
+        UsagePrinter printer = createUsagePrinter(out);
+        usage(programName, groupName, commandName, command, printer);
+        printer.flush();
     }
 
 }

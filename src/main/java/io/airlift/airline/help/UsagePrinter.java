@@ -176,6 +176,14 @@ public class UsagePrinter {
         }
         return this;
     }
+    
+    public void flush() throws IOException {
+        this.out.flush();
+    }
+    
+    public void close() throws IOException {
+        this.out.close();
+    }
 
     private static String spaces(int count) {
         StringBuilder result = new StringBuilder();

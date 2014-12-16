@@ -1,21 +1,23 @@
 package io.airlift.airline.help.ronn;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import static io.airlift.airline.help.UsageHelper.toSynopsisUsage;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import io.airlift.airline.help.AbstractCommandUsageGenerator;
-import io.airlift.airline.help.UsageHelper;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -69,7 +71,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         // command arguments (optional)
         ArgumentsMetadata arguments = command.getArguments();
         if (arguments != null) {
-            writer.append(" [--] ").append(UsageHelper.toUsage(arguments));
+            writer.append(" [--] ").append(toUsage(arguments));
         }
 
         if (options.size() > 0 || arguments != null) {
@@ -83,7 +85,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 }
 
                 // option names
-                writer.append(NEW_PARA).append("* ").append(UsageHelper.toRonnDescription(option)).append(":\n");
+                writer.append(NEW_PARA).append("* ").append(toDescription(option)).append(":\n");
 
                 // description
                 writer.append(option.getDescription());
@@ -98,7 +100,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                         + "list of arguments (useful when arguments might be mistaken for command-line options).");
 
                 // arguments name
-                writer.append(NEW_PARA).append("* ").append(UsageHelper.toDescription(arguments)).append(":\n");
+                writer.append(NEW_PARA).append("* ").append(toDescription(arguments)).append(":\n");
 
                 // description
                 writer.append(arguments.getDescription());
@@ -129,5 +131,38 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         // Flush the output
         output.flush();
+    }
+    
+    @Override
+    protected String toDescription(OptionMetadata option)
+    {
+        Set<String> options = option.getOptions();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        final String argumentString;
+        if (option.getArity() > 0) {
+            argumentString = Joiner.on(" ").join(Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>()
+            {
+                public String apply(@Nullable String argument)
+                {
+                    return "<" + argument + ">";
+                }
+            }));
+        } else {
+            argumentString = null;
+        }
+
+        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>()
+        {
+            public String apply(@Nullable String option)
+            {
+                if (argumentString != null) {
+                    return "`" + option + "` " + argumentString;
+                }
+                return "`" + option + "`";
+            }
+        }));
+
+        return stringBuilder.toString();
     }
 }

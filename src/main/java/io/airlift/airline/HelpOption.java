@@ -1,5 +1,7 @@
 package io.airlift.airline;
 
+import java.io.IOException;
+
 import io.airlift.airline.help.Help;
 import io.airlift.airline.model.CommandMetadata;
 
@@ -16,7 +18,11 @@ public class HelpOption
     public boolean showHelpIfRequested()
     {
         if (help) {
-            Help.help(commandMetadata);
+            try {
+                Help.help(commandMetadata);
+            } catch (IOException e) {
+                throw new RuntimeException("Error generating usage documentation", e);
+            }
         }
         return help;
     }

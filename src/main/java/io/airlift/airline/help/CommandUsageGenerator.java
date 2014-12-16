@@ -8,8 +8,8 @@ import io.airlift.airline.model.CommandMetadata;
 import javax.annotation.Nullable;
 
 /**
- * Interface implemented by classes that can generate help
- * 
+ * Interface implemented by classes that can generate usage documentation for a
+ * command
  */
 public interface CommandUsageGenerator {
 
@@ -24,7 +24,7 @@ public interface CommandUsageGenerator {
      *            Command Name
      * @param command
      *            Command Metadata
-     * @throws IOException 
+     * @throws IOException
      */
     public abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command) throws IOException;
@@ -42,7 +42,7 @@ public interface CommandUsageGenerator {
      *            Command Metadata
      * @param out
      *            Stream to output to
-     * @throws IOException 
+     * @throws IOException
      */
     public abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, OutputStream output) throws IOException;
