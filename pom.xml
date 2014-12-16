@@ -22,7 +22,7 @@
 	<scm>
 		<connection>scm:git:git@github.com:rvesse/airline.git</connection>
 		<developerConnection>scm:git:git@github.com:rvesse/airline.git</developerConnection>
-		<url>http://github.com/rvesse/airline/tree/master</url>
+		<url>git:git@github.com:rvesse/airline.git</url>
 	</scm>
 
 	<developers>
