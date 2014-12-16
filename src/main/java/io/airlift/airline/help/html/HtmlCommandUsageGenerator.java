@@ -1,7 +1,6 @@
 package io.airlift.airline.help.html;
 
 import static com.google.common.collect.Lists.newArrayList;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -65,7 +64,6 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, OutputStream output) throws IOException {
 
-        output = new BufferedOutputStream(output);
         Writer writer = new OutputStreamWriter(output);
 
         final String NEWLINE = "<br/>\n";
@@ -234,6 +232,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         writer.append("</html>\n");
         
         // Flush the output
+        writer.flush();
         output.flush();
     }
 

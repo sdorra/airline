@@ -2,7 +2,6 @@ package io.airlift.airline.help.ronn;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -35,7 +34,6 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             CommandMetadata command, OutputStream output) throws IOException {
         final String NEW_PARA = "\n\n";
 
-        output = new BufferedOutputStream(output);
         Writer writer = new OutputStreamWriter(output);
 
         writer.append(programName).append("_");
@@ -130,6 +128,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         // Flush the output
+        writer.flush();
         output.flush();
     }
     

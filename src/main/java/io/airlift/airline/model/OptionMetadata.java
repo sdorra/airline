@@ -20,9 +20,8 @@ import static com.google.common.collect.Sets.newHashSet;
 public class OptionMetadata {
     private final OptionType optionType;
     private final Set<String> options;
-    private final String title;
-    private final String description;
-    private final int arity;
+    private final String title, description, completionCommand;
+    private final int arity, completionBehaviours;
     private final boolean required, hidden, overrides, sealed;
     private final Set<String> allowedValues;
     private Set<Accessor> accessors;
@@ -38,6 +37,8 @@ public class OptionMetadata {
                           boolean overrides, 
                           boolean sealed,
                           Iterable<String> allowedValues, 
+                          int completionBehaviours,
+                          String completionCommand,
                           Iterable<Field> path) {
     //@formatter:on
         Preconditions.checkNotNull(optionType, "optionType is null");
@@ -54,6 +55,8 @@ public class OptionMetadata {
         this.hidden = hidden;
         this.overrides = overrides;
         this.sealed = sealed;
+        this.completionBehaviours = completionBehaviours;
+        this.completionCommand = completionCommand;
 
         if (allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(allowedValues);
@@ -87,6 +90,8 @@ public class OptionMetadata {
         } else {
             this.allowedValues = null;
         }
+        this.completionBehaviours = option.completionBehaviours;
+        this.completionCommand = option.completionCommand;
 
         Set<Accessor> accessors = newHashSet();
         for (OptionMetadata other : options) {
@@ -131,6 +136,14 @@ public class OptionMetadata {
 
     public boolean isSealed() {
         return sealed;
+    }
+    
+    public int getCompletionBehaviours() {
+        return completionBehaviours;
+    }
+    
+    public String getCompletionCommand() {
+        return completionCommand;
     }
 
     public boolean isMultiValued() {
@@ -323,7 +336,10 @@ public class OptionMetadata {
                                     child.hidden, 
                                     child.overrides,
                                     child.sealed,
-                                    child.allowedValues != null ? child.allowedValues : parent.allowedValues, null);
+                                    child.allowedValues != null ? child.allowedValues : parent.allowedValues,
+                                    child.completionBehaviours,
+                                    child.completionCommand,
+                                    null);
         //@formatter:on
 
         // Combine both child and parent accessors - this is necessary so the

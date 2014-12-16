@@ -232,6 +232,8 @@ public class MetadataLoader {
                                                                        override, 
                                                                        sealed, 
                                                                        allowedValues,
+                                                                       optionAnnotation.completionBehaviour(),
+                                                                       optionAnnotation.completionCommand(),
                                                                        path);
                     //@formatter:on
                     switch (optionType) {
