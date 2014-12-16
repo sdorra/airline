@@ -3,6 +3,8 @@ package io.airlift.airline;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import io.airlift.airline.Cli.CliBuilder;
+import io.airlift.airline.help.Help;
+
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;

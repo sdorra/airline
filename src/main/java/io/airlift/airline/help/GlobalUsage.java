@@ -1,6 +1,7 @@
-package io.airlift.airline;
+package io.airlift.airline.help;
 
 import com.google.common.base.Preconditions;
+
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
@@ -12,7 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.airlift.airline.UsageHelper.DEFAULT_OPTION_COMPARATOR;
+import static io.airlift.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
 public class GlobalUsage
 {

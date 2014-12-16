@@ -18,32 +18,34 @@
 
 package io.airlift.airline;
 
-public class ParseOptionConversionException extends ParseException
-{
+/**
+ * Exception that is thrown when the argument supplied as the value for an
+ * option cannot be converted to the options Java type
+ * 
+ */
+public class ParseOptionConversionException extends ParseException {
+    private static final long serialVersionUID = -9105701233341582179L;
+    
     private final String optionTitle;
     private final String value;
     private final String typeName;
 
-    ParseOptionConversionException(String optionTitle, String value, String typeName)
-    {
+    ParseOptionConversionException(String optionTitle, String value, String typeName) {
         super("%s: can not convert \"%s\" to a %s", optionTitle, value, typeName);
         this.optionTitle = optionTitle;
         this.value = value;
         this.typeName = typeName;
     }
 
-    public String getOptionTitle()
-    {
+    public String getOptionTitle() {
         return optionTitle;
     }
 
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
-    public String getTypeName()
-    {
+    public String getTypeName() {
         return typeName;
     }
 }

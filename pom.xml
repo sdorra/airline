@@ -1,55 +1,209 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>io.airlift</groupId>
-        <artifactId>airbase</artifactId>
-        <version>28</version>
-    </parent>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
 
-    <artifactId>airline</artifactId>
-    <packaging>jar</packaging>
-    <version>0.8-SNAPSHOT</version>
+	<groupId>org.dotnetrdf</groupId>
+	<artifactId>airline</artifactId>
+	<packaging>jar</packaging>
+	<version>0.8-SNAPSHOT</version>
 
-    <name>airline</name>
-    <description>Java annotation-based framework for parsing Git like command line structures</description>
-    <url>https://github.com/airlift/airline</url>
+	<name>airline</name>
+	<description>Java annotation-based framework for parsing Git like command line structures</description>
+	<url>https://github.com/rvesse/airline</url>
 
-    <inceptionYear>2012</inceptionYear>
+	<inceptionYear>2012</inceptionYear>
 
-    <scm>
-        <connection>scm:git:git@github.com:rvesse/airline.git</connection>
-        <developerConnection>scm:git:git@github.com:rvesse/airline.git</developerConnection>
-        <url>http://github.com/rvesse/airline/tree/master</url>
-    </scm>
+	<scm>
+		<connection>scm:git:git@github.com:rvesse/airline.git</connection>
+		<developerConnection>scm:git:git@github.com:rvesse/airline.git</developerConnection>
+		<url>http://github.com/rvesse/airline/tree/master</url>
+	</scm>
 
-    <properties>
-        <air.check.skip-findbugs>true</air.check.skip-findbugs>
-        <air.check.skip-pmd>true</air.check.skip-pmd>
-        <air.check.skip-license>true</air.check.skip-license>
-    </properties>
+	<developers>
+		<developer>
+			<id>rvesse</id>
+			<name>Rob Vesse</name>
+			<email>rvesse@dotnetrdf.org</email>
+		</developer>
+	</developers>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-        </dependency>
+	<properties>
+		<jdk.target>1.7</jdk.target>
 
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
+		<!-- Plugin Versions -->
+		<plugin.compiler>3.2</plugin.compiler>
+		<plugin.enforcer>1.3.1</plugin.enforcer>
+		<plugin.jar>2.5</plugin.jar>
+		<plugin.source>2.4</plugin.source>
+		<plugin.javadoc>2.10.1</plugin.javadoc>
+		<plugin.release>2.5.1</plugin.release>
+		<plugin.gpg>1.5</plugin.gpg>
 
-        <!-- for testing -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+		<!-- Dependency Versions -->
+		<dependency.javax-inject>1</dependency.javax-inject>
+		<dependency.guava>18.0</dependency.guava>
+		<dependency.testng>6.8.8</dependency.testng>
+		<dependency.annotations>3.0.0</dependency.annotations>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>${dependency.javax-inject}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${dependency.guava}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${dependency.annotations}</version>
+		</dependency>
+
+		<!-- for testing -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${dependency.testng}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Compiler Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${plugin.compiler}</version>
+				<configuration>
+					<source>1.7</source>
+					<target>${jdk.target}</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<!-- Source Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${plugin.source}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- JAR Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${plugin.jar}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Enforcer Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${plugin.enforcer}</version>
+				<executions>
+					<execution>
+						<id>enforce-jdk7</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>${jdk.target}</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Javadoc Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${plugin.javadoc}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<javadocVersion>${jdk.target}</javadocVersion>
+					<quiet>true</quiet>
+					<encoding>UTF-8</encoding>
+					<charset>UTF-8</charset>
+					<docencoding>UTF-8</docencoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>${plugin.release}</version>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${plugin.gpg}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

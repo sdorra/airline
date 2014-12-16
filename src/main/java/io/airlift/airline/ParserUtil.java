@@ -37,6 +37,7 @@ public class ParserUtil
     }
     
     
+    @SuppressWarnings("unchecked")
     public static <T> T injectOptions(T commandInstance,
         Iterable<OptionMetadata> options,
         ListMultimap<OptionMetadata, Object> parsedOptions,

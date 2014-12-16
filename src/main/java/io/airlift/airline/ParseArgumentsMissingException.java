@@ -22,19 +22,26 @@ import java.util.List;
 
 import com.google.common.base.Joiner;
 
-
-public class ParseArgumentsMissingException extends ParseException
-{
+/**
+ * Exception thrown when required arguments are missing
+ * 
+ */
+public class ParseArgumentsMissingException extends ParseException {
+    private static final long serialVersionUID = 6220909299960264997L;
+    
     private final List<String> argumentTitles;
 
-    ParseArgumentsMissingException(List<String> argumentTitles)
-    {
+    ParseArgumentsMissingException(List<String> argumentTitles) {
         super("Required arguments are missing: '%s'", Joiner.on(',').join(argumentTitles));
         this.argumentTitles = argumentTitles;
     }
 
-    public List<String> getArgumentTitle()
-    {
+    /**
+     * Gets the argument title
+     * 
+     * @return Title
+     */
+    public List<String> getArgumentTitle() {
         return argumentTitles;
     }
 }

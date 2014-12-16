@@ -1,5 +1,7 @@
-package io.airlift.airline;
+package io.airlift.airline.help;
 
+import io.airlift.airline.Arguments;
+import io.airlift.airline.Command;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;

@@ -72,7 +72,7 @@ public @interface Option {
      * the option definitions are compatible.
      * <p>
      * See
-     * {@link OptionMetadata#override(String, OptionMetadata, OptionMetadata)}
+     * {@link OptionMetadata#override(java.util.Set, OptionMetadata, OptionMetadata)}
      * for legal overrides
      * </p>
      * 

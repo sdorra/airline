@@ -297,6 +297,7 @@ public class Cli<C>
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public CliBuilder<C> withCommands(Class<? extends C> command, Class<? extends C>... moreCommands)
         {
             this.defaultCommandGroupCommands.add(command);
@@ -376,6 +377,7 @@ public class Cli<C>
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public GroupBuilder<C> withCommands(Class<? extends C> command, Class<? extends C>... moreCommands)
         {
             this.commands.add(command);

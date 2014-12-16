@@ -18,8 +18,14 @@
 
 package io.airlift.airline;
 
+/**
+ * Exception that is thrown when no command is specified
+ *
+ */
 public class ParseCommandMissingException extends ParseException
 {
+    private static final long serialVersionUID = -2671426251662153521L;
+
     ParseCommandMissingException()
     {
         super("No command specified");

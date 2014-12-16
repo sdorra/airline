@@ -1,6 +1,7 @@
-package io.airlift.airline;
+package io.airlift.airline.help;
 
 import com.google.common.collect.ImmutableList;
+
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 

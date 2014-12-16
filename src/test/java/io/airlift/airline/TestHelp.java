@@ -34,6 +34,9 @@ import io.airlift.airline.args.GlobalOptionsHidden;
 import io.airlift.airline.args.OptionsHidden;
 import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandRemove;
+import io.airlift.airline.help.CommandUsage;
+import io.airlift.airline.help.Help;
+
 import org.testng.annotations.Test;
 
 import static io.airlift.airline.SingleCommand.singleCommand;

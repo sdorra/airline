@@ -15,7 +15,8 @@ import io.airlift.airline.Group;
 import io.airlift.airline.Groups;
 import io.airlift.airline.Option;
 import io.airlift.airline.OptionType;
-import io.airlift.airline.Suggester;
+import io.airlift.airline.help.Suggester;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;

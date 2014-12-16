@@ -1,4 +1,4 @@
-package io.airlift.airline;
+package io.airlift.airline.help;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
@@ -18,7 +19,7 @@ import java.util.Map.Entry;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newTreeMap;
-import static io.airlift.airline.UsageHelper.toUsage;
+import static io.airlift.airline.help.UsageHelper.toUsage;
 
 public class GlobalUsageSummary
 {
@@ -99,6 +100,7 @@ public class GlobalUsageSummary
         out.append("Commands are:").newline();
         out.newIndentedPrinter(4).appendTable(Iterables.transform(commands.entrySet(), new Function<Entry<String, String>, Iterable<String>>()
         {
+            @SuppressWarnings("deprecation")
             public Iterable<String> apply(Entry<String, String> entry)
             {
                 return ImmutableList.of(entry.getKey(), Objects.firstNonNull(entry.getValue(), ""));

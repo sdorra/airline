@@ -1,5 +1,6 @@
 package io.airlift.airline;
 
+import io.airlift.airline.help.Help;
 import io.airlift.airline.model.CommandMetadata;
 
 import javax.inject.Inject;

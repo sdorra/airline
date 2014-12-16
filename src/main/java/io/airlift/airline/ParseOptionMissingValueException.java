@@ -18,18 +18,22 @@
 
 package io.airlift.airline;
 
-public class ParseOptionMissingValueException extends ParseException
-{
+/**
+ * Exception that is thrown when an option expects one/more values and no values
+ * are supplied
+ * 
+ */
+public class ParseOptionMissingValueException extends ParseException {
+    private static final long serialVersionUID = -731926542936989571L;
+    
     private final String optionTitle;
 
-    ParseOptionMissingValueException(String optionTitle)
-    {
+    ParseOptionMissingValueException(String optionTitle) {
         super("Required values for option '%s' not provided", optionTitle);
         this.optionTitle = optionTitle;
     }
 
-    public String getOptionTitle()
-    {
+    public String getOptionTitle() {
         return optionTitle;
     }
 }

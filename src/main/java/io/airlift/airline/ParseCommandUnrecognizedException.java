@@ -22,8 +22,14 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+/**
+ * Exception that is thrown when an unrecognized command is supplied
+ *
+ */
 public class ParseCommandUnrecognizedException extends ParseException
 {
+    private static final long serialVersionUID = 7580940207857781141L;
+    
     private final List<String> unparsedInput;
 
     ParseCommandUnrecognizedException(List<String> unparsedInput)

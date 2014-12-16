@@ -1,6 +1,7 @@
 package io.airlift.airline;
 
 import io.airlift.airline.Cli.CliBuilder;
+import io.airlift.airline.help.Help;
 
 import java.util.List;
 

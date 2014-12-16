@@ -1,4 +1,4 @@
-package io.airlift.airline;
+package io.airlift.airline.help;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -16,8 +16,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.airlift.airline.UsageHelper.DEFAULT_OPTION_COMPARATOR;
-import static io.airlift.airline.UsageHelper.toSynopsisUsage;
+import static io.airlift.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
+import static io.airlift.airline.help.UsageHelper.toSynopsisUsage;
 
 public class CommandUsage
 {

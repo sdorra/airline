@@ -152,6 +152,7 @@ public class CommandMetadata
         };
     }
 
+    @SuppressWarnings("rawtypes")
     public static Function<CommandMetadata, Class> typeGetter()
     {
         return new Function<CommandMetadata, Class>()

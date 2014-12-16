@@ -1,4 +1,4 @@
-package io.airlift.airline;
+package io.airlift.airline.help;
 
 public interface Suggester
 {

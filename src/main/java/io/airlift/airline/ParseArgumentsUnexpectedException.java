@@ -22,18 +22,21 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-public class ParseArgumentsUnexpectedException extends ParseException
-{
+/**
+ * Exception that is thrown when a command receives unexpected arguments
+ * 
+ */
+public class ParseArgumentsUnexpectedException extends ParseException {
+    private static final long serialVersionUID = -3146629773738933406L;
+    
     private final List<String> unparsedInput;
 
-    ParseArgumentsUnexpectedException(List<String> unparsedInput)
-    {
+    ParseArgumentsUnexpectedException(List<String> unparsedInput) {
         super("Found unexpected parameters: %s", unparsedInput);
         this.unparsedInput = ImmutableList.copyOf(unparsedInput);
     }
 
-    public List<String> getUnparsedInput()
-    {
+    public List<String> getUnparsedInput() {
         return unparsedInput;
     }
 }

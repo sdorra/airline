@@ -18,8 +18,14 @@
 
 package io.airlift.airline;
 
+/**
+ * Super class of all command line parsing exceptions
+ *
+ */
 public class ParseException extends RuntimeException
 {
+    private static final long serialVersionUID = 3772132549207742875L;
+
     public ParseException(String string, Object... args)
     {
         super(String.format(string, args));

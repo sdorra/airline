@@ -18,8 +18,14 @@
 
 package io.airlift.airline;
 
+/**
+ * Exception that is thrown when a required option is missing
+ *
+ */
 public class ParseOptionMissingException extends ParseException
 {
+    private static final long serialVersionUID = -2256462221508393062L;
+    
     private final String optionTitle;
 
     ParseOptionMissingException(String optionTitle)
