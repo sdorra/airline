@@ -1,41 +1,52 @@
-Airline
-=======
+# Airline
 
 Airline is a Java annotation-based framework for parsing Git like command line structures.
 
 This fork contains several improvements over the upstream fork created both by myself and taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork:
 
 - Annotation improvements
-    - `allowedValues` on `Option` annotations is enforced
-    - `override` and `sealed` on `Option` annotations allowing derived commands to change some properties of the annotation
-    - Overridden options may change the type when it is a narrowing conversion
+    - `Option` improvements:
+        - `allowedValues` properties is actually enforced and produces `ParseOptionIllegalValueException` if an invalid value is received
+        - New `override` and `sealed` properties allowing derived commands to change some properties of the annotation
+        - Overridden options may change the type when it is a narrowing conversion
+        - New `completionBehaviour` and `completionCommand` properties allowing defining behaviours for the purposes of completion script generators
+    - `Arguments` improvements
+        - New `completionBehaviour` and `completionCommand` properties allowing defining behaviours for the purposes of completion script generators
     - `Group` annotation for specifying groups
     - `Command` annotation supports discussion and examples
 - Help system improvements
-    - Help printing respects new lines to be used in descriptions
-    - Additional examples and discussion sections in command help
+    - Help printing respects new lines allowing them to be used in longer descriptions
+    - Support for additional examples and discussion sections in command help
+    - Abstracted out help generation system into interfaces with multiple concrete implementations:
+        - Command Line (the existing help system)
+        - [Ronn](http://rtomayko.github.io/ronn/)
+        - HTML
+        - Bash auto-completion script
 - Support for Command Factories
 
-Latest Release
-=============
+## License
 
-This fork has not been formally released anywhere, you can get the latest upstream release from Maven Central.
+Airline is licensed under the Apache Software License Version 2.0, see provided **License.txt**
+
+See provided **Notice.md** for Copyright Holders
+
+## Latest Release
+
+This fork is available using the following dependency information:
 
 ```xml
 <dependency>
-    <groupId>io.airlift</groupId>
+    <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
 </dependency>
 ```
 
-Build Status
-============
+## Build Status
 
 CI builds are run on [Travis CI](http://travis-ci.org/) ![Build Status](https://travis-ci.org/rvesse/airline.png), see build information and history at https://travis-ci.org/rvesse/airline
 
-Example Usage
-=============
+# Example Usage
 
 Here is a quick example:
 
@@ -112,10 +123,7 @@ $ git remote add origin git@github.com:airlift/airline.git
 $ git -v remote show origin
 ```
 
-
-
-Single Command Mode
-===================
+# Single Command Mode
 
 Airline can also be used for simple, single-command programs:
 
@@ -157,10 +165,7 @@ $ ping -c 5
 $ ping --help
 ```
 
-
-
-Help System
-===========
+# Help System
 
 Airline contains a fully automated help system, which generates man-page-like documentation driven by the Java
 annotations.
@@ -313,10 +318,3 @@ OPTIONS
         -h, --help
             Display help information
 ```
-
-License
-=======
-
-Airline is licensed under the Apache Software License Version 2.0, see provided License.txt
-
-See provided Notice.md for Copyright Holders
