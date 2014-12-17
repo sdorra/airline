@@ -104,12 +104,12 @@ public @interface Option {
      * completion scripts. It indicates any additional completion behaviour
      * that should apply in addition to completions generated from the
      * {@link #allowedValues()} and/or {@link #completionCommand()}. You should
-     * use the constants from {@link CompletionOptions} as values to this.
+     * use the constants from {@link CompletionBehaviour} as values to this.
      * </p>
      * 
      * @return Completion Behaviours
      */
-    int completionBehaviour() default CompletionOptions.NONE;
+    int completionBehaviour() default CompletionBehaviour.NONE;
 
     /**
      * Provides a command used to generate the completion words for this option

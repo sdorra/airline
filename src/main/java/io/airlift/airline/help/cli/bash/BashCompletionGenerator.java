@@ -8,7 +8,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import io.airlift.airline.CompletionOptions;
+import org.apache.commons.lang3.StringUtils;
+
+import io.airlift.airline.CompletionBehaviour;
 import io.airlift.airline.help.AbstractGlobalUsageGenerator;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
@@ -37,14 +39,19 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // for each
         boolean hasGroups = global.getCommandGroups().size() > 1 || global.getDefaultGroupCommands().size() == 0;
         if (hasGroups) {
-            // TODO Generate group completion functions
+            for (CommandGroupMetadata group : global.getCommandGroups()) {
+                generateGroupCompletionFunction(writer, global, group);
+            }
         } else {
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
+                if (command.isHidden())
+                    continue;
+
                 generateCommandCompletionFunction(writer, global, command);
             }
         }
 
-        // Main command completion function
+        // Start main completion function
         writer.append("_complete_").append(bashize(global.getName())).append(" {").append('\n');
 
         writer.append("  # Get completion data").append('\n');
@@ -59,6 +66,8 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // Prepare list of top level commands and groups
         Set<String> commandNames = new HashSet<>();
         for (CommandMetadata command : global.getDefaultGroupCommands()) {
+            if (command.isHidden())
+                continue;
             commandNames.add(command.getName());
         }
         if (hasGroups) {
@@ -70,7 +79,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
         // Firstly check whether we are only completing the group or command
         writer.append("  if [[ ${COMP_CWORD} -eq 1 ]]; then").append('\n');
-        writeCompletionGeneration(writer, 4, CompletionOptions.NONE, "COMMANDS");
+        writeCompletionGeneration(writer, 4, CompletionBehaviour.NONE, "COMMANDS");
         writer.append("  fi");
 
         // Otherwise we must be in a specific group/command
@@ -92,6 +101,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
             }
         } else {
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
+                if (command.isHidden())
+                    continue;
+
                 // Add case for the command
                 indent(writer, 4);
                 writer.append(command.getName()).append(')').append('\n');
@@ -108,6 +120,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
         writer.append("  esac").append("\n\n");
 
+        // End Function
         writer.append("}").append("\n\n");
 
         // Completion setup
@@ -118,9 +131,59 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         output.flush();
     }
 
+    private void generateGroupCompletionFunction(Writer writer, GlobalMetadata global, CommandGroupMetadata group)
+            throws IOException {
+        // Start Function
+        writer.append("_completion_group_").append(bashize(group.getName())).append(" {").append('\n');
+
+        // Prepare variables
+        writer.append("  # Get completion data").append('\n');
+        writer.append("  COMPREPLY=()").append('\n');
+        writer.append("  CURR_WORD=${COMP_WORDS[COMP_CWORD]}").append('\n');
+        writer.append("  PREV_WORD=${COMP_WORDS[COMP_CWORD-1]}").append("\n");
+
+        // Prepare list of group commands
+        Set<String> commandNames = new HashSet<>();
+        for (CommandMetadata command : group.getCommands()) {
+            if (command.isHidden())
+                continue;
+            commandNames.add(command.getName());
+        }
+        writeWordListVariable(writer, 2, "COMMANDS", commandNames.iterator());
+
+        // Check if we are completing a group
+        writer.append("  if [[ ${COMP_CWORD} -eq 2 ]]; then").append('\n');
+        writeCompletionGeneration(writer, 4, CompletionBehaviour.NONE, "COMMANDS");
+        writer.append("  fi");
+
+        // Otherwise we must be in a specific command
+        // Use a switch statement to provide command specific completion
+        writer.append("  case ${CURR_CMD} in ");
+        for (CommandMetadata command : group.getCommands()) {
+            if (command.isHidden())
+                continue;
+
+            // Add case for the command
+            indent(writer, 4);
+            writer.append(command.getName()).append(')').append('\n');
+            indent(writer, 6);
+
+            // Just call the command function and pass its value back up
+            writer.append("$( _completion_command_").append(bashize(command.getName())).append(" )").append('\n');
+            indent(writer, 6);
+            writer.append("return $?").append('\n');
+            indent(writer, 6);
+            writer.append(";;");
+        }
+
+        // End Function
+        writer.append('}').append("\n\n");
+    }
+
     private void generateCommandCompletionFunction(Writer writer, GlobalMetadata global, CommandMetadata command)
             throws IOException {
-        writer.append("_completion_command_").append(bashize(command.getName())).append('{').append('\n');
+        // Start Function
+        writer.append("_completion_command_").append(bashize(command.getName())).append(" {").append('\n');
 
         // Prepare variables
         writer.append("  # Get completion data").append('\n');
@@ -132,6 +195,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         Set<String> flagOpts = new HashSet<>();
         Set<String> argOpts = new HashSet<>();
         for (OptionMetadata option : command.getAllOptions()) {
+            if (option.isHidden())
+                continue;
+
             if (option.getArity() == 0) {
                 flagOpts.addAll(option.getOptions());
             } else {
@@ -142,19 +208,67 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writeWordListVariable(writer, 2, "ARG_OPTS", argOpts.iterator());
         writer.append('\n');
 
-        // Check whether we have a flag/arg option currently
-        writer.append("  $( containsElement ${PREV_WORD} ${FLAG_OPTS[@]} )").append('\n');
-        writer.append("  SAW_FLAG=$?").append('\n');
-        writer.append("  $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )").append('\n');
-        writer.append("  SAW_ARG=$?").append('\n');
-        
-        // If we previously saw an argument then we are completing that argument
-        writer.append("  if [[ ${SAW_ARG} -eq 0 ]]; then").append('\n');
-        // TODO Use a switch to populate completions for the argument options
-        
-        // If we previously saw a flag we could see another option or an argument if supported
-        writer.append("  elif [[ ${SAW_FLAG} -eq 0 ]]; then").append('\n');
-        
+        // Check whether we are completing a value for an argument flag
+        if (argOpts.size() > 0) {
+            writer.append("  $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )").append('\n');
+            writer.append("  SAW_ARG=$?").append('\n');
+
+            // If we previously saw an argument then we are completing that
+            // argument
+            writer.append("  if [[ ${SAW_ARG} -eq 0 ]]; then").append('\n');
+            writer.append("    case ${PREV_WORD} in").append('\n');
+            for (OptionMetadata option : command.getAllOptions()) {
+                if (option.isHidden() || option.getArity() == 0)
+                    continue;
+
+                // Add cases for the names
+                indent(writer, 6);
+                Iterator<String> names = option.getOptions().iterator();
+                while (names.hasNext()) {
+                    writer.append(names.next());
+                    if (names.hasNext())
+                        writer.append('|');
+                }
+                writer.append(")\n");
+
+                // Then generate the completions for the option
+                if (StringUtils.isNotEmpty(option.getCompletionCommand())) {
+                    indent(writer, 8);
+                    writer.append("ARG_GENERATED_VALUES=$( ").append(option.getCompletionCommand()).append(" )")
+                            .append('\n');
+                } else {
+                    indent(writer, 8);
+                    writer.append("ARG_GENERATED_VALUES=").append('\n');
+                }
+                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0) {
+                    writeWordListVariable(writer, 8, "ARG_VALUES", option.getAllowedValues().iterator());
+                } else {
+                    indent(writer, 8);
+                    writer.append("ARG_VALUES=").append('\n');
+                }
+                writeCompletionGeneration(writer, 8, option.getCompletionBehaviours(), "ARG_VALUES",
+                        "ARG_GENERATED_VALUES");
+                indent(writer, 8);
+                writer.append(";;").append('\n');
+            }
+            writer.append("    esac").append('\n');
+            writer.append("  fi").append("\n\n");
+        }
+
+        // If we previously saw a flag we could see another option or an
+        // argument if supported
+        int behaviour = CompletionBehaviour.NONE;
+        if (command.getArguments() != null && StringUtils.isNotEmpty(command.getArguments().getCompletionCommand())) {
+            writer.append("  ARGUMENTS=$( ").append(command.getArguments().getCompletionCommand()).append(" )")
+                    .append('\n');
+            behaviour = command.getArguments().getCompletionBehaviours();
+        } else {
+            writer.append("  ARGUMENTS=").append('\n');
+        }
+        writeCompletionGeneration(writer, 2, behaviour, "FLAG_OPTS", "ARG_OPTS", "ARGUMENTS");
+
+        // End Function
+        writer.append('}').append("\n\n");
     }
 
     private void indent(Writer writer, int indent) throws IOException {
@@ -184,21 +298,24 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
     private void writeCompletionGeneration(Writer writer, int indent, int behaviour, String... varNames)
             throws IOException {
         indent(writer, indent);
-        writer.append("COMPREPLY=( $(compgen");
+        writer.append("COMPREPLY=( $(compgen ");
 
         // Add -o flag as appropriate
         switch (behaviour) {
-        case CompletionOptions.FILENAMES:
-            writer.append(" -o default ");
+        case CompletionBehaviour.FILENAMES:
+            writer.append("-o default ");
             break;
-        case CompletionOptions.DIRECTORIES:
-            writer.append(" -o dirnames ");
+        case CompletionBehaviour.DIRECTORIES:
+            writer.append("-o dirnames ");
             break;
-        case CompletionOptions.AS_FILENAMES:
-            writer.append(" -o filenames ");
+        case CompletionBehaviour.AS_FILENAMES:
+            writer.append("-o filenames ");
             break;
-        case CompletionOptions.AS_DIRECTORIES:
-            writer.append(" -o plusdirs ");
+        case CompletionBehaviour.AS_DIRECTORIES:
+            writer.append("-o plusdirs ");
+            break;
+        case CompletionBehaviour.SYSTEM_COMMANDS:
+            writer.append("-c ");
             break;
         }
 
@@ -207,6 +324,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
             writer.append("${").append(varNames[i]).append("}");
             if (i < varNames.length - 1)
                 writer.append(' ');
+        }
+        if (behaviour == CompletionBehaviour.CLI_COMMANDS) {
+            writer.append(" ${COMMANDS}");
         }
         writer.append("\" -- ${CURR_WORD}) )").append('\n');
         indent(writer, indent);

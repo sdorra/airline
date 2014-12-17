@@ -24,13 +24,12 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.FIELD;
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target({FIELD})
-public @interface Arguments
-{
+@Target({ FIELD })
+public @interface Arguments {
     /**
      * Name or names of the arguments.
      */
-    String[] title() default {""};
+    String[] title() default { "" };
 
     /**
      * A description of the arguments.
@@ -46,4 +45,31 @@ public @interface Arguments
      * Whether these arguments are required.
      */
     boolean required() default false;
+
+    /**
+     * Sets the desired completion behaviour
+     * <p>
+     * This is used by usage generators that are capable of generating
+     * completion scripts. It indicates any additional completion behaviour that
+     * should apply in addition to completions generated from the
+     * {@link #completionCommand()} if set. You should use the constants from
+     * {@link CompletionBehaviour} as values to this.
+     * </p>
+     * 
+     * @return Completion Behaviours
+     */
+    int completionBehaviour() default CompletionBehaviour.NONE;
+
+    /**
+     * Provides a command used to generate the completion words for the
+     * arguments
+     * <p>
+     * This is used by usage generators that are capable of generating
+     * completion scripts. You can also use the {@link #completionBehaviour()}
+     * property if you want to use system supplied completions
+     * </p>
+     * 
+     * @return Completion command
+     */
+    String completionCommand() default "";
 }

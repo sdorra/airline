@@ -81,23 +81,20 @@ public class MetadataLoader {
         }));
     }
 
-    public static CommandMetadata loadCommand(Class<?> commandType)
-    {
+    public static CommandMetadata loadCommand(Class<?> commandType) {
         if (commandType == null) {
             return null;
         }
         Command command = null;
         List<Group> groups = Lists.newArrayList();
-        
+
         for (Class<?> cls = commandType; command == null && !Object.class.equals(cls); cls = cls.getSuperclass()) {
             command = cls.getAnnotation(Command.class);
-            
-            if(cls.isAnnotationPresent(Groups.class))
-            {
+
+            if (cls.isAnnotationPresent(Groups.class)) {
                 groups.addAll(Arrays.asList(cls.getAnnotation(Groups.class).value()));
             }
-            if(cls.isAnnotationPresent(Group.class))
-            {
+            if (cls.isAnnotationPresent(Group.class)) {
                 groups.add(cls.getAnnotation(Group.class));
             }
         }
@@ -106,24 +103,16 @@ public class MetadataLoader {
         String name = command.name();
         String description = command.description().isEmpty() ? null : command.description();
         List<String> groupNames = Arrays.asList(command.groupNames());
-        
+
         boolean hidden = command.hidden();
 
         InjectionMetadata injectionMetadata = loadInjectionMetadata(commandType);
 
-        CommandMetadata commandMetadata = new CommandMetadata(
-                name,
-                description,
-                command.discussion().isEmpty() ? null : command.discussion(),
-                command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
-                hidden, injectionMetadata.globalOptions,
-                injectionMetadata.groupOptions,
-                injectionMetadata.commandOptions,
-                Iterables.getFirst(injectionMetadata.arguments, null),
-                injectionMetadata.metadataInjections,
-                commandType,
-                groupNames,
-                groups);
+        CommandMetadata commandMetadata = new CommandMetadata(name, description, command.discussion().isEmpty() ? null
+                : command.discussion(), command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
+                hidden, injectionMetadata.globalOptions, injectionMetadata.groupOptions,
+                injectionMetadata.commandOptions, Iterables.getFirst(injectionMetadata.arguments, null),
+                injectionMetadata.metadataInjections, commandType, groupNames, groups);
 
         return commandMetadata;
     }
@@ -140,10 +129,8 @@ public class MetadataLoader {
         return injectionMetadata;
     }
 
-    public static void loadInjectionMetadata(Class<?> type, InjectionMetadata injectionMetadata, List<Field> fields)
-    {
-        if(type.isInterface())
-        {
+    public static void loadInjectionMetadata(Class<?> type, InjectionMetadata injectionMetadata, List<Field> fields) {
+        if (type.isInterface()) {
             return;
         }
         for (Class<?> cls = type; !Object.class.equals(cls); cls = cls.getSuperclass()) {
@@ -164,23 +151,24 @@ public class MetadataLoader {
 
                 try {
                     @SuppressWarnings("unchecked")
-                    Annotation aGuiceInject = field.getAnnotation((Class<? extends Annotation>)Class.forName("com.google.inject.Inject"));
+                    Annotation aGuiceInject = field.getAnnotation((Class<? extends Annotation>) Class
+                            .forName("com.google.inject.Inject"));
                     if (aGuiceInject != null) {
-                        if (field.getType().equals(GlobalMetadata.class) ||
-                            field.getType().equals(CommandGroupMetadata.class) ||
-                            field.getType().equals(CommandMetadata.class)) {
+                        if (field.getType().equals(GlobalMetadata.class)
+                                || field.getType().equals(CommandGroupMetadata.class)
+                                || field.getType().equals(CommandMetadata.class)) {
                             injectionMetadata.metadataInjections.add(new Accessor(path));
                         } else {
                             loadInjectionMetadata(field.getType(), injectionMetadata, path);
                         }
                     }
-                }
-                catch (ClassNotFoundException e) {
-                    // this is ok, means Guice is not on the class path, so probably not being used
+                } catch (ClassNotFoundException e) {
+                    // this is ok, means Guice is not on the class path, so
+                    // probably not being used
                     // and thus, ok that this did not work.
-                }
-                catch (ClassCastException e) {
-                    // ignore this too, we're doing some funky cross your fingers type reflect stuff to play
+                } catch (ClassCastException e) {
+                    // ignore this too, we're doing some funky cross your
+                    // fingers type reflect stuff to play
                     // nicely with Guice
                 }
 
@@ -251,12 +239,11 @@ public class MetadataLoader {
 
                 Arguments argumentsAnnotation = field.getAnnotation(Arguments.class);
                 if (field.isAnnotationPresent(Arguments.class)) {
-                    ImmutableList.Builder<String> titlesBuilder = ImmutableList.<String>builder();
-                    
+                    ImmutableList.Builder<String> titlesBuilder = ImmutableList.<String> builder();
+
                     if (!(argumentsAnnotation.title().length == 1 && argumentsAnnotation.title()[0].equals(""))) {
                         titlesBuilder.add(argumentsAnnotation.title());
-                    }
-                    else {
+                    } else {
                         titlesBuilder.add(field.getName());
                     }
 
@@ -264,15 +251,22 @@ public class MetadataLoader {
                     String usage = argumentsAnnotation.usage();
                     boolean required = argumentsAnnotation.required();
 
-                    injectionMetadata.arguments.add(new ArgumentsMetadata(titlesBuilder.build(), description, usage, required, path));
+                    injectionMetadata.arguments.add(new ArgumentsMetadata(titlesBuilder.build(), description, usage,
+                            required, argumentsAnnotation.completionBehaviour(), argumentsAnnotation
+                                    .completionCommand(), path));
                 }
             }
         }
     }
 
-    private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options)
-    {
-        Multimap<OptionMetadata, OptionMetadata> metadataIndex = Multimaps.newMultimap(Maps.<OptionMetadata, Collection<OptionMetadata>>newLinkedHashMap(), new Supplier<List<OptionMetadata>>() { public List<OptionMetadata> get() { return Lists.newArrayList(); } } );
+    private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options) {
+        Multimap<OptionMetadata, OptionMetadata> metadataIndex = Multimaps.newMultimap(
+                Maps.<OptionMetadata, Collection<OptionMetadata>> newLinkedHashMap(),
+                new Supplier<List<OptionMetadata>>() {
+                    public List<OptionMetadata> get() {
+                        return Lists.newArrayList();
+                    }
+                });
         for (OptionMetadata option : options) {
             metadataIndex.put(option, option);
         }
@@ -372,85 +366,82 @@ public class MetadataLoader {
         return ImmutableList.<T> builder().addAll(iterable).add(item).build();
     }
 
-    public static void loadCommandsIntoGroupsByAnnotation(List<CommandMetadata> allCommands, List<CommandGroupMetadata> commandGroups, List<CommandMetadata> defaultCommandGroup)
-    {
+    public static void loadCommandsIntoGroupsByAnnotation(List<CommandMetadata> allCommands,
+            List<CommandGroupMetadata> commandGroups, List<CommandMetadata> defaultCommandGroup) {
         List<CommandMetadata> newCommands = new ArrayList<CommandMetadata>();
 
         // first, create any groups explicitly annotated
-        createGroupsFromAnnotations(allCommands,newCommands,commandGroups,defaultCommandGroup);
-        
+        createGroupsFromAnnotations(allCommands, newCommands, commandGroups, defaultCommandGroup);
+
         for (CommandMetadata command : allCommands) {
             boolean added = false;
-            
-            //now add the command to any groupNames specified in the Command annotation
-            for(String groupName : command.getGroupNames())
-            {
-                CommandGroupMetadata group = find(commandGroups, compose(equalTo(groupName), CommandGroupMetadata.nameGetter()), null);
+
+            // now add the command to any groupNames specified in the Command
+            // annotation
+            for (String groupName : command.getGroupNames()) {
+                CommandGroupMetadata group = find(commandGroups,
+                        compose(equalTo(groupName), CommandGroupMetadata.nameGetter()), null);
                 if (group != null) {
                     group.addCommand(command);
                     added = true;
-                }
-                else
-                {
+                } else {
                     ImmutableList.Builder<OptionMetadata> groupOptionsBuilder = ImmutableList.builder();
                     groupOptionsBuilder.addAll(command.getGroupOptions());
-                    CommandGroupMetadata newGroup = loadCommandGroup(groupName,"",null, Collections.singletonList(command));
+                    CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", null,
+                            Collections.singletonList(command));
                     commandGroups.add(newGroup);
                     added = true;
                 }
             }
 
-            if(added && defaultCommandGroup.contains(command))
-            {
+            if (added && defaultCommandGroup.contains(command)) {
                 defaultCommandGroup.remove(command);
             }
         }
-        
+
         allCommands.addAll(newCommands);
     }
 
     @SuppressWarnings("rawtypes")
-    private static void createGroupsFromAnnotations(List<CommandMetadata> allCommands, List<CommandMetadata> newCommands, List<CommandGroupMetadata> commandGroups, List<CommandMetadata> defaultCommandGroup)
-    {
+    private static void createGroupsFromAnnotations(List<CommandMetadata> allCommands,
+            List<CommandMetadata> newCommands, List<CommandGroupMetadata> commandGroups,
+            List<CommandMetadata> defaultCommandGroup) {
         for (CommandMetadata command : allCommands) {
             boolean added = false;
 
             // first, create any groups explicitly annotated
-            for(Group groupAnno : command.getGroups())
-            {
+            for (Group groupAnno : command.getGroups()) {
                 Class defaultCommandClass = null;
                 CommandMetadata defaultCommand = null;
 
-                //load default command if needed
-                if(!groupAnno.defaultCommand().equals(Group.DEFAULT.class))
-                {
+                // load default command if needed
+                if (!groupAnno.defaultCommand().equals(Group.DEFAULT.class)) {
                     defaultCommandClass = groupAnno.defaultCommand();
-                    defaultCommand = find(allCommands, compose(equalTo(defaultCommandClass), CommandMetadata.typeGetter()), null);
-                    if(null == defaultCommand)
-                    {
+                    defaultCommand = find(allCommands,
+                            compose(equalTo(defaultCommandClass), CommandMetadata.typeGetter()), null);
+                    if (null == defaultCommand) {
                         defaultCommand = loadCommand(defaultCommandClass);
                         newCommands.add(defaultCommand);
                     }
                 }
 
-                //load other commands if needed
+                // load other commands if needed
                 List<CommandMetadata> groupCommands = new ArrayList<CommandMetadata>(groupAnno.commands().length);
                 CommandMetadata groupCommand = null;
-                for(Class commandClass : groupAnno.commands())
-                {
+                for (Class commandClass : groupAnno.commands()) {
                     groupCommand = find(allCommands, compose(equalTo(commandClass), CommandMetadata.typeGetter()), null);
-                    if(null == groupCommand)
-                    {
+                    if (null == groupCommand) {
                         groupCommand = loadCommand(commandClass);
                         newCommands.add(groupCommand);
                         groupCommands.add(groupCommand);
                     }
                 }
 
-                CommandGroupMetadata groupMetadata = find(commandGroups, compose(equalTo(groupAnno.name()), CommandGroupMetadata.nameGetter()), null);
-                if(null == groupMetadata)
-                {
-                    groupMetadata = loadCommandGroup(groupAnno.name(),groupAnno.description(),defaultCommand, groupCommands);
+                CommandGroupMetadata groupMetadata = find(commandGroups,
+                        compose(equalTo(groupAnno.name()), CommandGroupMetadata.nameGetter()), null);
+                if (null == groupMetadata) {
+                    groupMetadata = loadCommandGroup(groupAnno.name(), groupAnno.description(), defaultCommand,
+                            groupCommands);
                     commandGroups.add(groupMetadata);
                 }
 
@@ -458,8 +449,7 @@ public class MetadataLoader {
                 added = true;
             }
 
-            if(added && defaultCommandGroup.contains(command))
-            {
+            if (added && defaultCommandGroup.contains(command)) {
                 defaultCommandGroup.remove(command);
             }
         }

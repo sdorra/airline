@@ -1,10 +1,9 @@
 package io.airlift.airline;
 
 /**
- * Possible completion options for options/arguments
- * 
+ * Possible completion behaviour for options/arguments 
  */
-public class CompletionOptions {
+public class CompletionBehaviour {
     /**
      * None, either this is a flag option (i.e. arity zero) or you want to limit
      * completions to those specified by the option metadata

@@ -21,7 +21,7 @@ public class OptionMetadata {
     private final OptionType optionType;
     private final Set<String> options;
     private final String title, description, completionCommand;
-    private final int arity, completionBehaviours;
+    private final int arity, completionBehaviour;
     private final boolean required, hidden, overrides, sealed;
     private final Set<String> allowedValues;
     private Set<Accessor> accessors;
@@ -55,7 +55,7 @@ public class OptionMetadata {
         this.hidden = hidden;
         this.overrides = overrides;
         this.sealed = sealed;
-        this.completionBehaviours = completionBehaviours;
+        this.completionBehaviour = completionBehaviours;
         this.completionCommand = completionCommand;
 
         if (allowedValues != null) {
@@ -90,7 +90,7 @@ public class OptionMetadata {
         } else {
             this.allowedValues = null;
         }
-        this.completionBehaviours = option.completionBehaviours;
+        this.completionBehaviour = option.completionBehaviour;
         this.completionCommand = option.completionCommand;
 
         Set<Accessor> accessors = newHashSet();
@@ -139,7 +139,7 @@ public class OptionMetadata {
     }
     
     public int getCompletionBehaviours() {
-        return completionBehaviours;
+        return completionBehaviour;
     }
     
     public String getCompletionCommand() {
@@ -337,7 +337,7 @@ public class OptionMetadata {
                                     child.overrides,
                                     child.sealed,
                                     child.allowedValues != null ? child.allowedValues : parent.allowedValues,
-                                    child.completionBehaviours,
+                                    child.completionBehaviour,
                                     child.completionCommand,
                                     null);
         //@formatter:on

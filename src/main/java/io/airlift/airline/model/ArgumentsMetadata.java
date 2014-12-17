@@ -13,16 +13,15 @@ import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 
-public class ArgumentsMetadata
-{
+public class ArgumentsMetadata {
     private final List<String> titles;
-    private final String description;
-    private final String usage;
+    private final String description, usage, completionCommand;
+    private final int completionBehaviour;
     private final boolean required;
     private final Set<Accessor> accessors;
 
-    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required, Iterable<Field> path)
-    {
+    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required,
+            int completionBehaviour, String completionCommand, Iterable<Field> path) {
         Preconditions.checkNotNull(titles, "title is null");
         Preconditions.checkNotNull(path, "path is null");
         Preconditions.checkArgument(!Iterables.isEmpty(path), "path is empty");
@@ -31,11 +30,12 @@ public class ArgumentsMetadata
         this.description = description;
         this.usage = usage;
         this.required = required;
+        this.completionBehaviour = completionBehaviour;
+        this.completionCommand = completionCommand;
         this.accessors = ImmutableSet.of(new Accessor(path));
     }
 
-    public ArgumentsMetadata(Iterable<ArgumentsMetadata> arguments)
-    {
+    public ArgumentsMetadata(Iterable<ArgumentsMetadata> arguments) {
         Preconditions.checkNotNull(arguments, "arguments is null");
         Preconditions.checkArgument(!Iterables.isEmpty(arguments), "arguments is empty");
 
@@ -45,55 +45,56 @@ public class ArgumentsMetadata
         this.description = first.description;
         this.usage = first.usage;
         this.required = first.required;
+        this.completionBehaviour = first.completionBehaviour;
+        this.completionCommand = first.completionCommand;
 
         Set<Accessor> accessors = newHashSet();
         for (ArgumentsMetadata other : arguments) {
-            Preconditions.checkArgument(first.equals(other),
-                    "Conflicting arguments definitions: %s, %s", first, other);
+            Preconditions.checkArgument(first.equals(other), "Conflicting arguments definitions: %s, %s", first, other);
 
             accessors.addAll(other.getAccessors());
         }
         this.accessors = ImmutableSet.copyOf(accessors);
     }
 
-    public List<String> getTitle()
-    {
+    public List<String> getTitle() {
         return titles;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public String getUsage()
-    {
+    public String getUsage() {
         return usage;
     }
 
-    public boolean isRequired()
-    {
+    public boolean isRequired() {
         return required;
     }
 
-    public Set<Accessor> getAccessors()
-    {
+    public int getCompletionBehaviours() {
+        return completionBehaviour;
+    }
+
+    public String getCompletionCommand() {
+        return completionCommand;
+    }
+
+    public Set<Accessor> getAccessors() {
         return accessors;
     }
 
-    public boolean isMultiValued()
-    {
+    public boolean isMultiValued() {
         return accessors.iterator().next().isMultiValued();
     }
 
-    public Class<?> getJavaType()
-    {
+    public Class<?> getJavaType() {
         return accessors.iterator().next().getJavaType();
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -120,8 +121,7 @@ public class ArgumentsMetadata
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = titles.hashCode();
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (usage != null ? usage.hashCode() : 0);
@@ -130,8 +130,7 @@ public class ArgumentsMetadata
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("ArgumentsMetadata");
         sb.append("{title='").append(Joiner.on(',').join(titles)).append('\'');
