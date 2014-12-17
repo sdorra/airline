@@ -32,7 +32,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Latest Release
 
-This fork is available using the following dependency information:
+This fork is available from Maven Central using the following dependency information:
 
 ```xml
 <dependency>
