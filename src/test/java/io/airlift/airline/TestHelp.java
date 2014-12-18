@@ -18,6 +18,7 @@
 package io.airlift.airline;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -40,6 +41,7 @@ import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandRemove;
 import io.airlift.airline.help.Help;
 import io.airlift.airline.help.cli.CliCommandUsageGenerator;
+import io.airlift.airline.help.ronn.RonnGlobalUsageGenerator;
 
 import org.testng.annotations.Test;
 
@@ -659,6 +661,157 @@ public class TestHelp {
                 "\n" +
                 "        <parameters>\n" +
                 "\n" +
+                "\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testRonn() throws IOException {
+      //@formatter:off
+        CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
+                .withDescription("the stupid content tracker")
+                .withDefaultCommand(Help.class)
+                .withCommand(Help.class)
+                .withCommand(Add.class);
+
+        builder.withGroup("remote")
+                .withDescription("Manage set of tracked repositories")
+                .withDefaultCommand(RemoteShow.class)
+                .withCommand(RemoteShow.class)
+                .withCommand(RemoteAdd.class);
+
+        Cli<Runnable> gitParser = builder.build();
+        
+        RonnGlobalUsageGenerator generator = new RonnGlobalUsageGenerator();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        generator.usage(gitParser.getMetadata(), out);
+        String usage = new String(out.toByteArray(), utf8);
+        testStringAssert(usage,
+                "git(1) -- the stupid content tracker\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] [<group>] <command> [command-args]\n" +
+                "\n" +
+                "## GLOBAL OPTIONS\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "## COMMAND GROUPS\n" +
+                "\n" +
+                "Commands are grouped as follows:\n" +
+                "\n" +
+                "* Default (no <group> specified)\n" +
+                "\n" +
+                "  * `help`:\n" +
+                "  Display help information\n" +
+                "\n" +
+                "  * `add`:\n" +
+                "  Add file contents to the index\n" +
+                "\n" +
+                "* **remote**\n" +
+                "\n" +
+                "  Manage set of tracked repositories\n" +
+                "\n" +
+                "  * `show`:\n" +
+                "  Gives some information about the remote <name>\n" +
+                "\n" +
+                "  * `add`:\n" +
+                "  Adds a remote\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## git_help(1)\n" +
+                "\n" +
+                "### SYNOPSIS\n" +
+                "\n" +
+                "`git` `help`  [--] [ <command>... ]\n" +
+                "\n" +
+                "Display help information\n" +
+                "\n" +
+                "### OPTIONS\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <command>:\n" +
+                "\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## git_add(1)\n" +
+                "\n" +
+                "### SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `add` [ -i ] [--] [ <patterns>... ]\n" +
+                "\n" +
+                "Add file contents to the index\n" +
+                "\n" +
+                "### OPTIONS\n" +
+                "\n" +
+                "* `-i`:\n" +
+                "Add modified contents interactively.\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <patterns>:\n" +
+                "Patterns of files to be added\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## git_remote_show(1)\n" +
+                "\n" +
+                "### SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
+                "\n" +
+                "Gives some information about the remote <name>\n" +
+                "\n" +
+                "### OPTIONS\n" +
+                "\n" +
+                "* `-n`:\n" +
+                "Do not query remote heads\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <remote>:\n" +
+                "Remote to show\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## git_remote_add(1)\n" +
+                "\n" +
+                "### SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `remote` `add` [ -t <branch> ] [--] [ <name> <url>... ]\n" +
+                "\n" +
+                "Adds a remote\n" +
+                "\n" +
+                "### OPTIONS\n" +
+                "\n" +
+                "* `-t` <branch>:\n" +
+                "Track only a specific branch\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <name> <url>:\n" +
+                "Name and URL of remote repository to add\n" +
+                "\n" +
+                "---\n" +
                 "\n");
         //@formatter:on
     }

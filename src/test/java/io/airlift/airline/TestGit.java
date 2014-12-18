@@ -26,7 +26,7 @@ public class TestGit
         git("help", "remote");
         git("help", "remote", "show");
     }
-
+    
     private void git(String... args)
     {
         System.out.println("$ git " + Joiner.on(' ').join(args));

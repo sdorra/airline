@@ -29,20 +29,58 @@ import io.airlift.airline.model.OptionMetadata;
  */
 public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
+    private final int manSection;
+    private final boolean standalone;
+
+    public RonnCommandUsageGenerator() {
+        this(ManSections.GENERAL_COMMANDS, true);
+    }
+
+    /**
+     * Creates a new RONN usage generator
+     * 
+     * @param manSection
+     *            Man section to which this command belongs, use constants from
+     *            {@link ManSections}
+     * @param standalone
+     *            Whether this is a standalone RONN file, this controls the
+     *            formatting of the title which is significant when using this
+     *            in conjunction with things like the
+     *            {@link RonnGlobalUsageGenerator} where the output from this is
+     *            output a fragment of a larger document and RONN will not
+     *            render the titles if standalone is enabled
+     */
+    public RonnCommandUsageGenerator(int manSection, boolean standalone) {
+        this.manSection = manSection;
+        this.standalone = standalone;
+    }
+
     @Override
     public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, OutputStream output) throws IOException {
         final String NEW_PARA = "\n\n";
+        String SECTION_HEADER = "## ";
 
         Writer writer = new OutputStreamWriter(output);
 
-        writer.append(programName).append("_");
-        writer.append(groupName).append("_");
-        writer.append(command.getName()).append("(1) -");
-        writer.append(command.getDescription()).append("\n");
-        writer.append("==========");
+        if (!this.standalone) {
+            writer.append(SECTION_HEADER);
+            SECTION_HEADER = "#" + SECTION_HEADER;
+        }
+        if (programName != null) {
+            writer.append(programName).append("_");
+        }
+        if (groupName != null) {
+            writer.append(groupName).append("_");
+        }
+        writer.append(command.getName()).append("(").append(Integer.toString(this.manSection)).append(")");
+        if (this.standalone) {
+            writer.append(" -- ");
+            writer.append(command.getDescription()).append("\n");
+            writer.append("==========");
+        }
 
-        writer.append(NEW_PARA).append("## SYNOPSIS").append(NEW_PARA);
+        writer.append(NEW_PARA).append(SECTION_HEADER).append("SYNOPSIS").append(NEW_PARA);
         List<OptionMetadata> options = newArrayList();
         List<OptionMetadata> aOptions;
         if (programName != null) {
@@ -71,9 +109,13 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (arguments != null) {
             writer.append(" [--] ").append(toUsage(arguments));
         }
+        
+        if (!this.standalone) {
+            writer.append(NEW_PARA).append(command.getDescription());
+        }
 
         if (options.size() > 0 || arguments != null) {
-            writer.append(NEW_PARA).append("## OPTIONS");
+            writer.append(NEW_PARA).append(SECTION_HEADER).append("OPTIONS");
             options = sortOptions(options);
 
             for (OptionMetadata option : options) {
@@ -91,7 +133,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
             if (arguments != null) {
                 // "--" option
-                writer.append(NEW_PARA).append("* --:\n");
+                writer.append(NEW_PARA).append("* `--`:\n");
 
                 // description
                 writer.append("This option can be used to separate command-line options from the "
@@ -104,14 +146,13 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 writer.append(arguments.getDescription());
             }
         }
-
         if (command.getDiscussion() != null) {
-            writer.append(NEW_PARA).append("## DISCUSSION").append(NEW_PARA);
+            writer.append(NEW_PARA).append(SECTION_HEADER).append("DISCUSSION").append(NEW_PARA);
             writer.append(command.getDiscussion());
         }
 
         if (command.getExamples() != null && !command.getExamples().isEmpty()) {
-            writer.append(NEW_PARA).append("## EXAMPLES");
+            writer.append(NEW_PARA).append(SECTION_HEADER).append("EXAMPLES");
 
             // this will only work for "well-formed" examples
             for (int i = 0; i < command.getExamples().size(); i += 3) {
@@ -131,30 +172,26 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         writer.flush();
         output.flush();
     }
-    
+
     @Override
-    protected String toDescription(OptionMetadata option)
-    {
+    protected String toDescription(OptionMetadata option) {
         Set<String> options = option.getOptions();
         StringBuilder stringBuilder = new StringBuilder();
 
         final String argumentString;
         if (option.getArity() > 0) {
-            argumentString = Joiner.on(" ").join(Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>()
-            {
-                public String apply(@Nullable String argument)
-                {
-                    return "<" + argument + ">";
-                }
-            }));
+            argumentString = Joiner.on(" ").join(
+                    Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
+                        public String apply(@Nullable String argument) {
+                            return "<" + argument + ">";
+                        }
+                    }));
         } else {
             argumentString = null;
         }
 
-        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>()
-        {
-            public String apply(@Nullable String option)
-            {
+        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
+            public String apply(@Nullable String option) {
                 if (argumentString != null) {
                     return "`" + option + "` " + argumentString;
                 }
