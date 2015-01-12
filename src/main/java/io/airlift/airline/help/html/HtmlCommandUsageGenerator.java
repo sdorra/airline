@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
@@ -24,15 +25,15 @@ import io.airlift.airline.model.OptionMetadata;
  * A usage generator that generates HTML documentation
  */
 public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
-    
+
     public static final String DEFAULT_STYLESHEET = "css/bootstrap.min.css";
 
     protected final List<String> stylesheetUrls = newArrayList();
-    
+
     public HtmlCommandUsageGenerator() {
         this(DEFAULT_STYLESHEET);
     }
-    
+
     public HtmlCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator) {
         this(optionComparator, DEFAULT_STYLESHEET);
     }
@@ -55,7 +56,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             }
         }
     }
-    
+
     protected void addAdditionalCss(Writer writer) throws IOException {
         writer.append("    body { margin: 50px; }\n");
     }
@@ -227,12 +228,51 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("</div>\n");
             writer.append("</div>\n");
         }
-        
-        // TODO Include exit codes
+
+        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
+            writer.append(NEWLINE);
+            writer.append("<h1 class=\"text-info\">EXIT STATUS</h1>\n").append(NEWLINE);
+
+            writer.append("<p>\n");
+            writer.append("  The ");
+            if (programName != null) {
+                writer.append(programName).append(" ");
+            }
+            if (groupName != null) {
+                writer.append(groupName).append(" ");
+            }
+            writer.append(commandName).append(" command exits with one of the following values:");
+            writer.append("</p>\n");
+
+            for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
+                writer.append("<div class=\"row\">\n");
+                writer.append("<div class=\"span8 offset1\">\n");
+
+                // Print the exit code
+                writer.append(exit.getKey().toString());
+
+                // Include description if available
+                if (!StringUtils.isEmpty(exit.getValue())) {
+                    writer.append("</div>\n");
+                    writer.append("</div>\n");
+                    
+                    writer.append("<div class=\"row\">\n");
+                    writer.append("<div class=\"span8 offset2\">\n");
+                    
+                    writer.append(htmlize(exit.getValue()));
+                    
+                    writer.append("</div>\n");
+                    writer.append("</div>\n");
+                } else {
+                    writer.append("</div>\n");
+                    writer.append("</div>\n");
+                }
+            }
+        }
 
         writer.append("</body>\n");
         writer.append("</html>\n");
-        
+
         // Flush the output
         writer.flush();
         output.flush();
