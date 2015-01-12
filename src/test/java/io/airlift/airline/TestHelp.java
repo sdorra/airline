@@ -852,16 +852,16 @@ public class TestHelp {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new RonnCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
         testStringAssert(new String(out.toByteArray(), utf8),
-                "ArgsExitCodes(1) -- ArgsExitCodes description\n" +
+                "test(1) -- ArgsExitCodes description\n" +
                 "==========\n" +
                 "\n" +
                 "## SYNOPSIS\n" +
                 "\n" +
-                " `ArgsExitCodes` \n" +
+                " `test` \n" +
                 "\n" +
                 "## EXIT STATUS\n" +
                 "\n" +
-                "The ArgsExitCodes(1) command exits with one of the following values:\n" +
+                "The test(1) command exits with one of the following values:\n" +
                 "\n" +
                 "* 0 - Success\n" +
                 "* 1\n" +

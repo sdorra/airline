@@ -65,13 +65,17 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         final String NEW_PARA = "\n\n";
         String SECTION_HEADER = "## ";
 
+        // Fall back to metadata declared name if necessary
+        if (commandName == null)
+            commandName = command.getName();
+
         Writer writer = new OutputStreamWriter(output);
 
         if (!this.standalone) {
             writer.append(SECTION_HEADER);
             SECTION_HEADER = "#" + SECTION_HEADER;
         }
-        writeFullCommandName(programName, groupName, command, writer);
+        writeFullCommandName(programName, groupName, commandName, writer);
         if (this.standalone) {
             writer.append(" -- ");
             writer.append(command.getDescription()).append("\n");
@@ -98,7 +102,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             }
         }
         aOptions = command.getCommandOptions();
-        writer.append(" `").append(command.getName()).append("` ")
+        writer.append(" `").append(commandName).append("` ")
                 .append(Joiner.on(" ").join(toSynopsisUsage(sortOptions(aOptions))));
         options.addAll(aOptions);
 
@@ -169,7 +173,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
             writer.append(NEW_PARA).append(SECTION_HEADER).append("EXIT STATUS");
             writer.append(NEW_PARA).append("The ");
-            writeFullCommandName(programName, groupName, command, writer);
+            writeFullCommandName(programName, groupName, commandName, writer);
             writer.append(" command exits with one of the following values:");
             writer.append(NEW_PARA);
 
@@ -204,7 +208,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @throws IOException
      */
-    protected void writeFullCommandName(String programName, String groupName, CommandMetadata command, Writer writer)
+    protected void writeFullCommandName(String programName, String groupName, String commandName, Writer writer)
             throws IOException {
         if (programName != null) {
             writer.append(programName).append("_");
@@ -212,7 +216,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (groupName != null) {
             writer.append(groupName).append("_");
         }
-        writer.append(command.getName()).append("(").append(Integer.toString(this.manSection)).append(")");
+        writer.append(commandName).append("(").append(Integer.toString(this.manSection)).append(")");
     }
 
     @Override
