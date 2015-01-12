@@ -13,7 +13,10 @@ This fork contains several improvements over the upstream fork created both by m
     - `Arguments` improvements
         - New `completionBehaviour` and `completionCommand` properties allowing defining behaviours for the purposes of completion script generators
     - `Group` annotation for specifying groups
-    - `Command` annotation supports discussion and examples
+    - `Command` improvements
+        - `discussion` and `examples` properties for providing more detailed help information
+        - `groupNames` property for specifying the groups to which a command should belong
+        - `exitCodes` and `exitDescriptions` annotations for describing the exit statuses for a command
 - Help system improvements
     - Help printing respects new lines allowing them to be used in longer descriptions
     - Support for additional examples and discussion sections in command help
@@ -21,7 +24,7 @@ This fork contains several improvements over the upstream fork created both by m
         - Command Line (the existing help system)
         - [Ronn](http://rtomayko.github.io/ronn/)
         - HTML
-        - Bash auto-completion script
+        - Bash auto-completion scripts
 - Support for Command Factories
 
 ## License

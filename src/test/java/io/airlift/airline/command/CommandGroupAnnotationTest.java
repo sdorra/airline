@@ -17,7 +17,7 @@ public class CommandGroupAnnotationTest
     public void groupIsCreatedFromGroupsAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupsAnnotation.class)
                 .build();
 
@@ -33,7 +33,7 @@ public class CommandGroupAnnotationTest
     public void extraCommandsAreAddedFromGroupsAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupsAnnotation.class)
                 .build();
 
@@ -49,11 +49,11 @@ public class CommandGroupAnnotationTest
     public void commandRemovedFromDefaultGroupWithGroupsAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupsAnnotation.class)
                 .build();
 
-        Object command = parser.parse("commandWithGroupsAnno", "-i", "A.java");
+        parser.parse("commandWithGroupsAnno", "-i", "A.java");
 
     }
 
@@ -66,7 +66,7 @@ public class CommandGroupAnnotationTest
     public void defaultCommandIsAddedFromGroupsAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupsAnnotation.class)
                 .build();
 
@@ -85,7 +85,7 @@ public class CommandGroupAnnotationTest
     public void groupIsCreatedFromGroupAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupAnnotation.class)
                 .build();
 
@@ -101,7 +101,7 @@ public class CommandGroupAnnotationTest
     public void extraCommandsAreAddedFromGroupAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupAnnotation.class)
                 .build();
 
@@ -117,11 +117,11 @@ public class CommandGroupAnnotationTest
     public void commandRemovedFromDefaultGroupWithGroupAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupAnnotation.class)
                 .build();
 
-        Object command = parser.parse("commandWithGroup", "-i", "A.java");
+        parser.parse("commandWithGroup", "-i", "A.java");
 
     }
 
@@ -134,7 +134,7 @@ public class CommandGroupAnnotationTest
     public void defaultCommandIsAddedFromGroupAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupAnnotation.class)
                 .build();
 
@@ -149,11 +149,12 @@ public class CommandGroupAnnotationTest
     /*
        Tests for groupNames in Command annotation
     */
+    @SuppressWarnings("unchecked")
     @Test
     public void addedToGroupFromGroupAnnotation()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommands(CommandWithGroupAnnotation.class,CommandWithGroupNames.class)
                 .build();
 
@@ -168,8 +169,9 @@ public class CommandGroupAnnotationTest
     @Test
     public void addedToSingletonGroupWithoutGroupAnnotation()
     {
+        @SuppressWarnings("unchecked")
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommands(CommandWithGroupNames.class)
                 .build();
 
@@ -185,11 +187,11 @@ public class CommandGroupAnnotationTest
     public void commandRemovedFromDefaultGroupWithGroupNames()
     {
         Cli<?> parser = Cli
-                .buildCli("junk")
+                .builder("junk")
                 .withCommand(CommandWithGroupNames.class)
                 .build();
 
-        Object command = parser.parse("commandWithGroupNames", "-i", "A.java");
+        parser.parse("commandWithGroupNames", "-i", "A.java");
 
     }
 

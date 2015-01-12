@@ -250,13 +250,13 @@ public class TestSingleCommand
     @Test(expectedExceptions = ParseException.class)
     public void allowedValuesShouldThrowIfNotAllowed1()
     {
-        ArgsAllowedValues a = singleCommand(ArgsAllowedValues.class).parse("-mode", "d");
+        singleCommand(ArgsAllowedValues.class).parse("-mode", "d");
     }
     
     @Test(expectedExceptions = ParseException.class)
     public void allowedValuesShouldThrowIfNotAllowed2()
     {
-        ArgsAllowedValues a = singleCommand(ArgsAllowedValues.class).parse("-mode=d");
+        singleCommand(ArgsAllowedValues.class).parse("-mode=d");
     }
 
     @Test
@@ -404,7 +404,6 @@ public class TestSingleCommand
         singleCommand(ArgsEnum.class).parse("A");
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     @Test(expectedExceptions = ParseException.class)
     public void shouldThrowIfUnknownOption()
     {

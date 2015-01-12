@@ -5,6 +5,8 @@
 - Annotation improvements
     - `Command` improvements
         - Added `exitCodes` and `exitDescriptions` for declaring the exit codes a command can produce and their meanings
+- Help improvements
+    - All command help generator now include exit code information if declared for a command
 
 ## 0.8
 

@@ -18,7 +18,6 @@
 package io.airlift.airline;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -194,7 +193,6 @@ public class TestHelp {
      * @param expected
      *            Expected
      */
-    @SuppressWarnings("unused")
     private void testStringAssert(String actual, String expected) {
         if (!actual.equals(expected)) {
             if (actual.length() != expected.length()) {

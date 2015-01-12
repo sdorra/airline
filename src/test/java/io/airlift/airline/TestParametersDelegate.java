@@ -240,7 +240,6 @@ public class TestParametersDelegate
 
     // ========================================================================================================================
 
-    @SuppressWarnings("UnusedDeclaration")
     @Command(name = "command")
     public static class ConflictingMainParametersAreNotAllowed
     {

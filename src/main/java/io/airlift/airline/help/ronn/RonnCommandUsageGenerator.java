@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import io.airlift.airline.help.AbstractCommandUsageGenerator;
-import io.airlift.airline.help.UsagePrinter;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;

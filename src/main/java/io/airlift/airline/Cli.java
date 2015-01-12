@@ -47,18 +47,6 @@ public class Cli<C>
         return new CliBuilder<T>(name);
     }
 
-    @Deprecated
-    public static CliBuilder<Object> buildCli(String name)
-    {
-        return builder(name);
-    }
-
-    @Deprecated
-    public static <T> CliBuilder<T> buildCli(String name, Class<T> commandTypes)
-    {
-        return builder(name);
-    }
-
     private final GlobalMetadata metadata;
 
     private final CommandFactory<C> mCommandFactory;

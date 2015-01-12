@@ -389,7 +389,6 @@ public class TestCommand
         singleCommandParser(ArgsEnum.class).parse("-choice", "A");
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     @Test(expectedExceptions = ParseException.class)
     public void shouldThrowIfUnknownOption()
     {
