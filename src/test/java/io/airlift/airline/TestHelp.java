@@ -31,6 +31,7 @@ import io.airlift.airline.args.Args1;
 import io.airlift.airline.args.Args2;
 import io.airlift.airline.args.ArgsArityString;
 import io.airlift.airline.args.ArgsBooleanArity;
+import io.airlift.airline.args.ArgsExitCodes;
 import io.airlift.airline.args.ArgsInherited;
 import io.airlift.airline.args.ArgsMultiLineDescription;
 import io.airlift.airline.args.ArgsRequired;
@@ -813,6 +814,30 @@ public class TestHelp {
                 "\n" +
                 "---\n" +
                 "\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testExitCodes() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsExitCodes> command = singleCommand(ArgsExitCodes.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
+        assertEquals(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test - ArgsExitCodes description\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test\n" +
+                "\n" +
+                "EXIT CODES\n" +
+                "        0\n" +
+                "            Success\n" +
+                "        1\n" +
+                "\n" +
+                "        2\n" +
+                "            Error 2\n");
         //@formatter:on
     }
 }

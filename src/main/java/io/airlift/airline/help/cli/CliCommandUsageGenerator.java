@@ -5,6 +5,7 @@ import static io.airlift.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import io.airlift.airline.help.AbstractPrintedCommandUsageGenerator;
 import io.airlift.airline.help.UsagePrinter;
@@ -13,6 +14,8 @@ import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Iterables;
 
@@ -83,18 +86,21 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
                 // option names
                 UsagePrinter optionPrinter = out.newIndentedPrinter(8);
                 optionPrinter.append(toDescription(option)).newline();
+                optionPrinter.flush();
 
                 // description
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
                 descriptionPrinter.append(option.getDescription()).newline();
 
                 descriptionPrinter.newline();
+                descriptionPrinter.flush();
             }
 
             if (arguments != null) {
                 // "--" option
                 UsagePrinter optionPrinter = out.newIndentedPrinter(8);
                 optionPrinter.append("--").newline();
+                optionPrinter.flush();
 
                 // description
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
@@ -110,21 +116,47 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
                 // description
                 descriptionPrinter.append(arguments.getDescription()).newline();
                 descriptionPrinter.newline();
+                descriptionPrinter.flush();
             }
         }
 
         if (command.getDiscussion() != null) {
             out.append("DISCUSSION").newline();
-            UsagePrinter disc = out.newIndentedPrinter(8);
+            UsagePrinter discussionPrinter = out.newIndentedPrinter(8);
 
-            disc.append(command.getDiscussion()).newline().newline();
+            discussionPrinter.append(command.getDiscussion()).newline().newline();
+            discussionPrinter.flush();
         }
 
         if (command.getExamples() != null && !command.getExamples().isEmpty()) {
             out.append("EXAMPLES").newline();
-            UsagePrinter ex = out.newIndentedPrinter(8);
+            UsagePrinter examplePrinter = out.newIndentedPrinter(8);
 
-            ex.appendTable(Iterables.partition(command.getExamples(), 1));
+            examplePrinter.appendTable(Iterables.partition(command.getExamples(), 1));
+            examplePrinter.flush();
+        }
+        
+        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
+            out.append("EXIT CODES").newline();
+            UsagePrinter exitPrinter = out.newIndentedPrinter(8);
+            
+            for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
+                // Print the exit code
+                exitPrinter.append(exit.getKey().toString());
+                exitPrinter.newline();
+                exitPrinter.flush();
+                
+                // Include description if available
+                if (!StringUtils.isEmpty(exit.getValue())) {
+                    
+                    UsagePrinter exitDescripPrinter = exitPrinter.newIndentedPrinter(4);
+                    exitDescripPrinter.append(exit.getValue());
+                    exitDescripPrinter.flush();
+                }
+                
+                exitPrinter.newline();
+                exitPrinter.flush();
+            }
         }
     }
 
