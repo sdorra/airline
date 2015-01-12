@@ -90,7 +90,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
             }
         }
 
-        // TODO If we add Discussion and Examples to global metadata reinstate
+        // TODO If we add Discussion and Examples to global meta-data reinstate
         // this
         //@formatter:off
 //        if (global.getDiscussion() != null) {
