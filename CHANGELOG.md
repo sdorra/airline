@@ -1,5 +1,11 @@
 # Airline - Change Log
 
+## 0.9
+
+- Annotation improvements
+    - `Command` improvements
+        - Added `exitCodes` and `exitDescriptions` for declaring the exit codes a command can produce and their meanings
+
 ## 0.8
 
 - Forked from upstream repository

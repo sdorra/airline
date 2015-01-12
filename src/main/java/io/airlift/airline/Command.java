@@ -26,52 +26,87 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Marks a class as a command.
+ * Marks a class as a command
  */
 @Target(TYPE)
 @Retention(RUNTIME)
 @Documented
-public @interface Command
-{
+public @interface Command {
     /**
-     * Name of the command.  Command name is split on white space to form a multi-word name.
+     * Name of the command
+     * <p>
+     * Command name is split on white space to form a multi-word name
+     * </p>
+     * 
+     * @return Command name
      */
     String name();
 
     /**
-     * Description of the command.
+     * Description of the command
+     * 
+     * @return Command description
      */
     String description() default "";
 
     /**
-     * If true, this command won't appear in the usage().
+     * If true, this command won't appear in help
+     * 
+     * @return Whether this command is hidden
      */
     boolean hidden() default false;
 
     /**
-     * An array of lines of text to provide a series of example usages of the command e.g.
-     *
+     * An array of lines of text to provide a series of example usages of the
+     * command e.g.
+     * 
      * <pre>
-    examples = {"* Explain what the command example does",
-    "    $ cli group cmd foo.txt file.json",
-    "",
-    "* Explain what this command example does",
-    "    $ cli group cmd --non-standard-option value foo.txt"}
+     * examples= {&quot;* Explain what the command example does&quot;,
+     *     &quot;    $ cli group cmd foo.txt file.json&quot;,
+     *     &quot;&quot;,
+     *     &quot;* Explain what this command example does&quot;,
+     *     &quot;    $ cli group cmd --non-standard-option value foo.txt&quot;}
      * </pre>
-     * Formatting and blank lines are preserved to give users leverage over how the examples are displayed in the usage.
+     * 
+     * Formatting and blank lines are preserved to give users leverage over how
+     * the examples are displayed in the usage.
+     * 
+     * @return Examples
      */
     String[] examples() default {};
 
     /**
-     * Block of text that provides an extended discussion on the behavior of the command.  Should
-     * supplement the shorter description which is more of a summary where discussion can get into
-     * greater detail.
+     * Block of text that provides an extended discussion on the behaviour of
+     * the command. Should supplement the shorter description which is more of a
+     * summary where discussion can get into greater detail.
+     * 
+     * @return Command discussion
      */
     String discussion() default "";
 
     /**
-     *  the group(s) this command should belong to.
-     *  if left empty the command will belong to the default command group
+     * The group(s) this command should belong to. if left empty the command
+     * will belong to the default command group
+     * 
+     * @return Command groups
      */
     String[] groupNames() default {};
+
+    /**
+     * The exit codes that this command may return, meanings of the exit codes
+     * may be given using the {@link #exitDescriptions()} property. The data in
+     * these two properties is collated based on array indices.
+     * 
+     * @return Array of exit codes
+     */
+    int[] exitCodes() default {};
+
+    /**
+     * Descriptions of the meanings of the exit codes this command may return,
+     * the exit codes are given by the {@link #exitCodes()} property. The data
+     * in these two properties is collated based on array indices.
+     * 
+     * @return
+     */
+    String[] exitDescriptions() default {};
 }

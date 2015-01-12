@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,8 +104,15 @@ public class MetadataLoader {
         String name = command.name();
         String description = command.description().isEmpty() ? null : command.description();
         List<String> groupNames = Arrays.asList(command.groupNames());
-
         boolean hidden = command.hidden();
+        Map<Integer, String> exitCodes = new HashMap<>();
+        if (command.exitCodes() != null) {
+            String[] exitDescriptions = command.exitDescriptions() != null ? command.exitDescriptions() : new String[command.exitCodes().length];
+            for (int i = 0; i < command.exitCodes().length; i++) {
+                String exitDescrip = exitDescriptions.length > i ? exitDescriptions[i] : null;
+                exitCodes.put(command.exitCodes()[i], exitDescrip);
+            }
+        }
 
         InjectionMetadata injectionMetadata = loadInjectionMetadata(commandType);
 
@@ -112,7 +120,7 @@ public class MetadataLoader {
                 : command.discussion(), command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
                 hidden, injectionMetadata.globalOptions, injectionMetadata.groupOptions,
                 injectionMetadata.commandOptions, Iterables.getFirst(injectionMetadata.arguments, null),
-                injectionMetadata.metadataInjections, commandType, groupNames, groups);
+                injectionMetadata.metadataInjections, commandType, groupNames, groups, exitCodes);
 
         return commandMetadata;
     }

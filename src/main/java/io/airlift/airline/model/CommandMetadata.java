@@ -2,13 +2,15 @@ package io.airlift.airline.model;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import io.airlift.airline.Accessor;
 import io.airlift.airline.Group;
 
 import java.util.List;
+import java.util.Map;
 
-public class CommandMetadata
-{
+public class CommandMetadata {
     private final String name;
     private final String description;
     private final boolean hidden;
@@ -20,23 +22,16 @@ public class CommandMetadata
     private final Class<?> type;
     private final List<String> groupNames;
     private final List<Group> groups;
+    private final Map<Integer, String> exitCodes;
 
     private final List<String> examples;
     private final String discussion;
 
-    public CommandMetadata(String name,
-                           String description,
-                           final String discussion,
-                           final List<String> examples,
-                           boolean hidden, Iterable<OptionMetadata> globalOptions,
-                           Iterable<OptionMetadata> groupOptions,
-                           Iterable<OptionMetadata> commandOptions,
-                           ArgumentsMetadata arguments,
-                           Iterable<Accessor> metadataInjections,
-                           Class<?> type,
-                           List<String> groupNames,
-                           List<Group> groups)
-    {
+    public CommandMetadata(String name, String description, final String discussion, final List<String> examples,
+            boolean hidden, Iterable<OptionMetadata> globalOptions, Iterable<OptionMetadata> groupOptions,
+            Iterable<OptionMetadata> commandOptions, ArgumentsMetadata arguments,
+            Iterable<Accessor> metadataInjections, Class<?> type, List<String> groupNames, List<Group> groups,
+            Map<Integer, String> exitCodes) {
         this.name = name;
         this.description = description;
         this.hidden = hidden;
@@ -52,26 +47,25 @@ public class CommandMetadata
 
         this.groupNames = groupNames;
         this.groups = groups;
+
+        this.exitCodes = ImmutableMap.copyOf(exitCodes);
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public boolean isHidden()
-    {
+    public boolean isHidden() {
         return hidden;
     }
 
-    public List<OptionMetadata> getAllOptions()
-    {
-        return ImmutableList.<OptionMetadata>builder().addAll(globalOptions).addAll(groupOptions).addAll(commandOptions).build();
+    public List<OptionMetadata> getAllOptions() {
+        return ImmutableList.<OptionMetadata> builder().addAll(globalOptions).addAll(groupOptions)
+                .addAll(commandOptions).build();
     }
 
     public List<String> getExamples() {
@@ -82,49 +76,44 @@ public class CommandMetadata
         return discussion;
     }
 
-    public List<OptionMetadata> getGlobalOptions()
-    {
+    public List<OptionMetadata> getGlobalOptions() {
         return globalOptions;
     }
 
-    public List<OptionMetadata> getGroupOptions()
-    {
+    public List<OptionMetadata> getGroupOptions() {
         return groupOptions;
     }
 
-    public List<OptionMetadata> getCommandOptions()
-    {
+    public List<OptionMetadata> getCommandOptions() {
         return commandOptions;
     }
 
-    public ArgumentsMetadata getArguments()
-    {
+    public ArgumentsMetadata getArguments() {
         return arguments;
     }
 
-    public List<Accessor> getMetadataInjections()
-    {
+    public List<Accessor> getMetadataInjections() {
         return metadataInjections;
     }
 
-    public Class<?> getType()
-    {
+    public Class<?> getType() {
         return type;
     }
 
-    public List<String> getGroupNames()
-    {
+    public List<String> getGroupNames() {
         return groupNames;
     }
 
-    public List<Group> getGroups()
-    {
+    public List<Group> getGroups() {
         return groups;
     }
 
+    public Map<Integer, String> getExitCodes() {
+        return exitCodes;
+    }
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("CommandMetadata");
         sb.append("{name='").append(name).append('\'');
@@ -141,24 +130,18 @@ public class CommandMetadata
         return sb.toString();
     }
 
-    public static Function<CommandMetadata, String> nameGetter()
-    {
-        return new Function<CommandMetadata, String>()
-        {
-            public String apply(CommandMetadata input)
-            {
+    public static Function<CommandMetadata, String> nameGetter() {
+        return new Function<CommandMetadata, String>() {
+            public String apply(CommandMetadata input) {
                 return input.getName();
             }
         };
     }
 
     @SuppressWarnings("rawtypes")
-    public static Function<CommandMetadata, Class> typeGetter()
-    {
-        return new Function<CommandMetadata, Class>()
-        {
-            public Class<?> apply(CommandMetadata input)
-            {
+    public static Function<CommandMetadata, Class> typeGetter() {
+        return new Function<CommandMetadata, Class>() {
+            public Class<?> apply(CommandMetadata input) {
                 return input.getType();
             }
         };
