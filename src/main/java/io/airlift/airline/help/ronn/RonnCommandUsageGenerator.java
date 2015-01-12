@@ -8,8 +8,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -17,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import io.airlift.airline.help.AbstractCommandUsageGenerator;
+import io.airlift.airline.help.UsagePrinter;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -67,13 +71,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append(SECTION_HEADER);
             SECTION_HEADER = "#" + SECTION_HEADER;
         }
-        if (programName != null) {
-            writer.append(programName).append("_");
-        }
-        if (groupName != null) {
-            writer.append(groupName).append("_");
-        }
-        writer.append(command.getName()).append("(").append(Integer.toString(this.manSection)).append(")");
+        writeFullCommandName(programName, groupName, command, writer);
         if (this.standalone) {
             writer.append(" -- ");
             writer.append(command.getDescription()).append("\n");
@@ -109,7 +107,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (arguments != null) {
             writer.append(" [--] ").append(toUsage(arguments));
         }
-        
+
         if (!this.standalone) {
             writer.append(NEW_PARA).append(command.getDescription());
         }
@@ -168,9 +166,53 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             }
         }
 
+        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
+            writer.append(NEW_PARA).append(SECTION_HEADER).append("EXIT STATUS");
+            writer.append(NEW_PARA).append("The ");
+            writeFullCommandName(programName, groupName, command, writer);
+            writer.append(" command exits with one of the following values:");
+            writer.append(NEW_PARA);
+
+            for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
+                // Print the exit code
+                writer.append("* ").append(exit.getKey().toString());
+
+                // Include description if available
+                if (!StringUtils.isEmpty(exit.getValue())) {
+                    writer.append(" - ").append(exit.getValue());
+                }
+
+                writer.append('\n');
+            }
+        }
+
         // Flush the output
         writer.flush();
         output.flush();
+    }
+
+    /**
+     * Writes the full command name in man page syntax
+     * 
+     * @param programName
+     *            Program name
+     * @param groupName
+     *            Group name
+     * @param command
+     *            Command metadata
+     * @param writer
+     *            Writer
+     * @throws IOException
+     */
+    protected void writeFullCommandName(String programName, String groupName, CommandMetadata command, Writer writer)
+            throws IOException {
+        if (programName != null) {
+            writer.append(programName).append("_");
+        }
+        if (groupName != null) {
+            writer.append(groupName).append("_");
+        }
+        writer.append(command.getName()).append("(").append(Integer.toString(this.manSection)).append(")");
     }
 
     @Override

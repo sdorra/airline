@@ -227,6 +227,8 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("</div>\n");
             writer.append("</div>\n");
         }
+        
+        // TODO Include exit codes
 
         writer.append("</body>\n");
         writer.append("</html>\n");

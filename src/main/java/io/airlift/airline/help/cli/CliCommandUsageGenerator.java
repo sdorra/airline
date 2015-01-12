@@ -137,8 +137,19 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         }
         
         if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
-            out.append("EXIT CODES").newline();
+            out.append("EXIT STATUS").newline();
+            out.flush();
+            
             UsagePrinter exitPrinter = out.newIndentedPrinter(8);
+            exitPrinter.append("The ");
+            if (programName != null) {
+                exitPrinter.append(programName).append(" ");
+            }
+            if (groupName != null) {
+                exitPrinter.append(groupName).append(" ");
+            }
+            exitPrinter.append(commandName).append(" command exits with one of the following values:").newline().newline();
+            
             
             for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
                 // Print the exit code

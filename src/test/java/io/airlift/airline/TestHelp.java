@@ -42,6 +42,7 @@ import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandRemove;
 import io.airlift.airline.help.Help;
 import io.airlift.airline.help.cli.CliCommandUsageGenerator;
+import io.airlift.airline.help.ronn.RonnCommandUsageGenerator;
 import io.airlift.airline.help.ronn.RonnGlobalUsageGenerator;
 
 import org.testng.annotations.Test;
@@ -831,13 +832,40 @@ public class TestHelp {
                 "SYNOPSIS\n" +
                 "        test\n" +
                 "\n" +
-                "EXIT CODES\n" +
+                "EXIT STATUS\n" +
+                "        The test command exits with one of the following values:\n" +
+                "\n" +
                 "        0\n" +
                 "            Success\n" +
                 "        1\n" +
                 "\n" +
                 "        2\n" +
                 "            Error 2\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testExitCodesRonn() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsExitCodes> command = singleCommand(ArgsExitCodes.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new RonnCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "ArgsExitCodes(1) -- ArgsExitCodes description\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                " `ArgsExitCodes` \n" +
+                "\n" +
+                "## EXIT STATUS\n" +
+                "\n" +
+                "The ArgsExitCodes(1) command exits with one of the following values:\n" +
+                "\n" +
+                "* 0 - Success\n" +
+                "* 1\n" +
+                "* 2 - Error 2\n");
         //@formatter:on
     }
 }
