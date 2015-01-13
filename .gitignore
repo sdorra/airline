@@ -16,3 +16,4 @@ temp-testng-customsuite.xml
 *~
 .rvmrc
 bin/
+*.ronn

@@ -31,8 +31,8 @@ import io.airlift.airline.model.OptionMetadata;
  */
 public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
-    private final CommandUsageGenerator commandUsageGenerator;
-    private final int manSection;
+    protected final CommandUsageGenerator commandUsageGenerator;
+    protected final int manSection;
     private static final String NEW_PARA = "\n\n";
     private static final String HORIZONTAL_RULE = "---";
 
@@ -215,8 +215,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
             writer.flush();
             output.flush();
-            commandUsageGenerator.usage(global.getName(), group.getName(), getCommandName(global, null, command),
-                    command, output);
+            commandUsageGenerator.usage(global.getName(), group.getName(), command.getName(), command, output);
             writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
         }
     }
@@ -229,7 +228,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
             writer.flush();
             output.flush();
-            commandUsageGenerator.usage(global.getName(), null, getCommandName(global, null, command), command, output);
+            commandUsageGenerator.usage(global.getName(), null, command.getName(), command, output);
             writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
         }
     }

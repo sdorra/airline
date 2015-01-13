@@ -17,7 +17,11 @@
  */
 package io.airlift.airline;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -43,7 +47,9 @@ import io.airlift.airline.help.Help;
 import io.airlift.airline.help.cli.CliCommandUsageGenerator;
 import io.airlift.airline.help.ronn.RonnCommandUsageGenerator;
 import io.airlift.airline.help.ronn.RonnGlobalUsageGenerator;
+import io.airlift.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static io.airlift.airline.SingleCommand.singleCommand;
@@ -54,6 +60,64 @@ import static org.testng.Assert.assertTrue;
 @SuppressWarnings("unchecked")
 public class TestHelp {
     private final Charset utf8 = Charset.forName("utf-8");
+
+    /**
+     * Helper method for if you're trying to determine the differences between
+     * actual and expected output when debugging a new test and can't visually
+     * see the difference e.g. differing white space
+     * 
+     * @param actual
+     *            Actual
+     * @param expected
+     *            Expected
+     */
+    private void testStringAssert(String actual, String expected) {
+        if (!actual.equals(expected)) {
+            if (actual.length() != expected.length()) {
+                System.err.println("Different lengths, expected " + expected.length() + " but got " + actual.length());
+            }
+            for (int i = 0; i < expected.length(); i++) {
+                char e = expected.charAt(i);
+                if (i >= actual.length()) {
+                    System.err.println("Expected character '" + e + "' (Code " + (int) e + ") is at position " + i
+                            + " which is beyond the length of the actual string");
+                    break;
+                }
+                char a = actual.charAt(i);
+                if (e != a) {
+                    System.err.println("Expected character '" + e + "' (Code " + (int) e + ") at position " + i
+                            + " does not match actual character '" + a + "' (Code " + (int) a + ")");
+                    int start = Math.max(0, i - 10);
+                    int end = Math.min(expected.length(), i + 10);
+                    System.err.println("Expected Context:");
+                    System.err.println(expected.substring(start, end));
+                    System.err.println("Actual Context:");
+                    System.err.println(actual.substring(start, end));
+                    break;
+                }
+            }
+        }
+        assertEquals(actual, expected);
+    }
+
+    /**
+     * Helper method that reads in the given file
+     * 
+     * @param f
+     *            File
+     * @return File contents
+     * @throws IOException
+     */
+    private String readFile(File f) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(f));
+        String line = reader.readLine();
+        StringBuilder builder = new StringBuilder();
+        while (line != null) {
+            builder.append(line).append('\n');
+            line = reader.readLine();
+        }
+        return builder.toString();
+    }
 
     public void testMultiLineDescriptions() throws IOException {
         SingleCommand<ArgsMultiLineDescription> cmd = singleCommand(ArgsMultiLineDescription.class);
@@ -181,45 +245,6 @@ public class TestHelp {
                 "\n"
                 );
         //@formatter:on
-    }
-
-    /**
-     * Helper method for if you're trying to determine the differences between
-     * actual and expected output when debugging a new test and can't visually
-     * see the difference e.g. differing white space
-     * 
-     * @param actual
-     *            Actual
-     * @param expected
-     *            Expected
-     */
-    private void testStringAssert(String actual, String expected) {
-        if (!actual.equals(expected)) {
-            if (actual.length() != expected.length()) {
-                System.err.println("Different lengths, expected " + expected.length() + " but got " + actual.length());
-            }
-            for (int i = 0; i < expected.length(); i++) {
-                char e = expected.charAt(i);
-                if (i >= actual.length()) {
-                    System.err.println("Expected character '" + e + "' (Code " + (int) e + ") is at position " + i
-                            + " which is beyond the length of the actual string");
-                    break;
-                }
-                char a = actual.charAt(i);
-                if (e != a) {
-                    System.err.println("Expected character '" + e + "' (Code " + (int) e + ") at position " + i
-                            + " does not match actual character '" + a + "' (Code " + (int) a + ")");
-                    int start = Math.max(0, i - 10);
-                    int end = Math.min(expected.length(), i + 10);
-                    System.err.println("Expected Context:");
-                    System.err.println(expected.substring(start, end));
-                    System.err.println("Actual Context:");
-                    System.err.println(actual.substring(start, end));
-                    break;
-                }
-            }
-        }
-        assertEquals(actual, expected);
     }
 
     @Test
@@ -664,10 +689,10 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testRonn() throws IOException {
-      //@formatter:off
+        //@formatter:off
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
                 .withDescription("the stupid content tracker")
                 .withDefaultCommand(Help.class)
@@ -815,7 +840,157 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
+    @Test
+    public void testRonnMultiPage() throws IOException {
+        //@formatter:off
+        CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
+                .withDescription("the stupid content tracker")
+                .withDefaultCommand(Help.class)
+                .withCommand(Help.class)
+                .withCommand(Add.class);
+
+        builder.withGroup("remote")
+                .withDescription("Manage set of tracked repositories")
+                .withDefaultCommand(RemoteShow.class)
+                .withCommand(RemoteShow.class)
+                .withCommand(RemoteAdd.class);
+
+        Cli<Runnable> gitParser = builder.build();
+        
+        RonnGlobalUsageGenerator generator = new RonnMultiPageGlobalUsageGenerator();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        generator.usage(gitParser.getMetadata(), out);
+        String usage = new String(out.toByteArray(), utf8);
+        testStringAssert(usage,
+                "git(1) -- the stupid content tracker\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] [<group>] <command> [command-args]\n" +
+                "\n" +
+                "## GLOBAL OPTIONS\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "## COMMAND GROUPS\n" +
+                "\n" +
+                "Commands are grouped as follows:\n" +
+                "\n" +
+                "* Default (no <group> specified)\n" +
+                "\n" +
+                "  * `git-help(1)`:\n" +
+                "  Display help information\n" +
+                "\n" +
+                "  * `git-add(1)`:\n" +
+                "  Add file contents to the index\n" +
+                "\n" +
+                "* **remote**\n" +
+                "\n" +
+                "  Manage set of tracked repositories\n" +
+                "\n" +
+                "  * `git-remote-show(1)`:\n" +
+                "  Gives some information about the remote <name>\n" +
+                "\n" +
+                "  * `git-remote-add(1)`:\n" +
+                "  Adds a remote");
+        
+        File gitHelp = new File("git-help.1.ronn");
+        Assert.assertTrue(gitHelp.exists());
+        usage = readFile(gitHelp);
+        testStringAssert(usage,
+                "git-help(1) -- Display help information\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`git` `help`  [--] [ <command>... ]\n" +
+                "\n" +
+                "## OPTIONS\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <command>:\n");
+        
+//                "\n" +
+//                "## git_add(1)\n" +
+//                "\n" +
+//                "### SYNOPSIS\n" +
+//                "\n" +
+//                "`git` [ -v ] `add` [ -i ] [--] [ <patterns>... ]\n" +
+//                "\n" +
+//                "Add file contents to the index\n" +
+//                "\n" +
+//                "### OPTIONS\n" +
+//                "\n" +
+//                "* `-i`:\n" +
+//                "Add modified contents interactively.\n" +
+//                "\n" +
+//                "* `-v`:\n" +
+//                "Verbose mode\n" +
+//                "\n" +
+//                "* `--`:\n" +
+//                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+//                "\n" +
+//                "* <patterns>:\n" +
+//                "Patterns of files to be added\n" +
+//                "\n" +
+//                "---\n" +
+//                "\n" +
+//                "## git_remote_show(1)\n" +
+//                "\n" +
+//                "### SYNOPSIS\n" +
+//                "\n" +
+//                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
+//                "\n" +
+//                "Gives some information about the remote <name>\n" +
+//                "\n" +
+//                "### OPTIONS\n" +
+//                "\n" +
+//                "* `-n`:\n" +
+//                "Do not query remote heads\n" +
+//                "\n" +
+//                "* `-v`:\n" +
+//                "Verbose mode\n" +
+//                "\n" +
+//                "* `--`:\n" +
+//                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+//                "\n" +
+//                "* <remote>:\n" +
+//                "Remote to show\n" +
+//                "\n" +
+//                "---\n" +
+//                "\n" +
+//                "## git_remote_add(1)\n" +
+//                "\n" +
+//                "### SYNOPSIS\n" +
+//                "\n" +
+//                "`git` [ -v ] `remote` `add` [ -t <branch> ] [--] [ <name> <url>... ]\n" +
+//                "\n" +
+//                "Adds a remote\n" +
+//                "\n" +
+//                "### OPTIONS\n" +
+//                "\n" +
+//                "* `-t` <branch>:\n" +
+//                "Track only a specific branch\n" +
+//                "\n" +
+//                "* `-v`:\n" +
+//                "Verbose mode\n" +
+//                "\n" +
+//                "* `--`:\n" +
+//                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+//                "\n" +
+//                "* <name> <url>:\n" +
+//                "Name and URL of remote repository to add\n" +
+//                "\n" +
+//                "---\n" +
+//                "\n");
+        //@formatter:on
+    }
+
     @Test
     public void testExitCodes() throws IOException {
         //@formatter:off
@@ -841,7 +1016,7 @@ public class TestHelp {
                 "            Error 2\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testExitCodesRonn() throws IOException {
         //@formatter:off

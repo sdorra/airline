@@ -210,10 +210,10 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     protected void writeFullCommandName(String programName, String groupName, String commandName, Writer writer)
             throws IOException {
         if (programName != null) {
-            writer.append(programName).append("_");
+            writer.append(programName).append("-");
         }
         if (groupName != null) {
-            writer.append(groupName).append("_");
+            writer.append(groupName).append("-");
         }
         writer.append(commandName).append("(").append(Integer.toString(this.manSection)).append(")");
     }
