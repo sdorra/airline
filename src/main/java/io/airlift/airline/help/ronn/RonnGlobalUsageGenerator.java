@@ -128,7 +128,8 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
                     if (command.isHidden())
                         continue;
 
-                    writer.append(NEW_PARA).append("  * `").append(command.getName()).append("`:\n");
+                    writer.append(NEW_PARA).append("  * `").append(getCommandName(global, null, command))
+                            .append("`:\n");
                     writer.append("  ").append(command.getDescription());
                 }
             }
@@ -141,17 +142,13 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
                     if (command.isHidden())
                         continue;
 
-                    writer.append(NEW_PARA).append("  * `").append(command.getName()).append("`:\n");
+                    writer.append(NEW_PARA).append("  * `").append(getCommandName(global, group.getName(), command))
+                            .append("`:\n");
                     writer.append("  ").append(command.getDescription());
                 }
             }
 
-            writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
-            outputDefaultGroupCommandUsages(global, output, writer);
-            for (CommandGroupMetadata group : global.getCommandGroups()) {
-                outputGroupCommandUsages(global, output, writer, group);
-            }
-
+            outputCommandUsages(global, output, writer);
         } else {
             // No Groups
             writer.append(NEW_PARA).append("## COMMANDS");
@@ -160,17 +157,54 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
                 if (command.isHidden())
                     continue;
 
-                writer.append(NEW_PARA).append("* `").append(command.getName()).append("`:\n");
+                writer.append(NEW_PARA).append("* `").append(getCommandName(global, null, command)).append("`:\n");
                 writer.append(command.getDescription());
             }
 
-            writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
-            outputDefaultGroupCommandUsages(global, output, writer);
+            outputCommandUsages(global, output, writer);
         }
 
         // Flush the output
         writer.flush();
         output.flush();
+    }
+
+    /**
+     * Outputs the command usages
+     * 
+     * @param global
+     *            Global metadata
+     * @param output
+     *            Output stream
+     * @param writer
+     *            Writer
+     * @throws IOException
+     */
+    protected void outputCommandUsages(GlobalMetadata global, OutputStream output, Writer writer) throws IOException {
+        writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
+
+        // Default group usages
+        outputDefaultGroupCommandUsages(global, output, writer);
+
+        // Other group usages
+        for (CommandGroupMetadata group : global.getCommandGroups()) {
+            outputGroupCommandUsages(global, output, writer, group);
+        }
+    }
+
+    /**
+     * Gets the display name for a command
+     * 
+     * @param global
+     *            Global metadata
+     * @param groupName
+     *            Group name (may be null)
+     * @param command
+     *            Command metadata
+     * @return Display name for the command
+     */
+    protected String getCommandName(GlobalMetadata global, String groupName, CommandMetadata command) {
+        return command.getName();
     }
 
     protected void outputGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer,
@@ -181,7 +215,8 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
             writer.flush();
             output.flush();
-            commandUsageGenerator.usage(global.getName(), group.getName(), command.getName(), command, output);
+            commandUsageGenerator.usage(global.getName(), group.getName(), getCommandName(global, null, command),
+                    command, output);
             writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
         }
     }
@@ -194,7 +229,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
             writer.flush();
             output.flush();
-            commandUsageGenerator.usage(global.getName(), null, command.getName(), command, output);
+            commandUsageGenerator.usage(global.getName(), null, getCommandName(global, null, command), command, output);
             writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
         }
     }
