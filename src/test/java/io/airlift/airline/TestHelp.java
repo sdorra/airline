@@ -918,7 +918,11 @@ public class TestHelp {
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
                 "\n" +
-                "* <command>:\n");
+                "* <command>:\n" +
+                "\n\n" +
+                "## GIT\n" +
+                "\n" +
+                "Part of the git(1) suite\n");
         gitHelp.delete();
         
         File gitAdd = new File("git-add.1.ronn");
@@ -944,7 +948,11 @@ public class TestHelp {
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
                 "\n" +
                 "* <patterns>:\n" +
-                "Patterns of files to be added\n");
+                "Patterns of files to be added\n" +
+                "\n" +
+                "## GIT\n" +
+                "\n" +
+                "Part of the git(1) suite\n");
         gitAdd.delete();
         
         File gitRemoteShow = new File("git-remote-show.1.ronn");
@@ -970,7 +978,11 @@ public class TestHelp {
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
                 "\n" +
                 "* <remote>:\n" +
-                "Remote to show\n");
+                "Remote to show\n" +
+                "\n" +
+                "## GIT\n" +
+                "\n" +
+                "Part of the git(1) suite\n");
         gitRemoteShow.delete();
         
         File gitRemoteAdd = new File("git-remote-add.1.ronn");
@@ -996,7 +1008,11 @@ public class TestHelp {
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
                 "\n" +
                 "* <name> <url>:\n" +
-                "Name and URL of remote repository to add\n");
+                "Name and URL of remote repository to add\n" +
+                "\n" +
+                "## GIT\n" +
+                "\n" +
+                "Part of the git(1) suite\n");
         gitRemoteAdd.delete();
         //@formatter:on
     }
@@ -1046,9 +1062,9 @@ public class TestHelp {
                 "\n" +
                 "The test(1) command exits with one of the following values:\n" +
                 "\n" +
-                "* 0 - Success\n" +
-                "* 1\n" +
-                "* 2 - Error 2\n");
+                "* **0** - Success\n" +
+                "* **1**\n" +
+                "* **2** - Error 2\n");
         //@formatter:on
     }
 

@@ -33,8 +33,8 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
     protected final CommandUsageGenerator commandUsageGenerator;
     protected final int manSection;
-    private static final String NEW_PARA = "\n\n";
-    private static final String HORIZONTAL_RULE = "---";
+    protected static final String NEW_PARA = "\n\n";
+    protected static final String HORIZONTAL_RULE = "---";
 
     public RonnGlobalUsageGenerator() {
         this(ManSections.GENERAL_COMMANDS, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));

@@ -80,6 +80,9 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
 
             commandUsageGenerator.usage(global.getName(), group.getName(), command.getName(), command, output);
 
+            // Write a reference back to the suite man page
+            outputReferenceToSuite(global, writer);
+
             // Flush and close the newly created file
             writer.flush();
             output.flush();
@@ -88,8 +91,14 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
         }
     }
 
-    protected FileOutputStream createCommandFile(GlobalMetadata global, String groupName,
-            CommandMetadata command) throws FileNotFoundException {
+    protected void outputReferenceToSuite(GlobalMetadata global, Writer writer) throws IOException {
+        writer.append(NEW_PARA).append("## ").append(global.getName().toUpperCase()).append(NEW_PARA);
+        writer.append("Part of the ").append(global.getName()).append("(").append(Integer.toString(this.manSection))
+                .append(") suite");
+    }
+
+    protected FileOutputStream createCommandFile(GlobalMetadata global, String groupName, CommandMetadata command)
+            throws FileNotFoundException {
         return new FileOutputStream(getCommandName(global, groupName, command).replace(
                 String.format("(%d)", this.manSection), String.format(".%d.ronn", this.manSection)));
     }
@@ -106,6 +115,9 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
             writer = new OutputStreamWriter(output);
 
             commandUsageGenerator.usage(global.getName(), null, command.getName(), command, output);
+
+            // Write a reference back to the suite man page
+            outputReferenceToSuite(global, writer);
 
             // Flush and close the newly created file
             writer.flush();

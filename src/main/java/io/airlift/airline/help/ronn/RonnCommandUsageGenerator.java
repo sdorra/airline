@@ -178,7 +178,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
             for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
                 // Print the exit code
-                writer.append("* ").append(exit.getKey().toString());
+                writer.append("* **").append(exit.getKey().toString()).append("**");
 
                 // Include description if available
                 if (!StringUtils.isEmpty(exit.getValue())) {
