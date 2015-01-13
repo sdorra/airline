@@ -748,7 +748,7 @@ public class TestHelp {
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git_help(1)\n" +
+                "## git-help(1)\n" +
                 "\n" +
                 "### SYNOPSIS\n" +
                 "\n" +
@@ -766,7 +766,7 @@ public class TestHelp {
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git_add(1)\n" +
+                "## git-add(1)\n" +
                 "\n" +
                 "### SYNOPSIS\n" +
                 "\n" +
@@ -790,7 +790,7 @@ public class TestHelp {
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git_remote_show(1)\n" +
+                "## git-remote-show(1)\n" +
                 "\n" +
                 "### SYNOPSIS\n" +
                 "\n" +
@@ -814,7 +814,7 @@ public class TestHelp {
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git_remote_add(1)\n" +
+                "## git-remote-add(1)\n" +
                 "\n" +
                 "### SYNOPSIS\n" +
                 "\n" +
@@ -914,80 +914,85 @@ public class TestHelp {
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
                 "\n" +
                 "* <command>:\n");
+        gitHelp.delete();
         
-//                "\n" +
-//                "## git_add(1)\n" +
-//                "\n" +
-//                "### SYNOPSIS\n" +
-//                "\n" +
-//                "`git` [ -v ] `add` [ -i ] [--] [ <patterns>... ]\n" +
-//                "\n" +
-//                "Add file contents to the index\n" +
-//                "\n" +
-//                "### OPTIONS\n" +
-//                "\n" +
-//                "* `-i`:\n" +
-//                "Add modified contents interactively.\n" +
-//                "\n" +
-//                "* `-v`:\n" +
-//                "Verbose mode\n" +
-//                "\n" +
-//                "* `--`:\n" +
-//                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
-//                "\n" +
-//                "* <patterns>:\n" +
-//                "Patterns of files to be added\n" +
-//                "\n" +
-//                "---\n" +
-//                "\n" +
-//                "## git_remote_show(1)\n" +
-//                "\n" +
-//                "### SYNOPSIS\n" +
-//                "\n" +
-//                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
-//                "\n" +
-//                "Gives some information about the remote <name>\n" +
-//                "\n" +
-//                "### OPTIONS\n" +
-//                "\n" +
-//                "* `-n`:\n" +
-//                "Do not query remote heads\n" +
-//                "\n" +
-//                "* `-v`:\n" +
-//                "Verbose mode\n" +
-//                "\n" +
-//                "* `--`:\n" +
-//                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
-//                "\n" +
-//                "* <remote>:\n" +
-//                "Remote to show\n" +
-//                "\n" +
-//                "---\n" +
-//                "\n" +
-//                "## git_remote_add(1)\n" +
-//                "\n" +
-//                "### SYNOPSIS\n" +
-//                "\n" +
-//                "`git` [ -v ] `remote` `add` [ -t <branch> ] [--] [ <name> <url>... ]\n" +
-//                "\n" +
-//                "Adds a remote\n" +
-//                "\n" +
-//                "### OPTIONS\n" +
-//                "\n" +
-//                "* `-t` <branch>:\n" +
-//                "Track only a specific branch\n" +
-//                "\n" +
-//                "* `-v`:\n" +
-//                "Verbose mode\n" +
-//                "\n" +
-//                "* `--`:\n" +
-//                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
-//                "\n" +
-//                "* <name> <url>:\n" +
-//                "Name and URL of remote repository to add\n" +
-//                "\n" +
-//                "---\n" +
-//                "\n");
+        File gitAdd = new File("git-add.1.ronn");
+        Assert.assertTrue(gitAdd.exists());
+        usage = readFile(gitAdd);
+        testStringAssert(usage,
+                "git-add(1) -- Add file contents to the index\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `add` [ -i ] [--] [ <patterns>... ]\n" +
+                "\n" +
+                "## OPTIONS\n" +
+                "\n" +
+                "* `-i`:\n" +
+                "Add modified contents interactively.\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <patterns>:\n" +
+                "Patterns of files to be added\n");
+        gitAdd.delete();
+        
+        File gitRemoteShow = new File("git-remote-show.1.ronn");
+        Assert.assertTrue(gitRemoteShow.exists());
+        usage = readFile(gitRemoteShow);
+        testStringAssert(usage,
+                "git-remote-show(1) -- Gives some information about the remote <name>\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
+                "\n" +
+                "## OPTIONS\n" +
+                "\n" +
+                "* `-n`:\n" +
+                "Do not query remote heads\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <remote>:\n" +
+                "Remote to show\n");
+        gitRemoteShow.delete();
+        
+        File gitRemoteAdd = new File("git-remote-add.1.ronn");
+        Assert.assertTrue(gitRemoteAdd.exists());
+        usage = readFile(gitRemoteAdd);
+        testStringAssert(usage,
+                "git-remote-add(1) -- Adds a remote\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `remote` `add` [ -t <branch> ] [--] [ <name> <url>... ]\n" +
+                "\n" +
+                "## OPTIONS\n" +
+                "\n" +
+                "* `-t` <branch>:\n" +
+                "Track only a specific branch\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <name> <url>:\n" +
+                "Name and URL of remote repository to add\n");
+        gitRemoteAdd.delete();
         //@formatter:on
     }
 
