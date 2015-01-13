@@ -8,6 +8,7 @@
 - Help improvements
     - All command help generator now include exit code information if declared for a command
     - Add new `RonnMultiPageGlobalUsageGenerator` which generates a top level overview RONN page and then individual RONN files for each sub-command
+    - Fix broken sort order of commands and groups in various help generator implementations
 
 ## 0.8
 
