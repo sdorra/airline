@@ -18,16 +18,17 @@ import static io.airlift.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
 public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator {
     public CliGlobalUsageGenerator() {
-        this(79, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        this(79);
     }
 
     public CliGlobalUsageGenerator(int columnSize) {
-        this(columnSize, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        this(columnSize, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
     }
 
     public CliGlobalUsageGenerator(int columnSize, @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator) {
-        super(columnSize, optionComparator, commandComparator);
+            @Nullable Comparator<? super CommandMetadata> commandComparator,
+            @Nullable Comparator<? super CommandGroupMetadata> commandGroupComparator) {
+        super(columnSize, optionComparator, commandComparator, commandGroupComparator);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             printCommandDescription(commandPrinter, null, command);
         }
-        for (CommandGroupMetadata group : global.getCommandGroups()) {
+        for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             for (CommandMetadata command : sortCommands(group.getCommands())) {
                 printCommandDescription(commandPrinter, group, command);
             }

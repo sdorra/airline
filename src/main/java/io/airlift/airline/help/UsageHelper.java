@@ -1,6 +1,8 @@
 package io.airlift.airline.help;
 
 import com.google.common.collect.ComparisonChain;
+
+import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
@@ -44,6 +46,15 @@ public class UsageHelper {
                     .compare(o2.getName(), o1.getName()) // print lower case
                                                          // letters before upper
                                                          // case
+                    .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
+        }
+    };
+
+    public static final Comparator<CommandGroupMetadata> DEFAULT_COMMAND_GROUP_COMPARATOR = new Comparator<CommandGroupMetadata>() {
+        @Override
+        public int compare(CommandGroupMetadata o1, CommandGroupMetadata o2) {
+            return ComparisonChain.start().compare(o1.getName().toLowerCase(), o2.getName().toLowerCase())
+                    .compare(o2.getName(), o1.getName())
                     .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
         }
     };

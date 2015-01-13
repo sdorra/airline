@@ -1,5 +1,6 @@
 package io.airlift.airline.help;
 
+import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -23,8 +24,9 @@ public abstract class AbstractPrintedGlobalUsageGenerator extends AbstractGlobal
 
     public AbstractPrintedGlobalUsageGenerator(int columnSize,
             @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator) {
-        super(optionComparator, commandComparator);
+            @Nullable Comparator<? super CommandMetadata> commandComparator,
+            @Nullable Comparator<? super CommandGroupMetadata> commandGroupComparator) {
+        super(optionComparator, commandComparator, commandGroupComparator);
         Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
         this.columnSize = columnSize;
     }

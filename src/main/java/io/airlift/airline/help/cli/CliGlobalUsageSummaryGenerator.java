@@ -30,7 +30,8 @@ import static com.google.common.collect.Maps.newTreeMap;
  * 
  * <h4>Known Issues</h4>
  * <p>
- * This implementation does not currently respect the configured command comparator
+ * This implementation does not currently respect the configured command
+ * comparator
  * </p>
  * 
  */
@@ -40,13 +41,15 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
     }
 
     public CliGlobalUsageSummaryGenerator(int columnSize) {
-        this(columnSize, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        this(columnSize, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
     }
 
     public CliGlobalUsageSummaryGenerator(int columnSize,
             @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator) {
-        super(columnSize, optionComparator, commandComparator);
+            @Nullable Comparator<? super CommandMetadata> commandComparator,
+            @Nullable Comparator<? super CommandGroupMetadata> commandGroupComparator) {
+        super(columnSize, optionComparator, commandComparator, commandGroupComparator);
     }
 
     public void usage(GlobalMetadata global, UsagePrinter out) throws IOException {

@@ -61,7 +61,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
         outputDefaultGroupCommandUsages(global, output, writer);
 
         // Other group usages
-        for (CommandGroupMetadata group : global.getCommandGroups()) {
+        for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             outputGroupCommandUsages(global, output, writer, group);
         }
     }
@@ -70,7 +70,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     protected void outputGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer,
             CommandGroupMetadata group) throws IOException {
 
-        for (CommandMetadata command : group.getCommands()) {
+        for (CommandMetadata command : sortCommands(group.getCommands())) {
             if (command.isHidden())
                 continue;
 
@@ -97,7 +97,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     @Override
     protected void outputDefaultGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer)
             throws IOException {
-        for (CommandMetadata command : global.getDefaultGroupCommands()) {
+        for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden())
                 continue;
 

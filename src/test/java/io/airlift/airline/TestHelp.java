@@ -24,6 +24,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import io.airlift.airline.Cli.CliBuilder;
@@ -44,10 +47,12 @@ import io.airlift.airline.args.OptionsHidden;
 import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandRemove;
 import io.airlift.airline.help.Help;
+import io.airlift.airline.help.UsageHelper;
 import io.airlift.airline.help.cli.CliCommandUsageGenerator;
 import io.airlift.airline.help.ronn.RonnCommandUsageGenerator;
 import io.airlift.airline.help.ronn.RonnGlobalUsageGenerator;
 import io.airlift.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
+import io.airlift.airline.model.CommandMetadata;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -730,39 +735,21 @@ public class TestHelp {
                 "\n" +
                 "* Default (no <group> specified)\n" +
                 "\n" +
-                "  * `help`:\n" +
-                "  Display help information\n" +
-                "\n" +
                 "  * `add`:\n" +
                 "  Add file contents to the index\n" +
+                "\n" +
+                "  * `help`:\n" +
+                "  Display help information\n" +
                 "\n" +
                 "* **remote**\n" +
                 "\n" +
                 "  Manage set of tracked repositories\n" +
                 "\n" +
-                "  * `show`:\n" +
-                "  Gives some information about the remote <name>\n" +
-                "\n" +
                 "  * `add`:\n" +
                 "  Adds a remote\n" +
                 "\n" +
-                "---\n" +
-                "\n" +
-                "## git-help(1)\n" +
-                "\n" +
-                "### SYNOPSIS\n" +
-                "\n" +
-                "`git` `help`  [--] [ <command>... ]\n" +
-                "\n" +
-                "Display help information\n" +
-                "\n" +
-                "### OPTIONS\n" +
-                "\n" +
-                "* `--`:\n" +
-                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
-                "\n" +
-                "* <command>:\n" +
-                "\n" +
+                "  * `show`:\n" +
+                "  Gives some information about the remote <name>\n" +
                 "\n" +
                 "---\n" +
                 "\n" +
@@ -790,27 +777,21 @@ public class TestHelp {
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git-remote-show(1)\n" +
+                "## git-help(1)\n" +
                 "\n" +
                 "### SYNOPSIS\n" +
                 "\n" +
-                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
+                "`git` `help`  [--] [ <command>... ]\n" +
                 "\n" +
-                "Gives some information about the remote <name>\n" +
+                "Display help information\n" +
                 "\n" +
                 "### OPTIONS\n" +
-                "\n" +
-                "* `-n`:\n" +
-                "Do not query remote heads\n" +
-                "\n" +
-                "* `-v`:\n" +
-                "Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
                 "\n" +
-                "* <remote>:\n" +
-                "Remote to show\n" +
+                "* <command>:\n" +
+                "\n" +
                 "\n" +
                 "---\n" +
                 "\n" +
@@ -835,6 +816,30 @@ public class TestHelp {
                 "\n" +
                 "* <name> <url>:\n" +
                 "Name and URL of remote repository to add\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## git-remote-show(1)\n" +
+                "\n" +
+                "### SYNOPSIS\n" +
+                "\n" +
+                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
+                "\n" +
+                "Gives some information about the remote <name>\n" +
+                "\n" +
+                "### OPTIONS\n" +
+                "\n" +
+                "* `-n`:\n" +
+                "Do not query remote heads\n" +
+                "\n" +
+                "* `-v`:\n" +
+                "Verbose mode\n" +
+                "\n" +
+                "* `--`:\n" +
+                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "\n" +
+                "* <remote>:\n" +
+                "Remote to show\n" +
                 "\n" +
                 "---\n" +
                 "\n");
@@ -881,21 +886,21 @@ public class TestHelp {
                 "\n" +
                 "* Default (no <group> specified)\n" +
                 "\n" +
-                "  * `git-help(1)`:\n" +
-                "  Display help information\n" +
-                "\n" +
                 "  * `git-add(1)`:\n" +
                 "  Add file contents to the index\n" +
+                "\n" +
+                "  * `git-help(1)`:\n" +
+                "  Display help information\n" +
                 "\n" +
                 "* **remote**\n" +
                 "\n" +
                 "  Manage set of tracked repositories\n" +
                 "\n" +
-                "  * `git-remote-show(1)`:\n" +
-                "  Gives some information about the remote <name>\n" +
-                "\n" +
                 "  * `git-remote-add(1)`:\n" +
-                "  Adds a remote");
+                "  Adds a remote\n" +
+                "\n" +
+                "  * `git-remote-show(1)`:\n" +
+                "  Gives some information about the remote <name>");
         
         File gitHelp = new File("git-help.1.ronn");
         Assert.assertTrue(gitHelp.exists());
@@ -1044,6 +1049,38 @@ public class TestHelp {
                 "* 0 - Success\n" +
                 "* 1\n" +
                 "* 2 - Error 2\n");
+        //@formatter:on
+    }
+
+    @Test
+    public void testCommandSorting() {
+        //@formatter:off
+        CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
+                .withDescription("the stupid content tracker")
+                .withDefaultCommand(Help.class)
+                .withCommand(Help.class)
+                .withCommand(Add.class);
+
+        builder.withGroup("remote")
+                .withDescription("Manage set of tracked repositories")
+                .withDefaultCommand(RemoteShow.class)
+                .withCommand(RemoteShow.class)
+                .withCommand(RemoteAdd.class);
+
+        Cli<Runnable> gitParser = builder.build();
+        
+        List<CommandMetadata> defCommands = new ArrayList<>(gitParser.getMetadata().getDefaultGroupCommands());
+        Collections.sort(defCommands, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        
+        Assert.assertEquals(defCommands.get(0).getName(), "add");
+        Assert.assertEquals(defCommands.get(1).getName(), "help");
+        
+        // Check sort is stable
+        Collections.sort(defCommands, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        
+        Assert.assertEquals(defCommands.get(0).getName(), "add");
+        Assert.assertEquals(defCommands.get(1).getName(), "help");
+        
         //@formatter:on
     }
 }

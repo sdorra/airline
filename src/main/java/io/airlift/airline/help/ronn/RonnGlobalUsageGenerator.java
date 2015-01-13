@@ -124,7 +124,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
             if (global.getDefaultGroupCommands().size() > 0) {
                 writer.append(NEW_PARA).append("* Default (no <group> specified)");
-                for (CommandMetadata command : global.getDefaultGroupCommands()) {
+                for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
                     if (command.isHidden())
                         continue;
 
@@ -134,11 +134,11 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
                 }
             }
 
-            for (CommandGroupMetadata group : global.getCommandGroups()) {
+            for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
                 writer.append(NEW_PARA).append("* **").append(group.getName()).append("**").append(NEW_PARA);
                 writer.append("  ").append(group.getDescription());
 
-                for (CommandMetadata command : group.getCommands()) {
+                for (CommandMetadata command : sortCommands(group.getCommands())) {
                     if (command.isHidden())
                         continue;
 
@@ -153,7 +153,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
             // No Groups
             writer.append(NEW_PARA).append("## COMMANDS");
 
-            for (CommandMetadata command : global.getDefaultGroupCommands()) {
+            for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
                 if (command.isHidden())
                     continue;
 
@@ -187,7 +187,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
         outputDefaultGroupCommandUsages(global, output, writer);
 
         // Other group usages
-        for (CommandGroupMetadata group : global.getCommandGroups()) {
+        for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             outputGroupCommandUsages(global, output, writer, group);
         }
     }
@@ -209,7 +209,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
     protected void outputGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer,
             CommandGroupMetadata group) throws IOException {
-        for (CommandMetadata command : group.getCommands()) {
+        for (CommandMetadata command : sortCommands(group.getCommands())) {
             if (command.isHidden())
                 continue;
 
@@ -222,7 +222,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
     protected void outputDefaultGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer)
             throws IOException {
-        for (CommandMetadata command : global.getDefaultGroupCommands()) {
+        for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden())
                 continue;
 
