@@ -176,7 +176,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append(" command exits with one of the following values:");
             writer.append(NEW_PARA);
 
-            for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
+            for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
                 // Print the exit code
                 writer.append("* ").append(exit.getKey().toString());
 

@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import io.airlift.airline.help.AbstractCommandUsageGenerator;
 import io.airlift.airline.help.UsageHelper;
@@ -244,7 +245,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append(commandName).append(" command exits with one of the following values:");
             writer.append("</p>\n");
 
-            for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
+            for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
                 writer.append("<div class=\"row\">\n");
                 writer.append("<div class=\"span8 offset1\">\n");
 

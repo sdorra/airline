@@ -5,6 +5,7 @@ import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
 import java.util.Comparator;
+import java.util.Map.Entry;
 
 public class UsageHelper {
     /**
@@ -43,6 +44,21 @@ public class UsageHelper {
                     .compare(o2.getName(), o1.getName()) // print lower case
                                                          // letters before upper
                                                          // case
+                    .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
+        }
+    };
+
+    /**
+     * Default comparator for exit codes
+     * <p>
+     * Compares by numerical sorting on the exit codes and then alphabetical
+     * sorting on the descriptions
+     * </p>
+     */
+    public static final Comparator<Entry<Integer, String>> DEFAULT_EXIT_CODE_COMPARATOR = new Comparator<Entry<Integer, String>>() {
+        @Override
+        public int compare(Entry<Integer, String> o1, Entry<Integer, String> o2) {
+            return ComparisonChain.start().compare(o1.getKey(), o2.getKey()).compare(o1.getValue(), o2.getValue())
                     .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
         }
     };

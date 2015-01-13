@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
 
@@ -151,7 +152,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
             exitPrinter.append(commandName).append(" command exits with one of the following values:").newline().newline();
             
             
-            for (Entry<Integer, String> exit : command.getExitCodes().entrySet()) {
+            for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
                 // Print the exit code
                 exitPrinter.append(exit.getKey().toString());
                 exitPrinter.newline();
