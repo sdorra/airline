@@ -382,6 +382,34 @@ public class TestHelp {
         
         //@formatter:on
     }
+    
+    @Test
+    public void testArgsAllowedValuesRonn() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsAllowedValues> command = singleCommand(ArgsAllowedValues.class);
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new RonnCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "test-ArgsAllowedValues(1) -- ArgsAllowedValues description\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                "`test` `ArgsAllowedValues` [ -mode <mode> ]\n" +
+                "\n" +
+                "## OPTIONS\n" +
+                "\n" +
+                "* `-mode` <mode>:\n" +
+                "A string from a restricted set of values\n" +
+                "\n" +
+                "This options value is restricted to the following value(s):\n" +
+                "    * a\n" +
+                "    * b\n" +
+                "    * c\n");
+        
+        //@formatter:on
+    }
 
     @Test
     public void testArgsAritySting() throws IOException {

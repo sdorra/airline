@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import io.airlift.airline.help.AbstractCommandUsageGenerator;
+import io.airlift.airline.help.UsagePrinter;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -130,6 +131,21 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
                 // description
                 writer.append(option.getDescription());
+                
+                // allowedValues
+                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                    writer.append(NEW_PARA).append("This options value");
+                    if (option.getArity() == 1) {
+                        writer.append(" is ");
+                    } else {
+                        writer.append("s are ");
+                    }
+                    writer.append("restricted to the following value(s):\n");
+                    
+                    for (String value : option.getAllowedValues()) {
+                        writer.append("    * ").append(value).append("\n");
+                    }
+                }
             }
 
             if (arguments != null) {
