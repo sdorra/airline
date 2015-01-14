@@ -134,17 +134,24 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 
                 // allowedValues
                 if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                    writer.append(NEW_PARA).append("This options value");
+                    writer.append(NEW_PARA).append("  This options value");
                     if (option.getArity() == 1) {
                         writer.append(" is ");
                     } else {
                         writer.append("s are ");
                     }
-                    writer.append("restricted to the following value(s):\n");
+                    writer.append("restricted to the following value(s): [");
                     
+                    boolean first = true;
                     for (String value : option.getAllowedValues()) {
-                        writer.append("    * ").append(value).append("\n");
+                        if (first) {
+                            first = false;
+                        } else {
+                            writer.append(", ");
+                        }
+                        writer.append(value);
                     }
+                    writer.append("]");
                 }
             }
 

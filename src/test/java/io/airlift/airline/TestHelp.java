@@ -97,6 +97,7 @@ public class TestHelp {
                     System.err.println("Expected Context:");
                     System.err.println(expected.substring(start, end));
                     System.err.println("Actual Context:");
+                    end = Math.min(actual.length(), i + 10);
                     System.err.println(actual.substring(start, end));
                     break;
                 }
@@ -403,10 +404,7 @@ public class TestHelp {
                 "* `-mode` <mode>:\n" +
                 "A string from a restricted set of values\n" +
                 "\n" +
-                "This options value is restricted to the following value(s):\n" +
-                "    * a\n" +
-                "    * b\n" +
-                "    * c\n");
+                "  This options value is restricted to the following value(s): [a, b, c]");
         
         //@formatter:on
     }
