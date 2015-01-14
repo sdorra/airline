@@ -61,15 +61,16 @@ public @interface Command {
      * command e.g.
      * 
      * <pre>
-     * examples= {&quot;* Explain what the command example does&quot;,
-     *     &quot;    $ cli group cmd foo.txt file.json&quot;,
+     * examples= {&quot;Explain what the command example does&quot;,
+     *     &quot;$ cli group cmd foo.txt file.json&quot;,
      *     &quot;&quot;,
-     *     &quot;* Explain what this command example does&quot;,
-     *     &quot;    $ cli group cmd --non-standard-option value foo.txt&quot;}
+     *     &quot;Explain what this command example does&quot;,
+     *     &quot;$ cli group cmd --non-standard-option value foo.txt&quot;}
      * </pre>
      * 
-     * Formatting and blank lines are preserved to give users leverage over how
-     * the examples are displayed in the usage.
+     * Blank lines are preserved to give users leverage over how the examples
+     * are displayed in the usage. However indidvidual help generators may
+     * still choose to format the examples as they desire.
      * 
      * @return Examples
      */
