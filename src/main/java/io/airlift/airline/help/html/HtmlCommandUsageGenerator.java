@@ -146,6 +146,27 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 writer.append(htmlize(option.getDescription()));
                 writer.append("</div>\n");
                 writer.append("</div>\n");
+                
+                // allowedValues
+                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                    writer.append("<div class=\"row\">\n");
+                    writer.append("<div class=\"span8 offset3\">\n");
+                    writer.append("This options value");
+                    if (option.getArity() == 1) {
+                        writer.append(" is ");
+                    } else {
+                        writer.append("s are ");
+                    }
+                    writer.append("restricted to the following value(s):\n");
+                    
+                    writer.append("<ul>");
+                    for (String value : option.getAllowedValues()) {
+                        writer.append("<li>").append(value).append("</li>\n");
+                    }
+                    writer.append("</ul>");
+                    writer.append("</div>\n");
+                    writer.append("</div>\n");
+                }
             }
 
             if (arguments != null) {
@@ -163,7 +184,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 writer.append("<div class=\"span8 offset2\">\n");
 
                 writer.append("This option can be used to separate command-line options from the "
-                        + "list of argument, (useful when arguments might be mistaken for command-line options\n");
+                        + "list of argument, (useful when arguments might be mistaken for command-line options)\n");
 
                 writer.append("</div>\n");
                 writer.append("</div>\n");

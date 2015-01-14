@@ -6,9 +6,11 @@
     - `Command` improvements
         - Added `exitCodes` and `exitDescriptions` for declaring the exit codes a command can produce and their meanings
 - Help improvements
-    - All command help generator now include exit code information if declared for a command
+    - All command help generator now include exit code information if declared for a command via the `exitCodes` and `exitDescriptions` properties
     - Add new `RonnMultiPageGlobalUsageGenerator` which generates a top level overview RONN page and then individual RONN files for each sub-command
     - Fix broken sort order of commands and groups in various help generator implementations
+    - Add documentation of `allowedValues` to all help generators
+    - Fix typo in presentation of `--` option in various help generators
 
 ## 0.8
 

@@ -22,7 +22,8 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
     }
 
     public CliGlobalUsageGenerator(int columnSize) {
-        this(columnSize, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
+        this(columnSize, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
     }
 
     public CliGlobalUsageGenerator(int columnSize, @Nullable Comparator<? super OptionMetadata> optionComparator,
@@ -69,6 +70,24 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
                 // description
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
                 descriptionPrinter.append(option.getDescription()).newline();
+
+                // allowedValues
+                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                    descriptionPrinter.newline();
+                    descriptionPrinter.append("This options value");
+                    if (option.getArity() == 1) {
+                        descriptionPrinter.append(" is ");
+                    } else {
+                        descriptionPrinter.append("s are ");
+                    }
+                    descriptionPrinter.append("restricted to the following value(s):").newline();
+
+                    UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
+                    for (String value : option.getAllowedValues()) {
+                        allowedValuesPrinter.append(value).newline();
+                    }
+                    allowedValuesPrinter.flush();
+                }
 
                 descriptionPrinter.newline();
             }

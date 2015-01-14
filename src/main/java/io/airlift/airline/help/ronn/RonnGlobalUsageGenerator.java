@@ -78,15 +78,29 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
             for (OptionMetadata option : options) {
                 // skip hidden options
-                if (option.isHidden()) {
+                if (option.isHidden())
                     continue;
-                }
 
                 // option names
                 writer.append(NEW_PARA).append("* ").append(toDescription(option)).append(":\n");
 
                 // description
                 writer.append(option.getDescription());
+
+                // allowedValues
+                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                    writer.append(NEW_PARA).append("This options value");
+                    if (option.getArity() == 1) {
+                        writer.append(" is ");
+                    } else {
+                        writer.append("s are ");
+                    }
+                    writer.append("restricted to the following value(s):\n");
+
+                    for (String value : option.getAllowedValues()) {
+                        writer.append("    * ").append(value).append("\n");
+                    }
+                }
             }
         }
 
