@@ -93,8 +93,8 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
 
     protected void outputReferenceToSuite(GlobalMetadata global, Writer writer) throws IOException {
         writer.append(NEW_PARA).append("## ").append(global.getName().toUpperCase()).append(NEW_PARA);
-        writer.append("Part of the ").append(global.getName()).append("(").append(Integer.toString(this.manSection))
-                .append(") suite");
+        writer.append("Part of the `").append(global.getName()).append("(").append(Integer.toString(this.manSection))
+                .append(")` suite");
     }
 
     protected FileOutputStream createCommandFile(GlobalMetadata global, String groupName, CommandMetadata command)

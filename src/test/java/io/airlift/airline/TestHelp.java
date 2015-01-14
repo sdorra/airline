@@ -20,7 +20,6 @@ package io.airlift.airline;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,6 +34,7 @@ import io.airlift.airline.Git.RemoteAdd;
 import io.airlift.airline.Git.RemoteShow;
 import io.airlift.airline.args.Args1;
 import io.airlift.airline.args.Args2;
+import io.airlift.airline.args.ArgsAllowedValues;
 import io.airlift.airline.args.ArgsArityString;
 import io.airlift.airline.args.ArgsBooleanArity;
 import io.airlift.airline.args.ArgsExitCodes;
@@ -121,6 +121,7 @@ public class TestHelp {
             builder.append(line).append('\n');
             line = reader.readLine();
         }
+        reader.close();
         return builder.toString();
     }
 
@@ -194,7 +195,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <patterns>\n" +
                 "            Patterns of files to be added\n" +
@@ -243,7 +244,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <name> <url>\n" +
                 "            Name and URL of remote repository to add\n" +
@@ -302,7 +303,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
                 "\n" +
@@ -347,11 +348,38 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
                 "            List of parameters\n" +
                 "\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testArgsAllowedValues() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsAllowedValues> command = singleCommand(ArgsAllowedValues.class);
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test ArgsAllowedValues - ArgsAllowedValues description\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test ArgsAllowedValues [ -mode <mode> ]\n" +
+                "\n" +
+                "OPTIONS\n" +
+                "        -mode <mode>\n" +
+                "            A string from a restricted set of values\n" +
+                "\n" +
+                "            This options value is restricted to the following value(s):\n" +
+                "                a\n" +
+                "                b\n" +
+                "                c\n" +
+                "\n");
+        
         //@formatter:on
     }
 
@@ -382,7 +410,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <rest>\n" +
                 "            Rest\n" +
@@ -456,7 +484,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
                 "\n" +
@@ -488,7 +516,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
                 "            List of files\n" +
@@ -687,7 +715,7 @@ public class TestHelp {
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
                 "            list of argument, (useful when arguments might be mistaken for\n" +
-                "            command-line options\n" +
+                "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
                 "\n" +
@@ -922,7 +950,7 @@ public class TestHelp {
                 "\n\n" +
                 "## GIT\n" +
                 "\n" +
-                "Part of the git(1) suite\n");
+                "Part of the `git(1)` suite\n");
         gitHelp.delete();
         
         File gitAdd = new File("git-add.1.ronn");
@@ -952,7 +980,7 @@ public class TestHelp {
                 "\n" +
                 "## GIT\n" +
                 "\n" +
-                "Part of the git(1) suite\n");
+                "Part of the `git(1)` suite\n");
         gitAdd.delete();
         
         File gitRemoteShow = new File("git-remote-show.1.ronn");
@@ -982,7 +1010,7 @@ public class TestHelp {
                 "\n" +
                 "## GIT\n" +
                 "\n" +
-                "Part of the git(1) suite\n");
+                "Part of the `git(1)` suite\n");
         gitRemoteShow.delete();
         
         File gitRemoteAdd = new File("git-remote-add.1.ronn");
@@ -1012,7 +1040,7 @@ public class TestHelp {
                 "\n" +
                 "## GIT\n" +
                 "\n" +
-                "Part of the git(1) suite\n");
+                "Part of the `git(1)` suite\n");
         gitRemoteAdd.delete();
         //@formatter:on
     }
@@ -1060,7 +1088,7 @@ public class TestHelp {
                 "\n" +
                 "## EXIT STATUS\n" +
                 "\n" +
-                "The test(1) command exits with one of the following values:\n" +
+                "The `test(1)` command exits with one of the following values:\n" +
                 "\n" +
                 "* **0** - Success\n" +
                 "* **1**\n" +

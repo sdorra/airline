@@ -92,6 +92,24 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
                 // description
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
                 descriptionPrinter.append(option.getDescription()).newline();
+                
+                // allowedValues
+                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                    descriptionPrinter.newline();
+                    descriptionPrinter.append("This options value");
+                    if (option.getArity() == 1) {
+                        descriptionPrinter.append(" is ");
+                    } else {
+                        descriptionPrinter.append("s are ");
+                    }
+                    descriptionPrinter.append("restricted to the following value(s):").newline();
+                    
+                    UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
+                    for (String value : option.getAllowedValues()) {
+                        allowedValuesPrinter.append(value).newline();
+                    }
+                    allowedValuesPrinter.flush();
+                }
 
                 descriptionPrinter.newline();
                 descriptionPrinter.flush();
@@ -107,7 +125,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
                 UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
                 descriptionPrinter
                         .append("This option can be used to separate command-line options from the "
-                                + "list of argument, (useful when arguments might be mistaken for command-line options")
+                                + "list of argument, (useful when arguments might be mistaken for command-line options)")
                         .newline();
                 descriptionPrinter.newline();
 

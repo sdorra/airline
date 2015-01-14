@@ -171,9 +171,9 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
             writer.append(NEW_PARA).append(SECTION_HEADER).append("EXIT STATUS");
-            writer.append(NEW_PARA).append("The ");
+            writer.append(NEW_PARA).append("The `");
             writeFullCommandName(programName, groupName, commandName, writer);
-            writer.append(" command exits with one of the following values:");
+            writer.append("` command exits with one of the following values:");
             writer.append(NEW_PARA);
 
             for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
