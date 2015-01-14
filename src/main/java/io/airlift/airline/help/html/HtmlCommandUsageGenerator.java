@@ -230,21 +230,10 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("<div class=\"span12 offset1\">\n");
 
             // this will only work for "well-formed" examples
-            for (int i = 0; i < command.getExamples().size(); i += 3) {
-                String aText = command.getExamples().get(i).trim();
-                String aEx = htmlize(command.getExamples().get(i + 1));
-
-                if (aText.startsWith("*")) {
-                    aText = aText.substring(1).trim();
-                }
-
+            for (String example : command.getExamples()) {
                 writer.append("<p>\n");
-                writer.append(aText);
+                writer.append(example);
                 writer.append("</p>\n");
-
-                writer.append("<pre>\n");
-                writer.append(aEx);
-                writer.append("</pre>\n");
             }
 
             writer.append("</div>\n");

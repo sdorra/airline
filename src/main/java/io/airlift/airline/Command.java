@@ -67,10 +67,20 @@ public @interface Command {
      *     &quot;Explain what this command example does&quot;,
      *     &quot;$ cli group cmd --non-standard-option value foo.txt&quot;}
      * </pre>
-     * 
+     * <p>
      * Blank lines are preserved to give users leverage over how the examples
-     * are displayed in the usage. However indidvidual help generators may
-     * still choose to format the examples as they desire.
+     * are displayed in the usage. However individual help generators may still
+     * choose to format the examples as they desire.
+     * </p>
+     * <p>
+     * Example lines are not required to be in any specific order i.e. you can
+     * do example then explanation, explanation then example, multi-line
+     * explanations or whatever you see fit.
+     * </p>
+     * <p>
+     * If you have more free form discussion about the command it should be
+     * placed in the {@link #discussion()} property.
+     * </p>
      * 
      * @return Examples
      */
@@ -79,7 +89,8 @@ public @interface Command {
     /**
      * Block of text that provides an extended discussion on the behaviour of
      * the command. Should supplement the shorter description which is more of a
-     * summary where discussion can get into greater detail.
+     * summary where discussion can get into greater detail about exact
+     * behaviour of commands.
      * 
      * @return Command discussion
      */

@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import io.airlift.airline.help.AbstractCommandUsageGenerator;
-import io.airlift.airline.help.UsagePrinter;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
@@ -131,7 +130,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
                 // description
                 writer.append(option.getDescription());
-                
+
                 // allowedValues
                 if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
                     writer.append(NEW_PARA).append("  This options value");
@@ -141,7 +140,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                         writer.append("s are ");
                     }
                     writer.append("restricted to the following value(s): [");
-                    
+
                     boolean first = true;
                     for (String value : option.getAllowedValues()) {
                         if (first) {
@@ -178,17 +177,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (command.getExamples() != null && !command.getExamples().isEmpty()) {
             writer.append(NEW_PARA).append(SECTION_HEADER).append("EXAMPLES");
 
-            // this will only work for "well-formed" examples
-            for (int i = 0; i < command.getExamples().size(); i += 3) {
-                String aText = command.getExamples().get(i).trim();
-                String aEx = htmlize(command.getExamples().get(i + 1));
-
-                if (aText.startsWith("*")) {
-                    aText = aText.substring(1).trim();
-                }
-
-                writer.append(NEW_PARA).append("* ").append(aText).append(":\n");
-                writer.append(aEx);
+            for (String example : command.getExamples()) {
+                writer.append(NEW_PARA).append(example);
             }
         }
 
