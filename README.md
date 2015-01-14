@@ -20,12 +20,16 @@ This fork contains several improvements over the upstream fork created both by m
 - Help system improvements
     - Help printing respects new lines allowing them to be used in longer descriptions
     - Support for additional examples and discussion sections in command help
+    - Documentation of `allowedValues` for options with restricted set of values
+    - Documentation of `exitCodes` and `exitDescriptions` for commands
     - Abstracted out help generation system into interfaces with multiple concrete implementations:
         - Command Line (the existing help system)
-        - [Ronn](http://rtomayko.github.io/ronn/)
+        - [Ronn](http://rtomayko.github.io/ronn/) which can be easily converted into `man` pages
         - HTML
         - Bash auto-completion scripts
 - Support for Command Factories
+
+Please note that some of the features and improvements listed here may not yet have made it into the stable release build and may only be available
 
 ## License
 
@@ -33,9 +37,9 @@ Airline is licensed under the Apache Software License Version 2.0, see provided 
 
 See provided **Notice.md** for Copyright Holders
 
-## Latest Release
+## Artifacts
 
-This fork is available from Maven Central using the following dependency information:
+This library is available from [Maven Central](http://search.maven.org) using the following dependency information:
 
 ```xml
 <dependency>
@@ -44,6 +48,8 @@ This fork is available from Maven Central using the following dependency informa
     <version>0.8</version>
 </dependency>
 ```
+
+Snapshot artifacts of the latest source are also available using the version `0.9.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
 
 ## Build Status
 
