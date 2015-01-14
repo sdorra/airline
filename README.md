@@ -45,11 +45,11 @@ This library is available from [Maven Central](http://search.maven.org) using th
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>0.8</version>
+    <version>0.9</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `0.9.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
+Snapshot artifacts of the latest source are also available using the version `0.9.1-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
 
 ## Build Status
 

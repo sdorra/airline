@@ -1,5 +1,7 @@
 # Airline - Change Log
 
+## 0.9.1
+
 ## 0.9
 
 - Annotation improvements
@@ -11,6 +13,7 @@
     - Fix broken sort order of commands and groups in various help generator implementations
     - Add documentation of `allowedValues` to all help generators
     - Fix typo in presentation of `--` option in various help generators
+    - Fix presentation of `examples` to avoid need for users to use markup in their annotations
 
 ## 0.8
 
