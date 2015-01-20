@@ -1,7 +1,6 @@
 package io.airlift.airline.help.cli;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -17,6 +16,7 @@ import io.airlift.airline.model.OptionMetadata;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,15 +24,9 @@ import java.util.Map.Entry;
 import javax.annotation.Nullable;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newTreeMap;
 
 /**
  * 
- * <h4>Known Issues</h4>
- * <p>
- * This implementation does not currently respect the configured command
- * comparator
- * </p>
  * 
  */
 public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGenerator {
@@ -53,49 +47,84 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
     }
 
     public void usage(GlobalMetadata global, UsagePrinter out) throws IOException {
-        //
-        // Usage
-        //
+        // Synopsis
+        outputSynopsis(out, global);
 
-        // build arguments
-        List<String> commandArguments = newArrayList();
-        Collection<String> args = Collections2.transform(global.getOptions(), new Function<OptionMetadata, String>() {
-            public String apply(OptionMetadata option) {
-                if (option.isHidden()) {
-                    return "";
-                }
-                return toUsage(option);
-            }
-        });
+        // Command List
+        outputCommandList(out, global);
 
-        commandArguments.addAll(args);
-        out.newPrinterWithHangingIndent(8).append("usage:").append(global.getName()).appendWords(commandArguments)
-                .append("<command> [ <args> ]").newline().newline();
+        // Notes on how to get more help
+        outputFooter(out, global);
+    }
 
-        //
-        // Common commands
-        //
+    /**
+     * Outputs a documentation section detailing how to get more help
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputFooter(UsagePrinter out, GlobalMetadata global) throws IOException {
+        out.newline();
+        out.append("See").append("'" + global.getName())
+                .append("help <command>' for more information on a specific command.").newline();
+    }
 
-        Map<String, String> commands = newTreeMap();
-        for (CommandMetadata commandMetadata : global.getDefaultGroupCommands()) {
+    /**
+     * Outputs a documentation section listing the common commands
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @throws IOException
+     */
+    protected void outputCommandList(UsagePrinter out, GlobalMetadata global) throws IOException {
+        Map<String, String> commands = new LinkedHashMap<>();
+        for (CommandMetadata commandMetadata : sortCommands(global.getDefaultGroupCommands())) {
             if (!commandMetadata.isHidden()) {
                 commands.put(commandMetadata.getName(), commandMetadata.getDescription());
             }
         }
-        for (CommandGroupMetadata commandGroupMetadata : global.getCommandGroups()) {
+        for (CommandGroupMetadata commandGroupMetadata : sortCommandGroups(global.getCommandGroups())) {
             commands.put(commandGroupMetadata.getName(), commandGroupMetadata.getDescription());
         }
 
         out.append("Commands are:").newline();
         out.newIndentedPrinter(4).appendTable(
                 Iterables.transform(commands.entrySet(), new Function<Entry<String, String>, Iterable<String>>() {
-                    @SuppressWarnings("deprecation")
                     public Iterable<String> apply(Entry<String, String> entry) {
-                        return ImmutableList.of(entry.getKey(), Objects.firstNonNull(entry.getValue(), ""));
+                        return ImmutableList.of(entry.getKey(), entry.getValue() != null ? entry.getValue() : "");
                     }
                 }));
-        out.newline();
-        out.append("See").append("'" + global.getName())
-                .append("help <command>' for more information on a specific command.").newline();
+    }
+
+    /**
+     * Outputs a documentation section with a brief synopsis of usage
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @throws IOException
+     */
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata global) throws IOException {
+        List<String> commandArguments = newArrayList();
+        Collection<String> args = Collections2.transform(sortOptions(global.getOptions()),
+                new Function<OptionMetadata, String>() {
+                    public String apply(OptionMetadata option) {
+                        if (option.isHidden()) {
+                            return "";
+                        }
+                        return toUsage(option);
+                    }
+                });
+
+        commandArguments.addAll(args);
+        out.newPrinterWithHangingIndent(8).append("usage:").append(global.getName()).appendWords(commandArguments)
+                .append("<command> [ <args> ]").newline().newline();
     }
 }

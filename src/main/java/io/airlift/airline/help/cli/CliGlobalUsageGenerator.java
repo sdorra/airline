@@ -34,103 +34,164 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
 
     @Override
     protected void usage(GlobalMetadata global, UsagePrinter out) throws IOException {
-        //
-        // NAME
-        //
-        out.append("NAME").newline();
+        // Name and description
+        outputDescription(out, global);
 
-        out.newIndentedPrinter(8).append(global.getName()).append("-").append(global.getDescription()).newline()
-                .newline();
+        // Synopsis
+        outputSynopsis(out, global);
 
-        //
-        // SYNOPSIS
-        //
-        out.append("SYNOPSIS").newline();
-        out.newIndentedPrinter(8).newPrinterWithHangingIndent(8).append(global.getName())
-                .appendWords(toSynopsisUsage(global.getOptions())).append("<command> [ <args> ]").newline().newline();
-
-        //
-        // OPTIONS
-        //
+        // Options
         List<OptionMetadata> options = sortOptions(global.getOptions());
         if (options.size() > 0) {
-
-            out.append("OPTIONS").newline();
-
-            for (OptionMetadata option : options) {
-
-                if (option.isHidden()) {
-                    continue;
-                }
-
-                // option names
-                UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-                optionPrinter.append(toDescription(option)).newline();
-
-                // description
-                UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-                descriptionPrinter.append(option.getDescription()).newline();
-
-                // allowedValues
-                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                    descriptionPrinter.newline();
-                    descriptionPrinter.append("This options value");
-                    if (option.getArity() == 1) {
-                        descriptionPrinter.append(" is ");
-                    } else {
-                        descriptionPrinter.append("s are ");
-                    }
-                    descriptionPrinter.append("restricted to the following value(s):").newline();
-
-                    UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
-                    for (String value : option.getAllowedValues()) {
-                        allowedValuesPrinter.append(value).newline();
-                    }
-                    allowedValuesPrinter.flush();
-                }
-
-                descriptionPrinter.newline();
-            }
+            outputOptions(out, options);
         }
 
-        //
-        // COMMANDS
-        //
+        // Command list
+        outputCommandList(out, global);
+    }
+
+    /**
+     * Outputs a documentation section listing the commands
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @throws IOException
+     */
+    protected void outputCommandList(UsagePrinter out, GlobalMetadata global) throws IOException {
         out.append("COMMANDS").newline();
         UsagePrinter commandPrinter = out.newIndentedPrinter(8);
 
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
-            printCommandDescription(commandPrinter, null, command);
+            outputCommandDescription(commandPrinter, null, command);
         }
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             for (CommandMetadata command : sortCommands(group.getCommands())) {
-                printCommandDescription(commandPrinter, group, command);
+                outputCommandDescription(commandPrinter, group, command);
             }
         }
     }
 
     /**
-     * Prints the description for a command
+     * Outputs a documentation section detailing options and their usages
      * 
-     * @param commandPrinter
+     * @param out
      *            Usage printer
-     * @param group
-     *            Group metadata
-     * @param command
-     *            Command metadata
+     * @param options
+     *            Options
      * @throws IOException
      */
-    protected void printCommandDescription(UsagePrinter commandPrinter, @Nullable CommandGroupMetadata group,
+    protected void outputOptions(UsagePrinter out, List<OptionMetadata> options)
+            throws IOException {
+        out.append("OPTIONS").newline();
+
+        for (OptionMetadata option : options) {
+
+            if (option.isHidden()) {
+                continue;
+            }
+
+            // option names
+            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
+            optionPrinter.append(toDescription(option)).newline();
+
+            // description
+            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
+            descriptionPrinter.append(option.getDescription()).newline();
+
+            // allowedValues
+            if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                outputAllowedValues(descriptionPrinter, option);
+            }
+
+            descriptionPrinter.newline();
+        }
+
+        // Note - Global meta-data does not allow arguments, those are command specific hence their omission
+    }
+
+    /**
+     * Outputs a documentation section detailing the allowed values for an
+     * option
+     * 
+     * @param out
+     *            Usage printer
+     * @param option
+     *            Option meta-data
+     * @throws IOException
+     */
+    protected void outputAllowedValues(UsagePrinter out, OptionMetadata option) throws IOException {
+        out.newline();
+        out.append("This options value");
+        if (option.getArity() == 1) {
+            out.append(" is ");
+        } else {
+            out.append("s are ");
+        }
+        out.append("restricted to the following value(s):").newline();
+
+        UsagePrinter allowedValuesPrinter = out.newIndentedPrinter(4);
+        for (String value : option.getAllowedValues()) {
+            allowedValuesPrinter.append(value).newline();
+        }
+        allowedValuesPrinter.flush();
+    }
+
+    /**
+     * Outputs a documentation section with a synopsis of CLI usage
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata global) throws IOException {
+        out.append("SYNOPSIS").newline();
+        out.newIndentedPrinter(8).newPrinterWithHangingIndent(8).append(global.getName())
+                .appendWords(toSynopsisUsage(global.getOptions())).append("<command> [ <args> ]").newline().newline();
+    }
+
+    /**
+     * Outputs a documentation section with a description of the CLI
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @throws IOException
+     */
+    protected void outputDescription(UsagePrinter out, GlobalMetadata global) throws IOException {
+        out.append("NAME").newline();
+
+        out.newIndentedPrinter(8).append(global.getName()).append("-").append(global.getDescription()).newline()
+                .newline();
+    }
+
+    /**
+     * Outputs the description for a command
+     * 
+     * @param out
+     *            Usage printer
+     * @param group
+     *            Group meta-data
+     * @param command
+     *            Command meta-data
+     * @throws IOException
+     */
+    protected void outputCommandDescription(UsagePrinter out, @Nullable CommandGroupMetadata group,
             CommandMetadata command) throws IOException {
         if (!command.isHidden()) {
             if (group != null) {
-                commandPrinter.append(group.getName());
+                out.append(group.getName());
             }
-            commandPrinter.append(command.getName()).newline();
+            out.append(command.getName()).newline();
             if (command.getDescription() != null) {
-                commandPrinter.newIndentedPrinter(4).append(command.getDescription()).newline();
+                out.newIndentedPrinter(4).append(command.getDescription()).newline();
             }
-            commandPrinter.newline();
+            out.newline();
         }
     }
 }

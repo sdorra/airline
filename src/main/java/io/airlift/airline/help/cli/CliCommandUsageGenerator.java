@@ -38,16 +38,229 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     protected void usage(@Nullable String programName, @Nullable String groupName, String commandName,
             CommandMetadata command, UsagePrinter out) throws IOException {
         //
-        // NAME
+        // Name and description
         //
-        out.append("NAME").newline();
+        outputDescription(out, programName, groupName, commandName, command);
 
-        out.newIndentedPrinter(8).append(programName).append(groupName).append(commandName).append("-")
-                .append(command.getDescription()).newline().newline();
+        // Synopsis
+        List<OptionMetadata> options = outputSynopsis(out, programName, groupName, commandName, command);
 
-        //
-        // SYNOPSIS
-        //
+        // Options
+        ArgumentsMetadata arguments = command.getArguments();
+        if (options.size() > 0 || arguments != null) {
+            outputOptions(out, options, arguments);
+        }
+
+        // Discussion
+        if (command.getDiscussion() != null) {
+            outputDiscussion(out, command);
+        }
+
+        // Examples
+        if (command.getExamples() != null && !command.getExamples().isEmpty()) {
+            outputExamples(out, command);
+        }
+
+        // Exit Codes
+        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
+            outputExitCodes(out, programName, groupName, commandName, command);
+        }
+    }
+
+    /**
+     * Outputs a documentation section detailing the exit codes
+     * 
+     * @param out
+     *            Usage printer
+     * @param programName
+     *            Program name
+     * @param groupName
+     *            Group name
+     * @param commandName
+     *            Command name
+     * @param command
+     *            Command meta-data
+     * @throws IOException
+     */
+    protected void outputExitCodes(UsagePrinter out, String programName, String groupName, String commandName,
+            CommandMetadata command) throws IOException {
+        out.append("EXIT STATUS").newline();
+        out.flush();
+
+        UsagePrinter exitPrinter = out.newIndentedPrinter(8);
+        exitPrinter.append("The ");
+        if (programName != null) {
+            exitPrinter.append(programName).append(" ");
+        }
+        if (groupName != null) {
+            exitPrinter.append(groupName).append(" ");
+        }
+        exitPrinter.append(commandName).append(" command exits with one of the following values:").newline().newline();
+
+        for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
+            // Print the exit code
+            exitPrinter.append(exit.getKey().toString());
+            exitPrinter.newline();
+            exitPrinter.flush();
+
+            // Include description if available
+            if (!StringUtils.isEmpty(exit.getValue())) {
+
+                UsagePrinter exitDescripPrinter = exitPrinter.newIndentedPrinter(4);
+                exitDescripPrinter.append(exit.getValue());
+                exitDescripPrinter.flush();
+            }
+
+            exitPrinter.newline();
+            exitPrinter.flush();
+        }
+    }
+
+    /**
+     * Outputs a documentation section detailing examples
+     * 
+     * @param out
+     *            Usage printer
+     * @param command
+     *            Command meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputExamples(UsagePrinter out, CommandMetadata command) throws IOException {
+        out.append("EXAMPLES").newline();
+        UsagePrinter examplePrinter = out.newIndentedPrinter(8);
+
+        examplePrinter.appendTable(Iterables.partition(command.getExamples(), 1));
+        examplePrinter.flush();
+    }
+
+    /**
+     * Outputs a documentation section with discussion
+     * 
+     * @param out
+     *            Usage printer
+     * @param command
+     *            Command meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputDiscussion(UsagePrinter out, CommandMetadata command) throws IOException {
+        out.append("DISCUSSION").newline();
+        UsagePrinter discussionPrinter = out.newIndentedPrinter(8);
+
+        discussionPrinter.append(command.getDiscussion()).newline().newline();
+        discussionPrinter.flush();
+    }
+
+    /**
+     * Outputs a documentation section detailing options and their usages
+     * 
+     * @param out
+     *            Usage printer
+     * @param options
+     *            Options meta-data
+     * @param arguments
+     *            Arguments meta-data
+     * @throws IOException
+     */
+    protected void outputOptions(UsagePrinter out, List<OptionMetadata> options, ArgumentsMetadata arguments)
+            throws IOException {
+        options = sortOptions(options);
+
+        out.append("OPTIONS").newline();
+
+        for (OptionMetadata option : options) {
+            // skip hidden options
+            if (option.isHidden()) {
+                continue;
+            }
+
+            // option names
+            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
+            optionPrinter.append(toDescription(option)).newline();
+            optionPrinter.flush();
+
+            // description
+            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
+            descriptionPrinter.append(option.getDescription()).newline();
+
+            // allowedValues
+            if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                outputAllowedValues(descriptionPrinter, option);
+            }
+
+            descriptionPrinter.newline();
+            descriptionPrinter.flush();
+        }
+
+        if (arguments != null) {
+            // "--" option
+            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
+            optionPrinter.append("--").newline();
+            optionPrinter.flush();
+
+            // description
+            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
+            descriptionPrinter.append(
+                    "This option can be used to separate command-line options from the "
+                            + "list of argument, (useful when arguments might be mistaken for command-line options)")
+                    .newline();
+            descriptionPrinter.newline();
+
+            // arguments name(s)
+            optionPrinter.append(toDescription(arguments)).newline();
+
+            // description
+            descriptionPrinter.append(arguments.getDescription()).newline();
+            descriptionPrinter.newline();
+            descriptionPrinter.flush();
+        }
+    }
+
+    /**
+     * Outputs a documentation section detailing allowed values for an option
+     * 
+     * @param descriptionPrinter
+     *            Description printer
+     * @param option
+     *            Option meta-data
+     * @throws IOException
+     */
+    protected void outputAllowedValues(UsagePrinter descriptionPrinter, OptionMetadata option) throws IOException {
+        descriptionPrinter.newline();
+        descriptionPrinter.append("This options value");
+        if (option.getArity() == 1) {
+            descriptionPrinter.append(" is ");
+        } else {
+            descriptionPrinter.append("s are ");
+        }
+        descriptionPrinter.append("restricted to the following value(s):").newline();
+
+        UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
+        for (String value : option.getAllowedValues()) {
+            allowedValuesPrinter.append(value).newline();
+        }
+        allowedValuesPrinter.flush();
+    }
+
+    /**
+     * Outputs a documentation section with a synopsis of command usage
+     * 
+     * @param out
+     *            Usage printer
+     * @param programName
+     *            Program name
+     * @param groupName
+     *            Group name
+     * @param commandName
+     *            Command name
+     * @param command
+     *            Command meta-data
+     * @return Collection of all options (Global, Group and Command)
+     * @throws IOException
+     */
+    protected List<OptionMetadata> outputSynopsis(UsagePrinter out, String programName, String groupName,
+            String commandName, CommandMetadata command) throws IOException {
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
         List<OptionMetadata> options = newArrayList();
@@ -63,131 +276,35 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         options.addAll(command.getCommandOptions());
 
         // command arguments (optional)
-        ArgumentsMetadata arguments = command.getArguments();
-        if (arguments != null) {
-            synopsis.append("[--]").append(toUsage(arguments));
+        if (command.getArguments() != null) {
+            synopsis.append("[--]").append(toUsage(command.getArguments()));
         }
         synopsis.newline();
         synopsis.newline();
+        return options;
+    }
 
-        //
-        // OPTIONS
-        //
-        if (options.size() > 0 || arguments != null) {
-            options = sortOptions(options);
+    /**
+     * Outputs a documentation section describing the command
+     * 
+     * @param out
+     *            Usage printer
+     * @param programName
+     *            Program name
+     * @param groupName
+     *            Group name
+     * @param commandName
+     *            Command name
+     * @param command
+     *            Command meta-data
+     * @throws IOException
+     */
+    protected void outputDescription(UsagePrinter out, String programName, String groupName, String commandName,
+            CommandMetadata command) throws IOException {
+        out.append("NAME").newline();
 
-            out.append("OPTIONS").newline();
-
-            for (OptionMetadata option : options) {
-                // skip hidden options
-                if (option.isHidden()) {
-                    continue;
-                }
-
-                // option names
-                UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-                optionPrinter.append(toDescription(option)).newline();
-                optionPrinter.flush();
-
-                // description
-                UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-                descriptionPrinter.append(option.getDescription()).newline();
-                
-                // allowedValues
-                if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                    descriptionPrinter.newline();
-                    descriptionPrinter.append("This options value");
-                    if (option.getArity() == 1) {
-                        descriptionPrinter.append(" is ");
-                    } else {
-                        descriptionPrinter.append("s are ");
-                    }
-                    descriptionPrinter.append("restricted to the following value(s):").newline();
-                    
-                    UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
-                    for (String value : option.getAllowedValues()) {
-                        allowedValuesPrinter.append(value).newline();
-                    }
-                    allowedValuesPrinter.flush();
-                }
-
-                descriptionPrinter.newline();
-                descriptionPrinter.flush();
-            }
-
-            if (arguments != null) {
-                // "--" option
-                UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-                optionPrinter.append("--").newline();
-                optionPrinter.flush();
-
-                // description
-                UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-                descriptionPrinter
-                        .append("This option can be used to separate command-line options from the "
-                                + "list of argument, (useful when arguments might be mistaken for command-line options)")
-                        .newline();
-                descriptionPrinter.newline();
-
-                // arguments name(s)
-                optionPrinter.append(toDescription(arguments)).newline();
-
-                // description
-                descriptionPrinter.append(arguments.getDescription()).newline();
-                descriptionPrinter.newline();
-                descriptionPrinter.flush();
-            }
-        }
-
-        if (command.getDiscussion() != null) {
-            out.append("DISCUSSION").newline();
-            UsagePrinter discussionPrinter = out.newIndentedPrinter(8);
-
-            discussionPrinter.append(command.getDiscussion()).newline().newline();
-            discussionPrinter.flush();
-        }
-
-        if (command.getExamples() != null && !command.getExamples().isEmpty()) {
-            out.append("EXAMPLES").newline();
-            UsagePrinter examplePrinter = out.newIndentedPrinter(8);
-
-            examplePrinter.appendTable(Iterables.partition(command.getExamples(), 1));
-            examplePrinter.flush();
-        }
-        
-        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
-            out.append("EXIT STATUS").newline();
-            out.flush();
-            
-            UsagePrinter exitPrinter = out.newIndentedPrinter(8);
-            exitPrinter.append("The ");
-            if (programName != null) {
-                exitPrinter.append(programName).append(" ");
-            }
-            if (groupName != null) {
-                exitPrinter.append(groupName).append(" ");
-            }
-            exitPrinter.append(commandName).append(" command exits with one of the following values:").newline().newline();
-            
-            
-            for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
-                // Print the exit code
-                exitPrinter.append(exit.getKey().toString());
-                exitPrinter.newline();
-                exitPrinter.flush();
-                
-                // Include description if available
-                if (!StringUtils.isEmpty(exit.getValue())) {
-                    
-                    UsagePrinter exitDescripPrinter = exitPrinter.newIndentedPrinter(4);
-                    exitDescripPrinter.append(exit.getValue());
-                    exitDescripPrinter.flush();
-                }
-                
-                exitPrinter.newline();
-                exitPrinter.flush();
-            }
-        }
+        out.newIndentedPrinter(8).append(programName).append(groupName).append(commandName).append("-")
+                .append(command.getDescription()).newline().newline();
     }
 
 }

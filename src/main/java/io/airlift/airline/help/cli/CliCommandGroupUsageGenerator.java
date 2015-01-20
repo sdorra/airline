@@ -42,17 +42,77 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
     @Override
     protected void usage(@Nullable GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
             throws IOException {
-        //
-        // NAME
-        //
-        out.append("NAME").newline();
-
-        out.newIndentedPrinter(8).append(global.getName()).append(group.getName()).append("-")
-                .append(group.getDescription()).newline().newline();
+        // Description and Name
+        outputDescription(out, global, group);
 
         //
         // SYNOPSIS
         //
+        outputSynopsis(out, global, group);
+
+        //
+        // OPTIONS
+        //
+        outputOptions(out, global, group);
+    }
+
+    /**
+     * Outputs a documentation section detailing the available options and their
+     * usages
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @param group
+     *            Group meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputOptions(UsagePrinter out, GlobalMetadata global, CommandGroupMetadata group)
+            throws IOException {
+        List<OptionMetadata> options = newArrayList();
+        options.addAll(group.getOptions());
+        if (global != null && !hideGlobalOptions) {
+            options.addAll(global.getOptions());
+        }
+        if (options.size() > 0) {
+            options = sortOptions(options);
+
+            out.append("OPTIONS").newline();
+
+            for (OptionMetadata option : options) {
+
+                if (option.isHidden()) {
+                    continue;
+                }
+
+                // option names
+                UsagePrinter optionPrinter = out.newIndentedPrinter(8);
+                optionPrinter.append(toDescription(option)).newline();
+
+                // description
+                UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
+                descriptionPrinter.append(option.getDescription()).newline();
+
+                descriptionPrinter.newline();
+            }
+        }
+    }
+
+    /**
+     * Outputs a documentation section detailing a usage synopsis
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @param group
+     *            Group meta-data
+     * @throws IOException
+     */
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata global, CommandGroupMetadata group)
+            throws IOException {
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
 
@@ -151,36 +211,24 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
         }
         synopsis.newline().append("See").append("'" + global.getName()).append("help ").append(group.getName())
                 .appendOnOneLine(" <command>' for more information on a specific command.").newline();
+    }
 
-        //
-        // OPTIONS
-        //
-        List<OptionMetadata> options = newArrayList();
-        options.addAll(group.getOptions());
-        if (global != null && !hideGlobalOptions) {
-            options.addAll(global.getOptions());
-        }
-        if (options.size() > 0) {
-            options = sortOptions(options);
+    /**
+     * Outputs a description of the group
+     * 
+     * @param out
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * @param group
+     *            Group meta-data
+     * @throws IOException
+     */
+    protected void outputDescription(UsagePrinter out, GlobalMetadata global, CommandGroupMetadata group)
+            throws IOException {
+        out.append("NAME").newline();
 
-            out.append("OPTIONS").newline();
-
-            for (OptionMetadata option : options) {
-
-                if (option.isHidden()) {
-                    continue;
-                }
-
-                // option names
-                UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-                optionPrinter.append(toDescription(option)).newline();
-
-                // description
-                UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-                descriptionPrinter.append(option.getDescription()).newline();
-
-                descriptionPrinter.newline();
-            }
-        }
+        out.newIndentedPrinter(8).append(global.getName()).append(group.getName()).append("-")
+                .append(group.getDescription()).newline().newline();
     }
 }

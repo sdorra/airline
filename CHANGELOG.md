@@ -2,6 +2,9 @@
 
 ## 0.9.1
 
+- Help improvements
+    - Refactored various usage generators to make them easier to extend
+
 ## 0.9
 
 - Annotation improvements
