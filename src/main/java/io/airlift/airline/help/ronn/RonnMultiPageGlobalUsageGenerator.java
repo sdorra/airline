@@ -56,18 +56,18 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     }
 
     @Override
-    protected void outputCommandUsages(GlobalMetadata global, OutputStream output, Writer writer) throws IOException {
+    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata global) throws IOException {
         // Default group usages
-        outputDefaultGroupCommandUsages(global, output, writer);
+        outputDefaultGroupCommandUsages(output, writer, global);
 
         // Other group usages
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
-            outputGroupCommandUsages(global, output, writer, group);
+            outputGroupCommandUsages(output, writer, global, group);
         }
     }
 
     @Override
-    protected void outputGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer,
+    protected void outputGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global,
             CommandGroupMetadata group) throws IOException {
 
         for (CommandMetadata command : sortCommands(group.getCommands())) {
@@ -104,7 +104,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     }
 
     @Override
-    protected void outputDefaultGroupCommandUsages(GlobalMetadata global, OutputStream output, Writer writer)
+    protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global)
             throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden())
