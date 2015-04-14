@@ -10,7 +10,6 @@ import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import java.io.IOException;
@@ -23,7 +22,6 @@ import static com.google.common.collect.Lists.newArrayList;
 @Command(name = "help", description = "Display help information")
 public class Help implements Runnable, Callable<Void> {
     @Inject
-    @Nullable
     public GlobalMetadata global;
 
     @Arguments

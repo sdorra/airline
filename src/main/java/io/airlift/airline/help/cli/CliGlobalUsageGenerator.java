@@ -8,8 +8,6 @@ import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
-import javax.annotation.Nullable;
-
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -26,9 +24,9 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
                 UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
     }
 
-    public CliGlobalUsageGenerator(int columnSize, @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator,
-            @Nullable Comparator<? super CommandGroupMetadata> commandGroupComparator) {
+    public CliGlobalUsageGenerator(int columnSize,  Comparator<? super OptionMetadata> optionComparator,
+             Comparator<? super CommandMetadata> commandComparator,
+             Comparator<? super CommandGroupMetadata> commandGroupComparator) {
         super(columnSize, optionComparator, commandComparator, commandGroupComparator);
     }
 
@@ -181,7 +179,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      *            Command meta-data
      * @throws IOException
      */
-    protected void outputCommandDescription(UsagePrinter out, @Nullable CommandGroupMetadata group,
+    protected void outputCommandDescription(UsagePrinter out,  CommandGroupMetadata group,
             CommandMetadata command) throws IOException {
         if (!command.isHidden()) {
             if (group != null) {

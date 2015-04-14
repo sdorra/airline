@@ -5,8 +5,6 @@ import java.io.OutputStream;
 
 import io.airlift.airline.model.CommandMetadata;
 
-import javax.annotation.Nullable;
-
 /**
  * Interface implemented by classes that can generate usage documentation for a
  * command
@@ -26,7 +24,7 @@ public interface CommandUsageGenerator {
      *            Command Metadata
      * @throws IOException
      */
-    public abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    public abstract void usage( String programName,  String groupName, String commandName,
             CommandMetadata command) throws IOException;
 
     /**
@@ -44,6 +42,6 @@ public interface CommandUsageGenerator {
      *            Stream to output to
      * @throws IOException
      */
-    public abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    public abstract void usage( String programName,  String groupName, String commandName,
             CommandMetadata command, OutputStream output) throws IOException;
 }

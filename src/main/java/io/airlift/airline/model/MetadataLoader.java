@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import java.lang.annotation.Annotation;
@@ -282,7 +281,7 @@ public class MetadataLoader {
         options = ImmutableList.copyOf(transform(metadataIndex.asMap().values(),
                 new Function<Collection<OptionMetadata>, OptionMetadata>() {
                     @Override
-                    public OptionMetadata apply(@Nullable Collection<OptionMetadata> options) {
+                    public OptionMetadata apply( Collection<OptionMetadata> options) {
                         return new OptionMetadata(options);
                     }
                 }));

@@ -9,8 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Joiner;
@@ -69,7 +67,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    public void usage( String programName,  String groupName, String commandName,
             CommandMetadata command, OutputStream output) throws IOException {
 
         Writer writer = new OutputStreamWriter(output);

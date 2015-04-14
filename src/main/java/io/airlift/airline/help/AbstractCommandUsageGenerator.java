@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
-import javax.annotation.Nullable;
-
 /**
  * Abstract command usage generator
  * 
@@ -35,7 +33,7 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
     }
 
     @Override
-    public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    public void usage(String programName, String groupName, String commandName,
             CommandMetadata command) throws IOException {
         usage(programName, groupName, commandName, command, System.out);
     }

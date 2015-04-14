@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
-
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
@@ -40,9 +38,9 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
     }
 
     public CliGlobalUsageSummaryGenerator(int columnSize,
-            @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator,
-            @Nullable Comparator<? super CommandGroupMetadata> commandGroupComparator) {
+             Comparator<? super OptionMetadata> optionComparator,
+             Comparator<? super CommandMetadata> commandComparator,
+             Comparator<? super CommandGroupMetadata> commandGroupComparator) {
         super(columnSize, optionComparator, commandComparator, commandGroupComparator);
     }
 

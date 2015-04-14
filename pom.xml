@@ -56,7 +56,6 @@
 		<dependency.javax-inject>1</dependency.javax-inject>
 		<dependency.guava>18.0</dependency.guava>
 		<dependency.testng>6.8.8</dependency.testng>
-		<dependency.annotations>3.0.0</dependency.annotations>
 		<dependency.commons-lang3>3.3.2</dependency.commons-lang3>
 	</properties>
 
@@ -71,12 +70,6 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${dependency.guava}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>annotations</artifactId>
-			<version>${dependency.annotations}</version>
 		</dependency>
 		
 		<dependency>

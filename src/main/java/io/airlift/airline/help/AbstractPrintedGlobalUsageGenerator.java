@@ -10,8 +10,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Comparator;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -23,9 +21,9 @@ public abstract class AbstractPrintedGlobalUsageGenerator extends AbstractGlobal
     private final int columnSize;
 
     public AbstractPrintedGlobalUsageGenerator(int columnSize,
-            @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator,
-            @Nullable Comparator<? super CommandGroupMetadata> commandGroupComparator) {
+            Comparator<? super OptionMetadata> optionComparator,
+            Comparator<? super CommandMetadata> commandComparator,
+             Comparator<? super CommandGroupMetadata> commandGroupComparator) {
         super(optionComparator, commandComparator, commandGroupComparator);
         Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
         this.columnSize = columnSize;

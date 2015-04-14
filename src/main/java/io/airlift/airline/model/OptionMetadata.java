@@ -8,8 +8,6 @@ import com.google.common.collect.Iterables;
 import io.airlift.airline.Accessor;
 import io.airlift.airline.OptionType;
 
-import javax.annotation.Nullable;
-
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -361,7 +359,7 @@ public class OptionMetadata {
     public static Predicate<OptionMetadata> isHiddenPredicate() {
         return new Predicate<OptionMetadata>() {
             @Override
-            public boolean apply(@Nullable OptionMetadata input) {
+            public boolean apply( OptionMetadata input) {
                 return !input.isHidden();
             }
         };

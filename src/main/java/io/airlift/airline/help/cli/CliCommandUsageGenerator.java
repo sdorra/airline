@@ -13,8 +13,6 @@ import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Iterables;
@@ -30,12 +28,12 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         this(columnSize, DEFAULT_OPTION_COMPARATOR);
     }
 
-    public CliCommandUsageGenerator(int columnSize, @Nullable Comparator<? super OptionMetadata> optionComparator) {
+    public CliCommandUsageGenerator(int columnSize,  Comparator<? super OptionMetadata> optionComparator) {
         super(columnSize, optionComparator);
     }
 
     @Override
-    protected void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    protected void usage( String programName,  String groupName, String commandName,
             CommandMetadata command, UsagePrinter out) throws IOException {
         //
         // Name and description

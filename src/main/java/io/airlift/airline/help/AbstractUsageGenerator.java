@@ -13,8 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -170,7 +168,7 @@ public class AbstractUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(@Nullable String argument) {
+                        public String apply( String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -179,7 +177,7 @@ public class AbstractUsageGenerator {
         }
 
         Joiner.on(" | ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(@Nullable String option) {
+            public String apply( String option) {
                 // if (argumentString != null) {
                 // return option + " " + argumentString;
                 // }
@@ -234,7 +232,7 @@ public class AbstractUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(@Nullable String argument) {
+                        public String apply( String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -243,7 +241,7 @@ public class AbstractUsageGenerator {
         }
 
         Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(@Nullable String option) {
+            public String apply( String option) {
                 if (argumentString != null) {
                     return option + " " + argumentString;
                 }

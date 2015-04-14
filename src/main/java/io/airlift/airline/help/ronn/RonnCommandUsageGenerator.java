@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Function;
@@ -66,7 +64,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    public void usage( String programName,  String groupName, String commandName,
             CommandMetadata command, OutputStream output) throws IOException {
         String SECTION_HEADER = "## ";
 
@@ -379,7 +377,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(@Nullable String argument) {
+                        public String apply( String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -388,7 +386,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(@Nullable String option) {
+            public String apply( String option) {
                 if (argumentString != null) {
                     return "`" + option + "` " + argumentString;
                 }

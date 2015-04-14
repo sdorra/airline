@@ -9,8 +9,6 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -394,7 +392,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(@Nullable String argument) {
+                        public String apply( String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -403,7 +401,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
         }
 
         Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(@Nullable String option) {
+            public String apply( String option) {
                 if (argumentString != null) {
                     return "`" + option + "` " + argumentString;
                 }

@@ -7,8 +7,6 @@ import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
-import javax.annotation.Nullable;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -33,14 +31,14 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
     }
 
     public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions,
-            @Nullable Comparator<? super OptionMetadata> optionComparator,
-            @Nullable Comparator<? super CommandMetadata> commandComparator) {
+             Comparator<? super OptionMetadata> optionComparator,
+             Comparator<? super CommandMetadata> commandComparator) {
         super(columnSize, optionComparator, commandComparator);
         this.hideGlobalOptions = hideGlobalOptions;
     }
 
     @Override
-    protected void usage(@Nullable GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
+    protected void usage( GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
             throws IOException {
         // Description and Name
         outputDescription(out, global, group);

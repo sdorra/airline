@@ -8,8 +8,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Comparator;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -21,7 +19,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     private final int columnSize;
 
     public AbstractPrintedCommandUsageGenerator(int columnSize,
-            @Nullable Comparator<? super OptionMetadata> optionComparator) {
+            Comparator<? super OptionMetadata> optionComparator) {
         super(optionComparator);
         Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
         this.columnSize = columnSize;
@@ -42,7 +40,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Usage printer to output with
      * @throws IOException 
      */
-    protected abstract void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    protected abstract void usage(String programName, String groupName, String commandName,
             CommandMetadata command, UsagePrinter out) throws IOException;
 
     /**
@@ -59,7 +57,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     }
 
     @Override
-    public void usage(@Nullable String programName, @Nullable String groupName, String commandName,
+    public void usage(String programName, String groupName, String commandName,
             CommandMetadata command, OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
         usage(programName, groupName, commandName, command, printer);
