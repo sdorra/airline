@@ -27,9 +27,10 @@ This fork contains several improvements over the upstream fork created both by m
         - [Ronn](http://rtomayko.github.io/ronn/) which can be easily converted into `man` pages
         - HTML
         - Bash auto-completion scripts
+        - All generators break out their logic into `protected` methods so that individual portions of a generator can be overridden and customised
 - Support for Command Factories
 
-Please note that some of the features and improvements listed here may not yet have made it into the stable release build and may only be available
+Please note that some of the features and improvements listed here may not yet have made it into the stable release build and may only be available in the SNAPSHOT builds
 
 ## License
 
@@ -39,17 +40,19 @@ See provided **Notice.md** for Copyright Holders
 
 ## Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) using the following dependency information:
+This library is available from [Maven Central](http://search.maven.org) with the latest release being `0.9.1`
+
+Use the following maven dependency declaration:
 
 ```xml
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>0.9</version>
+    <version>0.9.1</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `0.9.1-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
+Snapshot artifacts of the latest source are also available using the version `0.9.2-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
 
 ## Build Status
 
