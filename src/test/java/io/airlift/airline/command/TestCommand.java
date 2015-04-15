@@ -223,4 +223,19 @@ public class TestCommand
         assertNotNull(command, "command is null");
         assertTrue(command instanceof CommandRemove);
     }
+    
+    @Test
+    public void abbreviatedCommands05() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemotes.class)
+            .withCommand(CommandRemote.class)
+            .withCommandAbbreviation()
+            .build();
+
+        // Command name which is also an abbreviation of another command name
+        Object command = parser.parse("remote");
+        
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandRemote);
+    }
 }
