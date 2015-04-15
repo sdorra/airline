@@ -12,13 +12,15 @@ public class GlobalMetadata
     private final CommandMetadata defaultCommand;
     private final List<CommandMetadata> defaultGroupCommands;
     private final List<CommandGroupMetadata> commandGroups;
+    private final boolean allowAbbreviatedCommands;
 
     public GlobalMetadata(String name,
             String description,
             Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand,
             Iterable<CommandMetadata> defaultGroupCommands,
-            Iterable<CommandGroupMetadata> commandGroups)
+            Iterable<CommandGroupMetadata> commandGroups,
+            boolean allowAbbreviatedCommands)
     {
         this.name = name;
         this.description = description;
@@ -26,6 +28,7 @@ public class GlobalMetadata
         this.defaultCommand = defaultCommand;
         this.defaultGroupCommands = ImmutableList.copyOf(defaultGroupCommands);
         this.commandGroups = ImmutableList.copyOf(commandGroups);
+        this.allowAbbreviatedCommands = allowAbbreviatedCommands;
     }
 
     public String getName()
@@ -57,6 +60,10 @@ public class GlobalMetadata
     {
         return commandGroups;
     }
+    
+    public boolean allowsAbbreviatedCommands() {
+        return allowAbbreviatedCommands;
+    }
 
     @Override
     public String toString()
@@ -69,6 +76,7 @@ public class GlobalMetadata
         sb.append(", defaultCommand=").append(defaultCommand);
         sb.append(", defaultGroupCommands=").append(defaultGroupCommands);
         sb.append(", commandGroups=").append(commandGroups);
+        sb.append(", allowAbbreviatedCommands=").append(allowAbbreviatedCommands);
         sb.append('}');
         return sb.toString();
     }

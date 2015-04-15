@@ -161,4 +161,22 @@ public class CommandTest
         assertEquals(cmdHighArity.option2, "val5");
         assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
     }
+    
+    @Test
+    public void testAbbreviatedCommands01() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandAdd.class)
+            .withCommand(CommandCommit.class)
+            .withDefaultCommand(CommandAdd.class)
+            .withCommandAbbreviation()
+            .build();
+
+        Object command = parser.parse("ad", "-i", "A.java");
+
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandAdd);
+        CommandAdd add = (CommandAdd) command;
+        assertEquals(add.interactive.booleanValue(), true);
+        assertEquals(add.patterns, Arrays.asList("A.java"));
+    }
 }
