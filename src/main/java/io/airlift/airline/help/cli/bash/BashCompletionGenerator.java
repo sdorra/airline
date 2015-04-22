@@ -192,11 +192,11 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // Check if we are completing a group
         writer.append("  if [[ ${COMP_CWORD} -eq 2 ]]; then").append('\n');
         writeCompletionGeneration(writer, 4, true, CompletionBehaviour.NONE, "COMMANDS");
-        writer.append("  fi");
+        writer.append("  fi").append('\n');
 
         // Otherwise we must be in a specific command
         // Use a switch statement to provide command specific completion
-        writer.append("  case ${CURR_CMD} in ");
+        writer.append("  case ${CURR_CMD} in").append('\n');
         for (CommandMetadata command : group.getCommands()) {
             if (command.isHidden())
                 continue;
@@ -212,8 +212,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
             indent(writer, 6);
             writer.append("return $?").append('\n');
             indent(writer, 6);
-            writer.append(";;");
+            writer.append(";;").append('\n');
         }
+        writer.append("  esac").append('\n');
 
         // End Function
         if (this.withDebugging) {
