@@ -59,13 +59,16 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         if (hasGroups) {
             for (CommandGroupMetadata group : global.getCommandGroups()) {
                 generateGroupCompletionFunction(writer, global, group);
+                for (CommandMetadata command : group.getCommands()) {
+                    generateCommandCompletionFunction(writer, global, group, command);
+                }
             }
         } else {
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
                 if (command.isHidden())
                     continue;
 
-                generateCommandCompletionFunction(writer, global, command);
+                generateCommandCompletionFunction(writer, global, null, command);
             }
         }
 
@@ -207,9 +210,19 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
             indent(writer, 6);
 
             // Just call the command function and pass its value back up
-            writer.append("COMPREPLY=( $( _completion_command_").append(bashize(command.getName()))
-                    .append(" \"${COMMANDS}\" ) )").append('\n');
+            //@formatter:off
+            writer.append("COMPREPLY=( $( _completion_")
+                  .append(bashize(group.getName()))
+                  .append("_command_")
+                  .append(bashize(command.getName()))
+                  .append(" \"${COMMANDS}\" ) )")
+                  .append('\n');
+            //@formatter:on
             indent(writer, 6);
+            if (this.withDebugging) {
+                writer.append("set +o xtrace").append('\n');
+                indent(writer, 6);
+            }
             writer.append("return $?").append('\n');
             indent(writer, 6);
             writer.append(";;").append('\n');
@@ -223,10 +236,14 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append('}').append("\n\n");
     }
 
-    private void generateCommandCompletionFunction(Writer writer, GlobalMetadata global, CommandMetadata command)
-            throws IOException {
+    private void generateCommandCompletionFunction(Writer writer, GlobalMetadata global, CommandGroupMetadata group,
+            CommandMetadata command) throws IOException {
         // Start Function
-        writer.append("_completion_command_").append(bashize(command.getName())).append("() {").append('\n');
+        writer.append("_completion_");
+        if (group != null) {
+            writer.append(bashize(group.getName())).append("_");
+        }
+        writer.append("command_").append(bashize(command.getName())).append("() {").append('\n');
         if (this.withDebugging) {
             writer.append("  # Debugging Enabled").append('\n');
             writer.append("  set -o xtrace").append("\n\n");
@@ -346,8 +363,8 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append('"').append('\n');
     }
 
-    private void writeCompletionGeneration(Writer writer, int indent, boolean isNestedFunction, int behaviour, String... varNames)
-            throws IOException {
+    private void writeCompletionGeneration(Writer writer, int indent, boolean isNestedFunction, int behaviour,
+            String... varNames) throws IOException {
         indent(writer, indent);
         writer.append("COMPREPLY=( $(compgen ");
 
