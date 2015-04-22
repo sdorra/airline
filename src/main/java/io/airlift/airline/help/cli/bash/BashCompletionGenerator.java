@@ -118,7 +118,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
                 indent(writer, 6);
 
                 // Just call the group function and pass its value back up
-                writer.append("$( _completion_group_").append(bashize(group.getName())).append(" )").append('\n');
+                writer.append("COMPREPLY=( $( _completion_group_").append(bashize(group.getName())).append(" ) )").append('\n');
                 if (this.withDebugging) {
                     indent(writer, 6);
                     writer.append("set +o xtrace").append('\n');
@@ -218,6 +218,8 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
                   .append(" \"${COMMANDS}\" ) )")
                   .append('\n');
             //@formatter:on
+            indent(writer, 6);
+            writer.append("echo ${COMPREPLY[@]}").append('\n');
             indent(writer, 6);
             if (this.withDebugging) {
                 writer.append("set +o xtrace").append('\n');
