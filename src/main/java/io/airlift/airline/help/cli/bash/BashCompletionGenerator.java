@@ -363,7 +363,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         }
 
         //@formatter:off
-        writer.append("_completion_")
+        writer.append("_complete_")
               .append(bashize(global.getName()))
               .append("_group_")
               .append(bashize(group.getName()));
@@ -382,14 +382,13 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         }
 
         //@formatter:off
-        writer.append("_completion_")
+        writer.append("_complete_")
               .append(bashize(global.getName()));
         if (group != null) {
             writer.append("_group_")
-                  .append(bashize(group.getName()))
-                  .append("_");
+                  .append(bashize(group.getName()));
         }
-        writer.append("command_")
+        writer.append("_command_")
               .append(bashize(command.getName()));
         //@formatter:on
 
