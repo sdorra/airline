@@ -2,6 +2,9 @@
 
 ## 0.9.2
 
+- Bash Completion Fixes
+    - Bash Completion Scripts for CLI that use groups are not valid Bash and function correctly 
+
 ## 0.9.1
 
 - Help improvements
