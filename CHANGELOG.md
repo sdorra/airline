@@ -4,6 +4,7 @@
 
 - Bash Completion Fixes
     - Bash Completion Scripts for CLI that use groups are not valid Bash and function correctly 
+    - Bash Completion Scripts generate more unique function names to avoid clashes between different airline generated completion scripts
 
 ## 0.9.1
 
