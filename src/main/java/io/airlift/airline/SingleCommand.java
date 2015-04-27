@@ -20,15 +20,24 @@ package io.airlift.airline;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.MetadataLoader;
 import io.airlift.airline.model.OptionMetadata;
+import io.airlift.airline.parser.ParseArgumentsMissingException;
+import io.airlift.airline.parser.ParseArgumentsUnexpectedException;
+import io.airlift.airline.parser.ParseCommandMissingException;
+import io.airlift.airline.parser.ParseCommandUnrecognizedException;
+import io.airlift.airline.parser.ParseOptionMissingException;
+import io.airlift.airline.parser.ParseOptionMissingValueException;
+import io.airlift.airline.parser.ParseState;
+import io.airlift.airline.parser.Parser;
 
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.airlift.airline.ParserUtil.createInstance;
+import static io.airlift.airline.parser.ParserUtil.createInstance;
 
 public class SingleCommand<C>
 {

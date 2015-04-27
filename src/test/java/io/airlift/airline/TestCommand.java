@@ -19,9 +19,11 @@
 package io.airlift.airline;
 
 import com.google.common.collect.ImmutableList;
+
 import io.airlift.airline.Cli.CliBuilder;
 import io.airlift.airline.args.Args1;
 import io.airlift.airline.args.Args2;
+import io.airlift.airline.args.ArgsArityLimited;
 import io.airlift.airline.args.ArgsArityString;
 import io.airlift.airline.args.ArgsBooleanArity;
 import io.airlift.airline.args.ArgsBooleanArity0;
@@ -37,6 +39,9 @@ import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandAdd;
 import io.airlift.airline.command.CommandCommit;
 import io.airlift.airline.model.CommandMetadata;
+import io.airlift.airline.parser.ParseException;
+import io.airlift.airline.parser.ParseTooManyArgumentsException;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -188,6 +193,20 @@ public class TestCommand
     public void arity2Fail()
     {
         singleCommandParser(ArgsArityString.class).parse("ArgsArityString", "-pairs", "pair0");
+    }
+    
+    @Test
+    public void argumentsRestrictedArity()
+    {
+        ArgsArityLimited args = singleCommandParser(ArgsArityLimited.class).parse("ArgsArityLimited", "one", "two", "three");
+        
+        assertEquals(args.args.size(), 3);
+    }
+    
+    @Test(expectedExceptions = ParseTooManyArgumentsException.class)
+    public void argumentsRestrictedArityFail()
+    {
+        singleCommandParser(ArgsArityLimited.class).parse("ArgsArityLimited", "one", "two", "three", "four");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

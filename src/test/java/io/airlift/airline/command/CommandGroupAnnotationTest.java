@@ -1,7 +1,7 @@
 package io.airlift.airline.command;
 
 import io.airlift.airline.Cli;
-import io.airlift.airline.ParseCommandUnrecognizedException;
+import io.airlift.airline.parser.ParseCommandUnrecognizedException;
 
 import java.util.Arrays;
 

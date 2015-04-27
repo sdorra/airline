@@ -1,4 +1,4 @@
-package io.airlift.airline;
+package io.airlift.airline.parser;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -6,6 +6,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
+import io.airlift.airline.AbbreviatedCommandFinder;
+import io.airlift.airline.AbbreviatedGroupFinder;
+import io.airlift.airline.Context;
+import io.airlift.airline.TypeConverter;
 import io.airlift.airline.model.ArgumentsMetadata;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
@@ -315,6 +319,12 @@ public class Parser {
         if (arguments != null) {
             // TODO: check each title one by one? see:
             // https://github.com/airlift/airline/issues/6
+            if (arguments.getArity() > 0 && state.getParsedArguments().size() == arguments.getArity()) {
+                throw new ParseTooManyArgumentsException(
+                        "Too many arguments, at most %d arguments are permitted but extra argument %s was encountered",
+                        arguments.getArity(), tokens.peek());
+            }
+
             state = state.withArgument(TypeConverter.newInstance().convert(arguments.getTitle().get(0),
                     arguments.getJavaType(), tokens.next()));
         } else {

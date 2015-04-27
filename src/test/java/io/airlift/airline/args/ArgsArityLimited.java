@@ -16,24 +16,18 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.args;
+
+import io.airlift.airline.Arguments;
+import io.airlift.airline.Command;
+import java.util.List;
 
 /**
- * Exception that is thrown when an option expects one/more values and no values
- * are supplied
- * 
+ * Test restricted argument arity.
  */
-public class ParseOptionMissingValueException extends ParseException {
-    private static final long serialVersionUID = -731926542936989571L;
-    
-    private final String optionTitle;
-
-    ParseOptionMissingValueException(String optionTitle) {
-        super("Required values for option '%s' not provided", optionTitle);
-        this.optionTitle = optionTitle;
-    }
-
-    public String getOptionTitle() {
-        return optionTitle;
-    }
+@Command(name = "ArgsArityLimited")
+public class ArgsArityLimited
+{
+    @Arguments(description = "Args", arity = 3)
+    public List<String> args;
 }

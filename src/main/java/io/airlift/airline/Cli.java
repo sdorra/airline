@@ -31,13 +31,23 @@ import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.MetadataLoader;
 import io.airlift.airline.model.OptionMetadata;
+import io.airlift.airline.parser.ParseArgumentsMissingException;
+import io.airlift.airline.parser.ParseArgumentsUnexpectedException;
+import io.airlift.airline.parser.ParseCommandMissingException;
+import io.airlift.airline.parser.ParseCommandUnrecognizedException;
+import io.airlift.airline.parser.ParseOptionMissingException;
+import io.airlift.airline.parser.ParseOptionMissingValueException;
+import io.airlift.airline.parser.ParseState;
+import io.airlift.airline.parser.Parser;
+import io.airlift.airline.parser.ParserUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static io.airlift.airline.ParserUtil.createInstance;
+import static io.airlift.airline.parser.ParserUtil.createInstance;
 
 public class Cli<C> {
     public static <T> CliBuilder<T> builder(String name) {

@@ -16,18 +16,30 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.parser;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 /**
- * Exception that is thrown when no command is specified
+ * Exception that is thrown when an unrecognized command is supplied
  *
  */
-public class ParseCommandMissingException extends ParseException
+public class ParseCommandUnrecognizedException extends ParseException
 {
-    private static final long serialVersionUID = -2671426251662153521L;
+    private static final long serialVersionUID = 7580940207857781141L;
+    
+    private final List<String> unparsedInput;
 
-    ParseCommandMissingException()
+    public ParseCommandUnrecognizedException(List<String> unparsedInput)
     {
-        super("No command specified");
+        super("Command '%s' not recognized", unparsedInput.get(0));
+        this.unparsedInput = ImmutableList.copyOf(unparsedInput);
+    }
+
+    public List<String> getUnparsedInput()
+    {
+        return unparsedInput;
     }
 }

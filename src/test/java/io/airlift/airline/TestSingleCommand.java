@@ -19,6 +19,7 @@
 package io.airlift.airline;
 
 import com.google.common.collect.ImmutableList;
+
 import io.airlift.airline.Cli.CliBuilder;
 import io.airlift.airline.args.Args1;
 import io.airlift.airline.args.Args2;
@@ -38,6 +39,8 @@ import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandAdd;
 import io.airlift.airline.command.CommandCommit;
 import io.airlift.airline.model.CommandMetadata;
+import io.airlift.airline.parser.ParseException;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

@@ -2,6 +2,8 @@ package io.airlift.airline;
 
 import com.google.common.base.Preconditions;
 
+import io.airlift.airline.parser.ParseOptionConversionException;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 

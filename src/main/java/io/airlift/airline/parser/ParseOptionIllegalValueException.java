@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.parser;
 
 import java.util.Set;
 

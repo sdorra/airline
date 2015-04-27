@@ -16,26 +16,18 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.parser;
 
 /**
- * Exception that is thrown when a required option is missing
+ * Exception that is thrown when no command is specified
  *
  */
-public class ParseOptionMissingException extends ParseException
+public class ParseCommandMissingException extends ParseException
 {
-    private static final long serialVersionUID = -2256462221508393062L;
-    
-    private final String optionTitle;
+    private static final long serialVersionUID = -2671426251662153521L;
 
-    ParseOptionMissingException(String optionTitle)
+    public ParseCommandMissingException()
     {
-        super("Required option '%s' is missing", optionTitle);
-        this.optionTitle = optionTitle;
-    }
-
-    public String getOptionTitle()
-    {
-        return optionTitle;
+        super("No command specified");
     }
 }

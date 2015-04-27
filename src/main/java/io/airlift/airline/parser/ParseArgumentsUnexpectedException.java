@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.parser;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,7 +31,7 @@ public class ParseArgumentsUnexpectedException extends ParseException {
     
     private final List<String> unparsedInput;
 
-    ParseArgumentsUnexpectedException(List<String> unparsedInput) {
+    public ParseArgumentsUnexpectedException(List<String> unparsedInput) {
         super("Found unexpected parameters: %s", unparsedInput);
         this.unparsedInput = ImmutableList.copyOf(unparsedInput);
     }

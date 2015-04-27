@@ -16,32 +16,26 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
-
-import java.util.List;
-
-import com.google.common.base.Joiner;
+package io.airlift.airline.parser;
 
 /**
- * Exception thrown when required arguments are missing
- * 
+ * Exception that is thrown when a required option is missing
+ *
  */
-public class ParseArgumentsMissingException extends ParseException {
-    private static final long serialVersionUID = 6220909299960264997L;
+public class ParseOptionMissingException extends ParseException
+{
+    private static final long serialVersionUID = -2256462221508393062L;
     
-    private final List<String> argumentTitles;
+    private final String optionTitle;
 
-    ParseArgumentsMissingException(List<String> argumentTitles) {
-        super("Required arguments are missing: '%s'", Joiner.on(',').join(argumentTitles));
-        this.argumentTitles = argumentTitles;
+    public ParseOptionMissingException(String optionTitle)
+    {
+        super("Required option '%s' is missing", optionTitle);
+        this.optionTitle = optionTitle;
     }
 
-    /**
-     * Gets the argument title
-     * 
-     * @return Title
-     */
-    public List<String> getArgumentTitle() {
-        return argumentTitles;
+    public String getOptionTitle()
+    {
+        return optionTitle;
     }
 }

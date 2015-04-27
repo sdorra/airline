@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.parser;
 
 /**
  * Exception that is thrown when the argument supplied as the value for an
@@ -30,7 +30,7 @@ public class ParseOptionConversionException extends ParseException {
     private final String value;
     private final String typeName;
 
-    ParseOptionConversionException(String optionTitle, String value, String typeName) {
+    public ParseOptionConversionException(String optionTitle, String value, String typeName) {
         super("%s: can not convert \"%s\" to a %s", optionTitle, value, typeName);
         this.optionTitle = optionTitle;
         this.value = value;

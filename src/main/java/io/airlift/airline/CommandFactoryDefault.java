@@ -1,5 +1,7 @@
 package io.airlift.airline;
 
+import io.airlift.airline.parser.ParserUtil;
+
 public class CommandFactoryDefault<T> implements CommandFactory<T> {
 
     @SuppressWarnings("unchecked")

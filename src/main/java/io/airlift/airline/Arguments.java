@@ -47,6 +47,12 @@ public @interface Arguments {
     boolean required() default false;
 
     /**
+     * The arity of the arguments, a value of less than or equal to zero is
+     * treated as unlimited
+     */
+    int arity() default Integer.MIN_VALUE;
+
+    /**
      * Sets the desired completion behaviour
      * <p>
      * This is used by usage generators that are capable of generating

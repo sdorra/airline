@@ -19,9 +19,10 @@ public class ArgumentsMetadata {
     private final int completionBehaviour;
     private final boolean required;
     private final Set<Accessor> accessors;
+    private final int arity;
 
     public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required,
-            int completionBehaviour, String completionCommand, Iterable<Field> path) {
+            int arity, int completionBehaviour, String completionCommand, Iterable<Field> path) {
         Preconditions.checkNotNull(titles, "title is null");
         Preconditions.checkNotNull(path, "path is null");
         Preconditions.checkArgument(!Iterables.isEmpty(path), "path is empty");
@@ -30,6 +31,7 @@ public class ArgumentsMetadata {
         this.description = description;
         this.usage = usage;
         this.required = required;
+        this.arity = arity <= 0 ? Integer.MIN_VALUE : arity;
         this.completionBehaviour = completionBehaviour;
         this.completionCommand = completionCommand;
         this.accessors = ImmutableSet.of(new Accessor(path));
@@ -45,6 +47,7 @@ public class ArgumentsMetadata {
         this.description = first.description;
         this.usage = first.usage;
         this.required = first.required;
+        this.arity = first.arity;
         this.completionBehaviour = first.completionBehaviour;
         this.completionCommand = first.completionCommand;
 
@@ -71,6 +74,10 @@ public class ArgumentsMetadata {
 
     public boolean isRequired() {
         return required;
+    }
+    
+    public int getArity() {
+        return arity;
     }
 
     public int getCompletionBehaviours() {

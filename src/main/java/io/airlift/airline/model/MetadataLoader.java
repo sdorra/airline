@@ -260,10 +260,18 @@ public class MetadataLoader {
                     String description = argumentsAnnotation.description();
                     String usage = argumentsAnnotation.usage();
                     boolean required = argumentsAnnotation.required();
+                    int arity = argumentsAnnotation.arity() <= 0 ? Integer.MIN_VALUE : argumentsAnnotation.arity();
 
-                    injectionMetadata.arguments.add(new ArgumentsMetadata(titlesBuilder.build(), description, usage,
-                            required, argumentsAnnotation.completionBehaviour(), argumentsAnnotation
-                                    .completionCommand(), path));
+                    //@formatter:off
+                    injectionMetadata.arguments.add(new ArgumentsMetadata(titlesBuilder.build(), 
+                                                                          description, 
+                                                                          usage,
+                                                                          required, 
+                                                                          arity,
+                                                                          argumentsAnnotation.completionBehaviour(), 
+                                                                          argumentsAnnotation.completionCommand(),
+                                                                          path));
+                    //@formatter:on
                 }
             }
         }

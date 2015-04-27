@@ -16,30 +16,24 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
+package io.airlift.airline.parser;
 
 /**
- * Exception that is thrown when an unrecognized command is supplied
- *
+ * Exception that is thrown when an option expects one/more values and no values
+ * are supplied
+ * 
  */
-public class ParseCommandUnrecognizedException extends ParseException
-{
-    private static final long serialVersionUID = 7580940207857781141L;
+public class ParseOptionMissingValueException extends ParseException {
+    private static final long serialVersionUID = -731926542936989571L;
     
-    private final List<String> unparsedInput;
+    private final String optionTitle;
 
-    ParseCommandUnrecognizedException(List<String> unparsedInput)
-    {
-        super("Command '%s' not recognized", unparsedInput.get(0));
-        this.unparsedInput = ImmutableList.copyOf(unparsedInput);
+    public ParseOptionMissingValueException(String optionTitle) {
+        super("Required values for option '%s' not provided", optionTitle);
+        this.optionTitle = optionTitle;
     }
 
-    public List<String> getUnparsedInput()
-    {
-        return unparsedInput;
+    public String getOptionTitle() {
+        return optionTitle;
     }
 }

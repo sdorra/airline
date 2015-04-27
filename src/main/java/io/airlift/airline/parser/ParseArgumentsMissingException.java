@@ -16,23 +16,32 @@
  * limitations under the License.
  */
 
-package io.airlift.airline;
+package io.airlift.airline.parser;
+
+import java.util.List;
+
+import com.google.common.base.Joiner;
 
 /**
- * Super class of all command line parsing exceptions
- *
+ * Exception thrown when required arguments are missing
+ * 
  */
-public class ParseException extends RuntimeException
-{
-    private static final long serialVersionUID = 3772132549207742875L;
+public class ParseArgumentsMissingException extends ParseException {
+    private static final long serialVersionUID = 6220909299960264997L;
+    
+    private final List<String> argumentTitles;
 
-    public ParseException(String string, Object... args)
-    {
-        super(String.format(string, args));
+    public ParseArgumentsMissingException(List<String> argumentTitles) {
+        super("Required arguments are missing: '%s'", Joiner.on(',').join(argumentTitles));
+        this.argumentTitles = argumentTitles;
     }
 
-    public ParseException(Exception cause, String string, Object... args)
-    {
-        super(String.format(string, args), cause);
+    /**
+     * Gets the argument title
+     * 
+     * @return Title
+     */
+    public List<String> getArgumentTitle() {
+        return argumentTitles;
     }
 }

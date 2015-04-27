@@ -8,22 +8,23 @@ import com.google.common.collect.ImmutableMap;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
 import io.airlift.airline.Context;
-import io.airlift.airline.ParseState;
-import io.airlift.airline.Parser;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
 import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.MetadataLoader;
 import io.airlift.airline.model.OptionMetadata;
 import io.airlift.airline.model.SuggesterMetadata;
+import io.airlift.airline.parser.ParseState;
+import io.airlift.airline.parser.Parser;
 
 import javax.inject.Inject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static io.airlift.airline.ParserUtil.createInstance;
+import static io.airlift.airline.parser.ParserUtil.createInstance;
 
 @Command(name = "suggest")
 public class SuggestCommand
