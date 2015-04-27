@@ -43,7 +43,8 @@ import static com.google.common.collect.Maps.newHashMap;
 
 public class MetadataLoader {
     public static GlobalMetadata loadGlobal(String name, String description, CommandMetadata defaultCommand,
-            Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups) {
+            Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups,
+            boolean allowAbbreviatedCommands) {
         ImmutableList.Builder<OptionMetadata> globalOptionsBuilder = ImmutableList.builder();
         if (defaultCommand != null) {
             globalOptionsBuilder.addAll(defaultCommand.getGlobalOptions());
@@ -57,7 +58,8 @@ public class MetadataLoader {
             }
         }
         List<OptionMetadata> globalOptions = mergeOptionSet(globalOptionsBuilder.build());
-        return new GlobalMetadata(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups);
+        return new GlobalMetadata(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups,
+                allowAbbreviatedCommands);
     }
 
     public static CommandGroupMetadata loadCommandGroup(String name, String description,
@@ -106,7 +108,8 @@ public class MetadataLoader {
         boolean hidden = command.hidden();
         Map<Integer, String> exitCodes = new HashMap<>();
         if (command.exitCodes() != null) {
-            String[] exitDescriptions = command.exitDescriptions() != null ? command.exitDescriptions() : new String[command.exitCodes().length];
+            String[] exitDescriptions = command.exitDescriptions() != null ? command.exitDescriptions()
+                    : new String[command.exitCodes().length];
             for (int i = 0; i < command.exitCodes().length; i++) {
                 String exitDescrip = exitDescriptions.length > i ? exitDescriptions[i] : null;
                 exitCodes.put(command.exitCodes()[i], exitDescrip);
@@ -281,7 +284,7 @@ public class MetadataLoader {
         options = ImmutableList.copyOf(transform(metadataIndex.asMap().values(),
                 new Function<Collection<OptionMetadata>, OptionMetadata>() {
                     @Override
-                    public OptionMetadata apply( Collection<OptionMetadata> options) {
+                    public OptionMetadata apply(Collection<OptionMetadata> options) {
                         return new OptionMetadata(options);
                     }
                 }));

@@ -8,4 +8,12 @@ public class TestingUtil
                 .withCommand(commandClass)
                 .build();
     }
+    
+    public static <T> Cli<T> singleAbbreviatedCommandParser(Class<T> commandClass)
+    {
+        return Cli.<T>builder("parser")
+                .withCommand(commandClass)
+                .withCommandAbbreviation()
+                .build();
+    }
 }

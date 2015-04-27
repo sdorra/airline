@@ -19,9 +19,11 @@
 package io.airlift.airline.command;
 
 import io.airlift.airline.Cli;
+import io.airlift.airline.ParseException;
 import io.airlift.airline.model.CommandMetadata;
 
 import com.google.common.collect.Lists;
+
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -32,7 +34,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-public class CommandTest
+public class TestCommand
 {
     @Test
     public void namedCommandTest1()
@@ -160,5 +162,80 @@ public class CommandTest
         assertEquals(cmdHighArity.option, Arrays.asList("val1", "val2", "val3", "val4"));
         assertEquals(cmdHighArity.option2, "val5");
         assertEquals(cmdHighArity.args, Arrays.asList("arg1", "arg2", "arg3"));
+    }
+    
+    @Test
+    public void abbreviatedCommands01() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandAdd.class)
+            .withCommand(CommandCommit.class)
+            .withDefaultCommand(CommandAdd.class)
+            .withCommandAbbreviation()
+            .build();
+
+        Object command = parser.parse("ad", "-i", "A.java");
+
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandAdd);
+        CommandAdd add = (CommandAdd) command;
+        assertEquals(add.interactive.booleanValue(), true);
+        assertEquals(add.patterns, Arrays.asList("A.java"));
+    }
+    
+    @Test(expectedExceptions = ParseException.class)
+    public void abbreviatedCommands02() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemove.class)
+            .withCommand(CommandRemote.class)
+            .withCommandAbbreviation()
+            .build();
+
+        // Expect this to error as abbreviation is ambiguous
+        parser.parse("rem");
+    }
+    
+    @Test
+    public void abbreviatedCommands03() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemove.class)
+            .withCommand(CommandRemote.class)
+            .withCommandAbbreviation()
+            .build();
+
+        // Abbreviation is non-ambigious
+        Object command = parser.parse("remot");
+        
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandRemote);
+    }
+    
+    @Test
+    public void abbreviatedCommands04() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemove.class)
+            .withCommand(CommandRemote.class)
+            .withCommandAbbreviation()
+            .build();
+
+        // Abbreviation is non-ambigious
+        Object command = parser.parse("remov");
+        
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandRemove);
+    }
+    
+    @Test
+    public void abbreviatedCommands05() {
+        Cli<?> parser = Cli.builder("git")
+            .withCommand(CommandRemotes.class)
+            .withCommand(CommandRemote.class)
+            .withCommandAbbreviation()
+            .build();
+
+        // Command name which is also an abbreviation of another command name
+        Object command = parser.parse("remote");
+        
+        assertNotNull(command, "command is null");
+        assertTrue(command instanceof CommandRemote);
     }
 }

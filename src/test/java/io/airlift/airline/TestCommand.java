@@ -48,6 +48,7 @@ import static com.google.common.base.Predicates.compose;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 import static io.airlift.airline.TestingUtil.singleCommandParser;
+import static io.airlift.airline.TestingUtil.singleAbbreviatedCommandParser;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -399,5 +400,15 @@ public class TestCommand
             public long l;
         }
         singleCommandParser(A.class).parse("-lon", "32");
+    }
+    
+    @Test(expectedExceptions = ParseException.class)
+    public void abbreviationsDisallowedByDefault() {
+        singleCommandParser(Args1.class).parse("Args");
+    }
+    
+    @Test
+    public void abbreviationsEnabled() {
+        singleAbbreviatedCommandParser(Args1.class).parse("Args");
     }
 }
