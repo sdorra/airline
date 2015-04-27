@@ -29,6 +29,7 @@ import io.airlift.airline.args.ArgsBooleanArity;
 import io.airlift.airline.args.ArgsBooleanArity0;
 import io.airlift.airline.args.ArgsDefaultOption;
 import io.airlift.airline.args.ArgsDefaultOptionAndArguments;
+import io.airlift.airline.args.ArgsDefaultOptionBadArity;
 import io.airlift.airline.args.ArgsEnum;
 import io.airlift.airline.args.ArgsInherited;
 import io.airlift.airline.args.ArgsMultipleDefaultOptions;
@@ -42,7 +43,10 @@ import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandAdd;
 import io.airlift.airline.command.CommandCommit;
 import io.airlift.airline.model.CommandMetadata;
+import io.airlift.airline.parser.ParseArgumentsMissingException;
 import io.airlift.airline.parser.ParseException;
+import io.airlift.airline.parser.ParseOptionMissingException;
+import io.airlift.airline.parser.ParseOptionMissingValueException;
 import io.airlift.airline.parser.ParseTooManyArgumentsException;
 
 import org.testng.annotations.DataProvider;
@@ -446,8 +450,18 @@ public class TestCommand
         assertEquals(cmd.arg, "example");
     }
     
+    @Test(expectedExceptions = ParseOptionMissingException.class)
+    public void defaultOption03() {
+        singleCommandParser(ArgsDefaultOption.class).parse("ArgsDefaultOption");
+    }
+    
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void multipleDefaultOptionsForbidden() {
+    public void defaultOptionIncorrectArity() {
+        singleCommandParser(ArgsDefaultOptionBadArity.class);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void defaultOptionMultipleDeclarationsForbidden() {
         singleCommandParser(ArgsMultipleDefaultOptions.class);
     }
     
