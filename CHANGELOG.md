@@ -5,11 +5,15 @@
 - Annotation Improvements
     - `Arguments` improvements
         - An `arity` can now be specified to set the maximum arity for arguments and throws a `ParseTooManyArgumentsException` if too many arguments are seen
+    - New `DefaultOption` annotation
+        - Allows a field already annotated with `@Option` to also be marked as the default option under certain circumstances.  This allows one option to be specified arguments style i.e. the `-n` or `--name` can be omitted provided only one field is annotated this way, it has an arity of 1 and no fields are annotated with `@Arguments`
 - Bash Completion Fixes
     - Bash Completion Scripts for CLI that use groups are not valid Bash and function correctly 
     - Bash Completion Scripts generate more unique function names to avoid clashes between different airline generated completion scripts
 - CLI Improvements
     - CLIs can now have command abbreviation enabled which allows users to only type part of the command name provided that the portion typed is unambiguous
+- Package Refactoring
+    - Parser functionality moved into `io.airlift.airline.parser` package
 
 ## 0.9.1
 
