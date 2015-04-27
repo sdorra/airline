@@ -2,7 +2,6 @@ package io.airlift.airline.model;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -11,6 +10,7 @@ import com.google.common.collect.Sets;
 import io.airlift.airline.Accessor;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
+import io.airlift.airline.DefaultOption;
 import io.airlift.airline.Group;
 import io.airlift.airline.Groups;
 import io.airlift.airline.Option;
@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+
 import javax.inject.Inject;
 
 import java.lang.annotation.Annotation;
@@ -118,11 +119,23 @@ public class MetadataLoader {
 
         InjectionMetadata injectionMetadata = loadInjectionMetadata(commandType);
 
-        CommandMetadata commandMetadata = new CommandMetadata(name, description, command.discussion().isEmpty() ? null
-                : command.discussion(), command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
-                hidden, injectionMetadata.globalOptions, injectionMetadata.groupOptions,
-                injectionMetadata.commandOptions, Iterables.getFirst(injectionMetadata.arguments, null),
-                injectionMetadata.metadataInjections, commandType, groupNames, groups, exitCodes);
+        //@formatter:off
+        CommandMetadata commandMetadata = new CommandMetadata(name, 
+                                                              description, 
+                                                              command.discussion().isEmpty() ? null : command.discussion(), 
+                                                              command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
+                                                              hidden, 
+                                                              injectionMetadata.globalOptions, 
+                                                              injectionMetadata.groupOptions,
+                                                              injectionMetadata.commandOptions, 
+                                                              injectionMetadata.defaultOption,
+                                                              Iterables.getFirst(injectionMetadata.arguments, null),
+                                                              injectionMetadata.metadataInjections, 
+                                                              commandType, 
+                                                              groupNames, 
+                                                              groups, 
+                                                              exitCodes);
+        //@formatter:on
 
         return commandMetadata;
     }
@@ -242,13 +255,49 @@ public class MetadataLoader {
                         injectionMetadata.groupOptions.add(optionMetadata);
                         break;
                     case COMMAND:
+                        // Do we also have a @DefaultOption annotation
+                        DefaultOption defOpt = field.getAnnotation(DefaultOption.class);
+                        if (defOpt != null) {
+                            // Can't have both @DefaultOption and @Arguments
+                            if (injectionMetadata.arguments.size() > 0)
+                                throw new IllegalArgumentException(
+                                        String.format(
+                                                "Field %s cannot be annotated with @DefaultOption because there are fields with @Arguments annotations present",
+                                                field));
+                            // Can't have more than one @DefaultOption
+                            if (injectionMetadata.defaultOption != null)
+                                throw new IllegalArgumentException(String.format(
+                                        "Command type %s has more than one field with @DefaultOption declared upon it",
+                                        type));
+                            // Arity of associated @Option must be 1
+                            if (optionMetadata.getArity() != 1)
+                                throw new IllegalArgumentException(
+                                        String.format(
+                                                "Field %s annotated with @DefaultOption must also have an @Option annotation with an arity of 1",
+                                                field));
+                            injectionMetadata.defaultOption = optionMetadata;
+                        }
                         injectionMetadata.commandOptions.add(optionMetadata);
                         break;
                     }
                 }
 
+                DefaultOption defOpt = field.getAnnotation(DefaultOption.class);
+                if (optionAnnotation == null && defOpt != null) {
+                    // Can't have @DefaultOption on a field without also @Option
+                    throw new IllegalArgumentException(String.format(
+                            "Field %s annotated with @DefaultOption must also have an @Option annotation", field));
+                }
+
                 Arguments argumentsAnnotation = field.getAnnotation(Arguments.class);
                 if (field.isAnnotationPresent(Arguments.class)) {
+                    // Can't have both @DefaultOption and @Arguments
+                    if (injectionMetadata.defaultOption != null)
+                        throw new IllegalArgumentException(
+                                String.format(
+                                        "Field %s cannot be annotated with @Arguments because there is a field with @DefaultOption present",
+                                        field));
+
                     ImmutableList.Builder<String> titlesBuilder = ImmutableList.<String> builder();
 
                     if (!(argumentsAnnotation.title().length == 1 && argumentsAnnotation.title()[0].equals(""))) {
@@ -477,6 +526,7 @@ public class MetadataLoader {
         private List<OptionMetadata> globalOptions = newArrayList();
         private List<OptionMetadata> groupOptions = newArrayList();
         private List<OptionMetadata> commandOptions = newArrayList();
+        private OptionMetadata defaultOption = null;
         private List<ArgumentsMetadata> arguments = newArrayList();
         private List<Accessor> metadataInjections = newArrayList();
 
@@ -484,6 +534,14 @@ public class MetadataLoader {
             globalOptions = overrideOptionSet(globalOptions);
             groupOptions = overrideOptionSet(groupOptions);
             commandOptions = overrideOptionSet(commandOptions);
+            if (defaultOption != null) {
+                for (OptionMetadata option : commandOptions) {
+                    if (Sets.intersection(option.getOptions(), defaultOption.getOptions()).size() > 0) {
+                        defaultOption = option;
+                        break;
+                    }
+                }
+            }
 
             if (arguments.size() > 1) {
                 arguments = ImmutableList.of(new ArgumentsMetadata(arguments));

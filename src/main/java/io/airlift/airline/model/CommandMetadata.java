@@ -17,6 +17,7 @@ public class CommandMetadata {
     private final List<OptionMetadata> globalOptions;
     private final List<OptionMetadata> groupOptions;
     private final List<OptionMetadata> commandOptions;
+    private final OptionMetadata defaultOption;
     private final ArgumentsMetadata arguments;
     private final List<Accessor> metadataInjections;
     private final Class<?> type;
@@ -27,18 +28,36 @@ public class CommandMetadata {
     private final List<String> examples;
     private final String discussion;
 
-    public CommandMetadata(String name, String description, final String discussion, final List<String> examples,
-            boolean hidden, Iterable<OptionMetadata> globalOptions, Iterable<OptionMetadata> groupOptions,
-            Iterable<OptionMetadata> commandOptions, ArgumentsMetadata arguments,
-            Iterable<Accessor> metadataInjections, Class<?> type, List<String> groupNames, List<Group> groups,
-            Map<Integer, String> exitCodes) {
+    //@formatter:off
+    public CommandMetadata(String name, 
+                           String description, 
+                           final String discussion, 
+                           final List<String> examples,
+                           boolean hidden, 
+                           Iterable<OptionMetadata> globalOptions, 
+                           Iterable<OptionMetadata> groupOptions,
+                           Iterable<OptionMetadata> commandOptions, 
+                           OptionMetadata defaultOption,
+                           ArgumentsMetadata arguments,
+                           Iterable<Accessor> metadataInjections, 
+                           Class<?> type, 
+                           List<String> groupNames, 
+                           List<Group> groups,
+                           Map<Integer, String> exitCodes) {
+    //@formatter:on
         this.name = name;
         this.description = description;
         this.hidden = hidden;
         this.globalOptions = ImmutableList.copyOf(globalOptions);
         this.groupOptions = ImmutableList.copyOf(groupOptions);
         this.commandOptions = ImmutableList.copyOf(commandOptions);
+        this.defaultOption = defaultOption;
         this.arguments = arguments;
+        
+        if (this.defaultOption != null && this.arguments != null) {
+            throw new IllegalArgumentException("Command cannot declare both @Arguments and @DefaultOption");
+        }
+        
         this.metadataInjections = ImmutableList.copyOf(metadataInjections);
         this.type = type;
 
@@ -86,6 +105,10 @@ public class CommandMetadata {
 
     public List<OptionMetadata> getCommandOptions() {
         return commandOptions;
+    }
+    
+    public OptionMetadata getDefaultOption() {
+        return defaultOption;
     }
 
     public ArgumentsMetadata getArguments() {

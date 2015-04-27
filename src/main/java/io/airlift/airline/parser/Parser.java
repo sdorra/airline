@@ -87,7 +87,7 @@ public class Parser {
                 while (tokens.hasNext()) {
                     state = parseOptions(tokens, state, command.getCommandOptions());
 
-                    state = parseArgs(state, tokens, command.getArguments());
+                    state = parseArgs(state, tokens, command.getArguments(), command.getDefaultOption());
                 }
             }
         }
@@ -102,7 +102,7 @@ public class Parser {
         while (tokens.hasNext()) {
             state = parseOptions(tokens, state, command.getCommandOptions());
 
-            state = parseArgs(state, tokens, command.getArguments());
+            state = parseArgs(state, tokens, command.getArguments(), command.getDefaultOption());
         }
         return state;
     }
@@ -297,37 +297,49 @@ public class Parser {
         throw new ParseOptionIllegalValueException(option.getTitle(), tokenStr, option.getAllowedValues());
     }
 
-    private ParseState parseArgs(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments) {
+    private ParseState parseArgs(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
+            OptionMetadata defaultOption) {
         if (tokens.hasNext()) {
             if (tokens.peek().equals("--")) {
                 state = state.pushContext(Context.ARGS);
                 tokens.next();
 
-                // consume all args
+                // Consume all remaining tokens as arguments
+                // Default option can't possibly apply at this point because we
+                // saw the -- separator
                 while (tokens.hasNext()) {
-                    state = parseArg(state, tokens, arguments);
+                    state = parseArg(state, tokens, arguments, null);
                 }
             } else {
-                state = parseArg(state, tokens, arguments);
+                state = parseArg(state, tokens, arguments, defaultOption);
             }
         }
 
         return state;
     }
 
-    private ParseState parseArg(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments) {
+    private ParseState parseArg(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
+            OptionMetadata defaultOption) {
         if (arguments != null) {
-            // TODO: check each title one by one? see:
-            // https://github.com/airlift/airline/issues/6
+            // Enforce maximum arity on arguments
             if (arguments.getArity() > 0 && state.getParsedArguments().size() == arguments.getArity()) {
                 throw new ParseTooManyArgumentsException(
                         "Too many arguments, at most %d arguments are permitted but extra argument %s was encountered",
                         arguments.getArity(), tokens.peek());
             }
 
+            // Argument
             state = state.withArgument(TypeConverter.newInstance().convert(arguments.getTitle().get(0),
                     arguments.getJavaType(), tokens.next()));
+        } else if (defaultOption != null) {
+            // Default Option
+            state = state.withOption(defaultOption);
+            String tokenStr = tokens.next();
+            checkValidValue(defaultOption, tokenStr);
+            Object value = TypeConverter.newInstance().convert(defaultOption.getTitle(), defaultOption.getJavaType(), tokenStr);
+            state = state.withOptionValue(defaultOption, value).popContext();
         } else {
+            // Unparsed input
             state = state.withUnparsedInput(tokens.next());
         }
         return state;
