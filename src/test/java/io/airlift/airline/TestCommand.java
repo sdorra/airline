@@ -27,8 +27,11 @@ import io.airlift.airline.args.ArgsArityLimited;
 import io.airlift.airline.args.ArgsArityString;
 import io.airlift.airline.args.ArgsBooleanArity;
 import io.airlift.airline.args.ArgsBooleanArity0;
+import io.airlift.airline.args.ArgsDefaultOption;
+import io.airlift.airline.args.ArgsDefaultOptionAndArguments;
 import io.airlift.airline.args.ArgsEnum;
 import io.airlift.airline.args.ArgsInherited;
+import io.airlift.airline.args.ArgsMultipleDefaultOptions;
 import io.airlift.airline.args.ArgsMultipleUnparsed;
 import io.airlift.airline.args.ArgsOutOfMemory;
 import io.airlift.airline.args.ArgsPrivate;
@@ -429,5 +432,27 @@ public class TestCommand
     @Test
     public void abbreviationsEnabled() {
         singleAbbreviatedCommandParser(Args1.class).parse("Args");
+    }
+    
+    @Test
+    public void defaultOption01() {
+        ArgsDefaultOption cmd = singleCommandParser(ArgsDefaultOption.class).parse("ArgsDefaultOption", "--test", "example");
+        assertEquals(cmd.arg, "example");
+    }
+    
+    @Test
+    public void defaultOption02() {
+        ArgsDefaultOption cmd = singleCommandParser(ArgsDefaultOption.class).parse("ArgsDefaultOption", "example");
+        assertEquals(cmd.arg, "example");
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void multipleDefaultOptionsForbidden() {
+        singleCommandParser(ArgsMultipleDefaultOptions.class);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void defaultOptionAndArgumentsForbidden() {
+        singleCommandParser(ArgsDefaultOptionAndArguments.class);
     }
 }
