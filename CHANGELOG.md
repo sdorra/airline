@@ -2,6 +2,9 @@
 
 ## 0.9.2
 
+- Annotation Improvements
+    - `Arguments` improvements
+        - An `arity` can now be specified to set the maximum arity for arguments and throws a `ParseTooManyArgumentsException` if too many arguments are seen
 - Bash Completion Fixes
     - Bash Completion Scripts for CLI that use groups are not valid Bash and function correctly 
     - Bash Completion Scripts generate more unique function names to avoid clashes between different airline generated completion scripts
