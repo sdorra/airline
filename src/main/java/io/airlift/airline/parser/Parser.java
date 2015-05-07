@@ -348,18 +348,21 @@ public class Parser {
         return state;
     }
 
-    private OptionMetadata findOption(ParseState state, List<OptionMetadata> options, String param) {
+    private OptionMetadata findOption(ParseState state, List<OptionMetadata> options, final String param) {
         Predicate<? super OptionMetadata> findOptionPredicate;
-        //if (state.getGlobal() != null && state.getGlobal().allowsAbbreviatedOptions()) {
-        //    
-        //}
-        
-        for (OptionMetadata optionMetadata : options) {
-            if (optionMetadata.getOptions().contains(param)) {
-                return optionMetadata;
-            }
+        if (state.getGlobal() != null && state.getGlobal().allowsAbbreviatedOptions()) {
+            findOptionPredicate = new AbbreviatedOptionFinder(param, options);
+        } else {
+            findOptionPredicate = new Predicate<OptionMetadata>() {
+
+                @Override
+                public boolean apply(OptionMetadata op) {
+                    return op.getOptions().contains(param);
+                }
+            };
         }
-        return null;
+        
+        return find(options, findOptionPredicate, null);
     }
 
 }
