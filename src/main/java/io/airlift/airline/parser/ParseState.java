@@ -8,6 +8,7 @@ import com.google.common.collect.ListMultimap;
 import io.airlift.airline.Context;
 import io.airlift.airline.model.CommandGroupMetadata;
 import io.airlift.airline.model.CommandMetadata;
+import io.airlift.airline.model.GlobalMetadata;
 import io.airlift.airline.model.OptionMetadata;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class ParseState
 {
     private final List<Context> locationStack;
+    private final GlobalMetadata global;
     private final CommandGroupMetadata group;
     private final CommandMetadata command;
     private final ListMultimap<OptionMetadata, Object> parsedOptions;
@@ -22,7 +24,9 @@ public class ParseState
     private final OptionMetadata currentOption;
     private final List<String> unparsedInput; 
 
-    ParseState(CommandGroupMetadata group,
+    ParseState(
+            GlobalMetadata global,
+            CommandGroupMetadata group,
             CommandMetadata command,
             ListMultimap<OptionMetadata, Object> parsedOptions,
             List<Context> locationStack,
@@ -30,6 +34,7 @@ public class ParseState
             OptionMetadata currentOption,
             List<String> unparsedInput)
     {
+        this.global = global;
         this.group = group;
         this.command = command;
         this.parsedOptions = parsedOptions;
@@ -41,7 +46,7 @@ public class ParseState
 
     public static ParseState newInstance()
     {
-        return new ParseState(null, null, ArrayListMultimap.<OptionMetadata, Object>create(), ImmutableList.<Context>of(), ImmutableList.of(), null, ImmutableList.<String>of());
+        return new ParseState(null, null, null, ArrayListMultimap.<OptionMetadata, Object>create(), ImmutableList.<Context>of(), ImmutableList.of(), null, ImmutableList.<String>of());
     }
 
     public ParseState pushContext(Context location)
@@ -51,13 +56,13 @@ public class ParseState
                 .add(location)
                 .build();
 
-        return new ParseState(group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
     }
 
     public ParseState popContext()
     {
         ImmutableList<Context> locationStack = ImmutableList.copyOf(this.locationStack.subList(0, this.locationStack.size() - 1));
-        return new ParseState(group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
     }
 
     public ParseState withOptionValue(OptionMetadata option, Object value)
@@ -67,22 +72,27 @@ public class ParseState
                 .put(option, value)
                 .build();
 
-        return new ParseState(group, command, newOptions, locationStack, parsedArguments, currentOption, unparsedInput);
+        return new ParseState(global, group, command, newOptions, locationStack, parsedArguments, currentOption, unparsedInput);
+    }
+    
+    public ParseState withGlobal(GlobalMetadata global)
+    {
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
     }
 
     public ParseState withGroup(CommandGroupMetadata group)
     {
-        return new ParseState(group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
     }
 
     public ParseState withCommand(CommandMetadata command)
     {
-        return new ParseState(group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, currentOption, unparsedInput);
     }
 
     public ParseState withOption(OptionMetadata option)
     {
-        return new ParseState(group, command, parsedOptions, locationStack, parsedArguments, option, unparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, option, unparsedInput);
     }
 
     public ParseState withArgument(Object argument)
@@ -92,7 +102,7 @@ public class ParseState
                 .add(argument)
                 .build();
 
-        return new ParseState(group, command, parsedOptions, locationStack, newArguments, currentOption, unparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, newArguments, currentOption, unparsedInput);
     }
 
 
@@ -103,7 +113,7 @@ public class ParseState
                 .add(input)
                 .build();
 
-        return new ParseState(group, command, parsedOptions, locationStack, parsedArguments, currentOption, newUnparsedInput);
+        return new ParseState(global, group, command, parsedOptions, locationStack, parsedArguments, currentOption, newUnparsedInput);
     }
 
     @Override
@@ -111,6 +121,7 @@ public class ParseState
     {
         return "ParseState{" +
                 "locationStack=" + locationStack +
+                ", global=" + global + 
                 ", group=" + group +
                 ", command=" + command +
                 ", parsedOptions=" + parsedOptions +
@@ -123,6 +134,11 @@ public class ParseState
     public Context getLocation()
     {
         return locationStack.get(locationStack.size() - 1);
+    }
+    
+    public GlobalMetadata getGlobal()
+    {
+        return global;
     }
 
     public CommandGroupMetadata getGroup()

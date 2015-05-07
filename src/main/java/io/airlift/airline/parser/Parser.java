@@ -6,8 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
-import io.airlift.airline.AbbreviatedCommandFinder;
-import io.airlift.airline.AbbreviatedGroupFinder;
 import io.airlift.airline.Context;
 import io.airlift.airline.TypeConverter;
 import io.airlift.airline.model.ArgumentsMetadata;
@@ -35,7 +33,7 @@ public class Parser {
     public ParseState parse(GlobalMetadata metadata, Iterable<String> params) {
         PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
 
-        ParseState state = ParseState.newInstance().pushContext(Context.GLOBAL);
+        ParseState state = ParseState.newInstance().pushContext(Context.GLOBAL).withGlobal(metadata);
 
         // parse global options
         state = parseOptions(tokens, state, metadata.getOptions());
@@ -43,8 +41,11 @@ public class Parser {
         // parse group
         if (tokens.hasNext()) {
             Predicate<? super CommandGroupMetadata> findGroupPredicate;
-            findGroupPredicate = metadata.allowsAbbreviatedCommands() ? new AbbreviatedGroupFinder(tokens.peek(),
-                    metadata.getCommandGroups()) : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
+            //@formatter:off
+            findGroupPredicate = metadata != null && metadata.allowsAbbreviatedCommands() 
+                                 ? new AbbreviatedGroupFinder(tokens.peek(), metadata.getCommandGroups()) 
+                                 : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
+            //@formatter:on
             CommandGroupMetadata group = find(metadata.getCommandGroups(), findGroupPredicate, null);
             if (group != null) {
                 tokens.next();
@@ -62,8 +63,11 @@ public class Parser {
 
         if (tokens.hasNext()) {
             Predicate<? super CommandMetadata> findCommandPredicate;
-            findCommandPredicate = metadata.allowsAbbreviatedCommands() ? new AbbreviatedCommandFinder(tokens.peek(),
-                    expectedCommands) : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
+            //@formatter:off
+            findCommandPredicate = metadata != null && metadata.allowsAbbreviatedCommands() 
+                                   ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
+                                   : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
+            //@formatter:on
             CommandMetadata command = find(expectedCommands, findCommandPredicate, state.getGroup() != null ? state
                     .getGroup().getDefaultCommand() : null);
 
@@ -112,8 +116,7 @@ public class Parser {
         while (tokens.hasNext()) {
             //
             // Try to parse next option(s) using different styles. If code
-            // matches it returns
-            // the next parser state, otherwise it returns null.
+            // matches it returns the next parser state, otherwise it returns null.
 
             // Parse a simple option
             ParseState nextState = parseSimpleOption(tokens, state, allowedOptions);
@@ -145,7 +148,7 @@ public class Parser {
 
     private ParseState parseSimpleOption(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
-        OptionMetadata option = findOption(allowedOptions, tokens.peek());
+        OptionMetadata option = findOption(state, allowedOptions, tokens.peek());
         if (option == null) {
             return null;
         }
@@ -173,7 +176,7 @@ public class Parser {
             while (count < option.getArity() && tokens.hasNext() && !hasSeparator) {
                 String peekedToken = tokens.peek();
                 hasSeparator = peekedToken.equals("--");
-                foundNextOption = findOption(allowedOptions, peekedToken) != null;
+                foundNextOption = findOption(state, allowedOptions, peekedToken) != null;
 
                 if (hasSeparator || foundNextOption)
                     break;
@@ -197,7 +200,7 @@ public class Parser {
             return null;
         }
 
-        OptionMetadata option = findOption(allowedOptions, parts.get(0));
+        OptionMetadata option = findOption(state, allowedOptions, parts.get(0));
         if (option == null || option.getArity() != 1) {
             // TODO: this is not exactly correct. It should be an error
             // condition
@@ -230,7 +233,7 @@ public class Parser {
             char tokenCharacter = remainingToken.charAt(0);
 
             // is the current token character a single letter option?
-            OptionMetadata option = findOption(allowedOptions, "-" + tokenCharacter);
+            OptionMetadata option = findOption(state, allowedOptions, "-" + tokenCharacter);
             if (option == null) {
                 return null;
             }
@@ -345,7 +348,12 @@ public class Parser {
         return state;
     }
 
-    private OptionMetadata findOption(List<OptionMetadata> options, String param) {
+    private OptionMetadata findOption(ParseState state, List<OptionMetadata> options, String param) {
+        Predicate<? super OptionMetadata> findOptionPredicate;
+        //if (state.getGlobal() != null && state.getGlobal().allowsAbbreviatedOptions()) {
+        //    
+        //}
+        
         for (OptionMetadata optionMetadata : options) {
             if (optionMetadata.getOptions().contains(param)) {
                 return optionMetadata;

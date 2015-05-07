@@ -61,7 +61,7 @@ public class Cli<C> {
 
     private Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
             CommandFactory<C> theCommandFactory, Iterable<Class<? extends C>> defaultGroupCommands,
-            Iterable<GroupBuilder<C>> groups, boolean allowAbberviatedCommands) {
+            Iterable<GroupBuilder<C>> groups, boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
         Preconditions.checkNotNull(name, "name is null");
         Preconditions.checkNotNull(typeConverter, "typeConverter is null");
         Preconditions.checkNotNull(theCommandFactory);
@@ -107,7 +107,7 @@ public class Cli<C> {
 
         this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
-                allowAbberviatedCommands);
+                allowAbbreviatedCommands, allowAbbreviatedOptions);
     }
 
     public GlobalMetadata getMetadata() {
@@ -231,7 +231,7 @@ public class Cli<C> {
         private final List<Class<? extends C>> defaultCommandGroupCommands = newArrayList();
         protected final Map<String, GroupBuilder<C>> groups = newHashMap();
         protected CommandFactory<C> commandFactory = new CommandFactoryDefault<C>();
-        protected boolean allowAbbreviatedCommands;
+        protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions;
 
         public CliBuilder(String name) {
             Preconditions.checkNotNull(name, "name is null");
@@ -313,10 +313,15 @@ public class Cli<C> {
             this.allowAbbreviatedCommands = true;
             return this;
         }
+        
+        public CliBuilder<C> withOptionAbbreviation() {
+            this.allowAbbreviatedOptions = true;
+            return this;
+        }
 
         public Cli<C> build() {
             return new Cli<C>(name, description, typeConverter, defaultCommand, commandFactory,
-                    defaultCommandGroupCommands, groups.values(), allowAbbreviatedCommands);
+                    defaultCommandGroupCommands, groups.values(), allowAbbreviatedCommands, allowAbbreviatedOptions);
         }
     }
 
