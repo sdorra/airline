@@ -31,8 +31,10 @@ import java.util.List;
 
 import static io.airlift.airline.TestingUtil.singleCommandParser;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
 public class TestCommand
 {
@@ -237,5 +239,90 @@ public class TestCommand
         
         assertNotNull(command, "command is null");
         assertTrue(command instanceof CommandRemote);
+    }
+    
+    @Test
+    public void abbreviatedOptions01()
+    {
+        Cli<?> parser = Cli.builder("git")
+                .withCommand(CommandCommit.class)
+                .withOptionAbbreviation()
+                .build();
+        
+        // Non-ambigious abbreviation of an option
+        Object command = parser.parse("commit", "--am");
+        
+        assertNotNull(command);;
+        assertTrue(command instanceof CommandCommit);
+        CommandCommit commit = (CommandCommit) command;
+        assertTrue(commit.amend);
+    }
+    
+    @Test
+    public void abbreviatedOptions02()
+    {
+        Cli<?> parser = Cli.builder("git")
+                .withCommand(CommandCommit.class)
+                .withOptionAbbreviation()
+                .build();
+        
+        // Will parse but as abbreviation is ambigious will be treated as an argument and not an option 
+        Object command = parser.parse("commit", "--a");
+        assertTrue(command instanceof CommandCommit);
+        CommandCommit commit = (CommandCommit) command;
+        assertFalse(commit.amend);
+        assertNull(commit.author);
+        assertTrue(commit.files.contains("--a"));
+    }
+    
+    @Test
+    public void abbreviatedOptions03()
+    {
+        Cli<?> parser = Cli.builder("git")
+                .withCommand(CommandCommits.class)
+                .withOptionAbbreviation()
+                .build();
+        
+        // Option name which is also an abbreviation of another option name
+        Object command = parser.parse("commits", "--author", "test");
+        
+        assertNotNull(command);;
+        assertTrue(command instanceof CommandCommits);
+        CommandCommits commit = (CommandCommits) command;
+        assertEquals(commit.author, "test");
+    }
+    
+    @Test
+    public void abbreviatedOptions04()
+    {
+        Cli<?> parser = Cli.builder("git")
+                .withCommand(CommandCommits.class)
+                .withOptionAbbreviation()
+                .build();
+        
+        // Option name which is also an abbreviation of another option name
+        Object command = parser.parse("commits", "--author", "test");
+        
+        assertNotNull(command);;
+        assertTrue(command instanceof CommandCommits);
+        CommandCommits commit = (CommandCommits) command;
+        assertEquals(commit.author, "test");
+    }
+    
+    @Test
+    public void abbreviatedOptions05()
+    {
+        Cli<?> parser = Cli.builder("git")
+                .withCommand(CommandCommits.class)
+                .withOptionAbbreviation()
+                .build();
+        
+        // Option name whose name is a super string of another option name
+        Object command = parser.parse("commits", "--authors", "test");
+        
+        assertNotNull(command);;
+        assertTrue(command instanceof CommandCommits);
+        CommandCommits commit = (CommandCommits) command;
+        assertTrue(commit.authors.contains("test"));
     }
 }
