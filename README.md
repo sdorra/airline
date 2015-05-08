@@ -10,13 +10,18 @@ This fork contains several improvements over the upstream fork created both by m
         - New `override` and `sealed` properties allowing derived commands to change some properties of the annotation
         - Overridden options may change the type when it is a narrowing conversion
         - New `completionBehaviour` and `completionCommand` properties allowing defining behaviours for the purposes of completion script generators
+        - New `DefaultOption` to mark an option the default allowing the name to be omitted under some circumstances
     - `Arguments` improvements
         - New `completionBehaviour` and `completionCommand` properties allowing defining behaviours for the purposes of completion script generators
+        - New `arity` for limiting maximum arity of arguments
     - `Group` annotation for specifying groups
     - `Command` improvements
         - `discussion` and `examples` properties for providing more detailed help information
         - `groupNames` property for specifying the groups to which a command should belong
         - `exitCodes` and `exitDescriptions` annotations for describing the exit statuses for a command
+- Parser Improvements
+    - Support for opt-in command abbreviation support
+    - Support for opt-in option abbreviation support
 - Help system improvements
     - Help printing respects new lines allowing them to be used in longer descriptions
     - Support for additional examples and discussion sections in command help
@@ -40,7 +45,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest release being `0.9.1`
+This library is available from [Maven Central](http://search.maven.org) with the latest release being `0.9.2`
 
 Use the following maven dependency declaration:
 
@@ -48,11 +53,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>0.9.1</version>
+    <version>0.9.2</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `0.9.2-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
+Snapshot artifacts of the latest source are also available using the version `0.9.3-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
 
 ## Build Status
 

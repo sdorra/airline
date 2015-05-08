@@ -196,6 +196,7 @@ public class MetadataLoader {
                 }
 
                 Option optionAnnotation = field.getAnnotation(Option.class);
+                DefaultOption defaultOptionAnnotation = field.getAnnotation(DefaultOption.class);
                 if (optionAnnotation != null) {
                     OptionType optionType = optionAnnotation.type();
                     String name;
@@ -249,15 +250,25 @@ public class MetadataLoader {
                     //@formatter:on
                     switch (optionType) {
                     case GLOBAL:
+                        if (defaultOptionAnnotation != null)
+                            throw new IllegalArgumentException(
+                                    String.format(
+                                            "Field %s which defines a global option cannot be annotated with @DefaultOption as this may only be applied to command options",
+                                            field));
                         injectionMetadata.globalOptions.add(optionMetadata);
                         break;
                     case GROUP:
+                        if (defaultOptionAnnotation != null)
+                            throw new IllegalArgumentException(
+                                    String.format(
+                                            "Field %s which defines a global option cannot be annotated with @DefaultOption as this may only be applied to command options",
+                                            field));
                         injectionMetadata.groupOptions.add(optionMetadata);
                         break;
                     case COMMAND:
                         // Do we also have a @DefaultOption annotation
-                        DefaultOption defOpt = field.getAnnotation(DefaultOption.class);
-                        if (defOpt != null) {
+
+                        if (defaultOptionAnnotation != null) {
                             // Can't have both @DefaultOption and @Arguments
                             if (injectionMetadata.arguments.size() > 0)
                                 throw new IllegalArgumentException(
@@ -282,8 +293,7 @@ public class MetadataLoader {
                     }
                 }
 
-                DefaultOption defOpt = field.getAnnotation(DefaultOption.class);
-                if (optionAnnotation == null && defOpt != null) {
+                if (optionAnnotation == null && defaultOptionAnnotation != null) {
                     // Can't have @DefaultOption on a field without also @Option
                     throw new IllegalArgumentException(String.format(
                             "Field %s annotated with @DefaultOption must also have an @Option annotation", field));

@@ -31,6 +31,8 @@ import io.airlift.airline.args.ArgsBooleanArity0;
 import io.airlift.airline.args.ArgsDefaultOption;
 import io.airlift.airline.args.ArgsDefaultOptionAndArguments;
 import io.airlift.airline.args.ArgsDefaultOptionBadArity;
+import io.airlift.airline.args.ArgsDefaultOptionGlobalScope;
+import io.airlift.airline.args.ArgsDefaultOptionGroupScope;
 import io.airlift.airline.args.ArgsEnum;
 import io.airlift.airline.args.ArgsInherited;
 import io.airlift.airline.args.ArgsMultipleDefaultOptions;
@@ -488,5 +490,15 @@ public class TestCommand
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void defaultOptionAndArgumentsForbidden() {
         singleCommandParser(ArgsDefaultOptionAndArguments.class);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void defaultOptionOnGroupOptionForbidden() {
+        singleCommandParser(ArgsDefaultOptionGroupScope.class);
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void defaultOptionOnGlobalOptionForbidden() {
+        singleCommandParser(ArgsDefaultOptionGlobalScope.class);
     }
 }
