@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import io.airlift.airline.Cli.CliBuilder;
 import io.airlift.airline.args.Args1;
 import io.airlift.airline.args.Args2;
+import io.airlift.airline.args.ArgsAllowedValues;
 import io.airlift.airline.args.ArgsArityLimited;
 import io.airlift.airline.args.ArgsArityString;
 import io.airlift.airline.args.ArgsBooleanArity;
@@ -43,12 +44,11 @@ import io.airlift.airline.args.OptionsRequired;
 import io.airlift.airline.command.CommandAdd;
 import io.airlift.airline.command.CommandCommit;
 import io.airlift.airline.model.CommandMetadata;
-import io.airlift.airline.parser.ParseArgumentsMissingException;
 import io.airlift.airline.parser.ParseException;
 import io.airlift.airline.parser.ParseOptionMissingException;
-import io.airlift.airline.parser.ParseOptionMissingValueException;
 import io.airlift.airline.parser.ParseTooManyArgumentsException;
 
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -61,6 +61,7 @@ import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 import static io.airlift.airline.TestingUtil.singleCommandParser;
 import static io.airlift.airline.TestingUtil.singleAbbreviatedCommandParser;
+import static io.airlift.airline.TestingUtil.singleAbbreviatedOptionParser;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -429,14 +430,33 @@ public class TestCommand
     }
     
     @Test(expectedExceptions = ParseException.class)
-    public void abbreviationsDisallowedByDefault() {
+    public void commandAbbreviationsDisallowedByDefault() {
         singleCommandParser(Args1.class).parse("Args");
     }
     
     @Test
-    public void abbreviationsEnabled() {
+    public void commandAbbreviationsEnabled() {
         singleAbbreviatedCommandParser(Args1.class).parse("Args");
     }
+    
+    @Test
+    public void optionAbbreviationsDisabledByDefault01() {
+        Args1 args = singleCommandParser(Args1.class).parse("Args1", "-deb");
+        Assert.assertFalse(args.debug);
+        Assert.assertTrue(args.parameters.contains("-deb"));
+    }
+    
+    @Test(expectedExceptions = ParseException.class)
+    public void optionAbbreviationsDisabledByDefault02() {
+        singleCommandParser(ArgsAllowedValues.class).parse("ArgsAllowedValues", "-mo");
+    }
+    
+    @Test
+    public void optionAbbreviationsEnabled() {
+        Args1 args = singleAbbreviatedOptionParser(Args1.class).parse("Args1", "-deb");
+        Assert.assertTrue(args.debug);
+    }
+    
     
     @Test
     public void defaultOption01() {

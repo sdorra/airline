@@ -17,7 +17,7 @@ public final class AbbreviatedOptionFinder extends AbstractAbbreviationFinder<Op
     @Override
     protected boolean isPartialNameMatch(String value, OptionMetadata item) {
         for (String name : item.getOptions()) {
-            if (!name.startsWith("--"))
+            if (name.length() <= 2)
                 continue;
             if (name.startsWith(value))
                 return true;
