@@ -1,5 +1,10 @@
 # Airline - Change Log
 
+## 0.9.3
+
+- Package Refactoring
+    - More parser errors have public constructors
+
 ## 0.9.2
 
 - Annotation Improvements
