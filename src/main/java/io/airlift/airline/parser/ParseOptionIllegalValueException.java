@@ -32,7 +32,7 @@ public class ParseOptionIllegalValueException extends ParseException {
     private final String optionTitle, illegalValue;
     private final Set<String> allowedValues;
 
-    ParseOptionIllegalValueException(String optionTitle, String value, Set<String> allowedValues) {
+    public ParseOptionIllegalValueException(String optionTitle, String value, Set<String> allowedValues) {
         super("Value for option '%s' was given as '%s' which is not in the list of allowed values: %s", optionTitle,
                 value, allowedValues);
         this.optionTitle = optionTitle;
