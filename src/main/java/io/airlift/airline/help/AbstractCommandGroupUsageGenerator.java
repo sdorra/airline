@@ -15,11 +15,12 @@ public abstract class AbstractCommandGroupUsageGenerator extends AbstractUsageGe
         CommandGroupUsageGenerator {
 
     public AbstractCommandGroupUsageGenerator() {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
     }
 
-    public AbstractCommandGroupUsageGenerator(Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator) {
-        super(optionComparator, commandComparator);
+    public AbstractCommandGroupUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
+            Comparator<? super CommandMetadata> commandComparator, boolean includeHidden) {
+        super(optionComparator, commandComparator, includeHidden);
     }
 
     @Override

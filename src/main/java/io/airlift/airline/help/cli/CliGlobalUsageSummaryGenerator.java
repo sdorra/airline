@@ -23,10 +23,6 @@ import java.util.Map.Entry;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-/**
- * 
- * 
- */
 public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGenerator {
     public CliGlobalUsageSummaryGenerator() {
         this(79);
@@ -34,14 +30,13 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
 
     public CliGlobalUsageSummaryGenerator(int columnSize) {
         this(columnSize, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
-    public CliGlobalUsageSummaryGenerator(int columnSize,
-             Comparator<? super OptionMetadata> optionComparator,
-             Comparator<? super CommandMetadata> commandComparator,
-             Comparator<? super CommandGroupMetadata> commandGroupComparator) {
-        super(columnSize, optionComparator, commandComparator, commandGroupComparator);
+    public CliGlobalUsageSummaryGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
+            Comparator<? super CommandMetadata> commandComparator,
+            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
+        super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
     }
 
     public void usage(GlobalMetadata global, UsagePrinter out) throws IOException {

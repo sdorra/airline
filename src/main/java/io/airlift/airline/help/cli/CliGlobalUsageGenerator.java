@@ -21,13 +21,13 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
 
     public CliGlobalUsageGenerator(int columnSize) {
         this(columnSize, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
-    public CliGlobalUsageGenerator(int columnSize,  Comparator<? super OptionMetadata> optionComparator,
-             Comparator<? super CommandMetadata> commandComparator,
-             Comparator<? super CommandGroupMetadata> commandGroupComparator) {
-        super(columnSize, optionComparator, commandComparator, commandGroupComparator);
+    public CliGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
+            Comparator<? super CommandMetadata> commandComparator,
+            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
+        super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
     }
 
     @Override
@@ -80,8 +80,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      *            Options
      * @throws IOException
      */
-    protected void outputOptions(UsagePrinter out, List<OptionMetadata> options)
-            throws IOException {
+    protected void outputOptions(UsagePrinter out, List<OptionMetadata> options) throws IOException {
         out.append("OPTIONS").newline();
 
         for (OptionMetadata option : options) {
@@ -106,7 +105,8 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
             descriptionPrinter.newline();
         }
 
-        // Note - Global meta-data does not allow arguments, those are command specific hence their omission
+        // Note - Global meta-data does not allow arguments, those are command
+        // specific hence their omission
     }
 
     /**
@@ -179,8 +179,8 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      *            Command meta-data
      * @throws IOException
      */
-    protected void outputCommandDescription(UsagePrinter out,  CommandGroupMetadata group,
-            CommandMetadata command) throws IOException {
+    protected void outputCommandDescription(UsagePrinter out, CommandGroupMetadata group, CommandMetadata command)
+            throws IOException {
         if (!command.isHidden()) {
             if (group != null) {
                 out.append(group.getName());

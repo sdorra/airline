@@ -29,11 +29,15 @@ import io.airlift.airline.model.GlobalMetadata;
 public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator {
 
     public RonnMultiPageGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, true));
+        this(ManSections.GENERAL_COMMANDS, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, true));
     }
 
     public RonnMultiPageGlobalUsageGenerator(int manSection) {
-        this(manSection, new RonnCommandUsageGenerator(manSection, true));
+        this(manSection, new RonnCommandUsageGenerator(manSection, false, true));
+    }
+
+    public RonnMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden) {
+        this(manSection, new RonnCommandUsageGenerator(manSection, includeHidden, true));
     }
 
     protected RonnMultiPageGlobalUsageGenerator(int manSection, CommandUsageGenerator commandUsageGenerator) {

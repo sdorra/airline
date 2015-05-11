@@ -19,27 +19,26 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
     private final boolean hideGlobalOptions;
 
     public CliCommandGroupUsageGenerator() {
-        this(79, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR);
+        this(79, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
     }
 
     public CliCommandGroupUsageGenerator(int columnSize) {
-        this(columnSize, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR);
+        this(columnSize, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
     }
 
     public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions) {
-        this(columnSize, hideGlobalOptions, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR);
+        this(columnSize, hideGlobalOptions, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
     }
 
     public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions,
-             Comparator<? super OptionMetadata> optionComparator,
-             Comparator<? super CommandMetadata> commandComparator) {
-        super(columnSize, optionComparator, commandComparator);
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
+            boolean includeHidden) {
+        super(columnSize, optionComparator, commandComparator, includeHidden);
         this.hideGlobalOptions = hideGlobalOptions;
     }
 
     @Override
-    protected void usage( GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
-            throws IOException {
+    protected void usage(GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out) throws IOException {
         // Description and Name
         outputDescription(out, global, group);
 

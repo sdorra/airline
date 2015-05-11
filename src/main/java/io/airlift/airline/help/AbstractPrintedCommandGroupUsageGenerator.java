@@ -21,9 +21,9 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator extends Abstract
     private final int columnSize;
 
     public AbstractPrintedCommandGroupUsageGenerator(int columnSize,
-            Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator) {
-        super(optionComparator, commandComparator);
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
+            boolean includeHidden) {
+        super(optionComparator, commandComparator, includeHidden);
         Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
         this.columnSize = columnSize;
     }

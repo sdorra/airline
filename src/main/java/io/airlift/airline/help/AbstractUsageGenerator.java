@@ -23,21 +23,32 @@ public class AbstractUsageGenerator {
 
     private final Comparator<? super OptionMetadata> optionComparator;
     private final Comparator<? super CommandMetadata> commandComparator;
+    private final boolean includeHidden;
 
     public AbstractUsageGenerator() {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR);
+        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
     }
 
     public AbstractUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator) {
+            Comparator<? super CommandMetadata> commandComparator, boolean includeHidden) {
         this.optionComparator = optionComparator;
         this.commandComparator = commandComparator;
+        this.includeHidden = includeHidden;
     }
-    
+
+    /**
+     * Gets whether hidden commands and options should be included in the output
+     * 
+     * @return True if hidden commands/options should be included
+     */
+    protected boolean includeHidden() {
+        return this.includeHidden;
+    }
+
     protected final Comparator<? super OptionMetadata> getOptionComparator() {
         return this.optionComparator;
     }
-    
+
     protected final Comparator<? super CommandMetadata> getCommandComparator() {
         return this.commandComparator;
     }
@@ -168,7 +179,7 @@ public class AbstractUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply( String argument) {
+                        public String apply(String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -177,13 +188,8 @@ public class AbstractUsageGenerator {
         }
 
         Joiner.on(" | ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply( String option) {
-                // if (argumentString != null) {
-                // return option + " " + argumentString;
-                // }
-                // else {
+            public String apply(String option) {
                 return option;
-                // }
             }
         }));
 
@@ -232,7 +238,7 @@ public class AbstractUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply( String argument) {
+                        public String apply(String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -241,7 +247,7 @@ public class AbstractUsageGenerator {
         }
 
         Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply( String option) {
+            public String apply(String option) {
                 if (argumentString != null) {
                     return option + " " + argumentString;
                 }

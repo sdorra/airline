@@ -24,7 +24,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
     private final boolean withDebugging;
 
     public BashCompletionGenerator() {
-        this(false);
+        this(false, false);
     }
 
     /**
@@ -35,7 +35,8 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
      *            will do {@code set -o xtrace} in its functions and
      *            {@code set +o xtrace} at the end of its functions
      */
-    public BashCompletionGenerator(boolean enableDebugging) {
+    public BashCompletionGenerator(boolean includeHidden, boolean enableDebugging) {
+        super(includeHidden);
         this.withDebugging = enableDebugging;
     }
 
@@ -65,7 +66,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
                 // Generate the associated command completion functions
                 for (CommandMetadata command : group.getCommands()) {
-                    if (command.isHidden())
+                    if (command.isHidden() && !this.includeHidden())
                         continue;
 
                     generateCommandCompletionFunction(writer, global, group, command);

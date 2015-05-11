@@ -20,11 +20,10 @@ public abstract class AbstractPrintedGlobalUsageGenerator extends AbstractGlobal
 
     private final int columnSize;
 
-    public AbstractPrintedGlobalUsageGenerator(int columnSize,
-            Comparator<? super OptionMetadata> optionComparator,
+    public AbstractPrintedGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
             Comparator<? super CommandMetadata> commandComparator,
-             Comparator<? super CommandGroupMetadata> commandGroupComparator) {
-        super(optionComparator, commandComparator, commandGroupComparator);
+            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
+        super(optionComparator, commandComparator, commandGroupComparator, includeHidden);
         Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
         this.columnSize = columnSize;
     }

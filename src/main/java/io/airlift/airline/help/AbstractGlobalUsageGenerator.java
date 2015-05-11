@@ -20,13 +20,18 @@ public abstract class AbstractGlobalUsageGenerator extends AbstractUsageGenerato
 
     public AbstractGlobalUsageGenerator() {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+    }
+
+    public AbstractGlobalUsageGenerator(boolean includeHidden) {
+        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
     public AbstractGlobalUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
             Comparator<? super CommandMetadata> commandComparator,
-            Comparator<? super CommandGroupMetadata> commandGroupComparator) {
-        super(optionComparator, commandComparator);
+            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
+        super(optionComparator, commandComparator, includeHidden);
         this.commandGroupComparator = commandGroupComparator;
     }
 

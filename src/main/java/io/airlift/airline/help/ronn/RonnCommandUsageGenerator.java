@@ -41,7 +41,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     protected static final String HORIZONTAL_RULE = "---";
 
     public RonnCommandUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, true);
+        this(ManSections.GENERAL_COMMANDS, false, true);
     }
 
     /**
@@ -58,7 +58,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            output a fragment of a larger document and RONN will not
      *            render the titles if stand-alone is enabled
      */
-    public RonnCommandUsageGenerator(int manSection, boolean standalone) {
+    public RonnCommandUsageGenerator(int manSection, boolean includeHidden, boolean standalone) {
+        super(includeHidden);
         this.manSection = manSection;
         this.standalone = standalone;
     }
