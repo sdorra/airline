@@ -189,7 +189,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // Prepare list of group commands
         Set<String> commandNames = new HashSet<>();
         for (CommandMetadata command : group.getCommands()) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
             commandNames.add(command.getName());
         }
@@ -204,7 +204,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // Use a switch statement to provide command specific completion
         writer.append("  case ${CURR_CMD} in").append(NEWLINE);
         for (CommandMetadata command : group.getCommands()) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
 
             // Add case for the command
@@ -245,7 +245,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         Set<String> flagOpts = new HashSet<>();
         Set<String> argOpts = new HashSet<>();
         for (OptionMetadata option : command.getAllOptions()) {
-            if (option.isHidden())
+            if (option.isHidden() && !this.includeHidden())
                 continue;
 
             if (option.getArity() == 0) {

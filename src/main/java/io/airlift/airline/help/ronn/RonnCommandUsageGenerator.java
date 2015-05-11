@@ -119,7 +119,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         for (OptionMetadata option : options) {
             // skip hidden options
-            if (option.isHidden()) {
+            if (option.isHidden() && !this.includeHidden()) {
                 continue;
             }
 

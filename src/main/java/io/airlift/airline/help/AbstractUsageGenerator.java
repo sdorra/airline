@@ -129,7 +129,7 @@ public class AbstractUsageGenerator {
         return ImmutableList.copyOf(transform(filter(options, isHiddenPredicate()),
                 new Function<OptionMetadata, String>() {
                     public String apply(OptionMetadata option) {
-                        if (option.isHidden()) {
+                        if (option.isHidden() && !includeHidden()) {
                             return "";
                         }
 

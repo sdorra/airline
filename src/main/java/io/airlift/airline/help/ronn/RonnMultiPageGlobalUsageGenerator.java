@@ -75,7 +75,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
             CommandGroupMetadata group) throws IOException {
 
         for (CommandMetadata command : sortCommands(group.getCommands())) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
 
             // Create new separate output stream and writer for each command
@@ -111,7 +111,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global)
             throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
 
             // Create new separate output stream and writer for each command

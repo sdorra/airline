@@ -144,7 +144,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
         if (global.getDefaultGroupCommands().size() > 0) {
             writer.append(NEW_PARA).append("* Default (no <group> specified)");
             for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
-                if (command.isHidden())
+                if (command.isHidden() && !this.includeHidden())
                     continue;
 
                 writer.append(NEW_PARA).append("  * `").append(getCommandName(global, null, command)).append("`:\n");
@@ -157,7 +157,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
             writer.append("  ").append(group.getDescription());
 
             for (CommandMetadata command : sortCommands(group.getCommands())) {
-                if (command.isHidden())
+                if (command.isHidden() && !this.includeHidden())
                     continue;
 
                 writer.append(NEW_PARA).append("  * `").append(getCommandName(global, group.getName(), command))
@@ -186,7 +186,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
         writer.append(NEW_PARA).append("## COMMANDS");
 
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
 
             writer.append(NEW_PARA).append("* `").append(getCommandName(global, null, command)).append("`:\n");
@@ -209,7 +209,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
         for (OptionMetadata option : options) {
             // skip hidden options
-            if (option.isHidden())
+            if (option.isHidden() && !this.includeHidden())
                 continue;
 
             // option names
@@ -351,7 +351,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
     protected void outputGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global,
             CommandGroupMetadata group) throws IOException {
         for (CommandMetadata command : sortCommands(group.getCommands())) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
 
             writer.flush();
@@ -376,7 +376,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
     protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global)
             throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
 
             writer.flush();

@@ -80,7 +80,7 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
 
             for (OptionMetadata option : options) {
 
-                if (option.isHidden()) {
+                if (option.isHidden() && !this.includeHidden()) {
                     continue;
                 }
 
@@ -173,7 +173,7 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
 
         for (CommandMetadata command : commands) {
 
-            if (!command.isHidden()) {
+            if (!command.isHidden() || this.includeHidden()) {
                 if (hasCommandSpecificOptions) {
                     List<OptionMetadata> thisCmdOptions = newArrayList(command.getCommandOptions());
                     thisCmdOptions.removeAll(commonGroupOptions);

@@ -85,7 +85,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
 
         for (OptionMetadata option : options) {
 
-            if (option.isHidden()) {
+            if (option.isHidden() && !this.includeHidden()) {
                 continue;
             }
 
@@ -181,7 +181,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      */
     protected void outputCommandDescription(UsagePrinter out, CommandGroupMetadata group, CommandMetadata command)
             throws IOException {
-        if (!command.isHidden()) {
+        if (!command.isHidden() || this.includeHidden()) {
             if (group != null) {
                 out.append(group.getName());
             }

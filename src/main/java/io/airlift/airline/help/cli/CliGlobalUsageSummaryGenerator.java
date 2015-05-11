@@ -78,7 +78,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
     protected void outputCommandList(UsagePrinter out, GlobalMetadata global) throws IOException {
         Map<String, String> commands = new LinkedHashMap<>();
         for (CommandMetadata commandMetadata : sortCommands(global.getDefaultGroupCommands())) {
-            if (!commandMetadata.isHidden()) {
+            if (!commandMetadata.isHidden() || this.includeHidden()) {
                 commands.put(commandMetadata.getName(), commandMetadata.getDescription());
             }
         }
@@ -109,7 +109,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
         Collection<String> args = Collections2.transform(sortOptions(global.getOptions()),
                 new Function<OptionMetadata, String>() {
                     public String apply(OptionMetadata option) {
-                        if (option.isHidden()) {
+                        if (option.isHidden() && !includeHidden()) {
                             return "";
                         }
                         return toUsage(option);

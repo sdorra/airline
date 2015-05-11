@@ -169,7 +169,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
 
         for (OptionMetadata option : options) {
             // skip hidden options
-            if (option.isHidden()) {
+            if (option.isHidden() && !this.includeHidden()) {
                 continue;
             }
 
