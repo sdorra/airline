@@ -4,6 +4,8 @@
 
 - Package Refactoring
     - More parser errors have public constructors
+- Help Improvements
+    - Help generators can now optionally display hidden commands and options
 
 ## 0.9.2
 
