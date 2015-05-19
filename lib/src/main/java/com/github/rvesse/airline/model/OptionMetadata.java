@@ -9,12 +9,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import static com.google.common.collect.Sets.newHashSet;
 
 public class OptionMetadata {
     private final OptionType optionType;
@@ -92,9 +89,9 @@ public class OptionMetadata {
         this.completionBehaviour = option.completionBehaviour;
         this.completionCommand = option.completionCommand;
 
-        Set<Accessor> accessors = newHashSet();
+        Set<Accessor> accessors = new LinkedHashSet<Accessor>();
         for (OptionMetadata other : options) {
-            Preconditions.checkArgument(option.equals(other), "Conflicting options definitions: %s, %s", option, other);
+            Preconditions.checkArgument(option.equals(other), "Duplicate options definitions: %s, %s", option, other);
 
             accessors.addAll(other.getAccessors());
         }
