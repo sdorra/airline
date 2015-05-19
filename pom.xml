@@ -52,6 +52,7 @@
     <plugin.javadoc>2.10.1</plugin.javadoc>
     <plugin.release>2.5.1</plugin.release>
     <plugin.gpg>1.5</plugin.gpg>
+    <plugin.shade>2.3</plugin.shade>
 
     <!-- Dependency Versions -->
     <dependency.javax-inject>1</dependency.javax-inject>
