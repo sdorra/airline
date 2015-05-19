@@ -50,10 +50,15 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
         // Helper functions
         writer.append("containsElement () {\n");
-        writer.append("  # This function from http://stackoverflow.com/a/8574392/107591\n");
-        writer.append("  local e\n");
-        writer.append("  for e in \"${@:2}\"; do [[ \"$e\" == \"$1\" ]] && return 0; done\n");
-        writer.append("  return 1\n");
+        indent(writer, 2);
+        writer.append("# This function from http://stackoverflow.com/a/8574392/107591\n");
+        indent(writer, 2);
+        writer.append("local e\n");
+        indent(writer, 2);
+        writer.append("for e in \"${@:2}\"; do [[ \"$e\" == \"$1\" ]] && return 0; done\n");
+        indent(writer, 2);
+        writer.append("return 1\n");
+        indent(writer, 2);
         writer.append("}\n\n");
 
         // If there are multiple groups then we will need to generate a function
@@ -74,7 +79,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
             }
         } else {
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
-                if (command.isHidden())
+                if (command.isHidden() && !this.includeHidden())
                     continue;
 
                 // Generate the command completion function
@@ -85,18 +90,26 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // Start main completion function
         writeFunctionName(writer, global, true);
 
-        writer.append("  # Get completion data").append(NEWLINE);
-        writer.append("  CURR_WORD=${COMP_WORDS[COMP_CWORD]}").append(NEWLINE);
-        writer.append("  PREV_WORD=${COMP_WORDS[COMP_CWORD-1]}").append(NEWLINE);
-        writer.append("  CURR_CMD=").append(NEWLINE);
-        writer.append("  if [[ ${COMP_CWORD} -ge 1 ]]; then").append(NEWLINE);
-        writer.append("    CURR_CMD=${COMP_WORDS[1]}").append(NEWLINE);
-        writer.append("  fi").append(DOUBLE_NEWLINE);
+        indent(writer, 2);
+        writer.append("# Get completion data").append(NEWLINE);
+        indent(writer, 2);
+        writer.append("CURR_WORD=${COMP_WORDS[COMP_CWORD]}").append(NEWLINE);
+        indent(writer, 2);
+        writer.append("PREV_WORD=${COMP_WORDS[COMP_CWORD-1]}").append(NEWLINE);
+        indent(writer, 2);
+        writer.append("CURR_CMD=").append(NEWLINE);
+        indent(writer, 2);
+        writer.append("if [[ ${COMP_CWORD} -ge 1 ]]; then").append(NEWLINE);
+        indent(writer, 4);
+        writer.append("CURR_CMD=${COMP_WORDS[1]}").append(NEWLINE);
+        indent(writer, 2);
+        writer.append("fi").append(DOUBLE_NEWLINE);
+        indent(writer, 2);
 
         // Prepare list of top level commands and groups
         Set<String> commandNames = new HashSet<>();
         for (CommandMetadata command : global.getDefaultGroupCommands()) {
-            if (command.isHidden())
+            if (command.isHidden() && !this.includeHidden())
                 continue;
             commandNames.add(command.getName());
         }
@@ -105,51 +118,71 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
                 commandNames.add(group.getName());
             }
         }
+        if (global.getDefaultCommand() != null)
+            commandNames.add(global.getDefaultCommand().getName());
         writeWordListVariable(writer, 2, "COMMANDS", commandNames.iterator());
 
         // Firstly check whether we are only completing the group or command
-        writer.append("  if [[ ${COMP_CWORD} -eq 1 ]]; then").append(NEWLINE);
-        writer.append("    COMPREPLY=()").append(NEWLINE);
-        writeCompletionGeneration(writer, 4, false, CompletionBehaviour.NONE, "COMMANDS");
-        writer.append("  fi").append(DOUBLE_NEWLINE);
+        indent(writer, 2);
+        writer.append("if [[ ${COMP_CWORD} -eq 1 ]]; then").append(NEWLINE);
+
+        // Include the default command directly if present
+        if (global.getDefaultCommand() != null) {
+            // TODO Need to call the completion function and combine its output
+            // with that of the list of available commands
+            generateCommandCase(writer, global, global.getDefaultCommand(), 4);
+            indent(writer, 4);
+            writer.append("DEFAULT_COMMAND_COMPLETIONS=${COMPREPLY}").append(NEWLINE);
+        }
+        indent(writer, 4);
+        writer.append("COMPREPLY=()").append(NEWLINE);
+        if (global.getDefaultCommand() != null) {
+            writeCompletionGeneration(writer, 4, false, CompletionBehaviour.NONE, "COMMANDS",
+                    "DEFAULT_COMMAND_COMPLETIONS");
+        } else {
+            writeCompletionGeneration(writer, 4, false, CompletionBehaviour.NONE, "COMMANDS");
+        }
+        indent(writer, 2);
+        writer.append("fi").append(DOUBLE_NEWLINE);
 
         // Otherwise we must be in a specific group/command
         // Use a switch statement to provide group/command specific completion
         writer.append("  case ${CURR_CMD} in ").append(NEWLINE);
         if (hasGroups) {
+            Set<String> groups = new HashSet<String>();
+
+            // Add a case for each group
             for (CommandGroupMetadata group : global.getCommandGroups()) {
                 // Add case for the group
-                indent(writer, 4);
-                writer.append(group.getName()).append(')').append(NEWLINE);
-                indent(writer, 6);
+                generateGroupCase(writer, global, group, 4);
 
-                // Just call the group function and pass its value back up
-                writer.append("COMPREPLY=( $( ");
-                writeGroupFunctionName(writer, global, group, false);
-                writer.append(" ) )").append(NEWLINE);
-                indent(writer, 6);
-                writer.append("return $?").append(NEWLINE);
-                indent(writer, 6);
-                writer.append(";;").append(NEWLINE);
+                // Track which groups we've generated completion functions for
+                groups.add(group.getName());
             }
-        } else {
+
+            // Include commands in the default group directly provided there
+            // isn't a conflicting group
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
-                if (command.isHidden())
+                if (groups.contains(command.getName()))
+                    continue;
+                groups.add(command.getName());
+
+                if (command.isHidden() && !this.includeHidden())
                     continue;
 
                 // Add case for the command
-                indent(writer, 4);
-                writer.append(command.getName()).append(')').append(NEWLINE);
-                indent(writer, 6);
+                generateCommandCase(writer, global, command, 4);
 
-                // Just call the command function and pass its value back up
-                writer.append("COMPREPLY=( $(");
-                writeCommandFunctionName(writer, global, null, command, false);
-                writer.append(" \"${COMMANDS}\" ) )").append(NEWLINE);
-                indent(writer, 6);
-                writer.append("return $?").append(NEWLINE);
-                indent(writer, 6);
-                writer.append(";;").append(NEWLINE);
+                groups.add(command.getName());
+            }
+        } else {
+            // Add a case for each command
+            for (CommandMetadata command : global.getDefaultGroupCommands()) {
+                if (command.isHidden() && !this.includeHidden())
+                    continue;
+
+                // Add case for the command
+                generateCommandCase(writer, global, command, 4);
             }
         }
 
@@ -169,6 +202,38 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         // Flush the output
         writer.flush();
         output.flush();
+    }
+
+    private void generateCommandCase(Writer writer, GlobalMetadata global, CommandMetadata command, int indent)
+            throws IOException {
+        indent(writer, indent);
+        writer.append(command.getName()).append(')').append(NEWLINE);
+        indent(writer, indent + 2);
+
+        // Just call the command function and pass its value back up
+        writer.append("COMPREPLY=( $(");
+        writeCommandFunctionName(writer, global, null, command, false);
+        writer.append(" \"${COMMANDS}\" ) )").append(NEWLINE);
+        indent(writer, indent + 2);
+        writer.append("return $?").append(NEWLINE);
+        indent(writer, indent + 2);
+        writer.append(";;").append(NEWLINE);
+    }
+
+    private void generateGroupCase(Writer writer, GlobalMetadata global, CommandGroupMetadata group, int indent)
+            throws IOException {
+        indent(writer, indent);
+        writer.append(group.getName()).append(')').append(NEWLINE);
+        indent(writer, indent + 2);
+
+        // Just call the group function and pass its value back up
+        writer.append("COMPREPLY=( $( ");
+        writeGroupFunctionName(writer, global, group, false);
+        writer.append(" ) )").append(NEWLINE);
+        indent(writer, indent + 2);
+        writer.append("return $?").append(NEWLINE);
+        indent(writer, indent + 2);
+        writer.append(";;").append(NEWLINE);
     }
 
     private void generateGroupCompletionFunction(Writer writer, GlobalMetadata global, CommandGroupMetadata group)
