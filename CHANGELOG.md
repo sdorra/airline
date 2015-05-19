@@ -1,11 +1,14 @@
 # Airline - Change Log
 
-## 0.9.3
+## 1.0.0
 
 - Package Refactoring
-    - More parser errors have public constructors
+    - Root package is now com.github.rvesse.airline
+- Parser Improvements
+    - All parser errors in the parser package have public constructors
 - Help Improvements
     - Help generators can now optionally display hidden commands and options
+    - Bash completion includes completion for default command/group in some cases
 
 ## 0.9.2
 
