@@ -11,6 +11,7 @@ import com.google.common.collect.Iterables;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -342,7 +343,7 @@ public class OptionMetadata {
 
         // Combine both child and parent accessors - this is necessary so the
         // parsed value propagates to all classes in the hierarchy
-        Set<Accessor> accessors = new HashSet<>(child.accessors);
+        Set<Accessor> accessors = new LinkedHashSet<>(child.accessors);
         accessors.addAll(parent.accessors);
         merged.accessors = ImmutableSet.copyOf(accessors);
         return merged;
