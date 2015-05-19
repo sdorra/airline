@@ -1,19 +1,12 @@
-*.iml
-*.ipr
-*.iws
-/target
+# Maven Artifacts
+target/
 pom.xml.versionsBackup
-/test-output
-atlassian-ide-plugin.xml
-.idea
+test-output/
+
+# OS X Artifacts
 .DS_Store
+
+# Eclipse Artifacts
 .classpath
 .project
 .settings
-.project
-temp-testng-customsuite.xml
-.externalToolBuilders
-*~
-.rvmrc
-bin/
-*.ronn

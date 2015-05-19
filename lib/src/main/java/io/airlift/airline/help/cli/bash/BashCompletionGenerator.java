@@ -128,11 +128,11 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
         // Include the default command directly if present
         if (global.getDefaultCommand() != null) {
-            // TODO Need to call the completion function and combine its output
+            // Need to call the completion function and combine its output
             // with that of the list of available commands
             generateCommandCase(writer, global, global.getDefaultCommand(), 4);
             indent(writer, 4);
-            writer.append("DEFAULT_COMMAND_COMPLETIONS=${COMPREPLY}").append(NEWLINE);
+            writer.append("DEFAULT_COMMAND_COMPLETIONS=(${COMPREPLY[@]})").append(NEWLINE);
         }
         indent(writer, 4);
         writer.append("COMPREPLY=()").append(NEWLINE);

@@ -8,11 +8,11 @@
 	</parent>
 
 	<groupId>com.github.rvesse</groupId>
-	<artifactId>airline</artifactId>
-	<packaging>jar</packaging>
+	<artifactId>airline-parent</artifactId>
+	<packaging>pom</packaging>
 	<version>0.9.3-SNAPSHOT</version>
 
-	<name>airline</name>
+	<name>Airline - Parent</name>
 	<description>Java annotation-based framework for parsing Git like command line structures</description>
 	<url>https://github.com/rvesse/airline</url>
 
@@ -59,6 +59,11 @@
 		<dependency.commons-lang3>3.3.2</dependency.commons-lang3>
 	</properties>
 
+        <modules>
+          <module>lib</module>
+        </modules>
+
+        <dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -86,6 +91,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+        </dependencyManagement>
 
 	<build>
 		<plugins>
