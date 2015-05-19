@@ -6,7 +6,7 @@
     <artifactId>airline-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>examples</artifactId>
+  <artifactId>airline-examples</artifactId>
   <name>Airline - Examples</name>
   <description>Provides a variety of examples of using Airline</description>
 
