@@ -17,7 +17,7 @@ You then need to use the various annotations to annotate your command classes:
 - `@Arguments` is used to annotate fields that take in arguments
 - `@Inject` can be used to modularize option definitions into separate classes
 
-Please see the [examples](tree/master/examples/) module for a range of examples that show off the many features of this library and practical examples of using the annotations.
+Please see the [examples](examples/) module for a range of examples that show off the many features of this library and practical examples of using the annotations.
 
 In your `main(String[] args)` method you then need to create a parser instance either via `SingleCommand.singleCommand()` or by creating an instance of a `Cli` using the `CliBuilder` and then call the `parse()` method passing in the provided `args`.  This will return you an instance of the command the user wants to execute and then you can go ahead and execute that however you want.
 
