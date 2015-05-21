@@ -11,3 +11,5 @@ Assuming you have built the code:
 Or try running with some arguments:
 
     > java -cp target/airline-examples.jar com.github.rvesse.airline.examples.simple.Simple foo bar
+
+Please browse the code to see all the examples available.
