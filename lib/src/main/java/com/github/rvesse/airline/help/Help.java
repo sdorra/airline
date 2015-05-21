@@ -33,14 +33,14 @@ public class Help implements Runnable, Callable<Void> {
 
     @Arguments
     public List<String> command = newArrayList();
-    
-    @Option(name = "--include-hidden", description = "When set the help output will include hidden commands and options")
+
+    @Option(name = "--include-hidden", description = "When set the help output will include hidden commands and options", hidden = true)
     public boolean includeHidden = false;
 
     @Override
     public void run() {
         try {
-            help(global, command);
+            help(global, command, this.includeHidden);
         } catch (IOException e) {
             throw new RuntimeException("Error generating usage documentation", e);
         }
@@ -62,7 +62,7 @@ public class Help implements Runnable, Callable<Void> {
     public static void help(CommandMetadata command) throws IOException {
         help(command, System.out);
     }
-    
+
     /**
      * Displays plain text format help for the given command to standard out
      * 
@@ -73,7 +73,7 @@ public class Help implements Runnable, Callable<Void> {
     public static void help(CommandMetadata command, boolean includeHidden) throws IOException {
         help(command, includeHidden, System.out);
     }
-    
+
     /**
      * Displays plain text format help or the given command to the given output
      * stream
@@ -112,7 +112,37 @@ public class Help implements Runnable, Callable<Void> {
      * @throws IOException
      */
     public static void help(GlobalMetadata global, List<String> commandNames) throws IOException {
-        help(global, commandNames, System.out);
+        help(global, commandNames, false, System.out);
+    }
+
+    /**
+     * Displays plain text format program help to standard out
+     * 
+     * @param global
+     *            Program metadata
+     * @param commandNames
+     *            Command Names
+     * @param includeHidden
+     *            Whether to include hidden commands and options in the output
+     * @throws IOException
+     */
+    public static void help(GlobalMetadata global, List<String> commandNames, boolean includeHidden) throws IOException {
+        help(global, commandNames, includeHidden, System.out);
+    }
+    
+    /**
+     * Displays plain text format program help to the given output stream
+     * 
+     * @param global
+     *            Program metadata
+     * @param commandNames
+     *            Command Names
+     * @param out
+     *            Output Stream
+     * @throws IOException
+     */
+    public static void help(GlobalMetadata global, List<String> commandNames, OutputStream out) throws IOException {
+        help(global, commandNames, false, out);
     }
 
     /**
@@ -126,7 +156,7 @@ public class Help implements Runnable, Callable<Void> {
      *            Output Stream
      * @throws IOException
      */
-    public static void help(GlobalMetadata global, List<String> commandNames, OutputStream out) throws IOException {
+    public static void help(GlobalMetadata global, List<String> commandNames, boolean includeHidden, OutputStream out) throws IOException {
         if (commandNames.isEmpty()) {
             new CliGlobalUsageSummaryGenerator().usage(global, out);
             return;
