@@ -21,20 +21,28 @@ import com.google.common.collect.Lists;
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
 
     public CliCommandUsageGenerator() {
-        this(79, DEFAULT_OPTION_COMPARATOR);
+        this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, false);
+    }
+    
+    public CliCommandUsageGenerator(boolean includeHidden) {
+        this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
 
-    public CliCommandUsageGenerator(int columnSize) {
-        this(columnSize, DEFAULT_OPTION_COMPARATOR);
+    public CliCommandUsageGenerator(int columns) {
+        this(columns, DEFAULT_OPTION_COMPARATOR, false);
+    }
+    
+    public CliCommandUsageGenerator(int columns, boolean includeHidden) {
+        this(columns, DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
 
-    public CliCommandUsageGenerator(int columnSize,  Comparator<? super OptionMetadata> optionComparator) {
-        super(columnSize, optionComparator);
+    public CliCommandUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
+        super(columns, optionComparator, includeHidden);
     }
 
     @Override
-    protected void usage( String programName,  String groupName, String commandName,
-            CommandMetadata command, UsagePrinter out) throws IOException {
+    protected void usage(String programName, String groupName, String commandName, CommandMetadata command,
+            UsagePrinter out) throws IOException {
         //
         // Name and description
         //

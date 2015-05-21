@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Command;
+import com.github.rvesse.airline.Option;
 import com.github.rvesse.airline.help.cli.CliCommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
@@ -32,6 +33,9 @@ public class Help implements Runnable, Callable<Void> {
 
     @Arguments
     public List<String> command = newArrayList();
+    
+    @Option(name = "--include-hidden", description = "When set the help output will include hidden commands and options")
+    public boolean includeHidden = false;
 
     @Override
     public void run() {
@@ -48,18 +52,80 @@ public class Help implements Runnable, Callable<Void> {
         return null;
     }
 
+    /**
+     * Displays plain text format help for the given command to standard out
+     * 
+     * @param command
+     *            Command
+     * @throws IOException
+     */
     public static void help(CommandMetadata command) throws IOException {
         help(command, System.out);
     }
-
+    
+    /**
+     * Displays plain text format help for the given command to standard out
+     * 
+     * @param command
+     *            Command
+     * @throws IOException
+     */
+    public static void help(CommandMetadata command, boolean includeHidden) throws IOException {
+        help(command, includeHidden, System.out);
+    }
+    
+    /**
+     * Displays plain text format help or the given command to the given output
+     * stream
+     * 
+     * @param command
+     *            Command
+     * @param out
+     *            Output stream
+     * @throws IOException
+     */
     public static void help(CommandMetadata command, OutputStream out) throws IOException {
-        new CliCommandUsageGenerator().usage(null, null, command.getName(), command, out);
+        help(command, false, out);
     }
 
+    /**
+     * Displays plain text format help or the given command to the given output
+     * stream
+     * 
+     * @param command
+     *            Command
+     * @param out
+     *            Output stream
+     * @throws IOException
+     */
+    public static void help(CommandMetadata command, boolean includeHidden, OutputStream out) throws IOException {
+        new CliCommandUsageGenerator(includeHidden).usage(null, null, command.getName(), command, out);
+    }
+
+    /**
+     * Displays plain text format program help to standard out
+     * 
+     * @param global
+     *            Program metadata
+     * @param commandNames
+     *            Command Names
+     * @throws IOException
+     */
     public static void help(GlobalMetadata global, List<String> commandNames) throws IOException {
         help(global, commandNames, System.out);
     }
 
+    /**
+     * Displays plain text format program help to the given output stream
+     * 
+     * @param global
+     *            Program metadata
+     * @param commandNames
+     *            Command Names
+     * @param out
+     *            Output Stream
+     * @throws IOException
+     */
     public static void help(GlobalMetadata global, List<String> commandNames, OutputStream out) throws IOException {
         if (commandNames.isEmpty()) {
             new CliGlobalUsageSummaryGenerator().usage(global, out);

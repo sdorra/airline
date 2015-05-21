@@ -17,11 +17,11 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
 
     private final int columnSize;
 
-    public AbstractPrintedCommandUsageGenerator(int columnSize,
-            Comparator<? super OptionMetadata> optionComparator) {
-        super(optionComparator);
-        Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
-        this.columnSize = columnSize;
+    public AbstractPrintedCommandUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
+            boolean includeHidden) {
+        super(optionComparator, includeHidden);
+        Preconditions.checkArgument(columns > 0, "columns must be greater than 0");
+        this.columnSize = columns;
     }
 
     /**
@@ -37,10 +37,10 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Command Metadata
      * @param out
      *            Usage printer to output with
-     * @throws IOException 
+     * @throws IOException
      */
-    protected abstract void usage(String programName, String groupName, String commandName,
-            CommandMetadata command, UsagePrinter out) throws IOException;
+    protected abstract void usage(String programName, String groupName, String commandName, CommandMetadata command,
+            UsagePrinter out) throws IOException;
 
     /**
      * Creates a usage printer for the given stream
@@ -56,8 +56,8 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     }
 
     @Override
-    public void usage(String programName, String groupName, String commandName,
-            CommandMetadata command, OutputStream out) throws IOException {
+    public void usage(String programName, String groupName, String commandName, CommandMetadata command,
+            OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
         usage(programName, groupName, commandName, command, printer);
         printer.flush();

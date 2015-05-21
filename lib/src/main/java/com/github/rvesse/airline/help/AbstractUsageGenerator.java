@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 
 public class AbstractUsageGenerator {
 
+    protected static final int DEFAULT_COLUMNS = 79;
     private final Comparator<? super OptionMetadata> optionComparator;
     private final Comparator<? super CommandMetadata> commandComparator;
     private final boolean includeHidden;
