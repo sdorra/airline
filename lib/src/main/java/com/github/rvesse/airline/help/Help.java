@@ -158,7 +158,7 @@ public class Help implements Runnable, Callable<Void> {
      */
     public static void help(GlobalMetadata global, List<String> commandNames, boolean includeHidden, OutputStream out) throws IOException {
         if (commandNames.isEmpty()) {
-            new CliGlobalUsageSummaryGenerator().usage(global, out);
+            new CliGlobalUsageSummaryGenerator(includeHidden).usage(global, out);
             return;
         }
 
@@ -167,7 +167,7 @@ public class Help implements Runnable, Callable<Void> {
         // Main program?
         if (name.equals(global.getName())) {
             // Main program help
-            new CliGlobalUsageGenerator().usage(global, out);
+            new CliGlobalUsageGenerator(includeHidden).usage(global, out);
             return;
         }
 
@@ -189,7 +189,7 @@ public class Help implements Runnable, Callable<Void> {
         CommandMetadata command = find(global.getDefaultGroupCommands(), findCommandPredicate, null);
         if (command != null) {
             // Command in default group help
-            new CliCommandUsageGenerator().usage(global.getName(), null, command.getName(), command, out);
+            new CliCommandUsageGenerator(includeHidden).usage(global.getName(), null, command.getName(), command, out);
             return;
         }
 
@@ -199,7 +199,7 @@ public class Help implements Runnable, Callable<Void> {
             // General group help or specific group command help?
             if (commandNames.size() == 1) {
                 // General group help
-                new CliCommandGroupUsageGenerator().usage(global, group, out);
+                new CliCommandGroupUsageGenerator(includeHidden).usage(global, group, out);
                 return;
             } else {
                 // Group command help

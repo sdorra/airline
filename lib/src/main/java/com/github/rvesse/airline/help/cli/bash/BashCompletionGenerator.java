@@ -76,14 +76,14 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
                     generateCommandCompletionFunction(writer, global, group, command);
                 }
             }
-        } else {
-            for (CommandMetadata command : global.getDefaultGroupCommands()) {
-                if (command.isHidden() && !this.includeHidden())
-                    continue;
+        }
+        // Need to generate functions for default group commands regardless
+        for (CommandMetadata command : global.getDefaultGroupCommands()) {
+            if (command.isHidden() && !this.includeHidden())
+                continue;
 
-                // Generate the command completion function
-                generateCommandCompletionFunction(writer, global, null, command);
-            }
+            // Generate the command completion function
+            generateCommandCompletionFunction(writer, global, null, command);
         }
 
         // Start main completion function
@@ -128,7 +128,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         if (global.getDefaultCommand() != null) {
             // Need to call the completion function and combine its output
             // with that of the list of available commands
-            generateCommandCase(writer, global, global.getDefaultCommand(), 4);
+            generateCommandCase(writer, global, global.getDefaultCommand(), 4, false);
             indent(writer, 4);
             writer.append("DEFAULT_COMMAND_COMPLETIONS=(${COMPREPLY[@]})").append(NEWLINE);
         }
@@ -169,7 +169,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
                     continue;
 
                 // Add case for the command
-                generateCommandCase(writer, global, command, 4);
+                generateCommandCase(writer, global, command, 4, true);
 
                 groups.add(command.getName());
             }
@@ -180,7 +180,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
                     continue;
 
                 // Add case for the command
-                generateCommandCase(writer, global, command, 4);
+                generateCommandCase(writer, global, command, 4, true);
             }
         }
 
@@ -202,20 +202,26 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         output.flush();
     }
 
-    private void generateCommandCase(Writer writer, GlobalMetadata global, CommandMetadata command, int indent)
-            throws IOException {
-        indent(writer, indent);
-        writer.append(command.getName()).append(')').append(NEWLINE);
-        indent(writer, indent + 2);
+    private void generateCommandCase(Writer writer, GlobalMetadata global, CommandMetadata command, int indent,
+            boolean isCase) throws IOException {
+        if (isCase) {
+            indent(writer, indent);
+            writer.append(command.getName()).append(')').append(NEWLINE);
+            indent += 2;
+        }
 
         // Just call the command function and pass its value back up
+        indent(writer, indent);
         writer.append("COMPREPLY=( $(");
         writeCommandFunctionName(writer, global, null, command, false);
         writer.append(" \"${COMMANDS}\" ) )").append(NEWLINE);
-        indent(writer, indent + 2);
-        writer.append("return $?").append(NEWLINE);
-        indent(writer, indent + 2);
-        writer.append(";;").append(NEWLINE);
+
+        if (isCase) {
+            indent(writer, indent);
+            writer.append("return $?").append(NEWLINE);
+            indent(writer, indent);
+            writer.append(";;").append(NEWLINE);
+        }
     }
 
     private void generateGroupCase(Writer writer, GlobalMetadata global, CommandGroupMetadata group, int indent)

@@ -34,7 +34,8 @@ public class CompletionCli {
                .withDescription("Commands that demonstrate option inheritance")
                .withCommands(Parent.class, Child.class, GoodGrandchild.class);
         // You can still define top level commands as well 
-        builder.withCommand(Help.class);
+        builder.withCommand(Help.class)
+               .withDefaultCommand(Help.class);
         //@formatter:on
         
         ExampleExecutor.executeCli(builder.build(), args);
