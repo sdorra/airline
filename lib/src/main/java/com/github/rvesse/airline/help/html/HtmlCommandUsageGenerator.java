@@ -40,19 +40,15 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     protected final List<String> stylesheetUrls = newArrayList();
 
     public HtmlCommandUsageGenerator() {
-        this(DEFAULT_STYLESHEET);
+        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, false, DEFAULT_STYLESHEET);
+    }
+    
+    public HtmlCommandUsageGenerator(boolean includeHidden) {
+        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden, DEFAULT_STYLESHEET);
     }
 
-    public HtmlCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator) {
-        this(optionComparator, false, DEFAULT_STYLESHEET);
-    }
-
-    public HtmlCommandUsageGenerator(String stylesheetUrl) {
-        this(stylesheetUrl, UsageHelper.DEFAULT_OPTION_COMPARATOR);
-    }
-
-    public HtmlCommandUsageGenerator(String stylesheetUrl, Comparator<? super OptionMetadata> optionComparator) {
-        this(optionComparator, false, stylesheetUrl);
+    public HtmlCommandUsageGenerator(String stylesheetUrl, boolean includeHidden) {
+        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden, stylesheetUrl);
     }
 
     public HtmlCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden, String... stylesheetUrls) {

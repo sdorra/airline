@@ -15,13 +15,25 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
 public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator {
+
     public CliGlobalUsageGenerator() {
-        this(79);
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
-    public CliGlobalUsageGenerator(int columnSize) {
-        this(columnSize, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+    public CliGlobalUsageGenerator(boolean includeHidden) {
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+    }
+
+    public CliGlobalUsageGenerator(int columns) {
+        this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
                 UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+    }
+
+    public CliGlobalUsageGenerator(int columns, boolean includeHidden) {
+        this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
     public CliGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,

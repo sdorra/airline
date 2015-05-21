@@ -19,21 +19,25 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
     private final boolean hideGlobalOptions;
 
     public CliCommandGroupUsageGenerator() {
-        this(79, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
+        this(DEFAULT_COLUMNS, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
     }
 
-    public CliCommandGroupUsageGenerator(int columnSize) {
-        this(columnSize, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
+    public CliCommandGroupUsageGenerator(boolean includeHidden) {
+        this(DEFAULT_COLUMNS, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, includeHidden);
     }
 
-    public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions) {
-        this(columnSize, hideGlobalOptions, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
+    public CliCommandGroupUsageGenerator(int columns) {
+        this(columns, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
+    }
+    
+    public CliCommandGroupUsageGenerator(int columns, boolean includeHidden) {
+        this(columns, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, includeHidden);
     }
 
-    public CliCommandGroupUsageGenerator(int columnSize, boolean hideGlobalOptions,
+    public CliCommandGroupUsageGenerator(int columns, boolean hideGlobalOptions,
             Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             boolean includeHidden) {
-        super(columnSize, optionComparator, commandComparator, includeHidden);
+        super(columns, optionComparator, commandComparator, includeHidden);
         this.hideGlobalOptions = hideGlobalOptions;
     }
 
