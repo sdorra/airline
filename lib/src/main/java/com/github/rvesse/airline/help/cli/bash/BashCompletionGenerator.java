@@ -44,6 +44,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
     public void usage(GlobalMetadata global, OutputStream output) throws IOException {
         Writer writer = new OutputStreamWriter(output);
 
+        // Script header
         writeHeader(writer);
         writeHelperFunctions(writer);
 
@@ -260,7 +261,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
         // Call the function
         writeGroupFunctionCall(writer, global, group, indent);
-        
+
         // Want to return and terminate the case
         indent(writer, indent);
         writer.append("return $?").append(NEWLINE);
@@ -303,7 +304,20 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
         // Check if we are completing a group
         writer.append("  if [[ ${COMP_CWORD} -eq 2 ]]; then").append(NEWLINE);
-        writeCompletionGeneration(writer, 4, true, CompletionBehaviour.NONE, "COMMANDS");
+        // Include the default command directly if present
+        if (group.getDefaultCommand() != null) {
+            // Need to call the completion function and combine its output
+            // with that of the list of available commands
+            writeCommandFunctionCall(writer, global, group, group.getDefaultCommand(), 4);
+            indent(writer, 4);
+            writer.append("DEFAULT_GROUP_COMMAND_COMPLETIONS=(${COMPREPLY[@]})").append(NEWLINE);
+        }
+        if (global.getDefaultCommand() != null) {
+            writeCompletionGeneration(writer, 4, true, CompletionBehaviour.NONE, "COMMANDS",
+                    "DEFAULT_GROUP_COMMAND_COMPLETIONS");
+        } else {
+            writeCompletionGeneration(writer, 4, true, CompletionBehaviour.NONE, "COMMANDS");
+        }
         writer.append("  fi").append(DOUBLE_NEWLINE);
 
         // Otherwise we must be in a specific command
@@ -315,20 +329,6 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
             // Add case for the command
             writeCommandCase(writer, global, group, command, 4, true);
-            // indent(writer, 4);
-            // writer.append(command.getName()).append(')').append(NEWLINE);
-            // indent(writer, 6);
-            //
-            // // Just call the command function and pass its value back up
-            // writer.append("COMPREPLY=( $( ");
-            // writeCommandFunctionName(writer, global, group, command, false);
-            // writer.append(" \"${COMMANDS}\" ) )").append(NEWLINE);
-            // indent(writer, 6);
-            // writer.append("echo ${COMPREPLY[@]}").append(NEWLINE);
-            // indent(writer, 6);
-            // writer.append("return $?").append(NEWLINE);
-            // indent(writer, 6);
-            // writer.append(";;").append(NEWLINE);
         }
         writer.append("  esac").append(NEWLINE);
 
