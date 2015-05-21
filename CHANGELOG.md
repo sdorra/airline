@@ -2,13 +2,20 @@
 
 ## 1.0.0
 
-- Package Refactoring
-    - Root package is now com.github.rvesse.airline
+- Code Structure Refactoring
+    - Root package is now `com.github.rvesse.airline`
+    - Main library now lives under `lib/` in source control
+    - New examples module under `examples/` in source control
 - Parser Improvements
     - All parser errors in the parser package have public constructors
 - Help Improvements
     - Help generators can now optionally display hidden commands and options
     - Bash completion includes completion for default command/group in some cases
+    - `HelpOption` improved:
+        - Generated help will include program and group name where applicable
+        - It can now be used to show help with an arbitrary usage generator
+        - `showHelpIfRequested()` guarantees to only display help once
+        - `showHelp()` can be used to display help regardless
 
 ## 0.9.2
 

@@ -23,9 +23,15 @@ public class Modules implements ExampleRunnable {
     @Inject
     private HelpOption help;
 
+    /**
+     * A field marked with {@link Inject} will also be scanned for options
+     */
     @Inject
     public CredentialsModule credentials = new CredentialsModule();
 
+    /**
+     * A field marked with {@link Inject} will also be scanned for options
+     */
     @Inject
     public VerbosityModule verbosity = new VerbosityModule();
 

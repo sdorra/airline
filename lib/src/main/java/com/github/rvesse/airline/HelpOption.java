@@ -31,22 +31,51 @@ public class HelpOption {
 
     private boolean shown = false;
 
+    /**
+     * Shows help if user requested it and it hasn't already been shown using
+     * the default {@link CliCommandUsageGenerator}
+     * 
+     * @return True if help was requested by the user
+     */
     public boolean showHelpIfRequested() {
         return this.showHelpIfRequested(new CliCommandUsageGenerator());
     }
 
+    /**
+     * Shows help if user requested it and it hasn't already been shown
+     * 
+     * @param generator
+     *            Usage generator
+     * @return True if help was requested by the user
+     */
     public boolean showHelpIfRequested(CommandUsageGenerator generator) {
         if (help && !shown) {
-            Preconditions.checkNotNull(generator, "Usage generator cannot be null");
-            try {
-                generator.usage(globalMetadata != null ? globalMetadata.getName() : null,
-                        groupMetadata != null ? groupMetadata.getName() : null, commandMetadata.getName(),
-                        commandMetadata);
-            } catch (IOException e) {
-                throw new RuntimeException("Error generating usage documentation", e);
-            }
+            showHelp(generator);
             shown = true;
         }
         return help;
+    }
+
+    /**
+     * Shows help using the default {@link CliCommandUsageGenerator}
+     */
+    public void showHelp() {
+        showHelp(new CliCommandUsageGenerator());
+    }
+
+    /**
+     * Shows help using the given usage generator
+     * 
+     * @param generator
+     *            Usage generator
+     */
+    public void showHelp(CommandUsageGenerator generator) {
+        Preconditions.checkNotNull(generator, "Usage generator cannot be null");
+        try {
+            generator.usage(globalMetadata != null ? globalMetadata.getName() : null,
+                    groupMetadata != null ? groupMetadata.getName() : null, commandMetadata.getName(), commandMetadata);
+        } catch (IOException e) {
+            throw new RuntimeException("Error generating usage documentation", e);
+        }
     }
 }
