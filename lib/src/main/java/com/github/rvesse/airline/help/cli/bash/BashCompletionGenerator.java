@@ -58,7 +58,6 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append("for e in \"${@:2}\"; do [[ \"$e\" == \"$1\" ]] && return 0; done\n");
         indent(writer, 2);
         writer.append("return 1\n");
-        indent(writer, 2);
         writer.append("}\n\n");
 
         // If there are multiple groups then we will need to generate a function
@@ -104,7 +103,6 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append("CURR_CMD=${COMP_WORDS[1]}").append(NEWLINE);
         indent(writer, 2);
         writer.append("fi").append(DOUBLE_NEWLINE);
-        indent(writer, 2);
 
         // Prepare list of top level commands and groups
         Set<String> commandNames = new HashSet<>();

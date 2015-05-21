@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.examples.cli;
+package com.github.rvesse.airline.examples.cli.commands;
 
 import java.io.IOException;
 import java.util.ArrayList;

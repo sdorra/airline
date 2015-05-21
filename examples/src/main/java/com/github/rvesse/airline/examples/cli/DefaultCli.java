@@ -4,6 +4,7 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.Cli.CliBuilder;
 import com.github.rvesse.airline.examples.ExampleExecutor;
 import com.github.rvesse.airline.examples.ExampleRunnable;
+import com.github.rvesse.airline.examples.cli.commands.Help;
 import com.github.rvesse.airline.examples.inheritance.Child;
 import com.github.rvesse.airline.examples.inheritance.GoodGrandchild;
 import com.github.rvesse.airline.examples.inheritance.Parent;
