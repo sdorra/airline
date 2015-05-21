@@ -113,7 +113,7 @@ public class Help implements Runnable, Callable<Void> {
                                        ? new AbbreviatedCommandFinder(commandName, group.getCommands())
                                        : compose(equalTo(commandName), CommandMetadata.nameGetter());
                 //@formatter:on
-                command = find(global.getDefaultGroupCommands(), findCommandPredicate, null);
+                command = find(group.getCommands(), findCommandPredicate, null);
                 if (command != null) {
                     new CliCommandUsageGenerator().usage(global.getName(), group.getName(), command.getName(), command,
                             out);
