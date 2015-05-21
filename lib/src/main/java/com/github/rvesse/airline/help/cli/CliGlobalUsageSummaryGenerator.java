@@ -103,7 +103,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
                     public Iterable<String> apply(Entry<String, String> entry) {
                         return ImmutableList.of(entry.getKey(), entry.getValue() != null ? entry.getValue() : "");
                     }
-                }));
+                }), 0);
     }
 
     /**

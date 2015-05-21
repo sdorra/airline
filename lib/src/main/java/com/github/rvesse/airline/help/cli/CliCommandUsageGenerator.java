@@ -136,7 +136,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         out.append("EXAMPLES").newline();
         UsagePrinter examplePrinter = out.newIndentedPrinter(8);
 
-        examplePrinter.appendTable(Iterables.partition(command.getExamples(), 1));
+        examplePrinter.appendTable(Iterables.partition(command.getExamples(), 1), 1);
         examplePrinter.flush();
     }
 

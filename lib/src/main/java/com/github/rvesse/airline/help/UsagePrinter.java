@@ -57,7 +57,7 @@ public class UsagePrinter {
         return this;
     }
 
-    public UsagePrinter appendTable(Iterable<? extends Iterable<String>> table) throws IOException {
+    public UsagePrinter appendTable(Iterable<? extends Iterable<String>> table, int rowSpacing) throws IOException {
         List<Integer> columnSizes = newArrayList();
         for (Iterable<String> row : table) {
             int column = 0;
@@ -86,6 +86,10 @@ public class UsagePrinter {
                 column++;
             }
             out.append(spaces(indent)).append(trimEnd(line.toString())).append("\n");
+            
+            for (int i = 0; i < rowSpacing; i++) {
+                out.append('\n');
+            }
         }
 
         return this;

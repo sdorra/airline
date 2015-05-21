@@ -690,7 +690,7 @@ public class TestHelp {
         "\n";
 
         String examples = "EXAMPLES\n" +
-        "        * The following is a usage example:\n" +
+        "        * The following is a usage example:\n\n" +
         "        \t$ git remove -i myfile.java\n";
 
         String usage = new String(out.toByteArray(), utf8);
