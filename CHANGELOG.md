@@ -10,8 +10,12 @@
     - All parser errors in the parser package have public constructors
 - Help Improvements
     - Help generators can now optionally display hidden commands and options
-    - `Help.help()` static now respects command abbreviation when enabled
-    - Bash completion includes completion for default command/group in some cases
+    - `Help.help()` static improved:
+         - Respects command abbreviation when enabled
+         - Additional overloads for enabled output of hidden commands and options
+    - Bash completion fixes and improvements:
+        - Default command and default group command completion now included
+        - Functions for default group commands (i.e. top level commands) are no longer missing if there are also groups present
     - `HelpOption` improved:
         - Generated help will include program and group name where applicable
         - It can now be used to show help with an arbitrary usage generator
