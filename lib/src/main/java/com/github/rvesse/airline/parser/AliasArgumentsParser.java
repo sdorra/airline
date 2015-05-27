@@ -37,7 +37,7 @@ public class AliasArgumentsParser {
                 i = parseUnquotedArgument(i, args);
             }
         }
-        
+
         return args;
     }
 
@@ -47,19 +47,19 @@ public class AliasArgumentsParser {
             char c = this.sequence.charAt(i);
             switch (c) {
             case '"':
-                // End of quoted argument UNLESS we have a preceding escape
-                if (arg.length() > 0) {
-                    char prev = this.sequence.charAt(i - 1);
-                    if (prev == '\\') {
-                        // Escaped quote so continue accumulating
-                        arg.append(c);
-                        continue;
-                    }
-                }
-                
                 // Reached end of quoted argument
                 args.add(arg.toString());
                 return i;
+            case '\\':
+                // May be an escape
+                if (i + 1 < this.sequence.length()) {
+                    char next = this.sequence.charAt(i + 1);
+                    if (next == '"') {
+                        arg.append(next);
+                        i++;
+                        continue;
+                    }
+                }
             default:
                 // Any other character just gets accumulated
                 arg.append(c);
@@ -74,22 +74,22 @@ public class AliasArgumentsParser {
         StringBuilder arg = new StringBuilder();
         for (int i = start; i < this.sequence.length(); i++) {
             char c = this.sequence.charAt(i);
-            if (Character.isWhitespace(c)) {
-                // End of argument UNLESS we have a preceding escape
-                if (arg.length() > 0) {
-                    char prev = this.sequence.charAt(i - 1);
-                    if (prev == '\\') {
-                        // Escaped whitespace so continue accumulating
-                        arg.append(c);
+            if (c == '\\') {
+                // May be an escape
+                if (i + 1 < this.sequence.length()) {
+                    char next = this.sequence.charAt(i + 1);
+                    if (Character.isWhitespace(next)) {
+                        arg.append(next);
+                        i++;
                         continue;
                     }
                 }
-                
+            } else if (Character.isWhitespace(c)) {
                 // Reached end of argument
                 args.add(arg.toString());
                 return i;
             }
-            
+
             // Otherwise accumulate
             arg.append(c);
         }
