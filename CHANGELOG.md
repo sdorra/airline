@@ -6,8 +6,11 @@
     - Root package is now `com.github.rvesse.airline`
     - Main library now lives under `lib/` in source control
     - New examples module under `examples/` in source control
-- Parser Improvements
-    - All parser errors in the parser package have public constructors
+- CLI Improvements
+    - User defined command aliases are now supported
+    - CLI builder classes are now public and have their own `builder` package
+    - Parser Improvements
+        - All parser errors in the `parser` package have public constructors
 - Help Improvements
     - Help generators can now optionally display hidden commands and options
     - `Help.help()` static improved:
