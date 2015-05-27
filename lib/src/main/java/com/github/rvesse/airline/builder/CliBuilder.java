@@ -114,6 +114,11 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         // Use default filename and search location
         return withUserAliases(this.name + ".config", null, System.getProperty("user.home") + "/." + this.name + "/");
     }
+    
+    public CliBuilder<C> withUserAliases(String...searchLocations) throws IOException {
+        // Use default filename
+        return withUserAliases(this.name + ".config", null, searchLocations);
+    }
 
     public CliBuilder<C> withUserAliases(final String filename, final String prefix, final String... searchLocations)
             throws IOException {

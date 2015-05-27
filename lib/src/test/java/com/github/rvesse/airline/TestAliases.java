@@ -15,7 +15,7 @@ import com.github.rvesse.airline.parser.ParseOptionConversionException;
 
 public class TestAliases {
 
-    private static final File f = new File("target/alias.config");
+    private static final File f = new File("target/test.config");
 
     @AfterClass
     public static void cleanup() {
@@ -31,6 +31,50 @@ public class TestAliases {
             writer.append('\n');
         }
         writer.close();
+    }
+    
+    @Test
+    public void user_aliases_default_01() throws IOException {
+        prepareConfig(f, "foo=Args1 bar");
+
+        //@formatter:off
+        Cli<Args1> cli = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class)
+                            .withUserAliases("target/")
+                            .build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+    
+    @Test
+    public void user_aliases_default_02() throws IOException {
+        prepareConfig(f, "foo=Args1 bar");
+
+        //@formatter:off
+        Cli<Args1> cli = Cli.<Args1>builder("other")
+                            .withCommand(Args1.class)
+                            .withUserAliases("target/")
+                            .build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        Assert.assertEquals(aliases.size(), 0);
     }
 
     @Test
@@ -201,4 +245,5 @@ public class TestAliases {
         Assert.assertEquals(cmd.parameters.size(), 1);
         Assert.assertEquals(cmd.parameters.get(0), "bar");
     }
+    
 }
