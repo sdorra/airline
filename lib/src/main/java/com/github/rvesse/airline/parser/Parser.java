@@ -2,6 +2,7 @@ package com.github.rvesse.airline.parser;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -13,7 +14,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Predicates.compose;
@@ -34,16 +38,89 @@ public class Parser {
 
         ParseState state = ParseState.newInstance().pushContext(Context.GLOBAL).withGlobal(metadata);
 
-        // parse global options
+        // Define needed predicates
+        Predicate<? super CommandGroupMetadata> findGroupPredicate;
+        Predicate<? super CommandMetadata> findCommandPredicate;
+
+        // Parse global options
         state = parseOptions(tokens, state, metadata.getOptions());
 
-        // parse group
+        // Check if we got an alias
+        if (metadata.getAliases().size() > 0) {
+            AliasMetadata alias = find(metadata.getAliases(),
+                    compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
+            if (alias != null) {
+                if (!metadata.aliasesOverrideBuiltIns()) {
+                    // Check we don't have a default group/command with the same
+                    // name as otherwise that would take precedence
+                    findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
+                    findCommandPredicate = compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
+                    if (find(metadata.getCommandGroups(), findGroupPredicate, null) != null
+                            || find(metadata.getDefaultGroupCommands(), findCommandPredicate, null) != null)
+                        alias = null;
+                }
+
+                // Apply the alias
+                if (alias != null) {
+                    // Discard the alias
+                    tokens.next();
+
+                    List<String> newParams = new ArrayList<String>();
+                    List<String> remainingParams = new ArrayList<String>();
+                    while (tokens.hasNext()) {
+                        remainingParams.add(tokens.next());
+                    }
+
+                    // Process alias arguments
+                    Set<Integer> used = new TreeSet<Integer>();
+                    for (String arg : alias.getArguments()) {
+                        if (arg.startsWith("$")) {
+                            // May be a positional parameter
+                            try {
+                                int num = Integer.parseInt(arg.substring(1));
+                                num--;
+
+                                if (num >= 0 && num < remainingParams.size()) {
+                                    // Valid positional parameter
+                                    newParams.add(remainingParams.get(num));
+                                    used.add(num);
+                                } else {
+                                    // Invalid positional parameter
+                                    newParams.add(arg);
+                                }
+                            } catch (NumberFormatException e) {
+                                newParams.add(arg);
+                            }
+                        }
+
+                        // Some other parameter
+                        newParams.add(arg);
+                    }
+
+                    // Remove used positional parameters
+                    int removed = 0;
+                    for (int pos : used) {
+                        remainingParams.remove(pos - removed);
+                        removed++;
+                    }
+
+                    // Pass through any remaining parameters
+                    for (String arg : remainingParams) {
+                        newParams.add(arg);
+                    }
+
+                    // Prepare a new tokens iterator
+                    tokens = Iterators.peekingIterator(newParams.iterator());
+                }
+            }
+        }
+
+        // Parse group
         if (tokens.hasNext()) {
-            Predicate<? super CommandGroupMetadata> findGroupPredicate;
             //@formatter:off
-            findGroupPredicate = metadata != null && metadata.allowsAbbreviatedCommands() 
+            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (metadata != null && metadata.allowsAbbreviatedCommands() 
                                  ? new AbbreviatedGroupFinder(tokens.peek(), metadata.getCommandGroups()) 
-                                 : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
+                                 : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter()));
             //@formatter:on
             CommandGroupMetadata group = find(metadata.getCommandGroups(), findGroupPredicate, null);
             if (group != null) {
@@ -61,11 +138,10 @@ public class Parser {
         }
 
         if (tokens.hasNext()) {
-            Predicate<? super CommandMetadata> findCommandPredicate;
             //@formatter:off
-            findCommandPredicate = metadata != null && metadata.allowsAbbreviatedCommands() 
+            findCommandPredicate = (Predicate<? super CommandMetadata>) (metadata != null && metadata.allowsAbbreviatedCommands() 
                                    ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
-                                   : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
+                                   : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()));
             //@formatter:on
             CommandMetadata command = find(expectedCommands, findCommandPredicate, state.getGroup() != null ? state
                     .getGroup().getDefaultCommand() : null);
@@ -115,7 +191,8 @@ public class Parser {
         while (tokens.hasNext()) {
             //
             // Try to parse next option(s) using different styles. If code
-            // matches it returns the next parser state, otherwise it returns null.
+            // matches it returns the next parser state, otherwise it returns
+            // null.
 
             // Parse a simple option
             ParseState nextState = parseSimpleOption(tokens, state, allowedOptions);
@@ -338,7 +415,8 @@ public class Parser {
             state = state.withOption(defaultOption);
             String tokenStr = tokens.next();
             checkValidValue(defaultOption, tokenStr);
-            Object value = TypeConverter.newInstance().convert(defaultOption.getTitle(), defaultOption.getJavaType(), tokenStr);
+            Object value = TypeConverter.newInstance().convert(defaultOption.getTitle(), defaultOption.getJavaType(),
+                    tokenStr);
             state = state.withOptionValue(defaultOption, value).popContext();
         } else {
             // Unparsed input
@@ -360,7 +438,7 @@ public class Parser {
                 }
             };
         }
-        
+
         return find(options, findOptionPredicate, null);
     }
 

@@ -94,8 +94,8 @@ public class Cli<C> {
      */
     public Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
             CommandFactory<C> theCommandFactory, Iterable<Class<? extends C>> defaultGroupCommands,
-            Iterable<GroupBuilder<C>> groups, Iterable<AliasBuilder<C>> aliases, boolean allowAbbreviatedCommands,
-            boolean allowAbbreviatedOptions) {
+            Iterable<GroupBuilder<C>> groups, Iterable<AliasBuilder<C>> aliases, boolean aliasesOverrideBuiltIns,
+            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
                 "Program name cannot be null/empty/whitespace");
         Preconditions.checkNotNull(typeConverter, "typeConverter is null");
@@ -157,12 +157,13 @@ public class Cli<C> {
         } else {
             aliasData = Lists.newArrayList();
         }
-        
+
         Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
 
         this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
-                ImmutableList.copyOf(aliasData), allowAbbreviatedCommands, allowAbbreviatedOptions);
+                ImmutableList.copyOf(aliasData), aliasesOverrideBuiltIns, allowAbbreviatedCommands,
+                allowAbbreviatedOptions);
     }
 
     public GlobalMetadata getMetadata() {

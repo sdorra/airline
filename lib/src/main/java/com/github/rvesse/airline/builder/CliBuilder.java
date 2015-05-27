@@ -32,7 +32,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     protected final Map<String, AliasBuilder<C>> aliases = newHashMap();
     protected final Map<String, GroupBuilder<C>> groups = newHashMap();
     protected CommandFactory<C> commandFactory = new CommandFactoryDefault<C>();
-    protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions;
+    protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
 
     public CliBuilder(String name) {
         checkNotBlank(name, "Program name");
@@ -164,6 +164,11 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         return this;
     }
 
+    public CliBuilder<C> withAliasesOverridingBuiltIns() {
+        this.aliasesOverrideBuiltIns = true;
+        return this;
+    }
+
     public CliBuilder<C> withCommandAbbreviation() {
         this.allowAbbreviatedCommands = true;
         return this;
@@ -177,7 +182,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     @Override
     public Cli<C> build() {
         return new Cli<C>(name, description, typeConverter, defaultCommand, commandFactory,
-                defaultCommandGroupCommands, groups.values(), aliases.values(), allowAbbreviatedCommands,
-                allowAbbreviatedOptions);
+                defaultCommandGroupCommands, groups.values(), aliases.values(), aliasesOverrideBuiltIns,
+                allowAbbreviatedCommands, allowAbbreviatedOptions);
     }
 }

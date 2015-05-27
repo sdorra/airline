@@ -12,12 +12,12 @@ public class GlobalMetadata {
     private final List<CommandMetadata> defaultGroupCommands;
     private final List<CommandGroupMetadata> commandGroups;
     private final List<AliasMetadata> aliases;
-    private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions;
+    private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
 
     public GlobalMetadata(String name, String description, Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> defaultGroupCommands,
             Iterable<CommandGroupMetadata> commandGroups, Iterable<AliasMetadata> aliases,
-            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
+            boolean aliasesOverrideBuiltIns, boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
         this.name = name;
         this.description = description;
         this.options = ImmutableList.copyOf(options);
@@ -25,6 +25,7 @@ public class GlobalMetadata {
         this.defaultGroupCommands = ImmutableList.copyOf(defaultGroupCommands);
         this.commandGroups = ImmutableList.copyOf(commandGroups);
         this.aliases = ImmutableList.copyOf(aliases);
+        this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
         this.allowAbbreviatedCommands = allowAbbreviatedCommands;
         this.allowAbbreviatedOptions = allowAbbreviatedOptions;
     }
@@ -55,6 +56,10 @@ public class GlobalMetadata {
 
     public List<AliasMetadata> getAliases() {
         return aliases;
+    }
+    
+    public boolean aliasesOverrideBuiltIns() {
+        return aliasesOverrideBuiltIns;
     }
 
     public boolean allowsAbbreviatedCommands() {

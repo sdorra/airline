@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -39,5 +40,16 @@ public class AliasMetadata {
         }
         builder.append("] }");
         return builder.toString();
+    }
+    
+    public static Function<AliasMetadata, String> nameGetter()
+    {
+        return new Function<AliasMetadata, String>()
+        {
+            public String apply(AliasMetadata input)
+            {
+                return input.getName();
+            }
+        };
     }
 }
