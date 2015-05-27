@@ -67,6 +67,31 @@ public class Cli<C> {
 
     private final CommandFactory<C> mCommandFactory;
 
+    /**
+     * Creates a new CLI
+     * 
+     * @param name
+     *            Program Name
+     * @param description
+     *            Program Description
+     * @param typeConverter
+     *            Type converter used to convert arguments into the Java types
+     *            that the options expect
+     * @param defaultCommand
+     *            Default command
+     * @param theCommandFactory
+     *            Command factory
+     * @param defaultGroupCommands
+     *            Commands in the default group i.e. top level commands
+     * @param groups
+     *            Command groups
+     * @param aliases
+     *            Command aliases
+     * @param allowAbbreviatedCommands
+     *            Whether command abbreviation is allowed
+     * @param allowAbbreviatedOptions
+     *            Whethr option abbreviation is allowed
+     */
     public Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
             CommandFactory<C> theCommandFactory, Iterable<Class<? extends C>> defaultGroupCommands,
             Iterable<GroupBuilder<C>> groups, Iterable<AliasBuilder<C>> aliases, boolean allowAbbreviatedCommands,
@@ -85,8 +110,8 @@ public class Cli<C> {
 
         final List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
 
-        List<CommandMetadata> defaultCommandGroup = Lists.newArrayList(MetadataLoader
-                .loadCommands(defaultGroupCommands));
+        List<CommandMetadata> defaultCommandGroup = defaultGroupCommands != null ? Lists.newArrayList(MetadataLoader
+                .loadCommands(defaultGroupCommands)) : Lists.<CommandMetadata> newArrayList();
 
         // Currently the default command is required to be in the commands
         // list. If that changes, we'll need to add it here and add checks for
@@ -94,15 +119,20 @@ public class Cli<C> {
         allCommands.addAll(defaultCommandGroup);
 
         // Build groups
-        List<CommandGroupMetadata> commandGroups = Lists.newArrayList(Iterables.transform(groups,
-                new Function<GroupBuilder<C>, CommandGroupMetadata>() {
+        List<CommandGroupMetadata> commandGroups;
+        if (groups != null) {
+            commandGroups = Lists.newArrayList(Iterables.transform(groups,
+                    new Function<GroupBuilder<C>, CommandGroupMetadata>() {
 
-                    @Override
-                    public CommandGroupMetadata apply(GroupBuilder<C> group) {
-                        return group.build();
-                    }
+                        @Override
+                        public CommandGroupMetadata apply(GroupBuilder<C> group) {
+                            return group.build();
+                        }
 
-                }));
+                    }));
+        } else {
+            commandGroups = Lists.newArrayList();
+        }
         for (CommandGroupMetadata group : commandGroups) {
             allCommands.addAll(group.getCommands());
         }
@@ -114,15 +144,21 @@ public class Cli<C> {
         MetadataLoader.loadCommandsIntoGroupsByAnnotation(allCommands, commandGroups, defaultCommandGroup);
 
         // Build aliases
-        List<AliasMetadata> aliasData = Lists.newArrayList(Iterables.transform(aliases,
-                new Function<AliasBuilder<C>, AliasMetadata>() {
+        List<AliasMetadata> aliasData;
+        if (aliases != null) {
+            aliasData = Lists.newArrayList(Iterables.transform(aliases, new Function<AliasBuilder<C>, AliasMetadata>() {
 
-                    @Override
-                    public AliasMetadata apply(AliasBuilder<C> input) {
-                        return input.build();
-                    }
+                @Override
+                public AliasMetadata apply(AliasBuilder<C> input) {
+                    return input.build();
+                }
 
-                }));
+            }));
+        } else {
+            aliasData = Lists.newArrayList();
+        }
+        
+        Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
 
         this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
