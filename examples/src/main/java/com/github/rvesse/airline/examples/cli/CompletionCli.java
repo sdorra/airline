@@ -1,7 +1,7 @@
 package com.github.rvesse.airline.examples.cli;
 
 import com.github.rvesse.airline.Cli;
-import com.github.rvesse.airline.Cli.CliBuilder;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.examples.ExampleExecutor;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 import com.github.rvesse.airline.examples.cli.commands.BashCompletion;

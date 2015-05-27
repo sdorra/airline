@@ -6,7 +6,7 @@ import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
-import com.github.rvesse.airline.Cli.CliBuilder;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.Help;
 
 import static com.github.rvesse.airline.OptionType.GLOBAL;

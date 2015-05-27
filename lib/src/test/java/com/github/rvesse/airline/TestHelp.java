@@ -29,7 +29,7 @@ import java.util.List;
 
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.SingleCommand;
-import com.github.rvesse.airline.Cli.CliBuilder;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.Git.Add;
 import com.github.rvesse.airline.Git.RemoteAdd;
 import com.github.rvesse.airline.Git.RemoteShow;
