@@ -43,7 +43,7 @@ import static com.google.common.collect.Maps.newHashMap;
 public class MetadataLoader {
     public static GlobalMetadata loadGlobal(String name, String description, CommandMetadata defaultCommand,
             Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups,
-            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
+            Iterable<AliasMetadata> aliases, boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
         ImmutableList.Builder<OptionMetadata> globalOptionsBuilder = ImmutableList.builder();
         if (defaultCommand != null) {
             globalOptionsBuilder.addAll(defaultCommand.getGlobalOptions());
@@ -58,7 +58,7 @@ public class MetadataLoader {
         }
         List<OptionMetadata> globalOptions = mergeOptionSet(globalOptionsBuilder.build());
         return new GlobalMetadata(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups,
-                allowAbbreviatedCommands, allowAbbreviatedOptions);
+                aliases, allowAbbreviatedCommands, allowAbbreviatedOptions);
     }
 
     public static CommandGroupMetadata loadCommandGroup(String name, String description,

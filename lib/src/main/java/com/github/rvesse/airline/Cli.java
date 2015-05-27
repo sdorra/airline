@@ -18,6 +18,10 @@
 
 package com.github.rvesse.airline;
 
+import com.github.rvesse.airline.builder.AliasBuilder;
+import com.github.rvesse.airline.builder.CliBuilder;
+import com.github.rvesse.airline.builder.GroupBuilder;
+import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -42,13 +46,18 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 
 public class Cli<C> {
+    /**
+     * Creates a builder for specifying a command line in fluent style
+     * 
+     * @param name
+     *            Program name
+     * @return CLI Builder
+     */
     public static <T> CliBuilder<T> builder(String name) {
         Preconditions.checkNotNull(name, "name is null");
         return new CliBuilder<T>(name);
@@ -58,12 +67,14 @@ public class Cli<C> {
 
     private final CommandFactory<C> mCommandFactory;
 
-    private Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
+    public Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
             CommandFactory<C> theCommandFactory, Iterable<Class<? extends C>> defaultGroupCommands,
-            Iterable<GroupBuilder<C>> groups, boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
-        Preconditions.checkNotNull(name, "name is null");
+            Iterable<GroupBuilder<C>> groups, Iterable<AliasBuilder<C>> aliases, boolean allowAbbreviatedCommands,
+            boolean allowAbbreviatedOptions) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
+                "Program name cannot be null/empty/whitespace");
         Preconditions.checkNotNull(typeConverter, "typeConverter is null");
-        Preconditions.checkNotNull(theCommandFactory);
+        Preconditions.checkNotNull(theCommandFactory, "theCommandFactory is null");
 
         mCommandFactory = theCommandFactory;
 
@@ -77,26 +88,24 @@ public class Cli<C> {
         List<CommandMetadata> defaultCommandGroup = Lists.newArrayList(MetadataLoader
                 .loadCommands(defaultGroupCommands));
 
-        // currentlly the default command is required to be in the commands
+        // Currently the default command is required to be in the commands
         // list. If that changes, we'll need to add it here and add checks for
         // existence
         allCommands.addAll(defaultCommandGroup);
 
+        // Build groups
         List<CommandGroupMetadata> commandGroups = Lists.newArrayList(Iterables.transform(groups,
                 new Function<GroupBuilder<C>, CommandGroupMetadata>() {
+
+                    @Override
                     public CommandGroupMetadata apply(GroupBuilder<C> group) {
-                        CommandMetadata groupDefault = MetadataLoader.loadCommand(group.defaultCommand);
-                        List<CommandMetadata> groupCommands = MetadataLoader.loadCommands(group.commands);
-
-                        // currently the default command is required to be in
-                        // the commands list. If that changes, we'll need to add
-                        // it here and add checks for existence
-                        allCommands.addAll(groupCommands);
-
-                        return MetadataLoader.loadCommandGroup(group.name, group.description, groupDefault,
-                                groupCommands);
+                        return group.build();
                     }
+
                 }));
+        for (CommandGroupMetadata group : commandGroups) {
+            allCommands.addAll(group.getCommands());
+        }
 
         // add commands to groups based on the value of groups in the @Command
         // annotations
@@ -104,9 +113,20 @@ public class Cli<C> {
         // post-processing was an easier, yet uglier, way to go
         MetadataLoader.loadCommandsIntoGroupsByAnnotation(allCommands, commandGroups, defaultCommandGroup);
 
+        // Build aliases
+        List<AliasMetadata> aliasData = Lists.newArrayList(Iterables.transform(aliases,
+                new Function<AliasBuilder<C>, AliasMetadata>() {
+
+                    @Override
+                    public AliasMetadata apply(AliasBuilder<C> input) {
+                        return input.build();
+                    }
+
+                }));
+
         this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
-                allowAbbreviatedCommands, allowAbbreviatedOptions);
+                ImmutableList.copyOf(aliasData), allowAbbreviatedCommands, allowAbbreviatedOptions);
     }
 
     public GlobalMetadata getMetadata() {
@@ -217,156 +237,4 @@ public class Cli<C> {
         }
     }
 
-    //
-    // Builder Classes
-    //
-
-    public static class CliBuilder<C> {
-        protected final String name;
-        protected String description;
-        protected TypeConverter typeConverter = new TypeConverter();
-        protected String optionSeparators;
-        private Class<? extends C> defaultCommand;
-        private final List<Class<? extends C>> defaultCommandGroupCommands = newArrayList();
-        protected final Map<String, GroupBuilder<C>> groups = newHashMap();
-        protected CommandFactory<C> commandFactory = new CommandFactoryDefault<C>();
-        protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions;
-
-        public CliBuilder(String name) {
-            Preconditions.checkNotNull(name, "name is null");
-            Preconditions.checkArgument(!name.isEmpty(), "name is empty");
-            this.name = name;
-        }
-
-        public CliBuilder<C> withDescription(String description) {
-            Preconditions.checkNotNull(description, "description is null");
-            Preconditions.checkArgument(!description.isEmpty(), "description is empty");
-            this.description = description;
-            return this;
-        }
-
-        public CliBuilder<C> withCommandFactory(CommandFactory<C> commandFactory) {
-            this.commandFactory = commandFactory;
-            return this;
-        }
-
-        // public CliBuilder<C> withTypeConverter(TypeConverter typeConverter)
-        // {
-        // Preconditions.checkNotNull(typeConverter, "typeConverter is null");
-        // this.typeConverter = typeConverter;
-        // return this;
-        // }
-
-        // public CliBuilder<C> withOptionSeparators(String optionsSeparator)
-        // {
-        // Preconditions.checkNotNull(optionsSeparator,
-        // "optionsSeparator is null");
-        // this.optionSeparators = optionsSeparator;
-        // return this;
-        // }
-
-        public CliBuilder<C> withDefaultCommand(Class<? extends C> defaultCommand) {
-            this.defaultCommand = defaultCommand;
-            return this;
-        }
-
-        public CliBuilder<C> withCommand(Class<? extends C> command) {
-            this.defaultCommandGroupCommands.add(command);
-            return this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public CliBuilder<C> withCommands(Class<? extends C> command, Class<? extends C>... moreCommands) {
-            this.defaultCommandGroupCommands.add(command);
-            this.defaultCommandGroupCommands.addAll(ImmutableList.copyOf(moreCommands));
-            return this;
-        }
-
-        public CliBuilder<C> withCommands(Iterable<Class<? extends C>> commands) {
-            this.defaultCommandGroupCommands.addAll(ImmutableList.copyOf(commands));
-            return this;
-        }
-
-        public GroupBuilder<C> withGroup(String name) {
-            Preconditions.checkNotNull(name, "name is null");
-            Preconditions.checkArgument(!name.isEmpty(), "name is empty");
-
-            if (groups.containsKey(name)) {
-                return groups.get(name);
-            }
-
-            GroupBuilder<C> group = new GroupBuilder<C>(name);
-            groups.put(name, group);
-            return group;
-        }
-
-        public GroupBuilder<C> getGroup(final String theName) {
-            Preconditions.checkNotNull(theName, "name is null");
-            Preconditions.checkArgument(!theName.isEmpty(), "name is empty");
-            Preconditions.checkArgument(groups.containsKey(theName), "Group %s has not been declared", theName);
-
-            return groups.get(theName);
-        }
-        
-        public CliBuilder<C> withCommandAbbreviation() {
-            this.allowAbbreviatedCommands = true;
-            return this;
-        }
-        
-        public CliBuilder<C> withOptionAbbreviation() {
-            this.allowAbbreviatedOptions = true;
-            return this;
-        }
-
-        public Cli<C> build() {
-            return new Cli<C>(name, description, typeConverter, defaultCommand, commandFactory,
-                    defaultCommandGroupCommands, groups.values(), allowAbbreviatedCommands, allowAbbreviatedOptions);
-        }
-    }
-
-    public static class GroupBuilder<C> {
-        private final String name;
-        private String description = null;
-        private Class<? extends C> defaultCommand = null;
-
-        private final List<Class<? extends C>> commands = newArrayList();
-
-        private GroupBuilder(String name) {
-            Preconditions.checkNotNull(name, "name is null");
-            this.name = name;
-        }
-
-        public GroupBuilder<C> withDescription(String description) {
-            Preconditions.checkNotNull(description, "description is null");
-            Preconditions.checkArgument(!description.isEmpty(), "description is empty");
-            Preconditions.checkState(this.description == null, "description is already set");
-            this.description = description;
-            return this;
-        }
-
-        public GroupBuilder<C> withDefaultCommand(Class<? extends C> defaultCommand) {
-            Preconditions.checkNotNull(defaultCommand, "defaultCommand is null");
-            Preconditions.checkState(this.defaultCommand == null, "defaultCommand is already set");
-            this.defaultCommand = defaultCommand;
-            return this;
-        }
-
-        public GroupBuilder<C> withCommand(Class<? extends C> command) {
-            Preconditions.checkNotNull(command, "command is null");
-            commands.add(command);
-            return this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public GroupBuilder<C> withCommands(Class<? extends C> command, Class<? extends C>... moreCommands) {
-            this.commands.add(command);
-            this.commands.addAll(ImmutableList.copyOf(moreCommands));
-            return this;
-        }
-
-        public GroupBuilder<C> withCommands(Iterable<Class<? extends C>> commands) {
-            this.commands.addAll(ImmutableList.copyOf(commands));
-            return this;
-        }
-    }
 }
