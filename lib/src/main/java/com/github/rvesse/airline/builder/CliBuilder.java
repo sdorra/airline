@@ -110,16 +110,101 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         return aliases.get(name);
     }
 
+    /**
+     * Reads in user aliases from the default configuration file in the default
+     * location.
+     * <p>
+     * The default configuration file name is constructed by appending the
+     * {@code .config} extension to the defined program name
+     * </p>
+     * <p>
+     * The default search location is a {@code .program} directory under the
+     * users home directory where {@code program} is the defined program name.
+     * </p>
+     * <p>
+     * If you prefer to control these values explicitly and for more detail on the
+     * configuration format please see the
+     * {@link #withUserAliases(String, String, String...)} method
+     * </p>
+     * 
+     * @return Builder
+     * @throws IOException
+     */
     public CliBuilder<C> withUserAliases() throws IOException {
         // Use default filename and search location
         return withUserAliases(this.name + ".config", null, System.getProperty("user.home") + "/." + this.name + "/");
     }
-    
+
+    /**
+     * Reads in user aliases from the default configuration file in the default
+     * location
+     * <p>
+     * The default configuration file name is constructed by appending the
+     * {@code .config} extension to the defined program name
+     * </p>
+     * <p>
+     * If you prefer to control this value explicitly and for more detail on the
+     * configuration format please see the
+     * {@link #withUserAliases(String, String, String...)} method
+     * </p>
+     * 
+     * @param searchLocation
+     *            Location to search
+     * 
+     * @return Builder
+     * @throws IOException
+     */
     public CliBuilder<C> withUserAliases(String searchLocation) throws IOException {
         // Use default filename
         return withUserAliases(this.name + ".config", null, searchLocation);
     }
 
+    /**
+     * Reads in user aliases from the default configuration file in the default
+     * location
+     * <p>
+     * This file is in standard Java properties format with the key being the
+     * alias and the value being the arguments for this alias. Arguments are
+     * whitespace separated though quotes ({@code "}) may be used to wrap
+     * arguments that need to contain whitespace. Quotes may be escaped within
+     * quoted arguments and whitespace may be escaped within unquoted arguments.
+     * Note that since Java property values are interpreted as Java strings it
+     * is necessary to double escape the backslash i.e. {@code \\"} for this to
+     * work properly.
+     * </p>
+     * <pre>
+     * example=command --option value
+     * quoted=command "long argument"
+     * escaped=command whitespace\\ escape "quote\\"escape"
+     * </pre>
+     * <p>
+     * The search locations should be given in order of preference, the file
+     * will be loaded from all search locations in which it exists such that
+     * values from the locations occurring first in the search locations list
+     * take precedence. This allows for having multiple locations for your
+     * configuration file and layering different sets of aliases over each other
+     * e.g. system, user and local aliases.
+     * </p>
+     * <p>
+     * The {@code prefix} is used to filter properties from the properties file
+     * such that you can include aliases with other configuration settings in
+     * your configuration files. When a prefix is used only properties that
+     * start with the prefix are interpreted as alias definitions and the actual
+     * alias is the property name with the prefix removed. For example if your
+     * prefix was {@code alias.} and you had a property {@code alias.foo} the
+     * resulting alias would be {@code foo}.
+     * </p>
+     * <h3>Notes</h3>
+     * <ul>
+     * <li>Recursive aliases are not supported and will result in errors when
+     * used</li>
+     * <li>Aliases cannot override built-ins unless you have called
+     * {@link #withAliasesOverridingBuiltIns()} on your builder</li>
+     * </ul>
+     * 
+     * @return
+     * @throws IOException
+     */
     public CliBuilder<C> withUserAliases(final String filename, final String prefix, final String... searchLocations)
             throws IOException {
         // Search locations in reverse order overwriting previously found values
@@ -139,7 +224,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         }
 
         // Strip any irrelevant properties
-        if (prefix != null) {
+        if (StringUtils.isNotEmpty(prefix)) {
             List<Object> keysToRemove = new ArrayList<Object>();
             for (Object key : properties.keySet()) {
                 if (!key.toString().startsWith(prefix))
