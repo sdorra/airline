@@ -10,6 +10,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.args.Args1;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.parser.ParseOptionConversionException;
 
@@ -32,7 +33,7 @@ public class TestAliases {
         }
         writer.close();
     }
-    
+
     @Test
     public void user_aliases_default_01() throws IOException {
         prepareConfig(f, "foo=Args1 bar");
@@ -60,7 +61,7 @@ public class TestAliases {
         Assert.assertEquals(cmd.parameters.size(), 1);
         Assert.assertEquals(cmd.parameters.get(0), "bar");
     }
-    
+
     @Test
     public void user_aliases_default_02() throws IOException {
         prepareConfig(f, "foo=Args1 bar");
@@ -132,7 +133,7 @@ public class TestAliases {
         Assert.assertEquals(cmd.parameters.size(), 1);
         Assert.assertEquals(cmd.parameters.get(0), "faz");
     }
-    
+
     @Test(expectedExceptions = ParseOptionConversionException.class)
     public void user_aliases_positional_01() throws IOException {
         prepareConfig(f, "foo=Args1 -long $1");
@@ -157,9 +158,12 @@ public class TestAliases {
         Assert.assertEquals(args.get(2), "$1");
 
         // Check parsing
+        // Should error because the positional parameter $1 will fail to expand
+        // and be passed as-is to the -long option resulting in a type
+        // conversion error
         cli.parse("foo");
     }
-    
+
     @Test
     public void user_aliases_positional_02() throws IOException {
         prepareConfig(f, "foo=Args1 -long $1");
@@ -186,8 +190,49 @@ public class TestAliases {
         // Check parsing
         Args1 cmd = cli.parse("foo", "345");
         Assert.assertEquals(cmd.l, 345l);
+        Assert.assertEquals(cmd.parameters.size(), 0);
     }
-    
+
+    @Test
+    public void user_aliases_positional_03() throws IOException {
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                    .withCommand(Args1.class);
+        builder.withAlias("foo")
+               .withArguments("Args1", "-long", "$1", "-float", "$3");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo", "345", "bar", "1.23");
+        Assert.assertEquals(cmd.l, 345l);
+        Assert.assertEquals(cmd.floa, 1.23f);
+        List<String> args = cmd.parameters;
+        Assert.assertEquals(args.size(), 1);
+        Assert.assertEquals(args.get(0), "bar");
+    }
+
+    @Test
+    public void user_aliases_positional_04() throws IOException {
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                    .withCommand(Args1.class);
+        builder.withAlias("foo")
+               .withArguments("Args1", "-long", "$1", "-float", "$5");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo", "345", "a", "b", "c", "1.23", "d", "e");
+        Assert.assertEquals(cmd.l, 345l);
+        Assert.assertEquals(cmd.floa, 1.23f);
+        List<String> args = cmd.parameters;
+        Assert.assertEquals(args.size(), 5);
+        for (int i = 0, c = 'a'; i < args.size(); i++, c++) {
+            Assert.assertEquals(args.get(i), new String(new char[] { (char) c }));
+        }
+    }
+
     @Test
     public void user_aliases_override_01() throws IOException {
         prepareConfig(f, "Args1=Args1 bar");
@@ -215,7 +260,7 @@ public class TestAliases {
         Args1 cmd = cli.parse("Args1");
         Assert.assertEquals(cmd.parameters.size(), 0);
     }
-    
+
     @Test
     public void user_aliases_override_02() throws IOException {
         prepareConfig(f, "Args1=Args1 bar");
@@ -245,5 +290,5 @@ public class TestAliases {
         Assert.assertEquals(cmd.parameters.size(), 1);
         Assert.assertEquals(cmd.parameters.get(0), "bar");
     }
-    
+
 }

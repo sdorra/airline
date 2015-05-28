@@ -84,12 +84,10 @@ public class Parser {
                                     // Valid positional parameter
                                     newParams.add(remainingParams.get(num));
                                     used.add(num);
-                                } else {
-                                    // Invalid positional parameter
-                                    newParams.add(arg);
+                                    continue;
                                 }
                             } catch (NumberFormatException e) {
-                                newParams.add(arg);
+                                // Ignore - the number was invalid so we'll treat it as an ordinary parameter
                             }
                         }
 
