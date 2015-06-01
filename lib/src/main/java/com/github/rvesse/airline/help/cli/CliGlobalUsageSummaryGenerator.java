@@ -93,8 +93,11 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
                 commands.put(commandMetadata.getName(), commandMetadata.getDescription());
             }
         }
-        for (CommandGroupMetadata commandGroupMetadata : sortCommandGroups(global.getCommandGroups())) {
-            commands.put(commandGroupMetadata.getName(), commandGroupMetadata.getDescription());
+        for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+            
+            commands.put(group.getName(), group.getDescription());
         }
 
         out.append("Commands are:").newline();

@@ -66,6 +66,9 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
 
         // Other group usages
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+            
             outputGroupCommandUsages(output, writer, global, group);
         }
     }

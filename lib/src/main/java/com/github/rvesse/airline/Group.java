@@ -38,4 +38,9 @@ public @interface Group
      * command classes to add to the group (optional)
      */
     Class<?>[] commands() default {};
+    
+    /**
+     * Whether the group should be hidden
+     */
+    boolean hidden() default false;
 }

@@ -62,7 +62,7 @@ public class MetadataLoader {
                 aliases, aliasesOverrideBuiltIns, allowAbbreviatedCommands, allowAbbreviatedOptions);
     }
 
-    public static CommandGroupMetadata loadCommandGroup(String name, String description,
+    public static CommandGroupMetadata loadCommandGroup(String name, String description, boolean hidden,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> commands) {
         ImmutableList.Builder<OptionMetadata> groupOptionsBuilder = ImmutableList.builder();
         if (defaultCommand != null) {
@@ -72,7 +72,7 @@ public class MetadataLoader {
             groupOptionsBuilder.addAll(command.getGroupOptions());
         }
         List<OptionMetadata> groupOptions = mergeOptionSet(groupOptionsBuilder.build());
-        return new CommandGroupMetadata(name, description, groupOptions, defaultCommand, commands);
+        return new CommandGroupMetadata(name, description, hidden, groupOptions, defaultCommand, commands);
     }
 
     public static <T> ImmutableList<CommandMetadata> loadCommands(Iterable<Class<? extends T>> defaultCommands) {
@@ -463,7 +463,7 @@ public class MetadataLoader {
                 } else {
                     ImmutableList.Builder<OptionMetadata> groupOptionsBuilder = ImmutableList.builder();
                     groupOptionsBuilder.addAll(command.getGroupOptions());
-                    CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", null,
+                    CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", false, null,
                             Collections.singletonList(command));
                     commandGroups.add(newGroup);
                     added = true;
@@ -516,8 +516,8 @@ public class MetadataLoader {
                 CommandGroupMetadata groupMetadata = find(commandGroups,
                         compose(equalTo(groupAnno.name()), CommandGroupMetadata.nameGetter()), null);
                 if (null == groupMetadata) {
-                    groupMetadata = loadCommandGroup(groupAnno.name(), groupAnno.description(), defaultCommand,
-                            groupCommands);
+                    groupMetadata = loadCommandGroup(groupAnno.name(), groupAnno.description(), groupAnno.hidden(),
+                            defaultCommand, groupCommands);
                     commandGroups.add(groupMetadata);
                 }
 

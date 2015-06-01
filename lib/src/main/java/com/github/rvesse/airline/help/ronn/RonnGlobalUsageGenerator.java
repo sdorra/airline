@@ -153,6 +153,9 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
         }
 
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+            
             writer.append(NEW_PARA).append("* **").append(group.getName()).append("**").append(NEW_PARA);
             writer.append("  ").append(group.getDescription());
 
@@ -315,6 +318,9 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
 
         // Other group usages
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+            
             outputGroupCommandUsages(output, writer, global, group);
         }
     }
