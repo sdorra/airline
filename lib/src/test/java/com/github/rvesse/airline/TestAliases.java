@@ -291,4 +291,30 @@ public class TestAliases {
         Assert.assertEquals(cmd.parameters.get(0), "bar");
     }
 
+    @Test
+    public void user_aliases_no_args() throws IOException {
+        prepareConfig(f, "foo=Args1 bar");
+
+        //@formatter:off
+        Cli<Args1> cli = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class)
+                            .withDefaultCommand(Args1.class)
+                            .withUserAliases(f.getName(), null, "target/")
+                            .build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        cli.parse();
+    }
 }

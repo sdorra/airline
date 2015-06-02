@@ -46,69 +46,73 @@ public class Parser {
         state = parseOptions(tokens, state, metadata.getOptions());
 
         // Check if we got an alias
-        if (metadata.getAliases().size() > 0) {
-            AliasMetadata alias = find(metadata.getAliases(),
-                    compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
-            if (alias != null) {
-                if (!metadata.aliasesOverrideBuiltIns()) {
-                    // Check we don't have a default group/command with the same
-                    // name as otherwise that would take precedence
-                    findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
-                    findCommandPredicate = compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
-                    if (find(metadata.getCommandGroups(), findGroupPredicate, null) != null
-                            || find(metadata.getDefaultGroupCommands(), findCommandPredicate, null) != null)
-                        alias = null;
-                }
-
-                // Apply the alias
+        if (tokens.hasNext()) {
+            if (metadata.getAliases().size() > 0) {
+                AliasMetadata alias = find(metadata.getAliases(),
+                        compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
                 if (alias != null) {
-                    // Discard the alias
-                    tokens.next();
-
-                    List<String> newParams = new ArrayList<String>();
-                    List<String> remainingParams = new ArrayList<String>();
-                    while (tokens.hasNext()) {
-                        remainingParams.add(tokens.next());
+                    if (!metadata.aliasesOverrideBuiltIns()) {
+                        // Check we don't have a default group/command with the
+                        // same
+                        // name as otherwise that would take precedence
+                        findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
+                        findCommandPredicate = compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
+                        if (find(metadata.getCommandGroups(), findGroupPredicate, null) != null
+                                || find(metadata.getDefaultGroupCommands(), findCommandPredicate, null) != null)
+                            alias = null;
                     }
 
-                    // Process alias arguments
-                    Set<Integer> used = new TreeSet<Integer>();
-                    for (String arg : alias.getArguments()) {
-                        if (arg.startsWith("$")) {
-                            // May be a positional parameter
-                            try {
-                                int num = Integer.parseInt(arg.substring(1));
-                                num--;
+                    // Apply the alias
+                    if (alias != null) {
+                        // Discard the alias
+                        tokens.next();
 
-                                if (num >= 0 && num < remainingParams.size()) {
-                                    // Valid positional parameter
-                                    newParams.add(remainingParams.get(num));
-                                    used.add(num);
-                                    continue;
-                                }
-                            } catch (NumberFormatException e) {
-                                // Ignore - the number was invalid so we'll treat it as an ordinary parameter
-                            }
+                        List<String> newParams = new ArrayList<String>();
+                        List<String> remainingParams = new ArrayList<String>();
+                        while (tokens.hasNext()) {
+                            remainingParams.add(tokens.next());
                         }
 
-                        // Some other parameter
-                        newParams.add(arg);
-                    }
+                        // Process alias arguments
+                        Set<Integer> used = new TreeSet<Integer>();
+                        for (String arg : alias.getArguments()) {
+                            if (arg.startsWith("$")) {
+                                // May be a positional parameter
+                                try {
+                                    int num = Integer.parseInt(arg.substring(1));
+                                    num--;
 
-                    // Remove used positional parameters
-                    int removed = 0;
-                    for (int pos : used) {
-                        remainingParams.remove(pos - removed);
-                        removed++;
-                    }
+                                    if (num >= 0 && num < remainingParams.size()) {
+                                        // Valid positional parameter
+                                        newParams.add(remainingParams.get(num));
+                                        used.add(num);
+                                        continue;
+                                    }
+                                } catch (NumberFormatException e) {
+                                    // Ignore - the number was invalid so we'll
+                                    // treat it as an ordinary parameter
+                                }
+                            }
 
-                    // Pass through any remaining parameters
-                    for (String arg : remainingParams) {
-                        newParams.add(arg);
-                    }
+                            // Some other parameter
+                            newParams.add(arg);
+                        }
 
-                    // Prepare a new tokens iterator
-                    tokens = Iterators.peekingIterator(newParams.iterator());
+                        // Remove used positional parameters
+                        int removed = 0;
+                        for (int pos : used) {
+                            remainingParams.remove(pos - removed);
+                            removed++;
+                        }
+
+                        // Pass through any remaining parameters
+                        for (String arg : remainingParams) {
+                            newParams.add(arg);
+                        }
+
+                        // Prepare a new tokens iterator
+                        tokens = Iterators.peekingIterator(newParams.iterator());
+                    }
                 }
             }
         }
