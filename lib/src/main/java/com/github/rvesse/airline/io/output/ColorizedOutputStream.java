@@ -33,15 +33,23 @@ public class ColorizedOutputStream<T> extends ControlOutputStream {
         this.foregroundControl.set(color);
     }
 
-    public void resetForegroundColor() throws IOException {
-        this.foregroundControl.reset();
+    public void resetForegroundColor() {
+        try {
+            this.foregroundControl.reset();
+        } catch (IOException e) {
+            this.setError();
+        }
     }
 
     public void setBackgroundColor(T color) {
         this.backgroundControl.set(color);
     }
 
-    public void resetBackgroundColor() throws IOException {
-        this.backgroundControl.reset();
+    public void resetBackgroundColor() {
+        try {
+            this.backgroundControl.reset();
+        } catch (IOException e) {
+            this.setError();
+        }
     }
 }

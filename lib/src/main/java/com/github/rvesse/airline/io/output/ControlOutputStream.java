@@ -1,28 +1,26 @@
 package com.github.rvesse.airline.io.output;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
-public abstract class ControlOutputStream extends FilterOutputStream {
+public abstract class ControlOutputStream extends PrintStream {
 
     private final List<OutputStreamControlTracker> controls = new ArrayList<OutputStreamControlTracker>();
-    
-    private static final byte[] NEWLINE_BYTES = "\n".getBytes();
-    
+
     public ControlOutputStream(OutputStream output) {
         super(output);
     }
-    
+
     protected final void registerControl(OutputStreamControlTracker control) {
         this.controls.add(control);
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         this.applyAll();
         super.write(b);
     }
@@ -34,35 +32,34 @@ public abstract class ControlOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) {
         this.applyAll();
         super.write(b, off, len);
     }
-    
-    protected final void applyAll() throws IOException {
-        for (OutputStreamControlTracker control : this.controls) {
-            control.apply();
+
+    protected final void applyAll() {
+        try {
+            for (OutputStreamControlTracker control : this.controls) {
+                control.apply();
+            }
+        } catch (IOException e) {
+            this.setError();
         }
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         resetAll();
         super.close();
     }
 
-    protected final void resetAll() throws IOException {
-        for (OutputStreamControlTracker control : this.controls) {
-            control.reset();
+    protected final void resetAll() {
+        try {
+            for (OutputStreamControlTracker control : this.controls) {
+                control.reset();
+            }
+        } catch (IOException e) {
+            this.setError();
         }
-    }
-    
-    public void print(String value) throws IOException {
-        this.write(value.getBytes());
-    }
-    
-    public void println(String value) throws IOException {
-        this.write(value.getBytes());
-        this.write(NEWLINE_BYTES);
     }
 }
