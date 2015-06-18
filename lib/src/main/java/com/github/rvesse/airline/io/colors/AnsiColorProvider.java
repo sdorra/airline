@@ -20,4 +20,12 @@ public interface AnsiColorProvider {
      */
     public abstract String getAnsiForegroundControlCode();
 
+    /**
+     * Gets whether extended colours are used as this will affect the ANSI reset
+     * sequence that needs to be used
+     * 
+     * @return True if extended colours are used, false otherwise
+     */
+    public boolean usesExtendedColors();
+
 }

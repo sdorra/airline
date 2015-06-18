@@ -23,6 +23,11 @@ public class AnsiControlCodes {
      * Character used to separate parameters in ANSI escape sequences
      */
     public static final char PARAM_SEPARATOR = ';';
+    
+    /**
+     * Character used to request reset 
+     */
+    public static final char RESET = '0';
 
     /**
      * Command code for setting the graphics rendition
@@ -32,12 +37,12 @@ public class AnsiControlCodes {
     /**
      * 24 bit extended colour mode
      */
-    public static final char COLOR_MODE_24_BIT = '2';
+    public static final char COLOR_MODE_TRUE = '2';
 
     /**
      * 256 colour extended colour mode
      */
-    public static final char COLOR_MODE_256_BIT = '5';
+    public static final char COLOR_MODE_256 = '5';
 
     /**
      * Control Code for setting the foreground colour to an extended colour
@@ -53,11 +58,21 @@ public class AnsiControlCodes {
      * Control Code for setting the foreground colour
      */
     public static final int FOREGROUND = 30;
+    
+    /**
+     * Control Code for setting the high intensity variant of the foreground colour
+     */
+    public static final int FOREGROUND_BRIGHT = 90;
 
     /**
      * Control Code for setting the background colour
      */
     public static final int BACKGROUND = 40;
+    
+    /**
+     * Control Code for setting the high intensity variant of the background colour
+     */
+    public static final int BACKGROUND_BRIGHT = 100;
 
     /**
      * Control code for resetting the foreground colour to the default
