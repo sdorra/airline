@@ -41,7 +41,7 @@ public class ColorizedWriter<T> extends ControlWriter {
         this.backgroundControl.set(color);
     }
 
-    public void resetBackgroundColor(T color) throws IOException {
+    public void resetBackgroundColor() throws IOException {
         this.backgroundControl.reset();
     }
 }

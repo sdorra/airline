@@ -1,6 +1,6 @@
 package com.github.rvesse.airline.io.colors.sources;
 
-import com.github.rvesse.airline.io.colors.AnsiColorProvider;
+import com.github.rvesse.airline.io.colors.AnsiColor;
 
 /**
  * An ANSI colour source for background colours
@@ -8,6 +8,6 @@ import com.github.rvesse.airline.io.colors.AnsiColorProvider;
  * @author rvesse
  *
  */
-public class AnsiForegroundColorSource extends AnsiColorSource<AnsiColorProvider> {
+public class AnsiForegroundColorSource extends AnsiColorSource<AnsiColor> {
 
 }
