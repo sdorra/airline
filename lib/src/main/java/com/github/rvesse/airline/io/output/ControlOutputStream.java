@@ -11,6 +11,8 @@ public abstract class ControlOutputStream extends FilterOutputStream {
 
     private final List<OutputStreamControlTracker> controls = new ArrayList<OutputStreamControlTracker>();
     
+    private static final byte[] NEWLINE_BYTES = "\n".getBytes();
+    
     public ControlOutputStream(OutputStream output) {
         super(output);
     }
@@ -53,5 +55,14 @@ public abstract class ControlOutputStream extends FilterOutputStream {
         for (OutputStreamControlTracker control : this.controls) {
             control.reset();
         }
+    }
+    
+    public void print(String value) throws IOException {
+        this.write(value.getBytes());
+    }
+    
+    public void println(String value) throws IOException {
+        this.write(value.getBytes());
+        this.write(NEWLINE_BYTES);
     }
 }
