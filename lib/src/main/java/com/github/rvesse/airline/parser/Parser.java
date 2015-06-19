@@ -2,12 +2,7 @@ package com.github.rvesse.airline.parser;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.TypeConverter;
-import com.github.rvesse.airline.model.AliasMetadata;
-import com.github.rvesse.airline.model.ArgumentsMetadata;
-import com.github.rvesse.airline.model.CommandGroupMetadata;
-import com.github.rvesse.airline.model.CommandMetadata;
-import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.*;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -273,7 +268,8 @@ public class Parser {
 
     private ParseState parseLongGnuGetOpt(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
-        List<String> parts = ImmutableList.copyOf(Splitter.on('=').limit(2).split(tokens.peek()));
+        Pattern pattern = Pattern.compile("=|:");
+        List<String> parts = ImmutableList.copyOf(Splitter.on(pattern).limit(2).split(tokens.peek()));
         if (parts.size() != 2) {
             return null;
         }
