@@ -8,8 +8,11 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
+import com.github.rvesse.airline.parser.options.LongGetOptParser;
+import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.parser.options.StandardOptionParser;
 import com.google.common.base.Predicate;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
@@ -18,14 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
-
 import static com.google.common.base.Predicates.compose;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 
 public class Parser {
-    private static final Pattern SHORT_OPTIONS_PATTERN = Pattern.compile("-[^-].*");
+    private static final OptionParser CLASSIC_GET_OPT_PARSER = new ClassicGetOptParser();
+    private static final OptionParser LONG_GET_OPT_PARSER = new LongGetOptParser();
+    private static final OptionParser STANDARD_PARSER = new StandardOptionParser();
 
     // global> (option value*)* (group (option value*)*)? (command (option
     // value* | arg)* '--'? args*)?
@@ -226,139 +229,17 @@ public class Parser {
 
     private ParseState parseSimpleOption(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
-        OptionMetadata option = findOption(state, allowedOptions, tokens.peek());
-        if (option == null) {
-            return null;
-        }
-
-        tokens.next();
-        state = state.pushContext(Context.OPTION).withOption(option);
-
-        Object value;
-        if (option.getArity() == 0) {
-            state = state.withOptionValue(option, Boolean.TRUE).popContext();
-        } else if (option.getArity() == 1) {
-            if (tokens.hasNext()) {
-                String tokenStr = tokens.next();
-                checkValidValue(option, tokenStr);
-                value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokenStr);
-                state = state.withOptionValue(option, value).popContext();
-            }
-        } else {
-            ImmutableList.Builder<Object> values = ImmutableList.builder();
-
-            int count = 0;
-
-            boolean hasSeparator = false;
-            boolean foundNextOption = false;
-            while (count < option.getArity() && tokens.hasNext() && !hasSeparator) {
-                String peekedToken = tokens.peek();
-                hasSeparator = peekedToken.equals("--");
-                foundNextOption = findOption(state, allowedOptions, peekedToken) != null;
-
-                if (hasSeparator || foundNextOption)
-                    break;
-                String tokenStr = tokens.next();
-                checkValidValue(option, tokenStr);
-                values.add(TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokenStr));
-                ++count;
-            }
-
-            if (count == option.getArity() || hasSeparator || foundNextOption) {
-                state = state.withOptionValue(option, values.build()).popContext();
-            }
-        }
-        return state;
+        return STANDARD_PARSER.parseOptions(tokens, state, allowedOptions);
     }
 
     private ParseState parseLongGnuGetOpt(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
-        List<String> parts = ImmutableList.copyOf(Splitter.on('=').limit(2).split(tokens.peek()));
-        if (parts.size() != 2) {
-            return null;
-        }
-
-        OptionMetadata option = findOption(state, allowedOptions, parts.get(0));
-        if (option == null || option.getArity() != 1) {
-            // TODO: this is not exactly correct. It should be an error
-            // condition
-            return null;
-        }
-
-        // we have a match so consume the token
-        tokens.next();
-
-        // update state
-        state = state.pushContext(Context.OPTION).withOption(option);
-        checkValidValue(option, parts.get(1));
-        Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), parts.get(1));
-        state = state.withOption(option).withOptionValue(option, value).popContext();
-
-        return state;
+        return LONG_GET_OPT_PARSER.parseOptions(tokens, state, allowedOptions);
     }
 
     private ParseState parseClassicGetOpt(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
-        if (!SHORT_OPTIONS_PATTERN.matcher(tokens.peek()).matches()) {
-            return null;
-        }
-
-        // remove leading dash from token
-        String remainingToken = tokens.peek().substring(1);
-
-        ParseState nextState = state;
-        while (!remainingToken.isEmpty()) {
-            char tokenCharacter = remainingToken.charAt(0);
-
-            // is the current token character a single letter option?
-            OptionMetadata option = findOption(state, allowedOptions, "-" + tokenCharacter);
-            if (option == null) {
-                return null;
-            }
-
-            nextState = nextState.pushContext(Context.OPTION).withOption(option);
-
-            // remove current token character
-            remainingToken = remainingToken.substring(1);
-
-            // for no argument options, process the option and remove the
-            // character from the token
-            if (option.getArity() == 0) {
-                nextState = nextState.withOptionValue(option, Boolean.TRUE).popContext();
-                continue;
-            }
-
-            if (option.getArity() == 1) {
-                // we must, consume the current token so we can see the next
-                // token
-                tokens.next();
-
-                // if current token has more characters, this is the value;
-                // otherwise it is the next token
-                if (!remainingToken.isEmpty()) {
-                    checkValidValue(option, remainingToken);
-                    Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(),
-                            remainingToken);
-                    nextState = nextState.withOptionValue(option, value).popContext();
-                } else if (tokens.hasNext()) {
-                    String tokenStr = tokens.next();
-                    checkValidValue(option, tokenStr);
-                    Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(),
-                            tokenStr);
-                    nextState = nextState.withOptionValue(option, value).popContext();
-                }
-
-                return nextState;
-            }
-
-            throw new UnsupportedOperationException("Short options style can not be used with option "
-                    + option.getAllowedValues());
-        }
-
-        // consume the current token
-        tokens.next();
-
-        return nextState;
+        return CLASSIC_GET_OPT_PARSER.parseOptions(tokens, state, allowedOptions);
     }
 
     /**
@@ -426,22 +307,4 @@ public class Parser {
         }
         return state;
     }
-
-    private OptionMetadata findOption(ParseState state, List<OptionMetadata> options, final String param) {
-        Predicate<? super OptionMetadata> findOptionPredicate;
-        if (state.getGlobal() != null && state.getGlobal().allowsAbbreviatedOptions()) {
-            findOptionPredicate = new AbbreviatedOptionFinder(param, options);
-        } else {
-            findOptionPredicate = new Predicate<OptionMetadata>() {
-
-                @Override
-                public boolean apply(OptionMetadata op) {
-                    return op.getOptions().contains(param);
-                }
-            };
-        }
-
-        return find(options, findOptionPredicate, null);
-    }
-
 }

@@ -1,0 +1,29 @@
+package com.github.rvesse.airline.parser.options;
+
+import java.util.List;
+
+import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.parser.ParseState;
+import com.google.common.collect.PeekingIterator;
+
+/**
+ * Interface for option parsers
+ *
+ */
+public interface OptionParser {
+
+    /**
+     * Parses one/more options from the token stream
+     * 
+     * @param tokens
+     *            Tokens
+     * @param state
+     *            Current parser state
+     * @param allowedOptions
+     *            Allowed options at this point of the parsing
+     * @return New parser state, may return {@code null} if this parser could
+     *         not parse the next token as an option
+     */
+    public abstract ParseState parseOptions(PeekingIterator<String> tokens, ParseState state,
+            List<OptionMetadata> allowedOptions);
+}
