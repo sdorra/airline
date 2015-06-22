@@ -178,6 +178,32 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
+    
+    public void testMultiParagraphDiscussionRonn() throws IOException {
+        SingleCommand<ArgsMultiParagraphDiscussion> cmd = singleCommand(ArgsMultiParagraphDiscussion.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RonnCommandUsageGenerator generator = new RonnCommandUsageGenerator();
+        generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "ArgsMultiParagraphDiscussion(1) -- null\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                " `ArgsMultiParagraphDiscussion` \n" +
+                "\n" +
+                "## DISCUSSION\n" +
+                "\n" +
+                "First paragraph\n" +
+                "\n" +
+                "Middle paragraph\n" +
+                "\n" +
+                "Final paragraph\n" + 
+                "\n");
+        //@formatter:on
+    }
 
     public void testGit() throws IOException {
         //@formatter:off

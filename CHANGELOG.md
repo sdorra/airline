@@ -1,5 +1,9 @@
 # Airline - Change Log
 
+## 1.0.1
+
+- Fix regression in `RonnCommandUsageGenerator`
+
 ## 1.0.0
 
 - Code Structure Refactoring

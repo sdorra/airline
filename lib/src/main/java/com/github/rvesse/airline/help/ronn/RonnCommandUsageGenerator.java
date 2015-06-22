@@ -309,6 +309,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      */
     protected void outputDiscussion(Writer writer, CommandMetadata command, String sectionHeader) throws IOException {
         if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
+            return;
         
         writer.append(NEW_PARA).append(sectionHeader).append("DISCUSSION").append(NEW_PARA);
         for (String discussionPara : command.getDiscussion()) {
