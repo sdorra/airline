@@ -6,9 +6,10 @@
     - Root package is now `com.github.rvesse.airline`
     - Main library now lives under `lib/` in source control
     - New examples module under `examples/` in source control
+- Annotation Improvements
+    - 
 - CLI Improvements
-    - User defined command
-    -  aliases are now supported
+    - User defined command aliases are now supported
     - CLI builder classes are now public and have their own `builder` package
     - Parser Improvements
         - All parser errors in the `parser` package have public constructors
