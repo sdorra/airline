@@ -31,15 +31,20 @@ public abstract class AnsiOutputStream extends PrintStream {
      *            Control
      */
     public final void registerControl(OutputStreamControlTracker control) {
+        if (control == null)
+            return;
         this.controls.add(control);
     }
-    
+
     /**
      * Registers some controls
-     * @param controls Controls
+     * 
+     * @param controls
+     *            Controls
      */
     public final void registerControls(OutputStreamControlTracker... controls) {
-        if (controls == null) return;
+        if (controls == null)
+            return;
         for (OutputStreamControlTracker control : controls) {
             registerControl(control);
         }
