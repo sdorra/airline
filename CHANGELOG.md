@@ -7,7 +7,8 @@
     - Main library now lives under `lib/` in source control
     - New examples module under `examples/` in source control
 - Annotation Improvements
-    - Groups can now be marked as hidden
+    - `@Group` can now be marked as `hidden`
+    - `discussion` parameter of `@Command` is now a `String[]` rather than a single string making it easier to specify long descriptions
 - CLI Improvements
     - User defined command aliases are now supported
     - CLI builder classes are now public and have their own `builder` package
@@ -27,6 +28,7 @@
         - It can now be used to show help with an arbitrary usage generator
         - `showHelpIfRequested()` guarantees to only display help once
         - `showHelp()` can be used to display help regardless
+    - Command usage generators now print each item in the discussion as a separate paragraph
 - IO Improvements
     - New `com.github.rvesse.airline.io` package with useful helper stuff for doing advanced console IO
     - Support for colorised output streams and writers:
