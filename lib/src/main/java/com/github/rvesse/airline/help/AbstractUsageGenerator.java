@@ -1,7 +1,5 @@
 package com.github.rvesse.airline.help;
 
-import static com.github.rvesse.airline.model.OptionMetadata.isHiddenPredicate;
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 
 import java.util.ArrayList;
