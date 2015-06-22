@@ -50,6 +50,7 @@ import com.github.rvesse.airline.command.CommandRemove;
 import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
+import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.help.ronn.RonnCommandUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnGlobalUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
@@ -630,7 +631,7 @@ public class TestHelp {
         Assert.assertNotNull(metadata);
         generator.usage("test", null, "OptionsHidden", metadata, out);
         
-        testStringAssert(new String(out.toByteArray(), utf8), 
+        assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
                 "        test OptionsHidden -\n" +
                 "\n" +
@@ -738,7 +739,7 @@ public class TestHelp {
     }
     
     @Test
-    public void testGroupsHidden() throws IOException {
+    public void testGroupsHidden01() throws IOException {
         //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
@@ -755,11 +756,42 @@ public class TestHelp {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
-        Assert.assertEquals(new String(out.toByteArray(), utf8),
+        assertEquals(new String(out.toByteArray(), utf8),
                 "usage: test <command> [ <args> ]\n" +
                 "\n" +
                 "Commands are:\n" +
                 "    help      Display help information\n" +
+                "    visible   Visible group\n" +
+                "\n" +
+                "See 'test help <command>' for more information on a specific command.\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testGroupsHidden02() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withCommand(Help.class);
+        builder.withGroup("visible")
+               .withDescription("Visible group")
+               .withCommands(ArgsRequired.class);
+        builder.withGroup("hidden")
+               .withDescription("Hidden group")
+               .withCommands(ArgsRequired.class)
+               .makeHidden();
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CliGlobalUsageSummaryGenerator generator = new CliGlobalUsageSummaryGenerator(true);
+        generator.usage(parser.getMetadata(), out);
+        assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
+                "\n" +
+                "Commands are:\n" +
+                "    help      Display help information\n" +
+                "    hidden    Hidden group\n" +
                 "    visible   Visible group\n" +
                 "\n" +
                 "See 'test help <command>' for more information on a specific command.\n");
