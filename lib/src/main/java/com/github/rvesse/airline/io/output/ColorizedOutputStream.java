@@ -38,44 +38,52 @@ public class ColorizedOutputStream<T> extends AnsiOutputStream {
         this.registerControls(this.bold, this.italic, this.underline, this.strikeThrough);
     }
 
-    public void setForegroundColor(T color) {
+    public ColorizedOutputStream<T> setForegroundColor(T color) {
         this.foregroundControl.set(color);
+        return this;
     }
 
-    public void resetForegroundColor() {
+    public ColorizedOutputStream<T> resetForegroundColor() {
         try {
             this.foregroundControl.reset();
         } catch (IOException e) {
             this.setError();
         }
+        return this;
     }
 
-    public void setBackgroundColor(T color) {
+    public ColorizedOutputStream<T> setBackgroundColor(T color) {
         this.backgroundControl.set(color);
+        return this;
     }
 
-    public void resetBackgroundColor() {
+    public ColorizedOutputStream<T> resetBackgroundColor() {
         try {
             this.backgroundControl.reset();
         } catch (IOException e) {
             this.setError();
         }
+        return this;
     }
 
-    public void setBold(boolean enabled) {
+    public ColorizedOutputStream<T> setBold(boolean enabled) {
         setDecoration(enabled, BasicDecoration.BOLD, this.bold);
+        return this;
     }
     
-    public void setItalic(boolean enabled) {
+    public ColorizedOutputStream<T> setItalic(boolean enabled) {
         setDecoration(enabled, BasicDecoration.ITALIC, this.italic);
+        return this;
     }
     
-    public void setUnderline(boolean enabled) {
+    public ColorizedOutputStream<T> setUnderline(boolean enabled) {
         setDecoration(enabled, BasicDecoration.UNDERLINE, this.underline);
+        return this;
     }
     
-    public void setStrikeThrough(boolean enabled) {
+    public ColorizedOutputStream<T> setStrikeThrough(boolean enabled) {
         setDecoration(enabled, BasicDecoration.STRIKE_THROUGH, this.strikeThrough);
+        return this;
     }
     
     protected final void setDecoration(boolean enabled, BasicDecoration decoration, OutputStreamControlTracker<BasicDecoration> control) {
