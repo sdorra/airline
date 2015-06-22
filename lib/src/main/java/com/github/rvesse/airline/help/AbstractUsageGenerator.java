@@ -127,16 +127,15 @@ public class AbstractUsageGenerator {
      * @return
      */
     protected List<String> toSynopsisUsage(List<OptionMetadata> options) {
-        return ImmutableList.copyOf(transform(filter(options, isHiddenPredicate()),
-                new Function<OptionMetadata, String>() {
-                    public String apply(OptionMetadata option) {
-                        if (option.isHidden() && !includeHidden()) {
-                            return "";
-                        }
+        return ImmutableList.copyOf(transform(options, new Function<OptionMetadata, String>() {
+            public String apply(OptionMetadata option) {
+                if (option.isHidden() && !includeHidden()) {
+                    return "";
+                }
 
-                        return toUsage(option);
-                    }
-                }));
+                return toUsage(option);
+            }
+        }));
     }
 
     protected String toUsage(ArgumentsMetadata arguments) {

@@ -60,6 +60,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
+import static com.google.common.base.Predicates.compose;
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.collect.Iterables.find;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -358,7 +361,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testArgsAllowedValues() throws IOException {
         //@formatter:off
@@ -385,7 +388,7 @@ public class TestHelp {
         
         //@formatter:on
     }
-    
+
     @Test
     public void testArgsAllowedValuesRonn() throws IOException {
         //@formatter:off
@@ -584,7 +587,7 @@ public class TestHelp {
     }
 
     @Test
-    public void testOptionsHidden() throws IOException {
+    public void testOptionsHidden01() throws IOException {
         //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
@@ -604,6 +607,40 @@ public class TestHelp {
                 "        test OptionsHidden [ --optional <optionalOption> ]\n" +
                 "\n" +
                 "OPTIONS\n" +
+                "        --optional <optionalOption>\n" +
+                "\n" +
+                "\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testOptionsHidden02() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withDefaultCommand(Help.class)
+                .withCommands(Help.class,
+                        OptionsHidden.class);
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CliCommandUsageGenerator generator = new CliCommandUsageGenerator(true);
+        CommandMetadata metadata = find(parser.getMetadata().getDefaultGroupCommands(), compose(equalTo("OptionsHidden"), CommandMetadata.nameGetter()), null);
+        Assert.assertNotNull(metadata);
+        generator.usage("test", null, "OptionsHidden", metadata, out);
+        
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        test OptionsHidden -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test OptionsHidden [ --hidden <hiddenOption> ]\n" +
+                "                [ --optional <optionalOption> ]\n" +
+                "\n" +
+                "OPTIONS\n" +
+                "        --hidden <hiddenOption>\n" +
+                "\n\n" +
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
@@ -672,6 +709,60 @@ public class TestHelp {
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
+    }
+
+    @Test
+    public void testGroups() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withCommand(Help.class);
+        builder.withGroup("visible")
+               .withDescription("Visible group")
+               .withCommands(ArgsRequired.class);
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        Assert.assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
+                "\n" +
+                "Commands are:\n" +
+                "    help      Display help information\n" +
+                "    visible   Visible group\n" +
+                "\n" +
+                "See 'test help <command>' for more information on a specific command.\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testGroupsHidden() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withCommand(Help.class);
+        builder.withGroup("visible")
+               .withDescription("Visible group")
+               .withCommands(ArgsRequired.class);
+        builder.withGroup("hidden")
+               .withDescription("Hidden group")
+               .withCommands(ArgsRequired.class)
+               .makeHidden();
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        Assert.assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
+                "\n" +
+                "Commands are:\n" +
+                "    help      Display help information\n" +
+                "    visible   Visible group\n" +
+                "\n" +
+                "See 'test help <command>' for more information on a specific command.\n");
         //@formatter:on
     }
 
