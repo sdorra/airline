@@ -6,6 +6,8 @@
     - Root package is now `com.github.rvesse.airline`
     - Main library now lives under `lib/` in source control
     - New examples module under `examples/` in source control
+- Annotation Improvements
+    - 
 - CLI Improvements
     - User defined command aliases are now supported
     - CLI builder classes are now public and have their own `builder` package
@@ -24,6 +26,13 @@
         - It can now be used to show help with an arbitrary usage generator
         - `showHelpIfRequested()` guarantees to only display help once
         - `showHelp()` can be used to display help regardless
+- IO Improvements
+    - New `com.github.rvesse.airline.io` package with useful helper stuff for doing advanced console IO
+    - Support for colorised output streams and writers:
+        - Basic ANSI Colors (8 Colors, normal and bright variants)
+        - 256 Colors (Basic ANSI Colors plus 3 colour palettes plus grayscale palette) - See [color chart](https://camo.githubusercontent.com/6378594a85c578517c5a4e494789bd4d66c9e46b/68747470733a2f2f7261772e6769746875622e636f6d2f666f697a652f676f2e7367722f6d61737465722f787465726d5f636f6c6f725f63686172742e706e67) for more detail
+        - True Color (24 bit colour i.e. 16 million colours) - Many terminals may not support this mode
+     - Support for basic text decorated output streams and writers e.g. bold, underline
 
 ## 0.9.2
 

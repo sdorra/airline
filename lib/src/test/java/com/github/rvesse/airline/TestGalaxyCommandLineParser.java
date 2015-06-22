@@ -6,9 +6,12 @@ import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.Help;
+import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.GlobalMetadata;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
@@ -18,44 +21,79 @@ import java.util.List;
 import static com.github.rvesse.airline.OptionType.GLOBAL;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Predicates.compose;
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Lists.newArrayList;
 
 public class TestGalaxyCommandLineParser
 {
     @Test
-    public void test()
+    public void test_parsing()
     {
-        parse();
-        parse("help");
-        parse("help", "galaxy");
-        parse("help", "show");
-        parse("help", "install");
-        parse("help", "upgrade");
-        parse("help", "upgrade");
-        parse("help", "terminate");
-        parse("help", "start");
-        parse("help", "stop");
-        parse("help", "restart");
-        parse("help", "reset-to-actual");
-        parse("help", "ssh");
-        parse("help", "agent");
-        parse("help", "agent", "show");
-        parse("help", "agent", "add");
+        run();
+        run("help");
+        run("help", "galaxy");
+        run("help", "show");
+        run("help", "install");
+        run("help", "upgrade");
+        run("help", "upgrade");
+        run("help", "terminate");
+        run("help", "start");
+        run("help", "stop");
+        run("help", "restart");
+        run("help", "reset-to-actual");
+        run("help", "ssh");
+        run("help", "agent");
+        run("help", "agent", "show");
+        run("help", "agent", "add");
 
-        parse("--debug", "show", "-u", "b2", "--state", "r");
-        parse("--debug", "install", "com.proofpoint.discovery:discovery-server:1.1", "@discovery:general:1.0");
-        parse("--debug", "upgrade", "-u", "b2", "1.1", "@1.0");
-        parse("--debug", "upgrade", "-u", "b2", "1.1", "@1.0", "-s", "r");
-        parse("--debug", "terminate", "-u", "b2");
-        parse("--debug", "start", "-u", "b2");
-        parse("--debug", "stop", "-u", "b2");
-        parse("--debug", "restart", "-u", "b2");
-        parse("--debug", "reset-to-actual", "-u", "b2");
-        parse("--debug", "ssh");
-        parse("--debug", "ssh", "-u", "b2", "--state", "r", "tail -F var/log/launcher.log");
-        parse("--debug", "agent");
-        parse("--debug", "agent", "show");
-        parse("--debug", "agent", "add", "--count", "4", "t1.micro");
+        run("--debug");
+        run("--debug", "show", "-u", "b2", "--state", "r");
+        run("--debug", "install", "com.proofpoint.discovery:discovery-server:1.1", "@discovery:general:1.0");
+        run("--debug", "upgrade", "-u", "b2", "1.1", "@1.0");
+        run("--debug", "upgrade", "-u", "b2", "1.1", "@1.0", "-s", "r");
+        run("--debug", "terminate", "-u", "b2");
+        run("--debug", "start", "-u", "b2");
+        run("--debug", "stop", "-u", "b2");
+        run("--debug", "restart", "-u", "b2");
+        run("--debug", "reset-to-actual", "-u", "b2");
+        run("--debug", "ssh");
+        run("--debug", "ssh", "-u", "b2", "--state", "r", "tail -F var/log/launcher.log");
+        run("--debug", "agent");
+        run("--debug", "agent", "show");
+        run("--debug", "agent", "add", "--count", "4", "t1.micro");
+    }
+    
+    @Test
+    public void test_default_command_01() {
+        GalaxyCommand command = parse();
+        Assert.assertTrue(command instanceof HelpCommand);
+    }
+    
+    @Test
+    public void test_default_command_02() {
+        GalaxyCommand command = parse("--debug");
+        Assert.assertTrue(command instanceof HelpCommand);
+    }
+    
+    @Test
+    public void test_default_command_03() {
+        GalaxyCommand command = parse("agent");
+        Assert.assertTrue(command instanceof AgentShowCommand);
+    }
+    
+    @Test
+    public void test_metadata() {
+        Cli<GalaxyCommand> cli = createParser();
+        
+        GlobalMetadata global = cli.getMetadata();
+        Assert.assertEquals(global.getOptions().size(), 2);
+        
+        CommandMetadata show = find(global.getDefaultGroupCommands(), compose(equalTo("show"), CommandMetadata.nameGetter()), null);
+        Assert.assertNotNull(show);
+        Assert.assertEquals(show.getCommandOptions().size(), 6);
+        Assert.assertEquals(show.getAllOptions().size(), 8);
     }
 
     private Cli<GalaxyCommand> createParser()
@@ -84,12 +122,17 @@ public class TestGalaxyCommandLineParser
         return builder.build();
     }
 
-    private void parse(String... args)
+    private void run(String... args)
     {
-        System.out.println("$ galaxy " + Joiner.on(" ").join(args));
-        GalaxyCommand command = createParser().parse(args);
+        GalaxyCommand command = parse(args);
         command.execute();
         System.out.println();
+    }
+
+    protected GalaxyCommand parse(String... args) {
+        System.out.println("$ galaxy " + Joiner.on(" ").join(args));
+        GalaxyCommand command = createParser().parse(args);
+        return command;
     }
 
     public static class GlobalOptions
