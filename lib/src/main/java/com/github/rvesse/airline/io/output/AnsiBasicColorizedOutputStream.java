@@ -7,7 +7,7 @@ import com.github.rvesse.airline.io.colors.sources.AnsiBackgroundColorSource;
 import com.github.rvesse.airline.io.colors.sources.AnsiForegroundColorSource;
 
 /**
- * A colorized output stream supporting the 8 basic ANSI colours
+ * A colorized output stream supporting the basic ANSI colours
  * @author rvesse
  *
  */

@@ -6,17 +6,33 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A writer that supports customizing the output with ANSI control codes
+ * 
+ * @author rvesse
+ *
+ */
 @SuppressWarnings("rawtypes")
-public abstract class ControlWriter extends FilterWriter {
+public abstract class AnsiWriter extends FilterWriter {
 
     private final List<WriterControlTracker> controls = new ArrayList<WriterControlTracker>();
 
-    public ControlWriter(Writer writer) {
+    public AnsiWriter(Writer writer) {
         super(writer);
     }
 
-    protected final void registerControl(WriterControlTracker control) {
+    public final void registerControl(WriterControlTracker control) {
+        if (control == null)
+            return;
         this.controls.add(control);
+    }
+
+    public final void registerControls(WriterControlTracker... controls) {
+        if (controls == null)
+            return;
+        for (WriterControlTracker control : controls) {
+            registerControl(control);
+        }
     }
 
     @Override

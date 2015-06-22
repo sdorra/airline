@@ -18,8 +18,8 @@ public class WriterControlTracker<T> extends ControlTracker<T> {
     }
 
     @Override
-    protected void resetInternal() throws IOException {
-        this.writer.write(this.provider.getResetControlCode());
+    protected void resetInternal(T value) throws IOException {
+        this.writer.write(this.provider.getResetControlCode(value));
     }
 
     @Override

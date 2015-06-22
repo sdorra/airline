@@ -25,8 +25,8 @@ public class OutputStreamControlTracker<T> extends ControlTracker<T> {
     }
 
     @Override
-    protected void resetInternal() throws IOException {
-        String code = this.provider.getResetControlCode();
+    protected void resetInternal(T value) throws IOException {
+        String code = this.provider.getResetControlCode(value);
         this.output.write(getBytes(code));
     }
 

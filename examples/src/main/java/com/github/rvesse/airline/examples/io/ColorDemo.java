@@ -1,11 +1,11 @@
 package com.github.rvesse.airline.examples.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Option;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 import com.github.rvesse.airline.io.AnsiControlCodes;
@@ -13,6 +13,7 @@ import com.github.rvesse.airline.io.output.ColorizedOutputStream;
 
 public abstract class ColorDemo<T> implements ExampleRunnable {
 
+    @Arguments(description = "Provides the example text to use")
     private List<String> args = new ArrayList<String>();
 
     @Option(name = { "-b", "--background" }, description = "When set changes the background rather than the foreground colour")
@@ -32,8 +33,7 @@ public abstract class ColorDemo<T> implements ExampleRunnable {
     @Override
     public int run() {
         if (this.hardReset) {
-            System.out.println(AnsiControlCodes.ESCAPE + AnsiControlCodes.RESET
-                    + AnsiControlCodes.SELECT_GRAPHIC_RENDITION);
+            System.out.println(AnsiControlCodes.getGraphicsResetCode());
             System.out.println("Your terminal was reset");
             return 0;
         }
@@ -46,13 +46,12 @@ public abstract class ColorDemo<T> implements ExampleRunnable {
             if (StringUtils.isEmpty(text)) {
                 text = "Sample text";
             }
-            byte[] bs = text.getBytes();
 
             T[] colors = getColors();
             System.out.println("Demoing " + colors.length + " available colours");
             for (T color : colors) {
                 // This text will appear in your terminal default colour
-                System.out.format("\nColor %s:\n", color.toString());
+                System.out.format("Color %s:\n", color.toString());
 
                 // Set the colour
                 if (this.background) {
@@ -61,13 +60,8 @@ public abstract class ColorDemo<T> implements ExampleRunnable {
                     output.setForegroundColor(color);
                 }
 
-                try {
-                    // Anything we write now will be appropriately colorized
-                    output.write(bs);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return 1;
-                }
+                // Anything we write now will be appropriately colorized
+                output.print(text);
 
                 // Reset back to default color
                 if (this.background) {
@@ -75,6 +69,7 @@ public abstract class ColorDemo<T> implements ExampleRunnable {
                 } else {
                     output.resetForegroundColor();
                 }
+                output.println();
             }
 
             return 0;
