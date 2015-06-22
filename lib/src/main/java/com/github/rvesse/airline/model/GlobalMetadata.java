@@ -1,5 +1,6 @@
 package com.github.rvesse.airline.model;
 
+import com.github.rvesse.airline.parser.options.OptionParser;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -13,11 +14,14 @@ public class GlobalMetadata {
     private final List<CommandGroupMetadata> commandGroups;
     private final List<AliasMetadata> aliases;
     private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
+    private final List<OptionParser> optionParsers;
 
     public GlobalMetadata(String name, String description, Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> defaultGroupCommands,
             Iterable<CommandGroupMetadata> commandGroups, Iterable<AliasMetadata> aliases,
-            boolean aliasesOverrideBuiltIns, boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
+            boolean aliasesOverrideBuiltIns, 
+            Iterable<OptionParser> optionParsers,
+            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
         this.name = name;
         this.description = description;
         this.options = ImmutableList.copyOf(options);
@@ -26,6 +30,7 @@ public class GlobalMetadata {
         this.commandGroups = ImmutableList.copyOf(commandGroups);
         this.aliases = ImmutableList.copyOf(aliases);
         this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
+        this.optionParsers = ImmutableList.copyOf(optionParsers);
         this.allowAbbreviatedCommands = allowAbbreviatedCommands;
         this.allowAbbreviatedOptions = allowAbbreviatedOptions;
     }
@@ -60,6 +65,10 @@ public class GlobalMetadata {
     
     public boolean aliasesOverrideBuiltIns() {
         return aliasesOverrideBuiltIns;
+    }
+    
+    public List<OptionParser> getOptionParsers() {
+        return optionParsers;
     }
 
     public boolean allowsAbbreviatedCommands() {

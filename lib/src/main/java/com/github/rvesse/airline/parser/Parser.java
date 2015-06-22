@@ -193,53 +193,49 @@ public class Parser {
 
     private ParseState parseOptions(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
+
+        // Get the option parsers in use
+        List<OptionParser> optionParsers;
+        if (state.getGlobal() != null) {
+            // Using CLI defined set
+            optionParsers = state.getGlobal().getOptionParsers();
+        } else {
+            // Using default set
+            optionParsers = new ArrayList<OptionParser>();
+            optionParsers.add(STANDARD_PARSER);
+            optionParsers.add(LONG_GET_OPT_PARSER);
+            optionParsers.add(CLASSIC_GET_OPT_PARSER);
+        }
+
         while (tokens.hasNext()) {
             //
             // Try to parse next option(s) using different styles. If code
             // matches it returns the next parser state, otherwise it returns
             // null.
 
-            // Parse a simple option
-            ParseState nextState = parseSimpleOption(tokens, state, allowedOptions);
-            if (nextState != null) {
-                state = nextState;
-                continue;
+            // Try each option parser in turn
+            boolean matched = false;
+            for (OptionParser optionParser : optionParsers) {
+                ParseState nextState = optionParser.parseOptions(tokens, state, allowedOptions);
+
+                if (nextState != null) {
+                    // If the current parser matched an option this token is
+                    // processed and we don't need to consider other parsers
+                    state = nextState;
+                    matched = true;
+                    break;
+                }
             }
 
-            // Parse GNU getopt long-form: --option=value
-            nextState = parseLongGnuGetOpt(tokens, state, allowedOptions);
-            if (nextState != null) {
-                state = nextState;
+            // Parsed an option so continue parsing options
+            if (matched)
                 continue;
-            }
 
-            // Handle classic getopt syntax: -abc
-            nextState = parseClassicGetOpt(tokens, state, allowedOptions);
-            if (nextState != null) {
-                state = nextState;
-                continue;
-            }
-
-            // did not match an option
+            // Otherwise did not match an option so parse no further options
             break;
         }
 
         return state;
-    }
-
-    private ParseState parseSimpleOption(PeekingIterator<String> tokens, ParseState state,
-            List<OptionMetadata> allowedOptions) {
-        return STANDARD_PARSER.parseOptions(tokens, state, allowedOptions);
-    }
-
-    private ParseState parseLongGnuGetOpt(PeekingIterator<String> tokens, ParseState state,
-            List<OptionMetadata> allowedOptions) {
-        return LONG_GET_OPT_PARSER.parseOptions(tokens, state, allowedOptions);
-    }
-
-    private ParseState parseClassicGetOpt(PeekingIterator<String> tokens, ParseState state,
-            List<OptionMetadata> allowedOptions) {
-        return CLASSIC_GET_OPT_PARSER.parseOptions(tokens, state, allowedOptions);
     }
 
     /**

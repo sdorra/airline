@@ -18,6 +18,10 @@ import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.CommandFactoryDefault;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.parser.AliasArgumentsParser;
+import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
+import com.github.rvesse.airline.parser.options.LongGetOptParser;
+import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.parser.options.StandardOptionParser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -33,6 +37,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     protected final Map<String, GroupBuilder<C>> groups = newHashMap();
     protected CommandFactory<C> commandFactory = new CommandFactoryDefault<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
+    protected final List<Class<? extends OptionParser>> optionParsers = newArrayList();
 
     public CliBuilder(String name) {
         checkNotBlank(name, "Program name");
@@ -122,8 +127,8 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
      * users home directory where {@code program} is the defined program name.
      * </p>
      * <p>
-     * If you prefer to control these values explicitly and for more detail on the
-     * configuration format please see the
+     * If you prefer to control these values explicitly and for more detail on
+     * the configuration format please see the
      * {@link #withUserAliases(String, String, String...)} method
      * </p>
      * 
@@ -172,6 +177,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
      * is necessary to double escape the backslash i.e. {@code \\"} for this to
      * work properly.
      * </p>
+     * 
      * <pre>
      * example=command --option value
      * quoted=command "long argument"
@@ -269,10 +275,90 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         return this;
     }
 
+    /**
+     * Configures the CLI to use the given option parser
+     * <p>
+     * Order of registration is important, if you have previously registered any
+     * parsers then those will be used prior to the one given here
+     * </p>
+     * 
+     * @param optionParsers
+     *            Option parsers
+     * @return Builder
+     */
+    public CliBuilder<C> withOptionParser(Class<? extends OptionParser> optionParser) {
+        if (optionParser != null) {
+            this.optionParsers.add(optionParser);
+        }
+        return this;
+    }
+
+    /**
+     * Configures the CLI to use the given option parsers
+     * <p>
+     * Order of registration is important, if you have previously registered any
+     * parsers then those will be used prior to those given here
+     * </p>
+     * 
+     * @param optionParsers
+     *            Option parsers
+     * @return Builder
+     */
+    @SuppressWarnings("unchecked")
+    public CliBuilder<C> withOptionParsers(Class<? extends OptionParser>... optionParsers) {
+        if (optionParsers != null) {
+            for (Class<? extends OptionParser> parser : optionParsers) {
+                if (parser != null) {
+                    this.optionParsers.add(parser);
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Configures the CLI to use only the default set of option parsers
+     * <p>
+     * This is the default behaviour so this need only be called if you have
+     * previously configured some option parsers using the
+     * {@link #withOptionParser(Class)} or {@link #withOptionParsers(Class...)}
+     * methods and wish to reset the configuration to the default.
+     * </p>
+     * <p>
+     * If you wish to instead add the default parsers in addition to your custom
+     * parsers you should instead call {@link #withDefaultOptionParsers()}
+     * </p>
+     * 
+     * @return Builder
+     */
+    public CliBuilder<C> withOnlyDefaultOptionParsers() {
+        this.optionParsers.clear();
+        return this.withDefaultOptionParsers();
+    }
+
+    /**
+     * Configures the CLI to use the default set of option parsers in addition
+     * to any previously registered
+     * <p>
+     * Order of registration is important, if you have previously registered any
+     * parsers then those will be used prior to those in the default set.
+     * </p>
+     * 
+     * @return Builder
+     */
+    @SuppressWarnings("unchecked")
+    public CliBuilder<C> withDefaultOptionParsers() {
+        return this.withOptionParsers(StandardOptionParser.class, LongGetOptParser.class, ClassicGetOptParser.class);
+    }
+
     @Override
     public Cli<C> build() {
+        if (this.optionParsers.size() == 0) {
+            this.withDefaultOptionParsers();
+        }
+
         return new Cli<C>(name, description, typeConverter, defaultCommand, commandFactory,
                 defaultCommandGroupCommands, groups.values(), aliases.values(), aliasesOverrideBuiltIns,
-                allowAbbreviatedCommands, allowAbbreviatedOptions);
+                this.optionParsers, allowAbbreviatedCommands, allowAbbreviatedOptions);
     }
 }

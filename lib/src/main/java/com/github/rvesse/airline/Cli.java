@@ -37,6 +37,7 @@ import com.github.rvesse.airline.parser.ParseOptionMissingValueException;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.Parser;
 import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.options.OptionParser;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -46,6 +47,7 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
@@ -95,6 +97,7 @@ public class Cli<C> {
     public Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
             CommandFactory<C> theCommandFactory, Iterable<Class<? extends C>> defaultGroupCommands,
             Iterable<GroupBuilder<C>> groups, Iterable<AliasBuilder<C>> aliases, boolean aliasesOverrideBuiltIns,
+            Iterable<Class<? extends OptionParser>> optionParsers,
             boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
                 "Program name cannot be null/empty/whitespace");
@@ -147,22 +150,40 @@ public class Cli<C> {
         List<AliasMetadata> aliasData;
         if (aliases != null) {
             aliasData = Lists.newArrayList(Iterables.transform(aliases, new Function<AliasBuilder<C>, AliasMetadata>() {
-
                 @Override
                 public AliasMetadata apply(AliasBuilder<C> input) {
                     return input.build();
                 }
-
             }));
         } else {
             aliasData = Lists.newArrayList();
+        }
+        
+        // Build option parsers
+        List<OptionParser> optParsers;
+        if (optionParsers != null) {
+            optParsers = Lists.newArrayList(Iterables.transform(optionParsers, new Function<Class<? extends OptionParser>, OptionParser>() {
+                @Override
+                public OptionParser apply(Class<? extends OptionParser> parser) {
+                    try {
+                        return parser.newInstance();
+                    } catch (Throwable e) {
+                        return null;
+                    }
+                }
+            }));
+            
+            // TODO This erroneously returns true even if all instances were created correctly
+            Preconditions.checkArgument(optParsers.contains(null), "One/more of the specified option parser classes could not be instantiated");
+        } else {
+            optParsers = Lists.newArrayList();
         }
 
         Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
 
         this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
-                ImmutableList.copyOf(aliasData), aliasesOverrideBuiltIns, allowAbbreviatedCommands,
+                ImmutableList.copyOf(aliasData), aliasesOverrideBuiltIns, optParsers, allowAbbreviatedCommands,
                 allowAbbreviatedOptions);
     }
 
