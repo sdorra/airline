@@ -87,14 +87,14 @@ public @interface Command {
     String[] examples() default {};
 
     /**
-     * Block of text that provides an extended discussion on the behaviour of
-     * the command. Should supplement the shorter description which is more of a
-     * summary where discussion can get into greater detail about exact
-     * behaviour of commands.
+     * An array of lines of text that provides an extended discussion on the
+     * behaviour of the command. Should supplement the shorter description which
+     * is more of a summary where discussion can get into greater detail about
+     * exact behaviour of commands.
      * 
      * @return Command discussion
      */
-    String discussion() default "";
+    String[] discussion() default {};
 
     /**
      * The group(s) this command should belong to. if left empty the command

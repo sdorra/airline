@@ -42,7 +42,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     public HtmlCommandUsageGenerator() {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, false, DEFAULT_STYLESHEET);
     }
-    
+
     public HtmlCommandUsageGenerator(boolean includeHidden) {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden, DEFAULT_STYLESHEET);
     }
@@ -51,7 +51,8 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden, stylesheetUrl);
     }
 
-    public HtmlCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden, String... stylesheetUrls) {
+    public HtmlCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden,
+            String... stylesheetUrls) {
         super(optionComparator, includeHidden);
         if (stylesheetUrls != null) {
             for (String stylesheet : stylesheetUrls) {
@@ -63,8 +64,8 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage( String programName,  String groupName, String commandName,
-            CommandMetadata command, OutputStream output) throws IOException {
+    public void usage(String programName, String groupName, String commandName, CommandMetadata command,
+            OutputStream output) throws IOException {
 
         Writer writer = new OutputStreamWriter(output);
 
@@ -88,7 +89,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         // Discussion
-        if (command.getDiscussion() != null) {
+        if (command.getDiscussion() != null && !command.getDiscussion().isEmpty()) {
             outputDiscussion(writer, command);
         }
 
@@ -204,14 +205,21 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @throws IOException
      */
     protected void outputDiscussion(Writer writer, CommandMetadata command) throws IOException {
+        if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
+            return;
+
         writer.append(NEWLINE);
         writer.append("<h1 class=\"text-info\">DISCUSSION</h1>\n").append(NEWLINE);
 
         writer.append("<div class=\"row\">\n");
         writer.append("<div class=\"span8 offset1\">\n");
-
-        writer.append(htmlize(command.getDiscussion()));
-
+        for (String discussionPara : command.getDiscussion()) {
+            if (StringUtils.isEmpty(discussionPara))
+                continue;
+            writer.append("<p>\n");
+            writer.append(htmlize(discussionPara));
+            writer.append("</p>\n");
+        }
         writer.append("</div>\n");
         writer.append("</div>\n");
     }

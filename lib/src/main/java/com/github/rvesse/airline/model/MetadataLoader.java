@@ -121,7 +121,7 @@ public class MetadataLoader {
         //@formatter:off
         CommandMetadata commandMetadata = new CommandMetadata(name, 
                                                               description, 
-                                                              command.discussion().isEmpty() ? null : command.discussion(), 
+                                                              command.discussion().length == 0 ? null : Lists.newArrayList(command.discussion()), 
                                                               command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
                                                               hidden, 
                                                               injectionMetadata.globalOptions, 
