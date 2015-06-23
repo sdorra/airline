@@ -23,6 +23,8 @@ public interface TypeConverter {
      * @param value
      *            String Value
      * @return Typed value
+     * @exception NullPointerException
+     *                Should be thrown if any of the provided arguments is null
      * @exception ParseOptionConversionException
      *                Should be thrown if the type converter cannot convert the
      *                value
