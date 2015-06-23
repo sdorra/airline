@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
 
 import java.util.Set;
 

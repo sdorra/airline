@@ -16,23 +16,26 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
 
 /**
- * Super class of all command line parsing exceptions
+ * Exception that is thrown when a required option is missing
  *
  */
-public class ParseException extends RuntimeException
+public class ParseOptionMissingException extends ParseException
 {
-    private static final long serialVersionUID = 3772132549207742875L;
+    private static final long serialVersionUID = -2256462221508393062L;
+    
+    private final String optionTitle;
 
-    public ParseException(String string, Object... args)
+    public ParseOptionMissingException(String optionTitle)
     {
-        super(String.format(string, args));
+        super("Required option '%s' is missing", optionTitle);
+        this.optionTitle = optionTitle;
     }
 
-    public ParseException(Exception cause, String string, Object... args)
+    public String getOptionTitle()
     {
-        super(String.format(string, args), cause);
+        return optionTitle;
     }
 }

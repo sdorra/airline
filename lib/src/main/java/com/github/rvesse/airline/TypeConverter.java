@@ -1,6 +1,6 @@
 package com.github.rvesse.airline;
 
-import com.github.rvesse.airline.parser.ParseOptionConversionException;
+import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
 /**
  * Interface for type converters

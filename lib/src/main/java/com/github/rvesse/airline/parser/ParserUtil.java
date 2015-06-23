@@ -5,6 +5,7 @@ import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.parser.errors.ParseException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 

@@ -5,14 +5,15 @@ import java.util.regex.Pattern;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.parser.ParseOptionUnexpectedException;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseOptionUnexpectedException;
 import com.google.common.collect.PeekingIterator;
 
 public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
     private static final Pattern SHORT_OPTIONS_PATTERN = Pattern.compile("-[^-].*");
 
-    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state, List<OptionMetadata> allowedOptions) {
+    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,
+            List<OptionMetadata> allowedOptions) {
         if (!SHORT_OPTIONS_PATTERN.matcher(tokens.peek()).matches()) {
             return null;
         }
@@ -21,6 +22,7 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
         String remainingToken = tokens.peek().substring(1);
 
         ParseState<T> nextState = state;
+        boolean first = true;
         while (!remainingToken.isEmpty()) {
             char tokenCharacter = remainingToken.charAt(0);
 
@@ -39,6 +41,7 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
             // character from the token
             if (option.getArity() == 0) {
                 nextState = nextState.withOptionValue(option, Boolean.TRUE).popContext();
+                first = false;
                 continue;
             }
 
@@ -57,14 +60,18 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
                 } else if (tokens.hasNext()) {
                     String tokenStr = tokens.next();
                     checkValidValue(option, tokenStr);
-                    Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
-                            tokenStr);
+                    Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 }
 
                 return nextState;
             }
 
+            // Don't throw an error if this is the first option we have seen as
+            // in that case the option may legitimately be processed by another
+            // option parser
+            if (first)
+                return null;
             throw new ParseOptionUnexpectedException("Short options style can not be used with option %s", option);
         }
 

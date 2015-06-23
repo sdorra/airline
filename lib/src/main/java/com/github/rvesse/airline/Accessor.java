@@ -1,7 +1,7 @@
 package com.github.rvesse.airline;
 
-import com.github.rvesse.airline.parser.ParseException;
 import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.errors.ParseException;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;

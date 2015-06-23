@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
 
 /**
  * Exception thrown if an option is encountered in an unexpected location e.g.

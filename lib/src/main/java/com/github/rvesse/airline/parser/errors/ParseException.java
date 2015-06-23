@@ -16,24 +16,23 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
 
 /**
- * Exception that is thrown when an option expects one/more values and no values
- * are supplied
- * 
+ * Super class of all command line parsing exceptions
+ *
  */
-public class ParseOptionMissingValueException extends ParseException {
-    private static final long serialVersionUID = -731926542936989571L;
-    
-    private final String optionTitle;
+public class ParseException extends RuntimeException
+{
+    private static final long serialVersionUID = 3772132549207742875L;
 
-    public ParseOptionMissingValueException(String optionTitle) {
-        super("Required values for option '%s' not provided", optionTitle);
-        this.optionTitle = optionTitle;
+    public ParseException(String string, Object... args)
+    {
+        super(String.format(string, args));
     }
 
-    public String getOptionTitle() {
-        return optionTitle;
+    public ParseException(Exception cause, String string, Object... args)
+    {
+        super(String.format(string, args), cause);
     }
 }

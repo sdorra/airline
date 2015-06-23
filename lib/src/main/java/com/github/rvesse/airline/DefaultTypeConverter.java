@@ -1,6 +1,6 @@
 package com.github.rvesse.airline;
 
-import com.github.rvesse.airline.parser.ParseOptionConversionException;
+import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;

@@ -20,7 +20,7 @@ package com.github.rvesse.airline.command;
 
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.model.CommandMetadata;
-import com.github.rvesse.airline.parser.ParseException;
+import com.github.rvesse.airline.parser.errors.ParseException;
 import com.google.common.collect.Lists;
 
 import org.testng.annotations.Test;

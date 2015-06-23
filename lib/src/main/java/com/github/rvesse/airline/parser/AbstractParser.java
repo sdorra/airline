@@ -3,6 +3,7 @@ package com.github.rvesse.airline.parser;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
 
 /**
  * Abstract base class for parsers providing some utility methods

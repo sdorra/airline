@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
 
 /**
  * Exception that is thrown when the argument supplied as the value for an

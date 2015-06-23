@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.AliasMetadata;
-import com.github.rvesse.airline.parser.ParseOptionConversionException;
+import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
 public class TestAliases {
 

@@ -47,9 +47,9 @@ import com.github.rvesse.airline.args.OptionsRequired;
 import com.github.rvesse.airline.command.CommandAdd;
 import com.github.rvesse.airline.command.CommandCommit;
 import com.github.rvesse.airline.model.CommandMetadata;
-import com.github.rvesse.airline.parser.ParseException;
-import com.github.rvesse.airline.parser.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.ParseTooManyArgumentsException;
+import com.github.rvesse.airline.parser.errors.ParseException;
+import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.google.common.collect.ImmutableList;
 
 import org.testng.Assert;

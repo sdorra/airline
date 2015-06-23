@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
 public class TestDefaultTypeConverter {
 

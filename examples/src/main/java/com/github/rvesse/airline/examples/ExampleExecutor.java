@@ -2,7 +2,7 @@ package com.github.rvesse.airline.examples;
 
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.SingleCommand;
-import com.github.rvesse.airline.parser.ParseException;
+import com.github.rvesse.airline.parser.errors.ParseException;
 
 /**
  * Helper class that launches and runs the actual example commands and CLIs

@@ -16,27 +16,24 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
+package com.github.rvesse.airline.parser.errors;
 
 /**
- * Exception that is thrown when a command receives unexpected arguments
+ * Exception that is thrown when an option expects one/more values and no values
+ * are supplied
  * 
  */
-public class ParseArgumentsUnexpectedException extends ParseException {
-    private static final long serialVersionUID = -3146629773738933406L;
+public class ParseOptionMissingValueException extends ParseException {
+    private static final long serialVersionUID = -731926542936989571L;
     
-    private final List<String> unparsedInput;
+    private final String optionTitle;
 
-    public ParseArgumentsUnexpectedException(List<String> unparsedInput) {
-        super("Found unexpected parameters: %s", unparsedInput);
-        this.unparsedInput = ImmutableList.copyOf(unparsedInput);
+    public ParseOptionMissingValueException(String optionTitle) {
+        super("Required values for option '%s' not provided", optionTitle);
+        this.optionTitle = optionTitle;
     }
 
-    public List<String> getUnparsedInput() {
-        return unparsedInput;
+    public String getOptionTitle() {
+        return optionTitle;
     }
 }

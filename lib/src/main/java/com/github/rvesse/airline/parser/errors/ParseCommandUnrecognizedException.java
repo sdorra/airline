@@ -16,26 +16,30 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 /**
- * Exception that is thrown when a required option is missing
+ * Exception that is thrown when an unrecognized command is supplied
  *
  */
-public class ParseOptionMissingException extends ParseException
+public class ParseCommandUnrecognizedException extends ParseException
 {
-    private static final long serialVersionUID = -2256462221508393062L;
+    private static final long serialVersionUID = 7580940207857781141L;
     
-    private final String optionTitle;
+    private final List<String> unparsedInput;
 
-    public ParseOptionMissingException(String optionTitle)
+    public ParseCommandUnrecognizedException(List<String> unparsedInput)
     {
-        super("Required option '%s' is missing", optionTitle);
-        this.optionTitle = optionTitle;
+        super("Command '%s' not recognized", unparsedInput.get(0));
+        this.unparsedInput = ImmutableList.copyOf(unparsedInput);
     }
 
-    public String getOptionTitle()
+    public List<String> getUnparsedInput()
     {
-        return optionTitle;
+        return unparsedInput;
     }
 }

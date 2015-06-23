@@ -16,30 +16,27 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.errors;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
 /**
- * Exception that is thrown when an unrecognized command is supplied
- *
+ * Exception that is thrown when a command receives unexpected arguments
+ * 
  */
-public class ParseCommandUnrecognizedException extends ParseException
-{
-    private static final long serialVersionUID = 7580940207857781141L;
+public class ParseArgumentsUnexpectedException extends ParseException {
+    private static final long serialVersionUID = -3146629773738933406L;
     
     private final List<String> unparsedInput;
 
-    public ParseCommandUnrecognizedException(List<String> unparsedInput)
-    {
-        super("Command '%s' not recognized", unparsedInput.get(0));
+    public ParseArgumentsUnexpectedException(List<String> unparsedInput) {
+        super("Found unexpected parameters: %s", unparsedInput);
         this.unparsedInput = ImmutableList.copyOf(unparsedInput);
     }
 
-    public List<String> getUnparsedInput()
-    {
+    public List<String> getUnparsedInput() {
         return unparsedInput;
     }
 }

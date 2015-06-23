@@ -3,6 +3,8 @@ package com.github.rvesse.airline.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.rvesse.airline.parser.errors.ParseException;
+
 public class AliasArgumentsParser {
 
     public static List<String> parse(String value) {

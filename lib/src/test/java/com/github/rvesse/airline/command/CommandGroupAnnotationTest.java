@@ -6,7 +6,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.Cli;
-import com.github.rvesse.airline.parser.ParseCommandUnrecognizedException;
+import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
 
 public class CommandGroupAnnotationTest
 {
