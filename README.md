@@ -23,6 +23,56 @@ In your `main(String[] args)` method you then need to create a parser instance e
 
 Note that typically you will want to create an executable JAR for your CLI using something like the Maven Shade plugin.  This will then allow you to create a simple wrapper script that invokes your CLI.
 
+Once that is done you can then invoke your application e.g.
+
+     myapp --global-option command --command-option arguments
+     
+Or:
+
+    myapp --global-option group --group-option command --command-option arguments
+    
+### Option Styles
+    
+Airline supports several option styles and will automatically use the relevant parsing mode depending on how the user passes in the option and how your options are configured.
+
+#### Classic GNU getopt style
+
+    myapp command -abc
+    
+Could do one of the following three things:
+
+- Set options `-a`, `-b` and `-c`
+- Set option `-a` to value `bc`
+- Set options `-a` and sets `-b` to value c
+
+Options are processed left to right and as soon as an option with an non-zero arity is seen the remainder of the token up to the next whitespace is considered as the value for the last option seen.  So as in this example exact behaviour will depend on your option definitions.
+
+This option style is only supported for options with a `-N` name where `N` is any single character.
+
+#### Long GNU getopt style
+
+    myapp command -a=bc
+
+Or:
+
+    myapp command --alpha=bc 
+   
+Sets the option `-a`/`--alpha` option to the value `bc`
+
+May be used with any option provided the option name does not contain an `=`
+
+#### Whitespace separated
+
+    myapp command -a bc
+    
+Or:
+
+    myapp command --alpha bc
+
+Sets the option `-a`/`--alpha` to the value `bc`
+
+May be used with any option
+
 ## License
 
 Airline is licensed under the Apache Software License Version 2.0, see provided **License.txt**
@@ -31,7 +81,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `0.9.2`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `1.0.1`
 
 Use the following maven dependency declaration:
 
@@ -39,13 +89,13 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>0.9.2</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `1.0.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
+Snapshot artifacts of the latest source are also available using the version `1.0.2-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
 
-Note that `1.0.0-SNAPSHOT` represents significant breaking changes from the existing `0.9.2` release
+Please note that the `1.0.x` release line represents significant breaking changes from the previous `0.9.x` releases, please review the Change Log before attempting to upgrade an application that uses an older version.
 
 ## Build Status
 

@@ -1,7 +1,5 @@
 package com.github.rvesse.airline.help;
 
-import static com.github.rvesse.airline.model.OptionMetadata.isHiddenPredicate;
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 
 import java.util.ArrayList;
@@ -127,16 +125,15 @@ public class AbstractUsageGenerator {
      * @return
      */
     protected List<String> toSynopsisUsage(List<OptionMetadata> options) {
-        return ImmutableList.copyOf(transform(filter(options, isHiddenPredicate()),
-                new Function<OptionMetadata, String>() {
-                    public String apply(OptionMetadata option) {
-                        if (option.isHidden() && !includeHidden()) {
-                            return "";
-                        }
+        return ImmutableList.copyOf(transform(options, new Function<OptionMetadata, String>() {
+            public String apply(OptionMetadata option) {
+                if (option.isHidden() && !includeHidden()) {
+                    return "";
+                }
 
-                        return toUsage(option);
-                    }
-                }));
+                return toUsage(option);
+            }
+        }));
     }
 
     protected String toUsage(ArgumentsMetadata arguments) {

@@ -17,6 +17,7 @@ public class GroupBuilder<C> {
     private final String name;
     private String description = null;
     private Class<? extends C> defaultCommand = null;
+    private boolean hidden = false;
 
     private final List<Class<? extends C>> commands = newArrayList();
 
@@ -31,6 +32,19 @@ public class GroupBuilder<C> {
         Preconditions.checkArgument(!description.isEmpty(), "description is empty");
         Preconditions.checkState(this.description == null, "description is already set");
         this.description = description;
+        return this;
+    }
+    
+    public GroupBuilder<C> makeHidden() {
+        return withHiddenState(true);
+    }
+    
+    public GroupBuilder<C> makeVisible() {
+        return withHiddenState(false);
+    }
+    
+    public GroupBuilder<C> withHiddenState(boolean hidden) {
+        this.hidden = hidden;
         return this;
     }
 
@@ -63,7 +77,7 @@ public class GroupBuilder<C> {
         CommandMetadata groupDefault = MetadataLoader.loadCommand(defaultCommand);
         List<CommandMetadata> groupCommands = MetadataLoader.loadCommands(commands);
 
-        return MetadataLoader.loadCommandGroup(name, description, groupDefault,
+        return MetadataLoader.loadCommandGroup(name, description, hidden, groupDefault,
                 groupCommands);
     }
 }

@@ -268,8 +268,7 @@ public class Parser {
 
     private ParseState parseLongGnuGetOpt(PeekingIterator<String> tokens, ParseState state,
             List<OptionMetadata> allowedOptions) {
-        Pattern pattern = Pattern.compile("=|:");
-        List<String> parts = ImmutableList.copyOf(Splitter.on(pattern).limit(2).split(tokens.peek()));
+        List<String> parts = ImmutableList.copyOf(Splitter.on(Pattern.compile("=|:")).limit(2).split(tokens.peek()));
         if (parts.size() != 2) {
             return null;
         }

@@ -41,6 +41,7 @@ import com.github.rvesse.airline.args.ArgsBooleanArity;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsInherited;
 import com.github.rvesse.airline.args.ArgsMultiLineDescription;
+import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
 import com.github.rvesse.airline.args.ArgsRequired;
 import com.github.rvesse.airline.args.CommandHidden;
 import com.github.rvesse.airline.args.GlobalOptionsHidden;
@@ -50,6 +51,7 @@ import com.github.rvesse.airline.command.CommandRemove;
 import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
+import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.help.ronn.RonnCommandUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnGlobalUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
@@ -60,6 +62,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
+import static com.google.common.base.Predicates.compose;
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.collect.Iterables.find;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -69,7 +74,7 @@ public class TestHelp {
     private final Charset utf8 = Charset.forName("utf-8");
 
     /**
-     * Helper method for if you're trying to determine the differences between
+     * Helper method for if you're trying to determine the differences betweeon
      * actual and expected output when debugging a new test and can't visually
      * see the difference e.g. differing white space
      * 
@@ -147,6 +152,55 @@ public class TestHelp {
                 "        -v\n" +
                 "            Verbose descriptions\n" +
                 "            have new lines\n" +
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testMultiParagraphDiscussion() throws IOException {
+        SingleCommand<ArgsMultiParagraphDiscussion> cmd = singleCommand(ArgsMultiParagraphDiscussion.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        ArgsMultiParagraphDiscussion -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsMultiParagraphDiscussion\n" +
+                "\n" +
+                "DISCUSSION\n" +
+                "        First paragraph\n" +
+                "\n" +
+                "        Middle paragraph\n" +
+                "\n" +
+                "        Final paragraph\n" + 
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testMultiParagraphDiscussionRonn() throws IOException {
+        SingleCommand<ArgsMultiParagraphDiscussion> cmd = singleCommand(ArgsMultiParagraphDiscussion.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RonnCommandUsageGenerator generator = new RonnCommandUsageGenerator();
+        generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "ArgsMultiParagraphDiscussion(1) -- null\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                " `ArgsMultiParagraphDiscussion` \n" +
+                "\n" +
+                "## DISCUSSION\n" +
+                "\n" +
+                "First paragraph\n" +
+                "\n" +
+                "Middle paragraph\n" +
+                "\n" +
+                "Final paragraph\n" + 
                 "\n");
         //@formatter:on
     }
@@ -269,7 +323,7 @@ public class TestHelp {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Help.help(parser.getMetadata(), ImmutableList.of("Args1"), out);
-        assertEquals(new String(out.toByteArray(), utf8),
+        testStringAssert(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test Args1 - args1 description\n" +
                 "\n" +
@@ -358,7 +412,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testArgsAllowedValues() throws IOException {
         //@formatter:off
@@ -366,7 +420,7 @@ public class TestHelp {
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new CliCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), out);
-        testStringAssert(new String(out.toByteArray(), utf8),
+        assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test ArgsAllowedValues - ArgsAllowedValues description\n" +
                 "\n" +
@@ -385,7 +439,7 @@ public class TestHelp {
         
         //@formatter:on
     }
-    
+
     @Test
     public void testArgsAllowedValuesRonn() throws IOException {
         //@formatter:off
@@ -393,7 +447,7 @@ public class TestHelp {
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new RonnCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), out);
-        testStringAssert(new String(out.toByteArray(), utf8),
+        assertEquals(new String(out.toByteArray(), utf8),
                 "test-ArgsAllowedValues(1) -- ArgsAllowedValues description\n" +
                 "==========\n" +
                 "\n" +
@@ -584,7 +638,7 @@ public class TestHelp {
     }
 
     @Test
-    public void testOptionsHidden() throws IOException {
+    public void testOptionsHidden01() throws IOException {
         //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
                 .withDescription("Test commandline")
@@ -604,6 +658,40 @@ public class TestHelp {
                 "        test OptionsHidden [ --optional <optionalOption> ]\n" +
                 "\n" +
                 "OPTIONS\n" +
+                "        --optional <optionalOption>\n" +
+                "\n" +
+                "\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testOptionsHidden02() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withDefaultCommand(Help.class)
+                .withCommands(Help.class,
+                        OptionsHidden.class);
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CliCommandUsageGenerator generator = new CliCommandUsageGenerator(true);
+        CommandMetadata metadata = find(parser.getMetadata().getDefaultGroupCommands(), compose(equalTo("OptionsHidden"), CommandMetadata.nameGetter()), null);
+        Assert.assertNotNull(metadata);
+        generator.usage("test", null, "OptionsHidden", metadata, out);
+        
+        assertEquals(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        test OptionsHidden -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test OptionsHidden [ --hidden <hiddenOption> ]\n" +
+                "                [ --optional <optionalOption> ]\n" +
+                "\n" +
+                "OPTIONS\n" +
+                "        --hidden <hiddenOption>\n" +
+                "\n\n" +
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
@@ -672,6 +760,91 @@ public class TestHelp {
                 "        --optional <optionalOption>\n" +
                 "\n" +
                 "\n");
+        //@formatter:on
+    }
+
+    @Test
+    public void testGroups() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withCommand(Help.class);
+        builder.withGroup("visible")
+               .withDescription("Visible group")
+               .withCommands(ArgsRequired.class);
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        Assert.assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
+                "\n" +
+                "Commands are:\n" +
+                "    help      Display help information\n" +
+                "    visible   Visible group\n" +
+                "\n" +
+                "See 'test help <command>' for more information on a specific command.\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testGroupsHidden01() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withCommand(Help.class);
+        builder.withGroup("visible")
+               .withDescription("Visible group")
+               .withCommands(ArgsRequired.class);
+        builder.withGroup("hidden")
+               .withDescription("Hidden group")
+               .withCommands(ArgsRequired.class)
+               .makeHidden();
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
+                "\n" +
+                "Commands are:\n" +
+                "    help      Display help information\n" +
+                "    visible   Visible group\n" +
+                "\n" +
+                "See 'test help <command>' for more information on a specific command.\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testGroupsHidden02() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder = Cli.builder("test")
+                .withDescription("Test commandline")
+                .withCommand(Help.class);
+        builder.withGroup("visible")
+               .withDescription("Visible group")
+               .withCommands(ArgsRequired.class);
+        builder.withGroup("hidden")
+               .withDescription("Hidden group")
+               .withCommands(ArgsRequired.class)
+               .makeHidden();
+
+        Cli<Object> parser = builder.build();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CliGlobalUsageSummaryGenerator generator = new CliGlobalUsageSummaryGenerator(true);
+        generator.usage(parser.getMetadata(), out);
+        assertEquals(new String(out.toByteArray(), utf8),
+                "usage: test <command> [ <args> ]\n" +
+                "\n" +
+                "Commands are:\n" +
+                "    help      Display help information\n" +
+                "    hidden    Hidden group\n" +
+                "    visible   Visible group\n" +
+                "\n" +
+                "See 'test help <command>' for more information on a specific command.\n");
         //@formatter:on
     }
 
@@ -772,7 +945,7 @@ public class TestHelp {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         generator.usage(gitParser.getMetadata(), out);
         String usage = new String(out.toByteArray(), utf8);
-        testStringAssert(usage,
+        assertEquals(usage,
                 "git(1) -- the stupid content tracker\n" +
                 "==========\n" +
                 "\n" +
@@ -923,7 +1096,7 @@ public class TestHelp {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         generator.usage(gitParser.getMetadata(), out);
         String usage = new String(out.toByteArray(), utf8);
-        testStringAssert(usage,
+        assertEquals(usage,
                 "git(1) -- the stupid content tracker\n" +
                 "==========\n" +
                 "\n" +
@@ -961,7 +1134,7 @@ public class TestHelp {
         File gitHelp = new File("git-help.1.ronn");
         Assert.assertTrue(gitHelp.exists());
         usage = readFile(gitHelp);
-        testStringAssert(usage,
+        assertEquals(usage,
                 "git-help(1) -- Display help information\n" +
                 "==========\n" +
                 "\n" +
@@ -984,7 +1157,7 @@ public class TestHelp {
         File gitAdd = new File("git-add.1.ronn");
         Assert.assertTrue(gitAdd.exists());
         usage = readFile(gitAdd);
-        testStringAssert(usage,
+        assertEquals(usage,
                 "git-add(1) -- Add file contents to the index\n" +
                 "==========\n" +
                 "\n" +
@@ -1014,7 +1187,7 @@ public class TestHelp {
         File gitRemoteShow = new File("git-remote-show.1.ronn");
         Assert.assertTrue(gitRemoteShow.exists());
         usage = readFile(gitRemoteShow);
-        testStringAssert(usage,
+        assertEquals(usage,
                 "git-remote-show(1) -- Gives some information about the remote <name>\n" +
                 "==========\n" +
                 "\n" +
@@ -1044,7 +1217,7 @@ public class TestHelp {
         File gitRemoteAdd = new File("git-remote-add.1.ronn");
         Assert.assertTrue(gitRemoteAdd.exists());
         usage = readFile(gitRemoteAdd);
-        testStringAssert(usage,
+        assertEquals(usage,
                 "git-remote-add(1) -- Adds a remote\n" +
                 "==========\n" +
                 "\n" +
@@ -1106,7 +1279,7 @@ public class TestHelp {
     
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new RonnCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
-        testStringAssert(new String(out.toByteArray(), utf8),
+        assertEquals(new String(out.toByteArray(), utf8),
                 "test(1) -- ArgsExitCodes description\n" +
                 "==========\n" +
                 "\n" +

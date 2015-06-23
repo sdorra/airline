@@ -77,6 +77,9 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
             outputCommandDescription(commandPrinter, null, command);
         }
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+
             for (CommandMetadata command : sortCommands(group.getCommands())) {
                 outputCommandDescription(commandPrinter, group, command);
             }

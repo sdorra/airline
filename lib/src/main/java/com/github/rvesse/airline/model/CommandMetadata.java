@@ -25,12 +25,12 @@ public class CommandMetadata {
     private final Map<Integer, String> exitCodes;
 
     private final List<String> examples;
-    private final String discussion;
+    private final List<String> discussion;
 
     //@formatter:off
     public CommandMetadata(String name, 
                            String description, 
-                           final String discussion, 
+                           final List<String> discussion, 
                            final List<String> examples,
                            boolean hidden, 
                            Iterable<OptionMetadata> globalOptions, 
@@ -90,7 +90,7 @@ public class CommandMetadata {
         return examples;
     }
 
-    public String getDiscussion() {
+    public List<String> getDiscussion() {
         return discussion;
     }
 

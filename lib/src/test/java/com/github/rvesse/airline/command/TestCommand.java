@@ -34,6 +34,7 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class TestCommand
 {
@@ -111,7 +112,7 @@ public class TestCommand
 
         assertEquals("remove", aMeta.getName());
 
-        assertEquals("More details about how this removes files from the index.", aMeta.getDiscussion());
+        assertEquals(newArrayList("More details about how this removes files from the index."), aMeta.getDiscussion());
     }
 
     @Test

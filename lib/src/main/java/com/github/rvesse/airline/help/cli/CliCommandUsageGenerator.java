@@ -23,7 +23,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     public CliCommandUsageGenerator() {
         this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, false);
     }
-    
+
     public CliCommandUsageGenerator(boolean includeHidden) {
         this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
@@ -31,12 +31,13 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     public CliCommandUsageGenerator(int columns) {
         this(columns, DEFAULT_OPTION_COMPARATOR, false);
     }
-    
+
     public CliCommandUsageGenerator(int columns, boolean includeHidden) {
         this(columns, DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
 
-    public CliCommandUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
+    public CliCommandUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
+            boolean includeHidden) {
         super(columns, optionComparator, includeHidden);
     }
 
@@ -58,7 +59,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         }
 
         // Discussion
-        if (command.getDiscussion() != null) {
+        if (command.getDiscussion() != null && !command.getDiscussion().isEmpty()) {
             outputDiscussion(out, command);
         }
 
@@ -151,10 +152,17 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      * @throws IOException
      */
     protected void outputDiscussion(UsagePrinter out, CommandMetadata command) throws IOException {
+        if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
+            return;
+
         out.append("DISCUSSION").newline();
         UsagePrinter discussionPrinter = out.newIndentedPrinter(8);
 
-        discussionPrinter.append(command.getDiscussion()).newline().newline();
+        for (String discussionPara : command.getDiscussion()) {
+            if (StringUtils.isEmpty(discussionPara))
+                continue;
+            discussionPrinter.append(discussionPara).newline().newline();
+        }
         discussionPrinter.flush();
     }
 

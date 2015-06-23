@@ -65,8 +65,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage( String programName,  String groupName, String commandName,
-            CommandMetadata command, OutputStream output) throws IOException {
+    public void usage(String programName, String groupName, String commandName, CommandMetadata command,
+            OutputStream output) throws IOException {
         String SECTION_HEADER = "## ";
 
         // Fall back to metadata declared name if necessary
@@ -83,7 +83,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (options.size() > 0 || command.getArguments() != null) {
             outputOptions(writer, command, options, SECTION_HEADER);
         }
-        if (command.getDiscussion() != null) {
+        if (command.getDiscussion() != null && !command.getDiscussion().isEmpty()) {
             outputDiscussion(writer, command, SECTION_HEADER);
         }
         if (command.getExamples() != null && !command.getExamples().isEmpty()) {
@@ -308,8 +308,15 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @throws IOException
      */
     protected void outputDiscussion(Writer writer, CommandMetadata command, String sectionHeader) throws IOException {
+        if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
+            return;
+        
         writer.append(NEW_PARA).append(sectionHeader).append("DISCUSSION").append(NEW_PARA);
-        writer.append(command.getDiscussion());
+        for (String discussionPara : command.getDiscussion()) {
+            if (StringUtils.isEmpty(discussionPara))
+                continue;
+            writer.append(discussionPara).append(NEW_PARA);
+        }
     }
 
     /**
@@ -378,7 +385,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (option.getArity() > 0) {
             argumentString = Joiner.on(" ").join(
                     Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply( String argument) {
+                        public String apply(String argument) {
                             return "<" + argument + ">";
                         }
                     }));
@@ -387,7 +394,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply( String option) {
+            public String apply(String option) {
                 if (argumentString != null) {
                     return "`" + option + "` " + argumentString;
                 }

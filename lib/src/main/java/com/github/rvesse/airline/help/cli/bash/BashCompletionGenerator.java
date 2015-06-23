@@ -84,6 +84,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         }
         if (hasGroups) {
             for (CommandGroupMetadata group : global.getCommandGroups()) {
+                if (group.isHidden() && !this.includeHidden())
+                    continue;
+                
                 commandNames.add(group.getName());
             }
         }
@@ -122,6 +125,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
             // Add a case for each group
             for (CommandGroupMetadata group : global.getCommandGroups()) {
+                if (group.isHidden() && !this.includeHidden())
+                    continue;
+                
                 // Add case for the group
                 writeGroupCase(writer, global, group, 4);
 
@@ -134,6 +140,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
                 if (groups.contains(command.getName()))
                     continue;
+                
                 groups.add(command.getName());
 
                 if (command.isHidden() && !this.includeHidden())
@@ -187,6 +194,9 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
 
     private void generateGroupFunctions(GlobalMetadata global, Writer writer) throws IOException {
         for (CommandGroupMetadata group : global.getCommandGroups()) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+            
             // Generate the group completion function
             generateGroupCompletionFunction(writer, global, group);
 
