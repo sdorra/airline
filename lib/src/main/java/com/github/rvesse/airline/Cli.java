@@ -18,10 +18,7 @@
 
 package com.github.rvesse.airline;
 
-import com.github.rvesse.airline.builder.AliasBuilder;
 import com.github.rvesse.airline.builder.CliBuilder;
-import com.github.rvesse.airline.builder.GroupBuilder;
-import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -37,18 +34,12 @@ import com.github.rvesse.airline.parser.ParseOptionMissingValueException;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.Parser;
 import com.github.rvesse.airline.parser.ParserUtil;
-import com.github.rvesse.airline.parser.options.OptionParser;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
+
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 
@@ -72,119 +63,16 @@ public class Cli<C> {
     /**
      * Creates a new CLI
      * 
-     * @param name
-     *            Program Name
-     * @param description
-     *            Program Description
-     * @param typeConverter
-     *            Type converter used to convert arguments into the Java types
-     *            that the options expect
-     * @param defaultCommand
-     *            Default command
      * @param theCommandFactory
      *            Command factory
-     * @param defaultGroupCommands
-     *            Commands in the default group i.e. top level commands
-     * @param groups
-     *            Command groups
-     * @param aliases
-     *            Command aliases
-     * @param allowAbbreviatedCommands
-     *            Whether command abbreviation is allowed
-     * @param allowAbbreviatedOptions
-     *            Whethr option abbreviation is allowed
+     * @param metadata
+     *            Metadata
      */
-    public Cli(String name, String description, TypeConverter typeConverter, Class<? extends C> defaultCommand,
-            CommandFactory<C> theCommandFactory, Iterable<Class<? extends C>> defaultGroupCommands,
-            Iterable<GroupBuilder<C>> groups, Iterable<AliasBuilder<C>> aliases, boolean aliasesOverrideBuiltIns,
-            Iterable<Class<? extends OptionParser>> optionParsers,
-            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
-                "Program name cannot be null/empty/whitespace");
-        Preconditions.checkNotNull(typeConverter, "typeConverter is null");
+    public Cli(CommandFactory<C> theCommandFactory, GlobalMetadata metadata) {
         Preconditions.checkNotNull(theCommandFactory, "theCommandFactory is null");
-
+        Preconditions.checkNotNull(metadata);
         mCommandFactory = theCommandFactory;
-
-        CommandMetadata defaultCommandMetadata = null;
-        if (defaultCommand != null) {
-            defaultCommandMetadata = MetadataLoader.loadCommand(defaultCommand);
-        }
-
-        final List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
-
-        List<CommandMetadata> defaultCommandGroup = defaultGroupCommands != null ? Lists.newArrayList(MetadataLoader
-                .loadCommands(defaultGroupCommands)) : Lists.<CommandMetadata> newArrayList();
-
-        // Currently the default command is required to be in the commands
-        // list. If that changes, we'll need to add it here and add checks for
-        // existence
-        allCommands.addAll(defaultCommandGroup);
-
-        // Build groups
-        List<CommandGroupMetadata> commandGroups;
-        if (groups != null) {
-            commandGroups = Lists.newArrayList(Iterables.transform(groups,
-                    new Function<GroupBuilder<C>, CommandGroupMetadata>() {
-
-                        @Override
-                        public CommandGroupMetadata apply(GroupBuilder<C> group) {
-                            return group.build();
-                        }
-
-                    }));
-        } else {
-            commandGroups = Lists.newArrayList();
-        }
-        for (CommandGroupMetadata group : commandGroups) {
-            allCommands.addAll(group.getCommands());
-        }
-
-        // add commands to groups based on the value of groups in the @Command
-        // annotations
-        // rather than change the entire way metadata is loaded, I figured just
-        // post-processing was an easier, yet uglier, way to go
-        MetadataLoader.loadCommandsIntoGroupsByAnnotation(allCommands, commandGroups, defaultCommandGroup);
-
-        // Build aliases
-        List<AliasMetadata> aliasData;
-        if (aliases != null) {
-            aliasData = Lists.newArrayList(Iterables.transform(aliases, new Function<AliasBuilder<C>, AliasMetadata>() {
-                @Override
-                public AliasMetadata apply(AliasBuilder<C> input) {
-                    return input.build();
-                }
-            }));
-        } else {
-            aliasData = Lists.newArrayList();
-        }
-        
-        // Build option parsers
-        List<OptionParser> optParsers;
-        if (optionParsers != null) {
-            optParsers = Lists.newArrayList(Iterables.transform(optionParsers, new Function<Class<? extends OptionParser>, OptionParser>() {
-                @Override
-                public OptionParser apply(Class<? extends OptionParser> parser) {
-                    try {
-                        return parser.newInstance();
-                    } catch (Throwable e) {
-                        return null;
-                    }
-                }
-            }));
-            
-            // TODO This erroneously returns true even if all instances were created correctly
-            Preconditions.checkArgument(optParsers.contains(null), "One/more of the specified option parser classes could not be instantiated");
-        } else {
-            optParsers = Lists.newArrayList();
-        }
-
-        Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
-
-        this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
-                ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
-                ImmutableList.copyOf(aliasData), aliasesOverrideBuiltIns, optParsers, allowAbbreviatedCommands,
-                allowAbbreviatedOptions);
+        this.metadata = metadata;
     }
 
     public GlobalMetadata getMetadata() {

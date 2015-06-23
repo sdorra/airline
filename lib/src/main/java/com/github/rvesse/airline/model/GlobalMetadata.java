@@ -1,9 +1,11 @@
 package com.github.rvesse.airline.model;
 
-import com.github.rvesse.airline.parser.options.OptionParser;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class GlobalMetadata {
     private final String name;
@@ -12,27 +14,23 @@ public class GlobalMetadata {
     private final CommandMetadata defaultCommand;
     private final List<CommandMetadata> defaultGroupCommands;
     private final List<CommandGroupMetadata> commandGroups;
-    private final List<AliasMetadata> aliases;
-    private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
-    private final List<OptionParser> optionParsers;
+    private final ParserMetadata parserConfig;
 
     public GlobalMetadata(String name, String description, Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> defaultGroupCommands,
-            Iterable<CommandGroupMetadata> commandGroups, Iterable<AliasMetadata> aliases,
-            boolean aliasesOverrideBuiltIns, 
-            Iterable<OptionParser> optionParsers,
-            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
+            Iterable<CommandGroupMetadata> commandGroups, ParserMetadata parserConfig) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
+                "Program name cannot be null/empty/whitespace");
+        Preconditions.checkNotNull(parserConfig);
+        //Preconditions.checkNotNull(typeConverter, "typeConverter is null");
+
         this.name = name;
         this.description = description;
         this.options = ImmutableList.copyOf(options);
         this.defaultCommand = defaultCommand;
         this.defaultGroupCommands = ImmutableList.copyOf(defaultGroupCommands);
         this.commandGroups = ImmutableList.copyOf(commandGroups);
-        this.aliases = ImmutableList.copyOf(aliases);
-        this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
-        this.optionParsers = ImmutableList.copyOf(optionParsers);
-        this.allowAbbreviatedCommands = allowAbbreviatedCommands;
-        this.allowAbbreviatedOptions = allowAbbreviatedOptions;
+        this.parserConfig = parserConfig;
     }
 
     public String getName() {
@@ -59,24 +57,8 @@ public class GlobalMetadata {
         return commandGroups;
     }
 
-    public List<AliasMetadata> getAliases() {
-        return aliases;
-    }
-    
-    public boolean aliasesOverrideBuiltIns() {
-        return aliasesOverrideBuiltIns;
-    }
-    
-    public List<OptionParser> getOptionParsers() {
-        return optionParsers;
-    }
-
-    public boolean allowsAbbreviatedCommands() {
-        return allowAbbreviatedCommands;
-    }
-
-    public boolean allowsAbbreviatedOptions() {
-        return allowAbbreviatedOptions;
+    public ParserMetadata getParserConfiguration() {
+        return parserConfig;
     }
 
     @Override
@@ -89,10 +71,8 @@ public class GlobalMetadata {
         sb.append(", defaultCommand=").append(defaultCommand);
         sb.append(", defaultGroupCommands=").append(defaultGroupCommands);
         sb.append(", commandGroups=").append(commandGroups);
-        sb.append(", aliases=").append(aliases);
-        sb.append(", allowAbbreviatedCommands=").append(allowAbbreviatedCommands);
-        sb.append(", allowAbbreviatedOptions=").append(allowAbbreviatedOptions);
-        sb.append('}');
+        sb.append(", parserConfig=").append('\n').append(parserConfig);
+        sb.append('\n').append('}');
         return sb.toString();
     }
 }

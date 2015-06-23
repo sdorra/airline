@@ -50,11 +50,11 @@ public class Parser {
 
         // Check if we got an alias
         if (tokens.hasNext()) {
-            if (metadata.getAliases().size() > 0) {
-                AliasMetadata alias = find(metadata.getAliases(),
+            if (metadata.getParserConfiguration().getAliases().size() > 0) {
+                AliasMetadata alias = find(metadata.getParserConfiguration().getAliases(),
                         compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
                 if (alias != null) {
-                    if (!metadata.aliasesOverrideBuiltIns()) {
+                    if (!metadata.getParserConfiguration().aliasesOverrideBuiltIns()) {
                         // Check we don't have a default group/command with the
                         // same
                         // name as otherwise that would take precedence
@@ -123,7 +123,7 @@ public class Parser {
         // Parse group
         if (tokens.hasNext()) {
             //@formatter:off
-            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (metadata != null && metadata.allowsAbbreviatedCommands() 
+            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (metadata != null && metadata.getParserConfiguration().allowsAbbreviatedCommands() 
                                  ? new AbbreviatedGroupFinder(tokens.peek(), metadata.getCommandGroups()) 
                                  : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter()));
             //@formatter:on
@@ -144,7 +144,7 @@ public class Parser {
 
         if (tokens.hasNext()) {
             //@formatter:off
-            findCommandPredicate = (Predicate<? super CommandMetadata>) (metadata != null && metadata.allowsAbbreviatedCommands() 
+            findCommandPredicate = (Predicate<? super CommandMetadata>) (metadata != null && metadata.getParserConfiguration().allowsAbbreviatedCommands() 
                                    ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
                                    : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()));
             //@formatter:on
@@ -162,7 +162,8 @@ public class Parser {
                     state = state.withUnparsedInput(tokens.next());
                 }
             } else {
-                if (tokens.peek().equals(command.getName()) || (!usingDefault && metadata.allowsAbbreviatedCommands())) {
+                if (tokens.peek().equals(command.getName())
+                        || (!usingDefault && metadata.getParserConfiguration().allowsAbbreviatedCommands())) {
                     tokens.next();
                 }
 
@@ -198,7 +199,7 @@ public class Parser {
         List<OptionParser> optionParsers;
         if (state.getGlobal() != null) {
             // Using CLI defined set
-            optionParsers = state.getGlobal().getOptionParsers();
+            optionParsers = state.getGlobal().getParserConfiguration().getOptionParsers();
         } else {
             // Using default set
             optionParsers = new ArrayList<OptionParser>();
@@ -208,7 +209,6 @@ public class Parser {
         }
 
         while (tokens.hasNext()) {
-            //
             // Try to parse next option(s) using different styles. If code
             // matches it returns the next parser state, otherwise it returns
             // null.

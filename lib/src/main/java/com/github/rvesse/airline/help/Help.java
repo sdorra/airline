@@ -12,6 +12,7 @@ import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.AbbreviatedCommandFinder;
 import com.github.rvesse.airline.parser.AbbreviatedGroupFinder;
 import com.google.common.base.Predicate;
@@ -27,7 +28,7 @@ import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Lists.newArrayList;
 
 @Command(name = "help", description = "Display help information")
-public class Help implements Runnable, Callable<Void> {
+public class Help implements Runnable, Callable<Void> {   
     @Inject
     public GlobalMetadata global;
 
@@ -175,14 +176,14 @@ public class Help implements Runnable, Callable<Void> {
         Predicate<? super CommandGroupMetadata> findGroupPredicate;
         Predicate<? super CommandMetadata> findCommandPredicate;
         //@formatter:off
-        findGroupPredicate = global.allowsAbbreviatedCommands() 
+        findGroupPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
                              ? new AbbreviatedGroupFinder(name, global.getCommandGroups()) 
                              : compose(equalTo(name), CommandGroupMetadata.nameGetter());
         //@formatter:on
 
         // A command in the default group?
         //@formatter:off
-        findCommandPredicate = global.allowsAbbreviatedCommands() 
+        findCommandPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
                                ? new AbbreviatedCommandFinder(name, global.getDefaultGroupCommands())
                                : compose(equalTo(name), CommandMetadata.nameGetter());
         //@formatter:on
@@ -205,7 +206,7 @@ public class Help implements Runnable, Callable<Void> {
                 // Group command help
                 String commandName = commandNames.get(1);
                 //@formatter:off
-                findCommandPredicate = global.allowsAbbreviatedCommands() 
+                findCommandPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
                                        ? new AbbreviatedCommandFinder(commandName, group.getCommands())
                                        : compose(equalTo(commandName), CommandMetadata.nameGetter());
                 //@formatter:on
@@ -218,7 +219,7 @@ public class Help implements Runnable, Callable<Void> {
                 }
 
                 // Didn't find an appropriate command
-                if (global.allowsAbbreviatedCommands()) {
+                if (global.getParserConfiguration().allowsAbbreviatedCommands()) {
                     System.out.println("Unknown command " + name + " " + commandName + " or an ambiguous abbreviation");
                 } else {
                     System.out.println("Unknown command " + name + " " + commandName);
@@ -227,7 +228,7 @@ public class Help implements Runnable, Callable<Void> {
         }
 
         // Didn't find an appropriate group
-        if (global.allowsAbbreviatedCommands()) {
+        if (global.getParserConfiguration().allowsAbbreviatedCommands()) {
             System.out.println("Unknown command " + name + " or an ambiguous abbreviation");
         } else {
             System.out.println("Unknown command " + name);

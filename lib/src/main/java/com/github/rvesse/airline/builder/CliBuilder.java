@@ -17,6 +17,12 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.CommandFactoryDefault;
 import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.model.AliasMetadata;
+import com.github.rvesse.airline.model.CommandGroupMetadata;
+import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.GlobalMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.AliasArgumentsParser;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
@@ -24,6 +30,7 @@ import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.parser.options.StandardOptionParser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
 
@@ -357,8 +364,77 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
             this.withDefaultOptionParsers();
         }
 
-        return new Cli<C>(name, description, typeConverter, defaultCommand, commandFactory,
-                defaultCommandGroupCommands, groups.values(), aliases.values(), aliasesOverrideBuiltIns,
-                this.optionParsers, allowAbbreviatedCommands, allowAbbreviatedOptions);
+        CommandMetadata defaultCommandMetadata = null;
+        if (defaultCommand != null) {
+            defaultCommandMetadata = MetadataLoader.loadCommand(defaultCommand);
+        }
+
+        final List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
+
+        List<CommandMetadata> defaultCommandGroup = defaultCommandGroupCommands != null ? Lists
+                .newArrayList(MetadataLoader.loadCommands(defaultCommandGroupCommands)) : Lists
+                .<CommandMetadata> newArrayList();
+
+        // Currently the default command is required to be in the commands
+        // list. If that changes, we'll need to add it here and add checks for
+        // existence
+        allCommands.addAll(defaultCommandGroup);
+
+        // Build groups
+        List<CommandGroupMetadata> commandGroups;
+        if (groups != null) {
+            commandGroups = new ArrayList<CommandGroupMetadata>();
+            for (GroupBuilder<C> groupBuilder : groups.values()) {
+                commandGroups.add(groupBuilder.build());
+            }
+        } else {
+            commandGroups = Lists.newArrayList();
+        }
+        for (CommandGroupMetadata group : commandGroups) {
+            allCommands.addAll(group.getCommands());
+        }
+
+        // add commands to groups based on the value of groups in the @Command
+        // annotations
+        // rather than change the entire way metadata is loaded, I figured just
+        // post-processing was an easier, yet uglier, way to go
+        MetadataLoader.loadCommandsIntoGroupsByAnnotation(allCommands, commandGroups, defaultCommandGroup);
+
+        // Build aliases
+        List<AliasMetadata> aliasData;
+        if (aliases != null) {
+            aliasData = new ArrayList<AliasMetadata>();
+            for (AliasBuilder<C> aliasBuilder : aliases.values()) {
+                aliasData.add(aliasBuilder.build());
+            }
+        } else {
+            aliasData = Lists.newArrayList();
+        }
+
+        // Build option parsers
+        List<OptionParser> optParsers;
+        if (optionParsers != null) {
+            optParsers = new ArrayList<OptionParser>();
+            for (Class<? extends OptionParser> parserClass : optionParsers) {
+                try {
+                    optParsers.add(parserClass.newInstance());
+                } catch (Throwable e) {
+                    throw new IllegalArgumentException("Cannot instantiate an option parser from the class "
+                            + parserClass.getCanonicalName(), e);
+                }
+            }
+        } else {
+            optParsers = Lists.newArrayList();
+        }
+
+        Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
+
+        // Build metadata objects
+        ParserMetadata parserConfig = new ParserMetadata(optParsers, allowAbbreviatedCommands, allowAbbreviatedOptions,
+                aliasData, aliasesOverrideBuiltIns);
+        GlobalMetadata metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
+                ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups), parserConfig);
+
+        return new Cli<C>(commandFactory, metadata);
     }
 }

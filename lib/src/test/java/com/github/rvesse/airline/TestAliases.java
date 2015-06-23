@@ -46,7 +46,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -74,7 +74,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 0);
     }
 
@@ -90,7 +90,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -118,7 +118,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -146,7 +146,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -176,7 +176,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -245,7 +245,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -274,7 +274,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);
@@ -304,7 +304,7 @@ public class TestAliases {
         //@formatter:on
 
         // Check definition
-        List<AliasMetadata> aliases = cli.getMetadata().getAliases();
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
         Assert.assertEquals(aliases.size(), 1);
 
         AliasMetadata alias = aliases.get(0);

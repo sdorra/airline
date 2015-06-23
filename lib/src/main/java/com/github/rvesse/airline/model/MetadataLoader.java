@@ -9,7 +9,6 @@ import com.github.rvesse.airline.Groups;
 import com.github.rvesse.airline.Option;
 import com.github.rvesse.airline.OptionType;
 import com.github.rvesse.airline.help.Suggester;
-import com.github.rvesse.airline.parser.options.OptionParser;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
@@ -22,7 +21,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
 import javax.inject.Inject;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -44,8 +42,7 @@ import static com.google.common.collect.Maps.newHashMap;
 public class MetadataLoader {
     public static GlobalMetadata loadGlobal(String name, String description, CommandMetadata defaultCommand,
             Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups,
-            Iterable<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns, Iterable<OptionParser> optionParsers,
-            boolean allowAbbreviatedCommands, boolean allowAbbreviatedOptions) {
+            ParserMetadata parserConfig) {
         ImmutableList.Builder<OptionMetadata> globalOptionsBuilder = ImmutableList.builder();
         if (defaultCommand != null) {
             globalOptionsBuilder.addAll(defaultCommand.getGlobalOptions());
@@ -59,8 +56,7 @@ public class MetadataLoader {
             }
         }
         List<OptionMetadata> globalOptions = mergeOptionSet(globalOptionsBuilder.build());
-        return new GlobalMetadata(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups,
-                aliases, aliasesOverrideBuiltIns, optionParsers, allowAbbreviatedCommands, allowAbbreviatedOptions);
+        return new GlobalMetadata(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups, parserConfig);
     }
 
     public static CommandGroupMetadata loadCommandGroup(String name, String description, boolean hidden,

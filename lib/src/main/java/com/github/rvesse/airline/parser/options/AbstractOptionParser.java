@@ -29,7 +29,7 @@ public abstract class AbstractOptionParser implements OptionParser {
      */
     protected final OptionMetadata findOption(ParseState state, List<OptionMetadata> options, final String name) {
         Predicate<? super OptionMetadata> findOptionPredicate;
-        if (state.getGlobal() != null && state.getGlobal().allowsAbbreviatedOptions()) {
+        if (state.getGlobal() != null && state.getGlobal().getParserConfiguration().allowsAbbreviatedOptions()) {
             findOptionPredicate = new AbbreviatedOptionFinder(name, options);
         } else {
             findOptionPredicate = new Predicate<OptionMetadata>() {
