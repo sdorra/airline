@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
  * Abstract global usage generator for generators that use a
  * {@link UsagePrinter} to generate the documentation
  */
-public abstract class AbstractPrintedGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
+public abstract class AbstractPrintedGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
     private final int columnSize;
 
@@ -36,7 +36,7 @@ public abstract class AbstractPrintedGlobalUsageGenerator extends AbstractGlobal
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract void usage(GlobalMetadata global, UsagePrinter out) throws IOException;
+    protected abstract void usage(GlobalMetadata<T> global, UsagePrinter out) throws IOException;
 
     /**
      * Creates a usage printer for the given stream
@@ -51,7 +51,7 @@ public abstract class AbstractPrintedGlobalUsageGenerator extends AbstractGlobal
     }
 
     @Override
-    public void usage(GlobalMetadata global, OutputStream out) throws IOException {
+    public void usage(GlobalMetadata<T> global, OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
         usage(global, printer);
         printer.flush();

@@ -834,7 +834,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CliGlobalUsageSummaryGenerator generator = new CliGlobalUsageSummaryGenerator(true);
+        CliGlobalUsageSummaryGenerator<Object> generator = new CliGlobalUsageSummaryGenerator<Object>(true);
         generator.usage(parser.getMetadata(), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "usage: test <command> [ <args> ]\n" +
@@ -941,7 +941,7 @@ public class TestHelp {
 
         Cli<Runnable> gitParser = builder.build();
         
-        RonnGlobalUsageGenerator generator = new RonnGlobalUsageGenerator();
+        RonnGlobalUsageGenerator<Runnable> generator = new RonnGlobalUsageGenerator<Runnable>();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         generator.usage(gitParser.getMetadata(), out);
         String usage = new String(out.toByteArray(), utf8);
@@ -1092,7 +1092,7 @@ public class TestHelp {
 
         Cli<Runnable> gitParser = builder.build();
         
-        RonnGlobalUsageGenerator generator = new RonnMultiPageGlobalUsageGenerator();
+        RonnGlobalUsageGenerator<Runnable> generator = new RonnMultiPageGlobalUsageGenerator<Runnable>();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         generator.usage(gitParser.getMetadata(), out);
         String usage = new String(out.toByteArray(), utf8);

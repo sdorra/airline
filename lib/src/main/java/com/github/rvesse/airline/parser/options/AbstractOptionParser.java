@@ -14,7 +14,7 @@ import com.google.common.base.Predicate;
  * Abstract option parser that provides some useful helper methods to derived
  * classes
  */
-public abstract class AbstractOptionParser extends AbstractParser implements OptionParser {
+public abstract class AbstractOptionParser<T> extends AbstractParser<T> implements OptionParser<T> {
 
     /**
      * Tries to find an option with the given name
@@ -27,7 +27,7 @@ public abstract class AbstractOptionParser extends AbstractParser implements Opt
      *            Name
      * @return Option if found, {@code null} otherwise
      */
-    protected final OptionMetadata findOption(ParseState state, List<OptionMetadata> options, final String name) {
+    protected final OptionMetadata findOption(ParseState<T> state, List<OptionMetadata> options, final String name) {
         return findOption(state, options, name, null);
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractOptionParser extends AbstractParser implements Opt
      *            Default value to return if nothing found
      * @return Option if found, {@code defaultValue} otherwise
      */
-    protected final OptionMetadata findOption(ParseState state, List<OptionMetadata> options, final String name,
+    protected final OptionMetadata findOption(ParseState<T> state, List<OptionMetadata> options, final String name,
             OptionMetadata defaultValue) {
         Predicate<? super OptionMetadata> findOptionPredicate;
         if (state.getGlobal() != null && state.getGlobal().getParserConfiguration().allowsAbbreviatedOptions()) {

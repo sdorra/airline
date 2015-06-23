@@ -25,6 +25,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.ParseCommandMissingException;
@@ -37,7 +38,6 @@ import com.github.rvesse.airline.parser.ParserUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 
 import java.util.List;
 
@@ -56,26 +56,20 @@ public class Cli<C> {
         return new CliBuilder<T>(name);
     }
 
-    private final GlobalMetadata metadata;
-
-    private final CommandFactory<C> mCommandFactory;
+    private final GlobalMetadata<C> metadata;
 
     /**
      * Creates a new CLI
      * 
-     * @param theCommandFactory
-     *            Command factory
      * @param metadata
      *            Metadata
      */
-    public Cli(CommandFactory<C> theCommandFactory, GlobalMetadata metadata) {
-        Preconditions.checkNotNull(theCommandFactory, "theCommandFactory is null");
+    public Cli(GlobalMetadata<C> metadata) {
         Preconditions.checkNotNull(metadata);
-        mCommandFactory = theCommandFactory;
         this.metadata = metadata;
     }
 
-    public GlobalMetadata getMetadata() {
+    public GlobalMetadata<C> getMetadata() {
         return metadata;
     }
 
@@ -84,18 +78,18 @@ public class Cli<C> {
     }
 
     public C parse(String... args) {
-        return parse(mCommandFactory, ImmutableList.copyOf(args));
+        return parse(metadata.getParserConfiguration().getCommandFactory(), ImmutableList.copyOf(args));
     }
 
     public C parse(Iterable<String> args) {
-        return parse(mCommandFactory, args);
+        return parse(metadata.getParserConfiguration().getCommandFactory(), args);
     }
 
     public C parse(CommandFactory<C> commandFactory, Iterable<String> args) {
         Preconditions.checkNotNull(args, "args is null");
 
-        Parser parser = new Parser();
-        ParseState state = parser.parse(metadata, args);
+        Parser<C> parser = new Parser<C>();
+        ParseState<C> state = parser.parse(metadata, args);
 
         if (state.getCommand() == null) {
             if (state.getGroup() != null) {
@@ -128,8 +122,8 @@ public class Cli<C> {
     public C parse(C commandInstance, String... args) {
         Preconditions.checkNotNull(args, "args is null");
 
-        Parser parser = new Parser();
-        ParseState state = parser.parse(metadata, args);
+        Parser<C> parser = new Parser<C>();
+        ParseState<C> state = parser.parse(metadata, args);
 
         CommandMetadata command = MetadataLoader.loadCommand(commandInstance.getClass());
 
@@ -139,6 +133,7 @@ public class Cli<C> {
 
         ImmutableMap.Builder<Class<?>, Object> bindings = ImmutableMap.<Class<?>, Object> builder().put(
                 GlobalMetadata.class, metadata);
+        bindings.put(ParserMetadata.class, metadata.getParserConfiguration());
 
         if (state.getGroup() != null) {
             bindings.put(CommandGroupMetadata.class, state.getGroup());
@@ -152,7 +147,7 @@ public class Cli<C> {
         return c;
     }
 
-    private void validate(ParseState state) {
+    private void validate(ParseState<C> state) {
         CommandMetadata command = state.getCommand();
         if (command == null) {
             List<String> unparsedInput = state.getUnparsedInput();

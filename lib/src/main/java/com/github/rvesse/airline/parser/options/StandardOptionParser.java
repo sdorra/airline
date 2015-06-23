@@ -3,7 +3,6 @@ package com.github.rvesse.airline.parser.options;
 import java.util.List;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.collect.ImmutableList;
@@ -14,10 +13,10 @@ import com.google.common.collect.PeekingIterator;
  * separated e.g. {@code --name value}
  *
  */
-public class StandardOptionParser extends AbstractOptionParser {
+public class StandardOptionParser<T> extends AbstractOptionParser<T> {
 
     @Override
-    public ParseState parseOptions(PeekingIterator<String> tokens, ParseState state, List<OptionMetadata> allowedOptions) {
+    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state, List<OptionMetadata> allowedOptions) {
         OptionMetadata option = findOption(state, allowedOptions, tokens.peek());
         if (option == null) {
             return null;

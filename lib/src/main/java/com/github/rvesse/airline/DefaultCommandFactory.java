@@ -2,7 +2,7 @@ package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.parser.ParserUtil;
 
-public class CommandFactoryDefault<T> implements CommandFactory<T> {
+public class DefaultCommandFactory<T> implements CommandFactory<T> {
 
     @SuppressWarnings("unchecked")
     @Override

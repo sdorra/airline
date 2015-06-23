@@ -435,7 +435,7 @@ public class TestSingleCommand
     public static class CommandTest
     {
         @Inject
-        public HelpOption helpOption;
+        public HelpOption<CommandTest> helpOption;
 
         @Arguments(description = "Patterns of files to be added")
         public List<String> patterns;

@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.CommandFactory;
-import com.github.rvesse.airline.CommandFactoryDefault;
+import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
@@ -33,6 +33,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+/**
+ * Builder for CLIs
+ *
+ * @param <C>
+ *            Command type
+ */
 public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
 
     protected final String name;
@@ -43,9 +49,9 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     private final List<Class<? extends C>> defaultCommandGroupCommands = newArrayList();
     protected final Map<String, AliasBuilder<C>> aliases = newHashMap();
     protected final Map<String, GroupBuilder<C>> groups = newHashMap();
-    protected CommandFactory<C> commandFactory = new CommandFactoryDefault<C>();
+    protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
-    protected final List<Class<? extends OptionParser>> optionParsers = newArrayList();
+    protected final List<OptionParser<C>> optionParsers = newArrayList();
 
     public CliBuilder(String name) {
         checkNotBlank(name, "Program name");
@@ -304,7 +310,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
      *            Option parsers
      * @return Builder
      */
-    public CliBuilder<C> withOptionParser(Class<? extends OptionParser> optionParser) {
+    public CliBuilder<C> withOptionParser(OptionParser<C> optionParser) {
         if (optionParser != null) {
             this.optionParsers.add(optionParser);
         }
@@ -323,9 +329,9 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
      * @return Builder
      */
     @SuppressWarnings("unchecked")
-    public CliBuilder<C> withOptionParsers(Class<? extends OptionParser>... optionParsers) {
+    public CliBuilder<C> withOptionParsers(OptionParser<C>... optionParsers) {
         if (optionParsers != null) {
-            for (Class<? extends OptionParser> parser : optionParsers) {
+            for (OptionParser<C> parser : optionParsers) {
                 if (parser != null) {
                     this.optionParsers.add(parser);
                 }
@@ -366,7 +372,8 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
      */
     @SuppressWarnings("unchecked")
     public CliBuilder<C> withDefaultOptionParsers() {
-        return this.withOptionParsers(StandardOptionParser.class, LongGetOptParser.class, ClassicGetOptParser.class);
+        return this.withOptionParsers(new StandardOptionParser<C>(), new LongGetOptParser<C>(),
+                new ClassicGetOptParser<C>());
     }
 
     @Override
@@ -422,30 +429,14 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
             aliasData = Lists.newArrayList();
         }
 
-        // Build option parsers
-        List<OptionParser> optParsers;
-        if (optionParsers != null) {
-            optParsers = new ArrayList<OptionParser>();
-            for (Class<? extends OptionParser> parserClass : optionParsers) {
-                try {
-                    optParsers.add(parserClass.newInstance());
-                } catch (Throwable e) {
-                    throw new IllegalArgumentException("Cannot instantiate an option parser from the class "
-                            + parserClass.getCanonicalName(), e);
-                }
-            }
-        } else {
-            optParsers = Lists.newArrayList();
-        }
-
         Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
 
         // Build metadata objects
-        ParserMetadata parserConfig = new ParserMetadata(optParsers, typeConverter, allowAbbreviatedCommands,
-                allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns);
-        GlobalMetadata metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
+        ParserMetadata<C> parserConfig = new ParserMetadata<C>(commandFactory, optionParsers, typeConverter,
+                allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns);
+        GlobalMetadata<C> metadata = MetadataLoader.<C> loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups), parserConfig);
 
-        return new Cli<C>(commandFactory, metadata);
+        return new Cli<C>(metadata);
     }
 }

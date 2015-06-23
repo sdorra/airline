@@ -10,7 +10,7 @@ import com.google.common.collect.PeekingIterator;
  * Interface for option parsers
  *
  */
-public interface OptionParser {
+public interface OptionParser<T> {
 
     /**
      * Parses one/more options from the token stream
@@ -24,6 +24,6 @@ public interface OptionParser {
      * @return New parser state, may return {@code null} if this parser could
      *         not parse the next token as an option
      */
-    public abstract ParseState parseOptions(PeekingIterator<String> tokens, ParseState state,
+    public abstract ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,
             List<OptionMetadata> allowedOptions);
 }

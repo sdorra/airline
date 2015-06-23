@@ -12,7 +12,6 @@ import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.AbbreviatedCommandFinder;
 import com.github.rvesse.airline.parser.AbbreviatedGroupFinder;
 import com.google.common.base.Predicate;
@@ -28,9 +27,9 @@ import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Lists.newArrayList;
 
 @Command(name = "help", description = "Display help information")
-public class Help implements Runnable, Callable<Void> {   
+public class Help<T> implements Runnable, Callable<Void> {   
     @Inject
-    public GlobalMetadata global;
+    public GlobalMetadata<T> global;
 
     @Arguments
     public List<String> command = newArrayList();
@@ -112,7 +111,7 @@ public class Help implements Runnable, Callable<Void> {
      *            Command Names
      * @throws IOException
      */
-    public static void help(GlobalMetadata global, List<String> commandNames) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames) throws IOException {
         help(global, commandNames, false, System.out);
     }
 
@@ -127,7 +126,7 @@ public class Help implements Runnable, Callable<Void> {
      *            Whether to include hidden commands and options in the output
      * @throws IOException
      */
-    public static void help(GlobalMetadata global, List<String> commandNames, boolean includeHidden) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, boolean includeHidden) throws IOException {
         help(global, commandNames, includeHidden, System.out);
     }
     
@@ -142,7 +141,7 @@ public class Help implements Runnable, Callable<Void> {
      *            Output Stream
      * @throws IOException
      */
-    public static void help(GlobalMetadata global, List<String> commandNames, OutputStream out) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, OutputStream out) throws IOException {
         help(global, commandNames, false, out);
     }
 
@@ -157,9 +156,9 @@ public class Help implements Runnable, Callable<Void> {
      *            Output Stream
      * @throws IOException
      */
-    public static void help(GlobalMetadata global, List<String> commandNames, boolean includeHidden, OutputStream out) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, boolean includeHidden, OutputStream out) throws IOException {
         if (commandNames.isEmpty()) {
-            new CliGlobalUsageSummaryGenerator(includeHidden).usage(global, out);
+            new CliGlobalUsageSummaryGenerator<T>(includeHidden).usage(global, out);
             return;
         }
 
@@ -168,7 +167,7 @@ public class Help implements Runnable, Callable<Void> {
         // Main program?
         if (name.equals(global.getName())) {
             // Main program help
-            new CliGlobalUsageGenerator(includeHidden).usage(global, out);
+            new CliGlobalUsageGenerator<T>(includeHidden).usage(global, out);
             return;
         }
 
@@ -200,7 +199,7 @@ public class Help implements Runnable, Callable<Void> {
             // General group help or specific group command help?
             if (commandNames.size() == 1) {
                 // General group help
-                new CliCommandGroupUsageGenerator(includeHidden).usage(global, group, out);
+                new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global, group, out);
                 return;
             } else {
                 // Group command help

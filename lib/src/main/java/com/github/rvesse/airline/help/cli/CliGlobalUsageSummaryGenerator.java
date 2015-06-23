@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGenerator {
+public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
 
     public CliGlobalUsageSummaryGenerator() {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
@@ -50,7 +50,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
         super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
     }
 
-    public void usage(GlobalMetadata global, UsagePrinter out) throws IOException {
+    public void usage(GlobalMetadata<T> global, UsagePrinter out) throws IOException {
         // Synopsis
         outputSynopsis(out, global);
 
@@ -71,7 +71,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
      * 
      * @throws IOException
      */
-    protected void outputFooter(UsagePrinter out, GlobalMetadata global) throws IOException {
+    protected void outputFooter(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.newline();
         out.append("See").append("'" + global.getName())
                 .append("help <command>' for more information on a specific command.").newline();
@@ -86,7 +86,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
      *            Global meta-data
      * @throws IOException
      */
-    protected void outputCommandList(UsagePrinter out, GlobalMetadata global) throws IOException {
+    protected void outputCommandList(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         Map<String, String> commands = new LinkedHashMap<>();
         for (CommandMetadata commandMetadata : sortCommands(global.getDefaultGroupCommands())) {
             if (!commandMetadata.isHidden() || this.includeHidden()) {
@@ -118,7 +118,7 @@ public class CliGlobalUsageSummaryGenerator extends AbstractPrintedGlobalUsageGe
      *            Global meta-data
      * @throws IOException
      */
-    protected void outputSynopsis(UsagePrinter out, GlobalMetadata global) throws IOException {
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         List<String> commandArguments = newArrayList();
         Collection<String> args = Collections2.transform(sortOptions(global.getOptions()),
                 new Function<OptionMetadata, String>() {

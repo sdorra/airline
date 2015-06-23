@@ -68,8 +68,8 @@ public class SingleCommand<C>
     {
         checkNotNull(args, "args is null");
         
-        Parser parser = new Parser();
-        ParseState state = parser.parseCommand(commandMetadata, args);
+        Parser<C> parser = new Parser<C>();
+        ParseState<C> state = parser.parseCommand(commandMetadata, args);
         validate(state);
 
         CommandMetadata command = state.getCommand();
@@ -83,7 +83,7 @@ public class SingleCommand<C>
                 ImmutableMap.<Class<?>, Object>of(CommandMetadata.class, commandMetadata));
     }
     
-    private void validate(ParseState state)
+    private void validate(ParseState<C> state)
     {
         CommandMetadata command = state.getCommand();
         if (command == null) {

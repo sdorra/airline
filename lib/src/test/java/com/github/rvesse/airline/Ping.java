@@ -11,7 +11,7 @@ import com.github.rvesse.airline.SingleCommand;
 public class Ping
 {
     @Inject
-    public HelpOption helpOption;
+    public HelpOption<Ping> helpOption;
 
     @Option(name = {"-c", "--count"}, description = "Send count packets")
     public int count = 1;

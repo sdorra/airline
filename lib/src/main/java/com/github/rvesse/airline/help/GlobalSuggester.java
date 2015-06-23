@@ -10,11 +10,11 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.transform;
 
-public class GlobalSuggester
+public class GlobalSuggester<T>
     implements Suggester
 {
     @Inject
-    public GlobalMetadata metadata;
+    public GlobalMetadata<T> metadata;
 
     @Override
     public Iterable<String> suggest()

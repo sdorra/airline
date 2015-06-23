@@ -87,7 +87,7 @@ public class TestGalaxyCommandLineParser
     public void test_metadata() {
         Cli<GalaxyCommand> cli = createParser();
         
-        GlobalMetadata global = cli.getMetadata();
+        GlobalMetadata<GalaxyCommand> global = cli.getMetadata();
         Assert.assertEquals(global.getOptions().size(), 2);
         
         CommandMetadata show = find(global.getDefaultGroupCommands(), compose(equalTo("show"), CommandMetadata.nameGetter()), null);
@@ -229,7 +229,7 @@ public class TestGalaxyCommandLineParser
             extends GalaxyCommand
     {
         @Inject
-        public Help help;
+        public Help<GalaxyCommand> help;
 
         @Override
         public void execute()

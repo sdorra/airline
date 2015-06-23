@@ -14,7 +14,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
-public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator {
+public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
 
     public CliGlobalUsageGenerator() {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
@@ -43,7 +43,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
     }
 
     @Override
-    protected void usage(GlobalMetadata global, UsagePrinter out) throws IOException {
+    protected void usage(GlobalMetadata<T> global, UsagePrinter out) throws IOException {
         // Name and description
         outputDescription(out, global);
 
@@ -69,7 +69,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      *            Global meta-data
      * @throws IOException
      */
-    protected void outputCommandList(UsagePrinter out, GlobalMetadata global) throws IOException {
+    protected void outputCommandList(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("COMMANDS").newline();
         UsagePrinter commandPrinter = out.newIndentedPrinter(8);
 
@@ -161,7 +161,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      * 
      * @throws IOException
      */
-    protected void outputSynopsis(UsagePrinter out, GlobalMetadata global) throws IOException {
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("SYNOPSIS").newline();
         out.newIndentedPrinter(8).newPrinterWithHangingIndent(8).append(global.getName())
                 .appendWords(toSynopsisUsage(global.getOptions())).append("<command> [ <args> ]").newline().newline();
@@ -176,7 +176,7 @@ public class CliGlobalUsageGenerator extends AbstractPrintedGlobalUsageGenerator
      *            Global meta-data
      * @throws IOException
      */
-    protected void outputDescription(UsagePrinter out, GlobalMetadata global) throws IOException {
+    protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("NAME").newline();
 
         out.newIndentedPrinter(8).append(global.getName()).append("-").append(global.getDescription()).newline()

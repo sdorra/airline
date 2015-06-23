@@ -26,7 +26,7 @@ import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 import static com.google.common.collect.Lists.newArrayList;
 
 @Command(name = "suggest")
-public class SuggestCommand
+public class SuggestCommand<T>
         implements Runnable, Callable<Void>
 {
     private static final Map<Context, Class<? extends Suggester>> BUILTIN_SUGGESTERS = ImmutableMap.<Context, Class<? extends Suggester>>builder()
@@ -36,7 +36,7 @@ public class SuggestCommand
             .build();
 
     @Inject
-    public GlobalMetadata metadata;
+    public GlobalMetadata<T> metadata;
 
     @Arguments
     public List<String> arguments = newArrayList();
@@ -44,8 +44,8 @@ public class SuggestCommand
     @VisibleForTesting
     public Iterable<String> generateSuggestions()
     {
-        Parser parser = new Parser();
-        ParseState state = parser.parse(metadata, arguments);
+        Parser<T> parser = new Parser<T>();
+        ParseState<T> state = parser.parse(metadata, arguments);
 
         Class<? extends Suggester> suggesterClass = BUILTIN_SUGGESTERS.get(state.getLocation());
         if (suggesterClass != null) {

@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
  * to customise how sections are output
  * </p>
  */
-public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
+public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
     protected final CommandUsageGenerator commandUsageGenerator;
     protected final int manSection;
@@ -64,7 +64,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
     }
 
     @Override
-    public void usage(GlobalMetadata global, OutputStream output) throws IOException {
+    public void usage(GlobalMetadata<T> global, OutputStream output) throws IOException {
         Writer writer = new OutputStreamWriter(output);
 
         outputTitle(global, writer);
@@ -137,7 +137,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputGroupCommandList(Writer writer, GlobalMetadata global) throws IOException {
+    protected void outputGroupCommandList(Writer writer, GlobalMetadata<T> global) throws IOException {
         writer.append(NEW_PARA).append("## COMMAND GROUPS").append(NEW_PARA);
         writer.append("Commands are grouped as follows:");
 
@@ -185,7 +185,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputCommandList(Writer writer, GlobalMetadata global) throws IOException {
+    protected void outputCommandList(Writer writer, GlobalMetadata<T> global) throws IOException {
         writer.append(NEW_PARA).append("## COMMANDS");
 
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
@@ -270,7 +270,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      * @return
      * @throws IOException
      */
-    protected void outputSynopsis(Writer writer, GlobalMetadata global) throws IOException {
+    protected void outputSynopsis(Writer writer, GlobalMetadata<T> global) throws IOException {
         writer.append(NEW_PARA).append("## SYNOPSIS").append(NEW_PARA);
         writer.append("`").append(global.getName()).append("`");
         if (global.getOptions() != null && global.getOptions().size() > 0) {
@@ -292,7 +292,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      *            Writer
      * @throws IOException
      */
-    protected void outputTitle(GlobalMetadata global, Writer writer) throws IOException {
+    protected void outputTitle(GlobalMetadata<T> global, Writer writer) throws IOException {
         writer.append(global.getName()).append("(").append(Integer.toString(this.manSection)).append(") -- ");
         writer.append(global.getDescription()).append("\n");
         writer.append("==========");
@@ -310,7 +310,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata global) throws IOException {
+    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global) throws IOException {
         writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
 
         // Default group usages
@@ -336,7 +336,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      *            Command meta-data
      * @return Display name for the command
      */
-    protected String getCommandName(GlobalMetadata global, String groupName, CommandMetadata command) {
+    protected String getCommandName(GlobalMetadata<T> global, String groupName, CommandMetadata command) {
         return command.getName();
     }
 
@@ -354,7 +354,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global,
+    protected void outputGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global,
             CommandGroupMetadata group) throws IOException {
         for (CommandMetadata command : sortCommands(group.getCommands())) {
             if (command.isHidden() && !this.includeHidden())
@@ -379,7 +379,7 @@ public class RonnGlobalUsageGenerator extends AbstractGlobalUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global)
+    protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global)
             throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden() && !this.includeHidden())

@@ -11,8 +11,8 @@ import com.github.rvesse.airline.model.OptionMetadata;
 /**
  * Abstract command group usage generator
  */
-public abstract class AbstractCommandGroupUsageGenerator extends AbstractUsageGenerator implements
-        CommandGroupUsageGenerator {
+public abstract class AbstractCommandGroupUsageGenerator<T> extends AbstractUsageGenerator implements
+        CommandGroupUsageGenerator<T> {
 
     public AbstractCommandGroupUsageGenerator() {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
@@ -24,7 +24,7 @@ public abstract class AbstractCommandGroupUsageGenerator extends AbstractUsageGe
     }
 
     @Override
-    public void usage(GlobalMetadata global, CommandGroupMetadata group) throws IOException {
+    public void usage(GlobalMetadata<T> global, CommandGroupMetadata group) throws IOException {
         usage(global, group, System.out);
     }
 }

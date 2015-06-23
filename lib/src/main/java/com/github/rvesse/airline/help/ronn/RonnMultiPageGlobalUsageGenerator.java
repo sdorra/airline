@@ -26,7 +26,7 @@ import com.github.rvesse.airline.model.GlobalMetadata;
  * @author rvesse
  * 
  */
-public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator {
+public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerator<T> {
 
     public RonnMultiPageGlobalUsageGenerator() {
         this(ManSections.GENERAL_COMMANDS, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, true));
@@ -45,7 +45,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     }
 
     @Override
-    protected String getCommandName(GlobalMetadata global, String groupName, CommandMetadata command) {
+    protected String getCommandName(GlobalMetadata<T> global, String groupName, CommandMetadata command) {
         // Use full man page reference style since we're going to generate
         // individual man-pages for the commands so the overview man page needs
         // to refer to them properly
@@ -60,7 +60,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     }
 
     @Override
-    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata global) throws IOException {
+    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global) throws IOException {
         // Default group usages
         outputDefaultGroupCommandUsages(output, writer, global);
 
@@ -74,7 +74,7 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
     }
 
     @Override
-    protected void outputGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global,
+    protected void outputGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global,
             CommandGroupMetadata group) throws IOException {
 
         for (CommandMetadata command : sortCommands(group.getCommands())) {
@@ -98,20 +98,20 @@ public class RonnMultiPageGlobalUsageGenerator extends RonnGlobalUsageGenerator 
         }
     }
 
-    protected void outputReferenceToSuite(GlobalMetadata global, Writer writer) throws IOException {
+    protected void outputReferenceToSuite(GlobalMetadata<T> global, Writer writer) throws IOException {
         writer.append(NEW_PARA).append("## ").append(global.getName().toUpperCase()).append(NEW_PARA);
         writer.append("Part of the `").append(global.getName()).append("(").append(Integer.toString(this.manSection))
                 .append(")` suite");
     }
 
-    protected FileOutputStream createCommandFile(GlobalMetadata global, String groupName, CommandMetadata command)
+    protected FileOutputStream createCommandFile(GlobalMetadata<T> global, String groupName, CommandMetadata command)
             throws FileNotFoundException {
         return new FileOutputStream(getCommandName(global, groupName, command).replace(
                 String.format("(%d)", this.manSection), String.format(".%d.ronn", this.manSection)));
     }
 
     @Override
-    protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata global)
+    protected void outputDefaultGroupCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global)
             throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden() && !this.includeHidden())

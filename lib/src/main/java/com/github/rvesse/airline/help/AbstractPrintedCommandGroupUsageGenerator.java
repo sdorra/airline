@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
  * Abstract command group usage generator for generators that use a
  * {@link UsagePrinter} to generate the documentation
  */
-public abstract class AbstractPrintedCommandGroupUsageGenerator extends AbstractCommandGroupUsageGenerator {
+public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends AbstractCommandGroupUsageGenerator<T> {
 
     private final int columnSize;
 
@@ -38,7 +38,7 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator extends Abstract
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract void usage(GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out)
+    protected abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata group, UsagePrinter out)
             throws IOException;
 
     /**
@@ -54,7 +54,7 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator extends Abstract
     }
 
     @Override
-    public void usage(GlobalMetadata global, CommandGroupMetadata group, OutputStream out) throws IOException {
+    public void usage(GlobalMetadata<T> global, CommandGroupMetadata group, OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
         usage(global, group, printer);
         printer.flush();

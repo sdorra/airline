@@ -3,7 +3,6 @@ package com.github.rvesse.airline.parser.options;
 import java.util.List;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.base.Splitter;
@@ -18,7 +17,7 @@ import com.google.common.collect.PeekingIterator;
  * @author rvesse
  *
  */
-public abstract class AbstractKeyValueOptionParser extends AbstractOptionParser {
+public abstract class AbstractKeyValueOptionParser<T> extends AbstractOptionParser<T> {
 
     private static final char DEFAULT_SEPARATOR = '=';
     private final char separator;
@@ -32,7 +31,7 @@ public abstract class AbstractKeyValueOptionParser extends AbstractOptionParser 
     }
 
     @Override
-    public ParseState parseOptions(PeekingIterator<String> tokens, ParseState state, List<OptionMetadata> allowedOptions) {
+    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state, List<OptionMetadata> allowedOptions) {
         List<String> parts = ImmutableList.copyOf(Splitter.on(this.separator).limit(2).split(tokens.peek()));
         if (parts.size() != 2) {
             return null;

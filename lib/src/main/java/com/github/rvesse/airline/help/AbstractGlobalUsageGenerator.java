@@ -14,7 +14,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 /**
  * Abstract global usage generator
  */
-public abstract class AbstractGlobalUsageGenerator extends AbstractUsageGenerator implements GlobalUsageGenerator {
+public abstract class AbstractGlobalUsageGenerator<T> extends AbstractUsageGenerator implements GlobalUsageGenerator<T> {
 
     private final Comparator<? super CommandGroupMetadata> commandGroupComparator;
 
@@ -36,7 +36,7 @@ public abstract class AbstractGlobalUsageGenerator extends AbstractUsageGenerato
     }
 
     @Override
-    public void usage(GlobalMetadata global) throws IOException {
+    public void usage(GlobalMetadata<T> global) throws IOException {
         usage(global, System.out);
     }
 

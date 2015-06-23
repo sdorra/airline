@@ -17,7 +17,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
-public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
+public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
     private static final char NEWLINE = '\n';
     private static final String DOUBLE_NEWLINE = "\n\n";
@@ -41,7 +41,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
     }
 
     @Override
-    public void usage(GlobalMetadata global, OutputStream output) throws IOException {
+    public void usage(GlobalMetadata<T> global, OutputStream output) throws IOException {
         Writer writer = new OutputStreamWriter(output);
 
         // Script header
@@ -182,7 +182,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         output.flush();
     }
 
-    private void generateCommandFunctions(GlobalMetadata global, Writer writer) throws IOException {
+    private void generateCommandFunctions(GlobalMetadata<T> global, Writer writer) throws IOException {
         for (CommandMetadata command : global.getDefaultGroupCommands()) {
             if (command.isHidden() && !this.includeHidden())
                 continue;
@@ -192,7 +192,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         }
     }
 
-    private void generateGroupFunctions(GlobalMetadata global, Writer writer) throws IOException {
+    private void generateGroupFunctions(GlobalMetadata<T> global, Writer writer) throws IOException {
         for (CommandGroupMetadata group : global.getCommandGroups()) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
@@ -230,7 +230,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append("}\n\n");
     }
 
-    private void writeCommandCase(Writer writer, GlobalMetadata global, CommandGroupMetadata group,
+    private void writeCommandCase(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group,
             CommandMetadata command, int indent, boolean isNestedFunction) throws IOException {
         // Start the case
         indent(writer, indent);
@@ -253,7 +253,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append(";;").append(NEWLINE);
     }
 
-    private void writeCommandFunctionCall(Writer writer, GlobalMetadata global, CommandGroupMetadata group,
+    private void writeCommandFunctionCall(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group,
             CommandMetadata command, int indent) throws IOException {
         // Just call the command function and pass its value back up
         indent(writer, indent);
@@ -262,7 +262,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append(" \"${COMMANDS}\" ) )").append(NEWLINE);
     }
 
-    private void writeGroupCase(Writer writer, GlobalMetadata global, CommandGroupMetadata group, int indent)
+    private void writeGroupCase(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group, int indent)
             throws IOException {
         // Start the case
         indent(writer, indent);
@@ -279,7 +279,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append(";;").append(NEWLINE);
     }
 
-    private void writeGroupFunctionCall(Writer writer, GlobalMetadata global, CommandGroupMetadata group, int indent)
+    private void writeGroupFunctionCall(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group, int indent)
             throws IOException {
         // Just call the group function and pass its value back up
         indent(writer, indent);
@@ -288,7 +288,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append(" ) )").append(NEWLINE);
     }
 
-    private void generateGroupCompletionFunction(Writer writer, GlobalMetadata global, CommandGroupMetadata group)
+    private void generateGroupCompletionFunction(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group)
             throws IOException {
         // Start Function
         writeGroupFunctionName(writer, global, group, true);
@@ -346,7 +346,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append('}').append(DOUBLE_NEWLINE);
     }
 
-    private void generateCommandCompletionFunction(Writer writer, GlobalMetadata global, CommandGroupMetadata group,
+    private void generateCommandCompletionFunction(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group,
             CommandMetadata command) throws IOException {
         // Start Function
         writeCommandFunctionName(writer, global, group, command, true);
@@ -462,7 +462,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         writer.append('"').append(NEWLINE);
     }
 
-    private void writeFunctionName(Writer writer, GlobalMetadata global, boolean declare) throws IOException {
+    private void writeFunctionName(Writer writer, GlobalMetadata<T> global, boolean declare) throws IOException {
         if (declare) {
             writer.append("function ");
         }
@@ -474,7 +474,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         }
     }
 
-    private void writeGroupFunctionName(Writer writer, GlobalMetadata global, CommandGroupMetadata group,
+    private void writeGroupFunctionName(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group,
             boolean declare) throws IOException {
         if (declare) {
             writer.append("function ");
@@ -493,7 +493,7 @@ public class BashCompletionGenerator extends AbstractGlobalUsageGenerator {
         }
     }
 
-    private void writeCommandFunctionName(Writer writer, GlobalMetadata global, CommandGroupMetadata group,
+    private void writeCommandFunctionName(Writer writer, GlobalMetadata<T> global, CommandGroupMetadata group,
             CommandMetadata command, boolean declare) throws IOException {
         if (declare) {
             writer.append("function ");

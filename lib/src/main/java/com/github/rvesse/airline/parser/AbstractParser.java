@@ -7,7 +7,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 /**
  * Abstract base class for parsers providing some utility methods
  */
-public class AbstractParser {
+public class AbstractParser<T> {
     
     /**
      * Default type converter
@@ -39,7 +39,7 @@ public class AbstractParser {
      *            Parser State
      * @return Type converter
      */
-    protected final TypeConverter getTypeConverter(ParseState state) {
+    protected final TypeConverter getTypeConverter(ParseState<T> state) {
         if (state != null && state.getGlobal() != null) {
             return state.getGlobal().getParserConfiguration().getTypeConverter();
         } else {

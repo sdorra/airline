@@ -4,16 +4,15 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseOptionUnexpectedException;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.collect.PeekingIterator;
 
-public class ClassicGetOptParser extends AbstractOptionParser {
+public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
     private static final Pattern SHORT_OPTIONS_PATTERN = Pattern.compile("-[^-].*");
 
-    public ParseState parseOptions(PeekingIterator<String> tokens, ParseState state, List<OptionMetadata> allowedOptions) {
+    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state, List<OptionMetadata> allowedOptions) {
         if (!SHORT_OPTIONS_PATTERN.matcher(tokens.peek()).matches()) {
             return null;
         }
@@ -21,7 +20,7 @@ public class ClassicGetOptParser extends AbstractOptionParser {
         // remove leading dash from token
         String remainingToken = tokens.peek().substring(1);
 
-        ParseState nextState = state;
+        ParseState<T> nextState = state;
         while (!remainingToken.isEmpty()) {
             char tokenCharacter = remainingToken.charAt(0);
 

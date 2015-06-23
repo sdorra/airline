@@ -7,18 +7,21 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class GlobalMetadata {
+/**
+ * Represents metadata about a CLI
+ */
+public class GlobalMetadata<T> {
     private final String name;
     private final String description;
     private final List<OptionMetadata> options;
     private final CommandMetadata defaultCommand;
     private final List<CommandMetadata> defaultGroupCommands;
     private final List<CommandGroupMetadata> commandGroups;
-    private final ParserMetadata parserConfig;
+    private final ParserMetadata<T> parserConfig;
 
     public GlobalMetadata(String name, String description, Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> defaultGroupCommands,
-            Iterable<CommandGroupMetadata> commandGroups, ParserMetadata parserConfig) {
+            Iterable<CommandGroupMetadata> commandGroups, ParserMetadata<T> parserConfig) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
                 "Program name cannot be null/empty/whitespace");
         Preconditions.checkNotNull(parserConfig);
@@ -57,7 +60,7 @@ public class GlobalMetadata {
         return commandGroups;
     }
 
-    public ParserMetadata getParserConfiguration() {
+    public ParserMetadata<T> getParserConfiguration() {
         return parserConfig;
     }
 

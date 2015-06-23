@@ -15,7 +15,7 @@ import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARAT
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newTreeMap;
 
-public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUsageGenerator {
+public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGroupUsageGenerator<T> {
     private final boolean hideGlobalOptions;
 
     public CliCommandGroupUsageGenerator() {
@@ -42,7 +42,7 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
     }
 
     @Override
-    protected void usage(GlobalMetadata global, CommandGroupMetadata group, UsagePrinter out) throws IOException {
+    protected void usage(GlobalMetadata<T> global, CommandGroupMetadata group, UsagePrinter out) throws IOException {
         // Description and Name
         outputDescription(out, global, group);
 
@@ -70,7 +70,7 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
      * 
      * @throws IOException
      */
-    protected void outputOptions(UsagePrinter out, GlobalMetadata global, CommandGroupMetadata group)
+    protected void outputOptions(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
             throws IOException {
         List<OptionMetadata> options = newArrayList();
         options.addAll(group.getOptions());
@@ -112,7 +112,7 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
      *            Group meta-data
      * @throws IOException
      */
-    protected void outputSynopsis(UsagePrinter out, GlobalMetadata global, CommandGroupMetadata group)
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
             throws IOException {
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
@@ -225,7 +225,7 @@ public class CliCommandGroupUsageGenerator extends AbstractPrintedCommandGroupUs
      *            Group meta-data
      * @throws IOException
      */
-    protected void outputDescription(UsagePrinter out, GlobalMetadata global, CommandGroupMetadata group)
+    protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
             throws IOException {
         out.append("NAME").newline();
 

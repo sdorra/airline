@@ -9,7 +9,7 @@ import com.github.rvesse.airline.model.GlobalMetadata;
  * Interface implemented by classes that can generate usage documentation for a
  * command line interface
  */
-public interface GlobalUsageGenerator {
+public interface GlobalUsageGenerator<T> {
 
     /**
      * Generate the help and output it on standard out
@@ -18,7 +18,7 @@ public interface GlobalUsageGenerator {
      *            Global Metadata
      * @throws IOException
      */
-    public abstract void usage(GlobalMetadata global) throws IOException;
+    public abstract void usage(GlobalMetadata<T> global) throws IOException;
 
     /**
      * Generate the help and output it to the stream
@@ -29,5 +29,5 @@ public interface GlobalUsageGenerator {
      *            Stream to output to
      * @throws IOException
      */
-    public abstract void usage(GlobalMetadata global, OutputStream output) throws IOException;
+    public abstract void usage(GlobalMetadata<T> global, OutputStream output) throws IOException;
 }

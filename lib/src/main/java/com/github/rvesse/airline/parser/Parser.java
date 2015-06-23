@@ -25,21 +25,27 @@ import static com.google.common.base.Predicates.compose;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 
-public class Parser extends AbstractParser {
-    private static final OptionParser CLASSIC_GET_OPT_PARSER = new ClassicGetOptParser();
-    private static final OptionParser LONG_GET_OPT_PARSER = new LongGetOptParser();
-    private static final OptionParser STANDARD_PARSER = new StandardOptionParser();
+/**
+ * CLI parser implementation
+ * 
+ * @author rvesse
+ *
+ * @param <T>
+ *            Command type
+ */
+public class Parser<T> extends AbstractParser<T> {
+    private final OptionParser<T> CLASSIC_GET_OPT_PARSER = new ClassicGetOptParser<T>();
+    private final OptionParser<T> LONG_GET_OPT_PARSER = new LongGetOptParser<T>();
+    private final OptionParser<T> STANDARD_PARSER = new StandardOptionParser<T>();
 
-    // global> (option value*)* (group (option value*)*)? (command (option
-    // value* | arg)* '--'? args*)?
-    public ParseState parse(GlobalMetadata metadata, String... params) {
+    public ParseState<T> parse(GlobalMetadata<T> metadata, String... params) {
         return parse(metadata, ImmutableList.copyOf(params));
     }
 
-    public ParseState parse(GlobalMetadata metadata, Iterable<String> params) {
+    public ParseState<T> parse(GlobalMetadata<T> metadata, Iterable<String> params) {
         PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
 
-        ParseState state = ParseState.newInstance().pushContext(Context.GLOBAL).withGlobal(metadata);
+        ParseState<T> state = ParseState.<T> newInstance().pushContext(Context.GLOBAL).withGlobal(metadata);
 
         // Define needed predicates
         Predicate<? super CommandGroupMetadata> findGroupPredicate;
@@ -180,9 +186,9 @@ public class Parser extends AbstractParser {
         return state;
     }
 
-    public ParseState parseCommand(CommandMetadata command, Iterable<String> params) {
+    public ParseState<T> parseCommand(CommandMetadata command, Iterable<String> params) {
         PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
-        ParseState state = ParseState.newInstance().pushContext(Context.GLOBAL).withCommand(command);
+        ParseState<T> state = ParseState.<T> newInstance().pushContext(Context.GLOBAL).withCommand(command);
 
         while (tokens.hasNext()) {
             state = parseOptions(tokens, state, command.getCommandOptions());
@@ -192,17 +198,17 @@ public class Parser extends AbstractParser {
         return state;
     }
 
-    private ParseState parseOptions(PeekingIterator<String> tokens, ParseState state,
+    private ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,
             List<OptionMetadata> allowedOptions) {
 
         // Get the option parsers in use
-        List<OptionParser> optionParsers;
+        List<OptionParser<T>> optionParsers;
         if (state.getGlobal() != null) {
             // Using CLI defined set
             optionParsers = state.getGlobal().getParserConfiguration().getOptionParsers();
         } else {
             // Using default set
-            optionParsers = new ArrayList<OptionParser>();
+            optionParsers = new ArrayList<OptionParser<T>>();
             optionParsers.add(STANDARD_PARSER);
             optionParsers.add(LONG_GET_OPT_PARSER);
             optionParsers.add(CLASSIC_GET_OPT_PARSER);
@@ -215,8 +221,8 @@ public class Parser extends AbstractParser {
 
             // Try each option parser in turn
             boolean matched = false;
-            for (OptionParser optionParser : optionParsers) {
-                ParseState nextState = optionParser.parseOptions(tokens, state, allowedOptions);
+            for (OptionParser<T> optionParser : optionParsers) {
+                ParseState<T> nextState = optionParser.parseOptions(tokens, state, allowedOptions);
 
                 if (nextState != null) {
                     // If the current parser matched an option this token is
@@ -238,7 +244,7 @@ public class Parser extends AbstractParser {
         return state;
     }
 
-    private ParseState parseArgs(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
+    private ParseState<T> parseArgs(ParseState<T> state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
             OptionMetadata defaultOption) {
         if (tokens.hasNext()) {
             if (tokens.peek().equals("--")) {
@@ -259,7 +265,7 @@ public class Parser extends AbstractParser {
         return state;
     }
 
-    private ParseState parseArg(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
+    private ParseState<T> parseArg(ParseState<T> state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
             OptionMetadata defaultOption) {
         if (arguments != null) {
             // Enforce maximum arity on arguments

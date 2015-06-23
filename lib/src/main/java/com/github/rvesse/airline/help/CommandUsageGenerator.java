@@ -24,8 +24,8 @@ public interface CommandUsageGenerator {
      *            Command Metadata
      * @throws IOException
      */
-    public abstract void usage( String programName,  String groupName, String commandName,
-            CommandMetadata command) throws IOException;
+    public abstract void usage(String programName, String groupName, String commandName, CommandMetadata command)
+            throws IOException;
 
     /**
      * Generate the help and output it to the stream
@@ -42,6 +42,6 @@ public interface CommandUsageGenerator {
      *            Stream to output to
      * @throws IOException
      */
-    public abstract void usage( String programName,  String groupName, String commandName,
-            CommandMetadata command, OutputStream output) throws IOException;
+    public abstract void usage(String programName, String groupName, String commandName, CommandMetadata command,
+            OutputStream output) throws IOException;
 }

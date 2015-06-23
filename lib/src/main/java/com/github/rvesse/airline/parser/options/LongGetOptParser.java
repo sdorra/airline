@@ -5,6 +5,6 @@ package com.github.rvesse.airline.parser.options;
  * {@code --name=value}
  *
  */
-public class LongGetOptParser extends AbstractKeyValueOptionParser {
+public class LongGetOptParser<T> extends AbstractKeyValueOptionParser<T> {
 
 }

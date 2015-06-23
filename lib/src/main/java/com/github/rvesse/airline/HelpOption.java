@@ -16,9 +16,9 @@ import com.google.common.base.Preconditions;
  * command
  *
  */
-public class HelpOption {
+public class HelpOption<C> {
     @Inject
-    private GlobalMetadata globalMetadata;
+    private GlobalMetadata<C> globalMetadata;
 
     @Inject
     private CommandGroupMetadata groupMetadata;

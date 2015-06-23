@@ -40,9 +40,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 
 public class MetadataLoader {
-    public static GlobalMetadata loadGlobal(String name, String description, CommandMetadata defaultCommand,
+    public static <C> GlobalMetadata<C> loadGlobal(String name, String description, CommandMetadata defaultCommand,
             Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups,
-            ParserMetadata parserConfig) {
+            ParserMetadata<C> parserConfig) {
         ImmutableList.Builder<OptionMetadata> globalOptionsBuilder = ImmutableList.builder();
         if (defaultCommand != null) {
             globalOptionsBuilder.addAll(defaultCommand.getGlobalOptions());
@@ -56,7 +56,7 @@ public class MetadataLoader {
             }
         }
         List<OptionMetadata> globalOptions = mergeOptionSet(globalOptionsBuilder.build());
-        return new GlobalMetadata(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups, parserConfig);
+        return new GlobalMetadata<C>(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups, parserConfig);
     }
 
     public static CommandGroupMetadata loadCommandGroup(String name, String description, boolean hidden,
