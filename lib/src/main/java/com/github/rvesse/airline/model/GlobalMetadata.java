@@ -25,7 +25,6 @@ public class GlobalMetadata<T> {
         Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
                 "Program name cannot be null/empty/whitespace");
         Preconditions.checkNotNull(parserConfig);
-        //Preconditions.checkNotNull(typeConverter, "typeConverter is null");
 
         this.name = name;
         this.description = description;
