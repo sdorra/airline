@@ -23,6 +23,17 @@ import com.google.common.collect.PeekingIterator;
  * parser expects that the list it receives contains the correct number of items
  * for the arity of the option and if not produces an error
  * </p>
+ * <p>
+ * You can also omit the whitespace between the name and the value list when
+ * using a single character name of the option similar to how the
+ * {@link ClassicGetOptParser} works. For example {@code -nfoo,bar} is
+ * equivalent to our previous example assuming that {@code -n} is an alternative
+ * name for the same option as {@code --name}.
+ * </p>
+ * <p>
+ * The default separator for values is {@code ,} but this can be configured as
+ * desired.
+ * </p>
  *
  */
 public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
@@ -47,25 +58,39 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
     @Override
     public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,
             List<OptionMetadata> allowedOptions) {
-        OptionMetadata option = findOption(state, allowedOptions, tokens.peek());
+        String name = tokens.peek();
+        boolean noSep = false;
+        OptionMetadata option = findOption(state, allowedOptions, name);
         if (option == null) {
-            return null;
+            // Check if we are looking at a maven style -Pa,b,c argument
+            if (hasShortNamePrefix(name) && name.length() > 2) {
+                String shortName = name.substring(0, 2);
+                option = findOption(state, allowedOptions, shortName);
+                noSep = option != null;
+            }
+
+            if (!noSep)
+                return null;
         }
 
         tokens.next();
         state = state.pushContext(Context.OPTION).withOption(option);
 
+        String list = noSep ? name.substring(2) : null;
         if (option.getArity() == 0) {
             // Zero arity option, consume token and continue
             state = state.withOptionValue(option, Boolean.TRUE).popContext();
         } else {
-            // Can't parse list value if there are no further tokens
-            if (!tokens.hasNext())
-                return state;
+            if (list == null) {
+                // Can't parse list value if there are no further tokens
+                if (!tokens.hasNext())
+                    return state;
 
-            // Consume the value immediately, this option parser will now either
-            // succeed to parse the option or will error
-            String list = tokens.next();
+                // Consume the value immediately, this option parser will now
+                // either
+                // succeed to parse the option or will error
+                list = tokens.next();
+            }
 
             // Parse value as a list
             List<String> listValues = getValues(list);

@@ -1,7 +1,6 @@
 package com.github.rvesse.airline.parser.options;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -9,12 +8,23 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionUnexpectedException;
 import com.google.common.collect.PeekingIterator;
 
+/**
+ * An options parsing that parses options given in classic get-opt style where
+ * multiple options may be concatenated together
+ * <p>
+ * For example {@code -abc} could potentially set the option {@code -a},
+ * {@code -b} and {@code -c} however interpretation is contextual depending on
+ * the option configuration. Say option {@code -a} has arity of 1 then the
+ * remainder of the token (the {@code bc}) would be interpreted as being the
+ * value passed to the {@code -a} option.
+ * </p>
+ *
+ * @param <T>
+ */
 public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
-    private static final Pattern SHORT_OPTIONS_PATTERN = Pattern.compile("-[^-].*");
-
     public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,
             List<OptionMetadata> allowedOptions) {
-        if (!SHORT_OPTIONS_PATTERN.matcher(tokens.peek()).matches()) {
+        if (!hasShortNamePrefix(tokens.peek())) {
             return null;
         }
 

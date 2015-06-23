@@ -3,6 +3,7 @@ package com.github.rvesse.airline.parser.options;
 import static com.google.common.collect.Iterables.find;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.AbbreviatedOptionFinder;
@@ -15,6 +16,8 @@ import com.google.common.base.Predicate;
  * classes
  */
 public abstract class AbstractOptionParser<T> extends AbstractParser<T> implements OptionParser<T> {
+
+    private static final Pattern SHORT_OPTIONS_PREFIX = Pattern.compile("-[^-].*");
 
     /**
      * Tries to find an option with the given name
@@ -60,5 +63,9 @@ public abstract class AbstractOptionParser<T> extends AbstractParser<T> implemen
         }
 
         return find(options, findOptionPredicate, defaultValue);
+    }
+
+    protected boolean hasShortNamePrefix(String name) {
+        return SHORT_OPTIONS_PREFIX.matcher(name).matches();
     }
 }
