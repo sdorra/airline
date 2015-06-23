@@ -93,7 +93,7 @@ Use the following maven dependency declaration:
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `1.0.2-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
+Snapshot artifacts of the latest source are also available using the version `1.1.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
 
 Please note that the `1.0.x` release line represents significant breaking changes from the previous `0.9.x` releases, please review the Change Log before attempting to upgrade an application that uses an older version.
 

@@ -2,7 +2,12 @@
 
 ## 1.0.2
 
-
+- Parser Improvements
+     - Type converter is now configurable
+     - Option parsing styles are now configurable
+- Metadata Improvements
+     - Parsing specific metadata moved to `ParserMetadata` class which is accessible via `GlobalMetadata.getParserConfiguration()`
+     - `GlobalMetadata` is now a generic class taking the command type as the type parameter
 
 ## 1.0.1
 
