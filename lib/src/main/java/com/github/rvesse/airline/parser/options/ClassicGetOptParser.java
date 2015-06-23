@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseOptionUnexpectedException;
 import com.github.rvesse.airline.parser.ParseState;
@@ -52,13 +52,13 @@ public class ClassicGetOptParser extends AbstractOptionParser {
                 // otherwise it is the next token
                 if (!remainingToken.isEmpty()) {
                     checkValidValue(option, remainingToken);
-                    Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(),
+                    Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
                             remainingToken);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 } else if (tokens.hasNext()) {
                     String tokenStr = tokens.next();
                     checkValidValue(option, tokenStr);
-                    Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(),
+                    Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
                             tokenStr);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 }
@@ -66,7 +66,7 @@ public class ClassicGetOptParser extends AbstractOptionParser {
                 return nextState;
             }
 
-            throw new ParseOptionUnexpectedException("Short options style can not be used with option ", option);
+            throw new ParseOptionUnexpectedException("Short options style can not be used with option %s", option);
         }
 
         // consume the current token

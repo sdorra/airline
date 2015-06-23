@@ -1,7 +1,6 @@
 package com.github.rvesse.airline.parser;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
@@ -21,11 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import static com.google.common.base.Predicates.compose;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 
-public class Parser {
+public class Parser extends AbstractParser {
     private static final OptionParser CLASSIC_GET_OPT_PARSER = new ClassicGetOptParser();
     private static final OptionParser LONG_GET_OPT_PARSER = new LongGetOptParser();
     private static final OptionParser STANDARD_PARSER = new StandardOptionParser();
@@ -238,23 +238,6 @@ public class Parser {
         return state;
     }
 
-    /**
-     * Checks for a valid value and throws an error if the value for the option
-     * is restricted and not in the set of allowed values
-     * 
-     * @param option
-     *            Option meta data
-     * @param tokenStr
-     *            Token string
-     */
-    private void checkValidValue(OptionMetadata option, String tokenStr) {
-        if (option.getAllowedValues() == null)
-            return;
-        if (option.getAllowedValues().contains(tokenStr))
-            return;
-        throw new ParseOptionIllegalValueException(option.getTitle(), tokenStr, option.getAllowedValues());
-    }
-
     private ParseState parseArgs(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
             OptionMetadata defaultOption) {
         if (tokens.hasNext()) {
@@ -287,14 +270,14 @@ public class Parser {
             }
 
             // Argument
-            state = state.withArgument(TypeConverter.newInstance().convert(arguments.getTitle().get(0),
+            state = state.withArgument(getTypeConverter(state).convert(arguments.getTitle().get(0),
                     arguments.getJavaType(), tokens.next()));
         } else if (defaultOption != null) {
             // Default Option
             state = state.withOption(defaultOption);
             String tokenStr = tokens.next();
             checkValidValue(defaultOption, tokenStr);
-            Object value = TypeConverter.newInstance().convert(defaultOption.getTitle(), defaultOption.getJavaType(),
+            Object value = getTypeConverter(state).convert(defaultOption.getTitle(), defaultOption.getJavaType(),
                     tokenStr);
             state = state.withOptionValue(defaultOption, value).popContext();
         } else {

@@ -1,80 +1,32 @@
 package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.parser.ParseOptionConversionException;
-import com.google.common.base.Preconditions;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+/**
+ * Interface for type converters
+ * <p>
+ * Type converters are used to convert the string values provided as
+ * option/argument values into appropriately typed values that can be assigned
+ * to the relevant option/arguments
+ * </p>
+ *
+ */
+public interface TypeConverter {
 
-public class TypeConverter
-{
-    public static TypeConverter newInstance()
-    {
-        return new TypeConverter();
-    }
+    /**
+     * Convert a string value into an appropriately typed value
+     * 
+     * @param name
+     *            Option Name
+     * @param type
+     *            Target Type
+     * @param value
+     *            String Value
+     * @return Typed value
+     * @exception ParseOptionConversionException
+     *                Should be thrown if the type converter cannot convert the
+     *                value
+     */
+    public abstract Object convert(String name, Class<?> type, String value);
 
-    public Object convert(String name, Class<?> type, String value)
-    {
-        Preconditions.checkNotNull(name, "name is null");
-        Preconditions.checkNotNull(type, "type is null");
-        Preconditions.checkNotNull(value, "value is null");
-
-        try {
-            if (String.class.isAssignableFrom(type)) {
-                return value;
-            }
-            else if (Boolean.class.isAssignableFrom(type) || Boolean.TYPE.isAssignableFrom(type)) {
-                return Boolean.valueOf(value);
-            }
-            else if (Byte.class.isAssignableFrom(type) || Byte.TYPE.isAssignableFrom(type)) {
-                return Byte.valueOf(value);
-            }
-            else if (Short.class.isAssignableFrom(type) || Short.TYPE.isAssignableFrom(type)) {
-                return Short.valueOf(value);
-            }
-            else if (Integer.class.isAssignableFrom(type) || Integer.TYPE.isAssignableFrom(type)) {
-                return Integer.valueOf(value);
-            }
-            else if (Long.class.isAssignableFrom(type) || Long.TYPE.isAssignableFrom(type)) {
-                return Long.valueOf(value);
-            }
-            else if (Float.class.isAssignableFrom(type) || Float.TYPE.isAssignableFrom(type)) {
-                return Float.valueOf(value);
-            }
-            else if (Double.class.isAssignableFrom(type) || Double.TYPE.isAssignableFrom(type)) {
-                return Double.valueOf(value);
-            }
-        }
-        catch (Exception ignored) {
-        }
-
-        // Look for a static fromString(String) method
-        try {
-            Method valueOf = type.getMethod("fromString", String.class);
-            if (valueOf.getReturnType().isAssignableFrom(type)) {
-                return valueOf.invoke(null, value);
-            }
-        } catch (Throwable ignored) {
-        }
-
-        // Look for a static valueOf(String) method (this covers enums which have a valueOf method)
-        try {
-            Method valueOf = type.getMethod("valueOf", String.class);
-            if (valueOf.getReturnType().isAssignableFrom(type)) {
-                return valueOf.invoke(null, value);
-            }
-        }
-        catch (Throwable ignored) {
-        }
-
-        // Look for a constructor taking a string
-        try {
-            Constructor<?> constructor = type.getConstructor(String.class);
-            return constructor.newInstance(value);
-        }
-        catch (Throwable ignored) {
-        }
-
-        throw new ParseOptionConversionException(name, value, type.getSimpleName());
-    }
 }

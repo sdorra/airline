@@ -2,6 +2,8 @@ package com.github.rvesse.airline.model;
 
 import java.util.List;
 
+import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -14,17 +16,35 @@ public class ParserMetadata {
     private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
     private final List<OptionParser> optionParsers;
     private final List<AliasMetadata> aliases;
+    private final TypeConverter typeConverter;
 
-    public ParserMetadata(List<OptionParser> optionParsers, boolean allowAbbreviateCommands,
-            boolean allowAbbreviatedOptions, List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns) {
+    public ParserMetadata(List<OptionParser> optionParsers, TypeConverter typeConverter,
+            boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions, List<AliasMetadata> aliases,
+            boolean aliasesOverrideBuiltIns) {
         Preconditions.checkNotNull(optionParsers, "optionParsers cannot be null");
         Preconditions.checkNotNull(aliases, "aliases cannot be null");
 
+        // Option Parsing
+        this.typeConverter = typeConverter != null ? typeConverter : new DefaultTypeConverter();
         this.optionParsers = ImmutableList.copyOf(optionParsers);
+
+        // Abbreviations
         this.allowAbbreviatedCommands = allowAbbreviateCommands;
         this.allowAbbreviatedOptions = allowAbbreviatedOptions;
+
+        // Aliases
         this.aliases = ImmutableList.copyOf(aliases);
         this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
+
+    }
+
+    /**
+     * Gets the type converter to use
+     * 
+     * @return Type converter
+     */
+    public TypeConverter getTypeConverter() {
+        return typeConverter;
     }
 
     /**

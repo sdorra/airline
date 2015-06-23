@@ -3,7 +3,7 @@ package com.github.rvesse.airline.parser.options;
 import java.util.List;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.base.Splitter;
@@ -50,7 +50,7 @@ public abstract class AbstractKeyValueOptionParser extends AbstractOptionParser 
         // update state
         state = state.pushContext(Context.OPTION).withOption(option);
         checkValidValue(option, parts.get(1));
-        Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), parts.get(1));
+        Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), parts.get(1));
         state = state.withOption(option).withOptionValue(option, value).popContext();
 
         return state;

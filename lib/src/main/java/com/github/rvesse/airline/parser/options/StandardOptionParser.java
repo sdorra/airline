@@ -3,7 +3,7 @@ package com.github.rvesse.airline.parser.options;
 import java.util.List;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.collect.ImmutableList;
@@ -33,7 +33,7 @@ public class StandardOptionParser extends AbstractOptionParser {
             if (tokens.hasNext()) {
                 String tokenStr = tokens.next();
                 checkValidValue(option, tokenStr);
-                value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokenStr);
+                value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
                 state = state.withOptionValue(option, value).popContext();
             }
         } else {
@@ -52,7 +52,7 @@ public class StandardOptionParser extends AbstractOptionParser {
                     break;
                 String tokenStr = tokens.next();
                 checkValidValue(option, tokenStr);
-                values.add(TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokenStr));
+                values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr));
                 ++count;
             }
 

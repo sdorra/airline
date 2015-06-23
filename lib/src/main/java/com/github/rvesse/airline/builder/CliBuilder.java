@@ -17,6 +17,7 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.CommandFactoryDefault;
 import com.github.rvesse.airline.TypeConverter;
+import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -36,7 +37,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
 
     protected final String name;
     protected String description;
-    protected TypeConverter typeConverter = new TypeConverter();
+    protected TypeConverter typeConverter = new DefaultTypeConverter();
     protected String optionSeparators;
     private Class<? extends C> defaultCommand;
     private final List<Class<? extends C>> defaultCommandGroupCommands = newArrayList();
@@ -282,6 +283,16 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         return this;
     }
 
+    public CliBuilder<C> withTypeConverter(TypeConverter converter) {
+        this.typeConverter = converter;
+        return this;
+    }
+
+    public CliBuilder<C> withDefaultTypeConverter() {
+        this.typeConverter = new DefaultTypeConverter();
+        return this;
+    }
+
     /**
      * Configures the CLI to use the given option parser
      * <p>
@@ -430,8 +441,8 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         Preconditions.checkArgument(allCommands.size() > 0, "Must specify at least one command to create a CLI");
 
         // Build metadata objects
-        ParserMetadata parserConfig = new ParserMetadata(optParsers, allowAbbreviatedCommands, allowAbbreviatedOptions,
-                aliasData, aliasesOverrideBuiltIns);
+        ParserMetadata parserConfig = new ParserMetadata(optParsers, typeConverter, allowAbbreviatedCommands,
+                allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns);
         GlobalMetadata metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups), parserConfig);
 
