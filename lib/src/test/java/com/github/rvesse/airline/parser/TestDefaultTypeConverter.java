@@ -118,14 +118,61 @@ public class TestDefaultTypeConverter {
             Assert.assertEquals(converted.floatValue(), f);
         }
     }
-    
+
     @Test
     public void convert_double() {
-        double[] ds = new double[] { Float.MIN_VALUE, Float.MAX_VALUE, 0.0f, 123.456f, Float.NaN, Double.MIN_VALUE, Double.MAX_VALUE, Double.NaN, 0.0d, 123.456d };
+        double[] ds = new double[] { Float.MIN_VALUE, Float.MAX_VALUE, 0.0f, 123.456f, Float.NaN, Double.MIN_VALUE,
+                Double.MAX_VALUE, Double.NaN, 0.0d, 123.456d };
         for (double d : ds) {
             String value = Double.toString(d);
             Double converted = testConvert(Double.class, value);
             Assert.assertEquals(converted.doubleValue(), d);
+        }
+    }
+
+    public static class ConversionExample {
+        public final String value;
+
+        public ConversionExample(String value) {
+            this.value = value;
+        }
+    }
+
+    public static class FromStringable extends ConversionExample {
+
+        private FromStringable(String value) {
+            super(value);
+        }
+
+        public static FromStringable fromString(String value) {
+            return new FromStringable(value);
+        }
+    }
+
+    @Test
+    public void convert_static_fromString() {
+        String value = "test";
+        FromStringable converted = testConvert(FromStringable.class, value);
+        Assert.assertEquals(converted.value, value);
+    }
+
+    @Test
+    public void convert_constructor() {
+        String value = "test";
+        ConversionExample converted = testConvert(ConversionExample.class, value);
+        Assert.assertEquals(converted.value, value);
+    }
+
+    public static enum ConversionEnum {
+        FOO, BAR
+    }
+
+    @Test
+    public void convert_enum() {
+        for (ConversionEnum item : ConversionEnum.values()) {
+            String value = item.name();
+            ConversionEnum converted = testConvert(ConversionEnum.class, value);
+            Assert.assertEquals(converted, item);
         }
     }
 }
