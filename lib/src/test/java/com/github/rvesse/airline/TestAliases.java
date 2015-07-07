@@ -41,7 +41,8 @@ public class TestAliases {
         //@formatter:off
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
-        builder.withParser().withUserAliases("target/");
+        builder.withParser()
+               .withUserAliases("test", "target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
