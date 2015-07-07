@@ -34,7 +34,8 @@ public class AliasedCli {
         // Define an alias
         // Here we define an alias example that invokes the simple command passing in some arguments
         // Any additional arguments an alias is invoked will be passed through normally
-        builder.withAlias("example")
+        builder.withParser()
+               .withAlias("example")
                .withArguments("simple", "--name", "alias");
         
         //@formatter:on

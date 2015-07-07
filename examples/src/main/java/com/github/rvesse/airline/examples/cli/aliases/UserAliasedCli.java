@@ -40,7 +40,10 @@ public class UserAliasedCli {
         // You can find this example configuration under
         // src/main/resources/aliases.config
         try {
-            builder.withUserAliases("aliases.config", null, "src/main/resources/");
+            //@formatter:off
+            builder.withParser()
+                   .withUserAliases("aliases.config", null, "src/main/resources/");
+            //@formatter:on
         } catch (IOException e) {
             System.out.println("Failed to read in aliases.config");
         }

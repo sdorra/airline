@@ -37,12 +37,15 @@ public class AbbreviationCli {
         // The program name is cli
         CliBuilder<ExampleRunnable> builder = Cli.<ExampleRunnable>builder("cli")
                                                  // Add a description
-                                                 .withDescription("A simple CLI with several commands available in groups")
-                                                 // We can enable command and option abbreviation, this allows users to only
-                                                 // type part of the group/command/option name provided that the portion they
-                                                 // type is unambiguous
-                                                 .withCommandAbbreviation()
-                                                 .withOptionAbbreviation();
+                                                 .withDescription("A simple CLI with several commands available in groups");
+        
+        // We can enable command and option abbreviation, this allows users to only
+        // type part of the group/command/option name provided that the portion they
+        // type is unambiguous
+        builder.withParser()
+               .withCommandAbbreviation()
+               .withOptionAbbreviation();
+        
         // Add a basic group
         builder.withGroup("basic")
                .withDescription("Basic commands")

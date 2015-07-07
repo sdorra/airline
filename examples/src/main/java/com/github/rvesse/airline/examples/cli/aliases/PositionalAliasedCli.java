@@ -51,9 +51,11 @@ public class PositionalAliasedCli {
         // Any additional arguments an alias is invoked will be passed through
         // normally
 
-        // :formatter:off
-        builder.withAlias("example").withArguments("simple", "--name", "$1");
-        // @formatter:on
+        //@formatter:off
+        builder.withParser()
+               .withAlias("example")
+               .withArguments("simple", "--name", "$1");
+        //@formatter:on
 
         ExampleExecutor.executeCli(builder.build(), args);
     }

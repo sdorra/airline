@@ -39,10 +39,10 @@ public class TestAliases {
         prepareConfig(f, "foo=Args1 bar");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases("target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser().withUserAliases("target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -67,10 +67,11 @@ public class TestAliases {
         prepareConfig(f, "foo=Args1 bar");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("other")
-                            .withCommand(Args1.class)
-                            .withUserAliases("target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("other")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases("target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -83,10 +84,11 @@ public class TestAliases {
         prepareConfig(f, "foo=Args1 bar");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases(f.getName(), null, "target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -111,10 +113,11 @@ public class TestAliases {
         prepareConfig(f, "a.foo=Args1 bar", "b.foo=Args1 faz");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases(f.getName(), "b.", "target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), "b.", "target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -139,10 +142,11 @@ public class TestAliases {
         prepareConfig(f, "foo=Args1 -long $1");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases(f.getName(), null, "target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -169,10 +173,11 @@ public class TestAliases {
         prepareConfig(f, "foo=Args1 -long $1");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases(f.getName(), null, "target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -198,7 +203,8 @@ public class TestAliases {
         //@formatter:off
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                     .withCommand(Args1.class);
-        builder.withAlias("foo")
+        builder.withParser()
+               .withAlias("foo")
                .withArguments("Args1", "-long", "$1", "-float", "$3");
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -217,7 +223,8 @@ public class TestAliases {
         //@formatter:off
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                     .withCommand(Args1.class);
-        builder.withAlias("foo")
+        builder.withParser()
+               .withAlias("foo")
                .withArguments("Args1", "-long", "$1", "-float", "$5");
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -238,10 +245,11 @@ public class TestAliases {
         prepareConfig(f, "Args1=Args1 bar");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases(f.getName(), null, "target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -266,11 +274,12 @@ public class TestAliases {
         prepareConfig(f, "Args1=Args1 bar");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withUserAliases(f.getName(), null, "target/")
-                            .withAliasesOverridingBuiltIns()
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "target/")
+               .withAliasesOverridingBuiltIns();
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition
@@ -296,11 +305,12 @@ public class TestAliases {
         prepareConfig(f, "foo=Args1 bar");
 
         //@formatter:off
-        Cli<Args1> cli = Cli.<Args1>builder("test")
-                            .withCommand(Args1.class)
-                            .withDefaultCommand(Args1.class)
-                            .withUserAliases(f.getName(), null, "target/")
-                            .build();
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class)
+                                       .withDefaultCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "target/");
+        Cli<Args1> cli = builder.build();
         //@formatter:on
 
         // Check definition

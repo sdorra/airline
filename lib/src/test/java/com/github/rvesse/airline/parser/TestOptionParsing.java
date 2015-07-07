@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
 import com.github.rvesse.airline.parser.errors.ParseOptionUnexpectedException;
@@ -62,12 +63,12 @@ public class TestOptionParsing {
 
     private final <T> Cli<T> createDefaultParser(Class<? extends T> cls) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withDefaultOptionParsers()
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                   .withCommand(cls);
+        builder.withParser()
+               .withDefaultOptionParsers();
         //@formatter:on
-        return parser;
+        return builder.build();
     }
 
     @Test
@@ -87,12 +88,12 @@ public class TestOptionParsing {
 
     private <T> Cli<T> createStandardParser(Class<? extends T> cls) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withOptionParser(new StandardOptionParser<T>())
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                .withCommand(cls);
+        builder.withParser()
+               .withOptionParser(new StandardOptionParser<T>());
         //@formatter:on
-        return parser;
+        return builder.build();
     }
 
     @Test
@@ -142,12 +143,12 @@ public class TestOptionParsing {
 
     private <T> Cli<T> createClassicGetOptParser(Class<? extends T> cls) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withOptionParser(new ClassicGetOptParser<T>())
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                   .withCommand(cls);
+        builder.withParser()
+               .withOptionParser(new ClassicGetOptParser<T>());
         //@formatter:on
-        return parser;
+        return builder.build();
     }
 
     @Test
@@ -180,12 +181,12 @@ public class TestOptionParsing {
 
     private <T> Cli<T> createLongGetOptParser(Class<? extends T> cls) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withOptionParser(new LongGetOptParser<T>())
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                   .withCommand(cls);
+        builder.withParser()
+               .withOptionParser(new LongGetOptParser<T>());
         //@formatter:on
-        return parser;
+        return builder.build();
     }
     
     @Test
@@ -228,12 +229,12 @@ public class TestOptionParsing {
 
     private <T> Cli<T> createKeyValueParser(Class<? extends T> cls, char separator) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withOptionParser(new KeyValueOptionParser<T>(separator))
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                .withCommand(cls);
+        builder.withParser()
+               .withOptionParser(new KeyValueOptionParser<T>(separator));
         //@formatter:on
-        return parser;
+        return builder.build();
     }
 
     public static class KeyValueOptionParser<T> extends AbstractKeyValueOptionParser<T> {
@@ -311,12 +312,12 @@ public class TestOptionParsing {
     
     private <T> Cli<T> createListValueParser(Class<? extends T> cls, char listSeparator) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withOptionParser(new ListValueOptionParser<T>(listSeparator))
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                   .withCommand(cls);
+        builder.withParser()
+               .withOptionParser(new ListValueOptionParser<T>(listSeparator));
         //@formatter:on
-        return parser;
+        return builder.build();
     }
     
     @Test
@@ -369,11 +370,11 @@ public class TestOptionParsing {
     
     private <T> Cli<T> createMaybePairValueParser(Class<? extends T> cls, char pairSeparator) {
         //@formatter:off
-        Cli<T> parser = Cli.<T>builder("test")
-                                .withCommand(cls)
-                                .withOptionParser(new MaybePairValueOptionParser<T>(pairSeparator))
-                                .build();
+        CliBuilder<T> builder = Cli.<T>builder("test")
+                                   .withCommand(cls);
+        builder.withParser()
+               .withOptionParser(new MaybePairValueOptionParser<T>(pairSeparator));
         //@formatter:on
-        return parser;
+        return builder.build();
     }
 }
