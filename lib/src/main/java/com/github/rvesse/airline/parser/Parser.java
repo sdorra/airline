@@ -8,10 +8,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
-import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
-import com.github.rvesse.airline.parser.options.StandardOptionParser;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
@@ -35,9 +32,6 @@ import static com.google.common.collect.Iterables.find;
  *            Command type
  */
 public class Parser<T> extends AbstractParser<T> {
-    private final OptionParser<T> CLASSIC_GET_OPT_PARSER = new ClassicGetOptParser<T>();
-    private final OptionParser<T> LONG_GET_OPT_PARSER = new LongGetOptParser<T>();
-    private final OptionParser<T> STANDARD_PARSER = new StandardOptionParser<T>();
 
     public ParseState<T> parse(GlobalMetadata<T> metadata, String... params) {
         return parse(metadata, ImmutableList.copyOf(params));
@@ -57,11 +51,11 @@ public class Parser<T> extends AbstractParser<T> {
 
         // Check if we got an alias
         if (tokens.hasNext()) {
-            if (metadata.getParserConfiguration().getAliases().size() > 0) {
-                AliasMetadata alias = find(metadata.getParserConfiguration().getAliases(),
+            if (state.getParserConfiguration().getAliases().size() > 0) {
+                AliasMetadata alias = find(state.getParserConfiguration().getAliases(),
                         compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
                 if (alias != null) {
-                    if (!metadata.getParserConfiguration().aliasesOverrideBuiltIns()) {
+                    if (!state.getParserConfiguration().aliasesOverrideBuiltIns()) {
                         // Check we don't have a default group/command with the
                         // same name as otherwise that would take precedence
                         findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
@@ -129,7 +123,7 @@ public class Parser<T> extends AbstractParser<T> {
         // Parse group
         if (tokens.hasNext()) {
             //@formatter:off
-            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (metadata != null && metadata.getParserConfiguration().allowsAbbreviatedCommands() 
+            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
                                  ? new AbbreviatedGroupFinder(tokens.peek(), metadata.getCommandGroups()) 
                                  : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter()));
             //@formatter:on
@@ -150,7 +144,7 @@ public class Parser<T> extends AbstractParser<T> {
 
         if (tokens.hasNext()) {
             //@formatter:off
-            findCommandPredicate = (Predicate<? super CommandMetadata>) (metadata != null && metadata.getParserConfiguration().allowsAbbreviatedCommands() 
+            findCommandPredicate = (Predicate<? super CommandMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
                                    ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
                                    : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()));
             //@formatter:on
@@ -169,7 +163,7 @@ public class Parser<T> extends AbstractParser<T> {
                 }
             } else {
                 if (tokens.peek().equals(command.getName())
-                        || (!usingDefault && metadata.getParserConfiguration().allowsAbbreviatedCommands())) {
+                        || (!usingDefault && state.getParserConfiguration().allowsAbbreviatedCommands())) {
                     tokens.next();
                 }
 
@@ -186,9 +180,14 @@ public class Parser<T> extends AbstractParser<T> {
         return state;
     }
 
-    public ParseState<T> parseCommand(CommandMetadata command, Iterable<String> params) {
+    public ParseState<T> parseCommand(ParserMetadata<T> parserConfig, CommandMetadata command, Iterable<String> params) {
         PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
-        ParseState<T> state = ParseState.<T> newInstance().pushContext(Context.GLOBAL).withCommand(command);
+        //@formatter:off
+        ParseState<T> state = ParseState.<T> newInstance()
+                                        .pushContext(Context.GLOBAL)
+                                        .withConfiguration(parserConfig)
+                                        .withCommand(command);
+        //@formatter:off
 
         while (tokens.hasNext()) {
             state = parseOptions(tokens, state, command.getCommandOptions());
@@ -202,17 +201,7 @@ public class Parser<T> extends AbstractParser<T> {
             List<OptionMetadata> allowedOptions) {
 
         // Get the option parsers in use
-        List<OptionParser<T>> optionParsers;
-        if (state.getGlobal() != null) {
-            // Using CLI defined set
-            optionParsers = state.getGlobal().getParserConfiguration().getOptionParsers();
-        } else {
-            // Using default set
-            optionParsers = new ArrayList<OptionParser<T>>();
-            optionParsers.add(STANDARD_PARSER);
-            optionParsers.add(LONG_GET_OPT_PARSER);
-            optionParsers.add(CLASSIC_GET_OPT_PARSER);
-        }
+        List<OptionParser<T>> optionParsers = state.getParserConfiguration().getOptionParsers();
 
         while (tokens.hasNext()) {
             // Try to parse next option(s) using different styles. If code
@@ -246,8 +235,7 @@ public class Parser<T> extends AbstractParser<T> {
 
     private ParseState<T> parseArgs(ParseState<T> state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
             OptionMetadata defaultOption) {
-        String sep = state.getGlobal() != null ? state.getGlobal().getParserConfiguration().getArgumentsSeparator()
-                : ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR;
+        String sep = state.getParserConfiguration().getArgumentsSeparator();
 
         if (tokens.hasNext()) {
             if (tokens.peek().equals(sep)) {

@@ -41,8 +41,8 @@ public class AbstractParser<T> {
      * @return Type converter
      */
     protected final TypeConverter getTypeConverter(ParseState<T> state) {
-        if (state != null && state.getGlobal() != null) {
-            return state.getGlobal().getParserConfiguration().getTypeConverter();
+        if (state != null) {
+            return state.getParserConfiguration().getTypeConverter();
         } else {
             return DEFAULT_TYPE_CONVERTER;
         }

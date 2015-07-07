@@ -18,10 +18,12 @@
 
 package com.github.rvesse.airline;
 
+import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.Parser;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
@@ -42,14 +44,16 @@ public class SingleCommand<C>
 {
     public static <C> SingleCommand<C> singleCommand(Class<C> command)
     {
-        return new SingleCommand<C>(command);
+        return new SingleCommand<C>(command, null);
     }
 
+    private final ParserMetadata<C> parserConfig;
     private final CommandMetadata commandMetadata;
 
-    private SingleCommand(Class<C> command)
+    private SingleCommand(Class<C> command, ParserMetadata<C> parserConfig)
     {
         checkNotNull(command, "command is null");
+        this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<C>defaultConfiguration();
 
         commandMetadata = MetadataLoader.loadCommand(command);
     }
@@ -69,7 +73,7 @@ public class SingleCommand<C>
         checkNotNull(args, "args is null");
         
         Parser<C> parser = new Parser<C>();
-        ParseState<C> state = parser.parseCommand(commandMetadata, args);
+        ParseState<C> state = parser.parseCommand(parserConfig, commandMetadata, args);
         validate(state);
 
         CommandMetadata command = state.getCommand();

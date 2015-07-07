@@ -43,7 +43,7 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
 
             boolean hasSeparator = false;
             boolean foundNextOption = false;
-            String argsSeparator = state.getGlobal() != null ? state.getGlobal().getParserConfiguration().getArgumentsSeparator() : ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR;
+            String argsSeparator = state.getParserConfiguration().getArgumentsSeparator();
             while (count < option.getArity() && tokens.hasNext() && !hasSeparator) {
                 String peekedToken = tokens.peek();
                 hasSeparator = peekedToken.equals(argsSeparator);

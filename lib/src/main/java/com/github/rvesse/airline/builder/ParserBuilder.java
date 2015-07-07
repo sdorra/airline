@@ -41,6 +41,10 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
     protected final List<OptionParser<C>> optionParsers = newArrayList();
     protected String argsSeparator;
+    
+    public static <T> ParserMetadata<T> defaultConfiguration() {
+        return new ParserBuilder<T>().build();
+    }
 
     public ParserBuilder<C> withCommandFactory(CommandFactory<C> commandFactory) {
         this.commandFactory = commandFactory;
