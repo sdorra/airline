@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.PeekingIterator;
@@ -42,9 +43,10 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
 
             boolean hasSeparator = false;
             boolean foundNextOption = false;
+            String argsSeparator = state.getGlobal() != null ? state.getGlobal().getParserConfiguration().getArgumentsSeparator() : ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR;
             while (count < option.getArity() && tokens.hasNext() && !hasSeparator) {
                 String peekedToken = tokens.peek();
-                hasSeparator = peekedToken.equals("--");
+                hasSeparator = peekedToken.equals(argsSeparator);
                 foundNextOption = findOption(state, allowedOptions, peekedToken) != null;
 
                 if (hasSeparator || foundNextOption)

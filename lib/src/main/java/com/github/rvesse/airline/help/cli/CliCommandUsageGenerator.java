@@ -15,6 +15,7 @@ import com.github.rvesse.airline.help.UsagePrinter;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -55,7 +56,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         // Options
         ArgumentsMetadata arguments = command.getArguments();
         if (options.size() > 0 || arguments != null) {
-            outputOptions(out, options, arguments);
+            outputOptions(out, command, options, arguments);
         }
 
         // Discussion
@@ -171,14 +172,16 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      * 
      * @param out
      *            Usage printer
+     * @param command
+     *            Command meta-data
      * @param options
      *            Options meta-data
      * @param arguments
      *            Arguments meta-data
      * @throws IOException
      */
-    protected void outputOptions(UsagePrinter out, List<OptionMetadata> options, ArgumentsMetadata arguments)
-            throws IOException {
+    protected void outputOptions(UsagePrinter out, CommandMetadata command, List<OptionMetadata> options,
+            ArgumentsMetadata arguments) throws IOException {
         options = sortOptions(options);
 
         out.append("OPTIONS").newline();
@@ -208,9 +211,9 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         }
 
         if (arguments != null) {
-            // "--" option
+            // Arguments separator option
             UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append("--").newline();
+            optionPrinter.append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).newline();
             optionPrinter.flush();
 
             // description

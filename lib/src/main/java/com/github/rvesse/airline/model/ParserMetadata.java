@@ -2,6 +2,8 @@ package com.github.rvesse.airline.model;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.TypeConverter;
@@ -15,15 +17,21 @@ import com.google.common.collect.ImmutableList;
  */
 public class ParserMetadata<T> {
 
+    /**
+     * Default separator used to separate arguments from options
+     */
+    public static final String DEFAULT_ARGUMENTS_SEPARATOR = "--";
+
     private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
     private final List<OptionParser<T>> optionParsers;
     private final List<AliasMetadata> aliases;
     private final TypeConverter typeConverter;
     private final CommandFactory<T> commandFactory;
+    private final String argsSeparator;
 
     public ParserMetadata(CommandFactory<T> commandFactory, List<OptionParser<T>> optionParsers,
             TypeConverter typeConverter, boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions,
-            List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns) {
+            List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns, String argumentsSeparator) {
         Preconditions.checkNotNull(optionParsers, "optionParsers cannot be null");
         Preconditions.checkNotNull(aliases, "aliases cannot be null");
 
@@ -39,6 +47,14 @@ public class ParserMetadata<T> {
         // Aliases
         this.aliases = ImmutableList.copyOf(aliases);
         this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
+
+        // Arguments Separator
+        if (StringUtils.isNotEmpty(argumentsSeparator)) {
+            Preconditions.checkArgument(StringUtils.containsWhitespace(argumentsSeparator),
+                    "argumentsSeparator cannot contain any whitespace");
+        }
+        this.argsSeparator = StringUtils.isNotEmpty(argumentsSeparator) ? argumentsSeparator
+                : DEFAULT_ARGUMENTS_SEPARATOR;
 
     }
 
@@ -105,6 +121,15 @@ public class ParserMetadata<T> {
         return allowAbbreviatedOptions;
     }
 
+    /**
+     * Gets the arguments separator to be used
+     * 
+     * @return Arguments separator
+     */
+    public String getArgumentsSeparator() {
+        return this.argsSeparator;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -116,6 +141,7 @@ public class ParserMetadata<T> {
         sb.append(", allowAbbreviatedOptions=").append(allowAbbreviatedOptions);
         sb.append(", aliases=").append(aliases);
         sb.append(", aliasesOverrideBuiltIns=").append(aliasesOverrideBuiltIns);
+        sb.append(", argumentsSeparator='").append(argsSeparator).append("'");
         sb.append("}");
         return sb.toString();
     }

@@ -52,6 +52,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
     protected final List<OptionParser<C>> optionParsers = newArrayList();
+    protected String argsSeparator;
 
     public CliBuilder(String name) {
         checkNotBlank(name, "Program name");
@@ -376,6 +377,24 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
                 new ClassicGetOptParser<C>());
     }
 
+    /**
+     * Sets the arguments separator, this is a token used to indicate the point
+     * at which no further options will be seen and all further tokens should be
+     * treated as arguments.
+     * <p>
+     * This is useful for disambiguating where arguments may be misinterpreted
+     * as options. The default value of this is the standard {@code --} used by
+     * many command line tools.
+     * </p>>
+     * 
+     * @param separator
+     * @return
+     */
+    public CliBuilder<C> withArgumentsSeparator(String separator) {
+        this.argsSeparator = separator;
+        return this;
+    }
+
     @Override
     public Cli<C> build() {
         if (this.optionParsers.size() == 0) {
@@ -433,7 +452,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
 
         // Build metadata objects
         ParserMetadata<C> parserConfig = new ParserMetadata<C>(commandFactory, optionParsers, typeConverter,
-                allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns);
+                allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns, argsSeparator);
         GlobalMetadata<C> metadata = MetadataLoader.<C> loadGlobal(name, description, defaultCommandMetadata,
                 ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups), parserConfig);
 

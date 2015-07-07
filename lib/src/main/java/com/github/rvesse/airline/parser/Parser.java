@@ -7,6 +7,7 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
@@ -62,8 +63,7 @@ public class Parser<T> extends AbstractParser<T> {
                 if (alias != null) {
                     if (!metadata.getParserConfiguration().aliasesOverrideBuiltIns()) {
                         // Check we don't have a default group/command with the
-                        // same
-                        // name as otherwise that would take precedence
+                        // same name as otherwise that would take precedence
                         findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
                         findCommandPredicate = compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
                         if (find(metadata.getCommandGroups(), findGroupPredicate, null) != null
@@ -246,14 +246,17 @@ public class Parser<T> extends AbstractParser<T> {
 
     private ParseState<T> parseArgs(ParseState<T> state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
             OptionMetadata defaultOption) {
+        String sep = state.getGlobal() != null ? state.getGlobal().getParserConfiguration().getArgumentsSeparator()
+                : ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR;
+
         if (tokens.hasNext()) {
-            if (tokens.peek().equals("--")) {
+            if (tokens.peek().equals(sep)) {
                 state = state.pushContext(Context.ARGS);
                 tokens.next();
 
                 // Consume all remaining tokens as arguments
                 // Default option can't possibly apply at this point because we
-                // saw the -- separator
+                // saw the arguments separator
                 while (tokens.hasNext()) {
                     state = parseArg(state, tokens, arguments, null);
                 }
@@ -280,7 +283,7 @@ public class Parser<T> extends AbstractParser<T> {
                     arguments.getJavaType(), tokens.next()));
         } else if (defaultOption != null) {
             // Default Option
-            state = state.withOption(defaultOption);
+            state = state.pushContext(Context.OPTION).withOption(defaultOption);
             String tokenStr = tokens.next();
             checkValidValue(defaultOption, tokenStr);
             Object value = getTypeConverter(state).convert(defaultOption.getTitle(), defaultOption.getJavaType(),

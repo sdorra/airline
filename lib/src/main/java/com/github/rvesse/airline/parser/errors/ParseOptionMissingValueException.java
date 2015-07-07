@@ -32,6 +32,11 @@ public class ParseOptionMissingValueException extends ParseException {
         super("Required values for option '%s' not provided", optionTitle);
         this.optionTitle = optionTitle;
     }
+    
+    public ParseOptionMissingValueException(String message, String optionTitle, Object... args) {
+        super(message, args);
+        this.optionTitle = optionTitle;
+    }
 
     public String getOptionTitle() {
         return optionTitle;

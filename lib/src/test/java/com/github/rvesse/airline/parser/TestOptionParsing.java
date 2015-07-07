@@ -16,6 +16,7 @@ import com.github.rvesse.airline.parser.options.AbstractKeyValueOptionParser;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.ListValueOptionParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
+import com.github.rvesse.airline.parser.options.MaybePairValueOptionParser;
 import com.github.rvesse.airline.parser.options.StandardOptionParser;
 
 public class TestOptionParsing {
@@ -248,7 +249,7 @@ public class TestOptionParsing {
         testParsing(parser, "OptionParsing1", "-c");
     }
 
-    @Test(expectedExceptions = ParseOptionUnexpectedException.class)
+    @Test(expectedExceptions = ParseOptionMissingValueException.class)
     public void option_parsing_list_value_bad_02() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-c", "one");
@@ -260,7 +261,7 @@ public class TestOptionParsing {
         testParsing(parser, "OptionParsing1", "-c", "one,two,three");
     }
     
-    @Test(expectedExceptions = ParseOptionUnexpectedException.class)
+    @Test(expectedExceptions = ParseOptionMissingValueException.class)
     public void option_parsing_list_value_bad_04() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-cone");
@@ -313,6 +314,64 @@ public class TestOptionParsing {
         Cli<T> parser = Cli.<T>builder("test")
                                 .withCommand(cls)
                                 .withOptionParser(new ListValueOptionParser<T>(listSeparator))
+                                .build();
+        //@formatter:on
+        return parser;
+    }
+    
+    @Test
+    public void option_parsing_maybe_pair_value_01() {
+        Cli<OptionParsing> parser = createMaybePairValueParser(OptionParsing.class, '=');
+        OptionParsing cmd = testParsing(parser, "OptionParsing1", "-c", "foo", "bar");
+
+        Assert.assertEquals(cmd.charlie.get(0), "foo");
+        Assert.assertEquals(cmd.charlie.get(1), "bar");
+    }
+    
+    @Test
+    public void option_parsing_maybe_pair_value_02() {
+        Cli<OptionParsing> parser = createMaybePairValueParser(OptionParsing.class, '=');
+        OptionParsing cmd = testParsing(parser, "OptionParsing1", "-c", "foo=bar");
+
+        Assert.assertEquals(cmd.charlie.get(0), "foo");
+        Assert.assertEquals(cmd.charlie.get(1), "bar");
+    }
+    
+    @Test
+    public void option_parsing_maybe_pair_value_03() {
+        Cli<OptionParsing> parser = createMaybePairValueParser(OptionParsing.class, '=');
+        OptionParsing cmd = testParsing(parser, "OptionParsing1", "-cfoo", "bar");
+
+        Assert.assertEquals(cmd.charlie.get(0), "foo");
+        Assert.assertEquals(cmd.charlie.get(1), "bar");
+    }
+    
+    @Test
+    public void option_parsing_maybe_pair_value_04() {
+        Cli<OptionParsing> parser = createMaybePairValueParser(OptionParsing.class, '=');
+        OptionParsing cmd = testParsing(parser, "OptionParsing1", "-cfoo=bar");
+
+        Assert.assertEquals(cmd.charlie.get(0), "foo");
+        Assert.assertEquals(cmd.charlie.get(1), "bar");
+    }
+    
+    @Test(expectedExceptions = ParseOptionMissingValueException.class)
+    public void option_parsing_maybe_pair_value_bad_01() {
+        Cli<OptionParsing> parser = createMaybePairValueParser(OptionParsing.class, '=');
+        testParsing(parser, "OptionParsing1", "-c", "foo");
+    }
+    
+    @Test(expectedExceptions = ParseOptionMissingValueException.class)
+    public void option_parsing_maybe_pair_value_bad_02() {
+        Cli<OptionParsing> parser = createMaybePairValueParser(OptionParsing.class, '=');
+        testParsing(parser, "OptionParsing1", "-cfoo");
+    }
+    
+    private <T> Cli<T> createMaybePairValueParser(Class<? extends T> cls, char pairSeparator) {
+        //@formatter:off
+        Cli<T> parser = Cli.<T>builder("test")
+                                .withCommand(cls)
+                                .withOptionParser(new MaybePairValueOptionParser<T>(pairSeparator))
                                 .build();
         //@formatter:on
         return parser;

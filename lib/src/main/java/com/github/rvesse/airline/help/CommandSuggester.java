@@ -2,6 +2,7 @@ package com.github.rvesse.airline.help;
 
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
@@ -22,7 +23,8 @@ public class CommandSuggester
                 .addAll(concat(transform(command.getCommandOptions(), OptionMetadata.optionsGetter())));
 
         if (command.getArguments() != null) {
-            suggestions.add("--");
+            // Include arguments separator
+            suggestions.add(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
         }
 
         return suggestions.build();

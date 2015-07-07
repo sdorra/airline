@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.help.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -136,8 +137,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         if (command.getArguments() != null) {
-            // "--" option
-            writer.append(NEW_PARA).append("* `--`:\n");
+            // Arguments separator
+            writer.append(NEW_PARA).append("* `").append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).append("`:\n");
 
             // description
             writer.append("This option can be used to separate command-line options from the "

@@ -5,6 +5,7 @@ import java.util.List;
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
 import com.github.rvesse.airline.parser.errors.ParseOptionUnexpectedException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -95,9 +96,9 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
             // Parse value as a list
             List<String> listValues = getValues(list);
             if (listValues.size() < option.getArity())
-                throw new ParseOptionUnexpectedException(
-                        "Too few option values received for option %s in list value '%s' (%d values expected)", option
-                                .getOptions().iterator().next(), list, option.getArity());
+                throw new ParseOptionMissingValueException(
+                        "Too few option values received for option %s in list value '%s' (%d values expected)",
+                        option.getTitle(), option.getOptions().iterator().next(), list, option.getArity());
             if (listValues.size() > option.getArity())
                 throw new ParseOptionUnexpectedException(
                         "Too many option values received for option %s in list value '%s' (%d values expected)", option

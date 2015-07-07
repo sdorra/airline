@@ -17,6 +17,7 @@ import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -265,11 +266,11 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         if (arguments != null) {
-            // "--" option
+            // Arguments separator
             writer.append("<div class=\"row\">\n");
             writer.append("<div class=\"span8 offset1\">\n");
 
-            writer.append("--\n");
+            writer.append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).append("\n");
 
             writer.append("</div>\n");
             writer.append("</div>\n");
