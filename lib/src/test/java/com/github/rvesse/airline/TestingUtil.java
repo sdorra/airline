@@ -5,13 +5,9 @@ import com.github.rvesse.airline.builder.CliBuilder;
 
 public class TestingUtil
 {
-    public static <T> Cli<T> singleCommandParser(Class<T> commandClass)
+    public static <T> SingleCommand<T> singleCommandParser(Class<T> commandClass)
     {
-        //@formatter:off
-        return Cli.<T>builder("parser")
-                  .withCommand(commandClass)
-                  .build();
-        //@formatter:on
+        return SingleCommand.singleCommand(commandClass);
     }
     
     public static <T> Cli<T> singleAbbreviatedCommandParser(Class<T> commandClass)

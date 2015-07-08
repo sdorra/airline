@@ -19,25 +19,12 @@
 package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.builder.ParserBuilder;
-import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
-import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.parser.ParseState;
-import com.github.rvesse.airline.parser.Parser;
-import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
-import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
-import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
-import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
+import com.github.rvesse.airline.parser.command.SingleCommandParser;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
-import java.util.List;
-
-import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -105,49 +92,7 @@ public class SingleCommand<C> {
     }
 
     public C parse(Iterable<String> args) {
-        checkNotNull(args, "args is null");
-
-        Parser<C> parser = new Parser<C>();
-        
-        // TODO Rest of logic including validate method can move to Parser
-        ParseState<C> state = parser.parseCommand(parserConfig, commandMetadata, args);
-        validate(state);
-
-        CommandMetadata command = state.getCommand();
-
-        return createInstance(command.getType(), command.getAllOptions(), state.getParsedOptions(),
-                command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(),
-                ImmutableMap.<Class<?>, Object> of(CommandMetadata.class, commandMetadata));
-    }
-
-    private void validate(ParseState<C> state) {
-        CommandMetadata command = state.getCommand();
-        if (command == null) {
-            List<String> unparsedInput = state.getUnparsedInput();
-            if (unparsedInput.isEmpty()) {
-                throw new ParseCommandMissingException();
-            } else {
-                throw new ParseCommandUnrecognizedException(unparsedInput);
-            }
-        }
-
-        ArgumentsMetadata arguments = command.getArguments();
-        if (state.getParsedArguments().isEmpty() && arguments != null && arguments.isRequired()) {
-            throw new ParseArgumentsMissingException(arguments.getTitle());
-        }
-
-        if (!state.getUnparsedInput().isEmpty()) {
-            throw new ParseArgumentsUnexpectedException(state.getUnparsedInput());
-        }
-
-        if (state.getLocation() == Context.OPTION) {
-            throw new ParseOptionMissingValueException(state.getCurrentOption().getTitle());
-        }
-
-        for (OptionMetadata option : command.getAllOptions()) {
-            if (option.isRequired() && !state.getParsedOptions().containsKey(option)) {
-                throw new ParseOptionMissingException(option.getOptions().iterator().next());
-            }
-        }
+        SingleCommandParser<C> parser = new SingleCommandParser<C>();
+        return parser.parse(parserConfig, commandMetadata, args);
     }
 }

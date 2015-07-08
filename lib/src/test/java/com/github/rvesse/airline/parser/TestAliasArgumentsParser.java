@@ -5,6 +5,7 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.rvesse.airline.parser.aliases.AliasArgumentsParser;
 import com.github.rvesse.airline.parser.errors.ParseException;
 
 public class TestAliasArgumentsParser {

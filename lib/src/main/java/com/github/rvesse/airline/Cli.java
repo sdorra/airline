@@ -19,26 +19,10 @@
 package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.builder.CliBuilder;
-import com.github.rvesse.airline.model.ArgumentsMetadata;
-import com.github.rvesse.airline.model.CommandGroupMetadata;
-import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.parser.ParseState;
-import com.github.rvesse.airline.parser.Parser;
-import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
-import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
-import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
-import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
+import com.github.rvesse.airline.parser.command.CliParser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
-import java.util.List;
-
-import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 
 public class Cli<C> {
     /**
@@ -71,78 +55,11 @@ public class Cli<C> {
     }
 
     public C parse(String... args) {
-        return parse(metadata.getParserConfiguration().getCommandFactory(), ImmutableList.copyOf(args));
+        return parse(ImmutableList.copyOf(args));
     }
 
-    public C parse(Iterable<String> args) {
-        return parse(metadata.getParserConfiguration().getCommandFactory(), args);
+    private C parse(Iterable<String> args) {
+        CliParser<C> parser = new CliParser<C>();
+        return parser.parse(metadata, args);
     }
-
-    private C parse(CommandFactory<C> commandFactory, Iterable<String> args) {
-        Preconditions.checkNotNull(args, "args is null");
-
-        Parser<C> parser = new Parser<C>();
-        
-        // TODO Rest of logic including validateState should move to Parser 
-        ParseState<C> state = parser.parse(metadata, args);
-
-        if (state.getCommand() == null) {
-            if (state.getGroup() != null) {
-                state = state.withCommand(state.getGroup().getDefaultCommand());
-            } else {
-                state = state.withCommand(metadata.getDefaultCommand());
-            }
-        }
-
-        validate(state);
-
-        CommandMetadata command = state.getCommand();
-
-        ImmutableMap.Builder<Class<?>, Object> bindings = ImmutableMap.<Class<?>, Object> builder().put(
-                GlobalMetadata.class, metadata);
-
-        if (state.getGroup() != null) {
-            bindings.put(CommandGroupMetadata.class, state.getGroup());
-        }
-
-        if (state.getCommand() != null) {
-            bindings.put(CommandMetadata.class, state.getCommand());
-        }
-
-        return createInstance(command.getType(), command.getAllOptions(), state.getParsedOptions(),
-                command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(), bindings.build(),
-                commandFactory);
-    }
-
-    private void validate(ParseState<C> state) {
-        CommandMetadata command = state.getCommand();
-        if (command == null) {
-            List<String> unparsedInput = state.getUnparsedInput();
-            if (unparsedInput.isEmpty()) {
-                throw new ParseCommandMissingException();
-            } else {
-                throw new ParseCommandUnrecognizedException(unparsedInput);
-            }
-        }
-
-        ArgumentsMetadata arguments = command.getArguments();
-        if (state.getParsedArguments().isEmpty() && arguments != null && arguments.isRequired()) {
-            throw new ParseArgumentsMissingException(arguments.getTitle());
-        }
-
-        if (!state.getUnparsedInput().isEmpty()) {
-            throw new ParseArgumentsUnexpectedException(state.getUnparsedInput());
-        }
-
-        if (state.getLocation() == Context.OPTION) {
-            throw new ParseOptionMissingValueException(state.getCurrentOption().getTitle());
-        }
-
-        for (OptionMetadata option : command.getAllOptions()) {
-            if (option.isRequired() && !state.getParsedOptions().containsKey(option)) {
-                throw new ParseOptionMissingException(option.getOptions().iterator().next());
-            }
-        }
-    }
-
 }

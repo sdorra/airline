@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.PeekingIterator;

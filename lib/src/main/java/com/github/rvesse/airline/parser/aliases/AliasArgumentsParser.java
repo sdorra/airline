@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.parser.aliases;
 
 import java.util.ArrayList;
 import java.util.List;

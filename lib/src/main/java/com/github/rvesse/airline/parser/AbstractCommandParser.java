@@ -8,6 +8,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -24,19 +25,38 @@ import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 
 /**
- * CLI and Single Command parser implementation
+ * Abstract implementation of a parser for commands that can cope with both CLI
+ * and Single Command parsing
  *
  * @param <T>
  *            Command type
  */
-public class Parser<T> extends AbstractParser<T> {
+public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
 
-    public ParseState<T> parse(GlobalMetadata<T> metadata, String... params) {
-        return parse(metadata, ImmutableList.copyOf(params));
+    /**
+     * Tries to parse the arguments
+     * 
+     * @param metadata
+     *            Global Metadata
+     * @param args
+     *            Arguments
+     * @return Parser State
+     */
+    protected ParseState<T> tryParse(GlobalMetadata<T> metadata, String... args) {
+        return tryParse(metadata, ImmutableList.copyOf(args));
     }
 
-    public ParseState<T> parse(GlobalMetadata<T> metadata, Iterable<String> params) {
-        PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
+    /**
+     * Tries to parse the arguments
+     * 
+     * @param metadata
+     *            Global Metadata
+     * @param args
+     *            Arguments
+     * @return Parser State
+     */
+    protected ParseState<T> tryParse(GlobalMetadata<T> metadata, Iterable<String> args) {
+        PeekingIterator<String> tokens = Iterators.peekingIterator(args.iterator());
 
         //@formatter:off
         ParseState<T> state = ParseState.<T> newInstance()
@@ -56,6 +76,31 @@ public class Parser<T> extends AbstractParser<T> {
         // parse command
         state = parseCommand(tokens, state);
 
+        return state;
+    }
+
+    /**
+     * Tries to parse the arguments
+     * 
+     * @param parserConfig
+     *            Parser Configuration
+     * @param command
+     *            Command metadata
+     * @param args
+     *            Arguments
+     * @return Parser State
+     */
+    protected ParseState<T> tryParse(ParserMetadata<T> parserConfig, CommandMetadata command, Iterable<String> args) {
+        PeekingIterator<String> tokens = Iterators.peekingIterator(args.iterator());
+        //@formatter:off
+        ParseState<T> state = ParseState.<T> newInstance()
+                                        .pushContext(Context.GLOBAL)
+                                        .withConfiguration(parserConfig)
+                                        .withCommand(command)
+                                        .pushContext(Context.COMMAND);
+        //@formatter:off
+
+        state = parseCommandOptionsAndArguments(tokens, state, command);
         return state;
     }
 
@@ -203,20 +248,6 @@ public class Parser<T> extends AbstractParser<T> {
             }
         }
         return tokens;
-    }
-
-    public ParseState<T> parseCommand(ParserMetadata<T> parserConfig, CommandMetadata command, Iterable<String> params) {
-        PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
-        //@formatter:off
-        ParseState<T> state = ParseState.<T> newInstance()
-                                        .pushContext(Context.GLOBAL)
-                                        .withConfiguration(parserConfig)
-                                        .withCommand(command)
-                                        .pushContext(Context.COMMAND);
-        //@formatter:off
-
-        state = parseCommandOptionsAndArguments(tokens, state, command);
-        return state;
     }
 
     private ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,

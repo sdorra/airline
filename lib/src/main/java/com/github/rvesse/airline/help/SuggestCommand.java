@@ -10,7 +10,7 @@ import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.SuggesterMetadata;
 import com.github.rvesse.airline.parser.ParseState;
-import com.github.rvesse.airline.parser.Parser;
+import com.github.rvesse.airline.parser.suggester.SuggestionParser;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -44,7 +44,7 @@ public class SuggestCommand<T>
     @VisibleForTesting
     public Iterable<String> generateSuggestions()
     {
-        Parser<T> parser = new Parser<T>();
+        SuggestionParser<T> parser = new SuggestionParser<T>();
         ParseState<T> state = parser.parse(metadata, arguments);
 
         Class<? extends Suggester> suggesterClass = BUILTIN_SUGGESTERS.get(state.getLocation());

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  * Represents metadata about a CLI
  */
 public class GlobalMetadata<T> {
+    
     private final String name;
     private final String description;
     private final List<OptionMetadata> options;

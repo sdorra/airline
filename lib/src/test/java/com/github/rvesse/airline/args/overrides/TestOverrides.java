@@ -20,7 +20,7 @@ package com.github.rvesse.airline.args.overrides;
 
 import org.testng.annotations.Test;
 
-import com.github.rvesse.airline.Cli;
+import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -56,8 +56,8 @@ public class TestOverrides {
 
     @Test
     public void merging_additive() {
-        Cli<ArgsMergeAddition> parser = singleCommandParser(ArgsMergeAddition.class);
-        CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeAddition> parser = singleCommandParser(ArgsMergeAddition.class);
+        CommandMetadata metadata = parser.getCommandMetadata();
 
         OptionMetadata verboseOption = findByName(metadata, "-v");
         assertNotNull(verboseOption);
@@ -73,8 +73,8 @@ public class TestOverrides {
     
     @Test
     public void merging_declared_override() {
-        Cli<ArgsMergeOverride> parser = singleCommandParser(ArgsMergeOverride.class);
-        CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeOverride> parser = singleCommandParser(ArgsMergeOverride.class);
+        CommandMetadata metadata = parser.getCommandMetadata();
 
         OptionMetadata verboseOption = findByName(metadata, "-v");
         assertNotNull(verboseOption);
@@ -98,14 +98,14 @@ public class TestOverrides {
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*must explicitly specify override.*")
     public void merging_undeclared_override() {
         // Should fail as the override is not explicitly declared in the child class
-        Cli<ArgsMergeUndeclaredOverride> parser = singleCommandParser(ArgsMergeUndeclaredOverride.class);
-        parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeUndeclaredOverride> parser = singleCommandParser(ArgsMergeUndeclaredOverride.class);
+        parser.getCommandMetadata();
     }
     
     @Test
     public void merging_sealed() {
-        Cli<ArgsMergeSealed> parser = singleCommandParser(ArgsMergeSealed.class);
-        CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeSealed> parser = singleCommandParser(ArgsMergeSealed.class);
+        CommandMetadata metadata = parser.getCommandMetadata();
 
         OptionMetadata verboseOption = findByName(metadata, "-v");
         assertNotNull(verboseOption);
@@ -126,36 +126,36 @@ public class TestOverrides {
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*sealed.*")
     public void merging_sealed_override() {
         // Should fail as cannot override an option declared sealed in the parent class
-        Cli<ArgsMergeSealedOverride> parser = singleCommandParser(ArgsMergeSealedOverride.class);
-        parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeSealedOverride> parser = singleCommandParser(ArgsMergeSealedOverride.class);
+        parser.getCommandMetadata();
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*overlapping.*")
     public void merging_overlapping_names() {
         // Should fail as cannot change the names of an option when overriding
-        Cli<ArgsMergeNameChange> parser = singleCommandParser(ArgsMergeNameChange.class);
-        parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeNameChange> parser = singleCommandParser(ArgsMergeNameChange.class);
+        parser.getCommandMetadata();
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Cannot change the Java type.*")
     public void merging_invalid_type_change() {
         // Should fail as cannot change the Java type of an option when overriding unless there is a legal narrowing change
-        Cli<ArgsMergeInvalidTypeChange> parser = singleCommandParser(ArgsMergeInvalidTypeChange.class);
-        parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeInvalidTypeChange> parser = singleCommandParser(ArgsMergeInvalidTypeChange.class);
+        parser.getCommandMetadata();
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*widening type change.*")
     public void merging_widening_type_change() {
         // Should fail as cannot change the Java type of an option when overriding
-        Cli<ArgsMergeWideningTypeChange> parser = singleCommandParser(ArgsMergeWideningTypeChange.class);
-        parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeWideningTypeChange> parser = singleCommandParser(ArgsMergeWideningTypeChange.class);
+        parser.getCommandMetadata();
     }
     
     @Test
     public void merging_narrowing_type_change() {
         // It is legal to make a narrowing type change
-        Cli<ArgsMergeNarrowingTypeChange> parser = singleCommandParser(ArgsMergeNarrowingTypeChange.class);
-        CommandMetadata metadata = parser.getMetadata().getDefaultGroupCommands().get(0);
+        SingleCommand<ArgsMergeNarrowingTypeChange> parser = singleCommandParser(ArgsMergeNarrowingTypeChange.class);
+        CommandMetadata metadata = parser.getCommandMetadata();
         
         OptionMetadata testOption = findByName(metadata, "--test");
         assertNotNull(testOption);

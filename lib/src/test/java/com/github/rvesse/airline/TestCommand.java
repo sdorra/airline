@@ -47,9 +47,9 @@ import com.github.rvesse.airline.args.OptionsRequired;
 import com.github.rvesse.airline.command.CommandAdd;
 import com.github.rvesse.airline.command.CommandCommit;
 import com.github.rvesse.airline.model.CommandMetadata;
-import com.github.rvesse.airline.parser.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
+import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.google.common.collect.ImmutableList;
 
 import org.testng.Assert;
@@ -63,9 +63,6 @@ import java.util.List;
 import static com.github.rvesse.airline.TestingUtil.singleAbbreviatedCommandParser;
 import static com.github.rvesse.airline.TestingUtil.singleAbbreviatedOptionParser;
 import static com.github.rvesse.airline.TestingUtil.singleCommandParser;
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -145,8 +142,8 @@ public class TestCommand
     @Test
     public void repeatedArgs()
     {
-        Cli<Args1> parser = singleCommandParser(Args1.class);
-        CommandMetadata command = find(parser.getMetadata().getDefaultGroupCommands(), compose(equalTo("Args1"), CommandMetadata.nameGetter()));
+        SingleCommand<Args1> parser = singleCommandParser(Args1.class);
+        CommandMetadata command = parser.getCommandMetadata();
         assertEquals(command.getAllOptions().size(), 8);
     }
 

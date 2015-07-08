@@ -19,7 +19,7 @@ import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.parser.AliasArgumentsParser;
+import com.github.rvesse.airline.parser.aliases.AliasArgumentsParser;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
