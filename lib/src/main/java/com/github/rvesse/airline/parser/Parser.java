@@ -24,9 +24,7 @@ import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
 
 /**
- * CLI parser implementation
- * 
- * @author rvesse
+ * CLI and Single Command parser implementation
  *
  * @param <T>
  *            Command type
@@ -40,15 +38,100 @@ public class Parser<T> extends AbstractParser<T> {
     public ParseState<T> parse(GlobalMetadata<T> metadata, Iterable<String> params) {
         PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
 
-        ParseState<T> state = ParseState.<T> newInstance().pushContext(Context.GLOBAL).withGlobal(metadata);
-
-        // Define needed predicates
-        Predicate<? super CommandGroupMetadata> findGroupPredicate;
-        Predicate<? super CommandMetadata> findCommandPredicate;
+        //@formatter:off
+        ParseState<T> state = ParseState.<T> newInstance()
+                                        .pushContext(Context.GLOBAL)
+                                        .withGlobal(metadata);
+        //@formatter:on
 
         // Parse global options
         state = parseOptions(tokens, state, metadata.getOptions());
 
+        // Apply aliases
+        tokens = applyAliases(metadata, tokens, state);
+
+        // Parse group
+        state = parseGroup(tokens, state);
+
+        // parse command
+        state = parseCommand(tokens, state);
+
+        return state;
+    }
+
+    protected ParseState<T> parseCommand(PeekingIterator<String> tokens, ParseState<T> state) {
+        Predicate<? super CommandMetadata> findCommandPredicate;
+        List<CommandMetadata> expectedCommands = state.getGlobal().getDefaultGroupCommands();
+        if (state.getGroup() != null) {
+            expectedCommands = state.getGroup().getCommands();
+        }
+
+        if (tokens.hasNext()) {
+            //@formatter:off
+            findCommandPredicate = (Predicate<? super CommandMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
+                                   ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
+                                   : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()));
+            //@formatter:on
+            CommandMetadata command = find(expectedCommands, findCommandPredicate, state.getGroup() != null ? state
+                    .getGroup().getDefaultCommand() : null);
+
+            boolean usingDefault = false;
+            if (command == null && state.getGroup() == null && state.getGlobal().getDefaultCommand() != null) {
+                usingDefault = true;
+                command = state.getGlobal().getDefaultCommand();
+            }
+
+            if (command == null) {
+                while (tokens.hasNext()) {
+                    state = state.withUnparsedInput(tokens.next());
+                }
+            } else {
+                if (tokens.peek().equals(command.getName())
+                        || (!usingDefault && state.getParserConfiguration().allowsAbbreviatedCommands())) {
+                    tokens.next();
+                }
+
+                state = state.withCommand(command).pushContext(Context.COMMAND);
+
+                state = parseCommandOptionsAndArguments(tokens, state, command);
+            }
+        }
+        return state;
+    }
+
+    protected ParseState<T> parseCommandOptionsAndArguments(PeekingIterator<String> tokens, ParseState<T> state,
+            CommandMetadata command) {
+        while (tokens.hasNext()) {
+            state = parseOptions(tokens, state, command.getCommandOptions());
+
+            state = parseArgs(state, tokens, command.getArguments(), command.getDefaultOption());
+        }
+        return state;
+    }
+
+    protected ParseState<T> parseGroup(PeekingIterator<String> tokens, ParseState<T> state) {
+        Predicate<? super CommandGroupMetadata> findGroupPredicate;
+        if (tokens.hasNext()) {
+            //@formatter:off
+            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
+                                 ? new AbbreviatedGroupFinder(tokens.peek(), state.getGlobal().getCommandGroups()) 
+                                 : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter()));
+            //@formatter:on
+            CommandGroupMetadata group = find(state.getGlobal().getCommandGroups(), findGroupPredicate, null);
+            if (group != null) {
+                tokens.next();
+                state = state.withGroup(group).pushContext(Context.GROUP);
+
+                state = parseOptions(tokens, state, state.getGroup().getOptions());
+            }
+        }
+        return state;
+    }
+
+    protected PeekingIterator<String> applyAliases(GlobalMetadata<T> metadata, PeekingIterator<String> tokens,
+            ParseState<T> state) {
+        Predicate<? super CommandGroupMetadata> findGroupPredicate;
+        Predicate<? super CommandMetadata> findCommandPredicate;
         // Check if we got an alias
         if (tokens.hasNext()) {
             if (state.getParserConfiguration().getAliases().size() > 0) {
@@ -119,65 +202,7 @@ public class Parser<T> extends AbstractParser<T> {
                 }
             }
         }
-
-        // Parse group
-        if (tokens.hasNext()) {
-            //@formatter:off
-            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
-                                 ? new AbbreviatedGroupFinder(tokens.peek(), metadata.getCommandGroups()) 
-                                 : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter()));
-            //@formatter:on
-            CommandGroupMetadata group = find(metadata.getCommandGroups(), findGroupPredicate, null);
-            if (group != null) {
-                tokens.next();
-                state = state.withGroup(group).pushContext(Context.GROUP);
-
-                state = parseOptions(tokens, state, state.getGroup().getOptions());
-            }
-        }
-
-        // parse command
-        List<CommandMetadata> expectedCommands = metadata.getDefaultGroupCommands();
-        if (state.getGroup() != null) {
-            expectedCommands = state.getGroup().getCommands();
-        }
-
-        if (tokens.hasNext()) {
-            //@formatter:off
-            findCommandPredicate = (Predicate<? super CommandMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
-                                   ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
-                                   : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()));
-            //@formatter:on
-            CommandMetadata command = find(expectedCommands, findCommandPredicate, state.getGroup() != null ? state
-                    .getGroup().getDefaultCommand() : null);
-
-            boolean usingDefault = false;
-            if (command == null && state.getGroup() == null && metadata.getDefaultCommand() != null) {
-                usingDefault = true;
-                command = metadata.getDefaultCommand();
-            }
-
-            if (command == null) {
-                while (tokens.hasNext()) {
-                    state = state.withUnparsedInput(tokens.next());
-                }
-            } else {
-                if (tokens.peek().equals(command.getName())
-                        || (!usingDefault && state.getParserConfiguration().allowsAbbreviatedCommands())) {
-                    tokens.next();
-                }
-
-                state = state.withCommand(command).pushContext(Context.COMMAND);
-
-                while (tokens.hasNext()) {
-                    state = parseOptions(tokens, state, command.getCommandOptions());
-
-                    state = parseArgs(state, tokens, command.getArguments(), command.getDefaultOption());
-                }
-            }
-        }
-
-        return state;
+        return tokens;
     }
 
     public ParseState<T> parseCommand(ParserMetadata<T> parserConfig, CommandMetadata command, Iterable<String> params) {
@@ -186,14 +211,11 @@ public class Parser<T> extends AbstractParser<T> {
         ParseState<T> state = ParseState.<T> newInstance()
                                         .pushContext(Context.GLOBAL)
                                         .withConfiguration(parserConfig)
-                                        .withCommand(command);
+                                        .withCommand(command)
+                                        .pushContext(Context.COMMAND);
         //@formatter:off
 
-        while (tokens.hasNext()) {
-            state = parseOptions(tokens, state, command.getCommandOptions());
-
-            state = parseArgs(state, tokens, command.getArguments(), command.getDefaultOption());
-        }
+        state = parseCommandOptionsAndArguments(tokens, state, command);
         return state;
     }
 

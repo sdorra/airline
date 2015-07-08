@@ -23,12 +23,9 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.Parser;
-import com.github.rvesse.airline.parser.ParserUtil;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
@@ -73,10 +70,6 @@ public class Cli<C> {
         return metadata;
     }
 
-    public C parse(CommandFactory<C> commandFactory, String... args) {
-        return parse(commandFactory, ImmutableList.copyOf(args));
-    }
-
     public C parse(String... args) {
         return parse(metadata.getParserConfiguration().getCommandFactory(), ImmutableList.copyOf(args));
     }
@@ -85,10 +78,12 @@ public class Cli<C> {
         return parse(metadata.getParserConfiguration().getCommandFactory(), args);
     }
 
-    public C parse(CommandFactory<C> commandFactory, Iterable<String> args) {
+    private C parse(CommandFactory<C> commandFactory, Iterable<String> args) {
         Preconditions.checkNotNull(args, "args is null");
 
         Parser<C> parser = new Parser<C>();
+        
+        // TODO Rest of logic including validateState should move to Parser 
         ParseState<C> state = parser.parse(metadata, args);
 
         if (state.getCommand() == null) {
@@ -117,34 +112,6 @@ public class Cli<C> {
         return createInstance(command.getType(), command.getAllOptions(), state.getParsedOptions(),
                 command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(), bindings.build(),
                 commandFactory);
-    }
-
-    public C parse(C commandInstance, String... args) {
-        Preconditions.checkNotNull(args, "args is null");
-
-        Parser<C> parser = new Parser<C>();
-        ParseState<C> state = parser.parse(metadata, args);
-
-        CommandMetadata command = MetadataLoader.loadCommand(commandInstance.getClass());
-
-        state = state.withCommand(command);
-
-        validate(state);
-
-        ImmutableMap.Builder<Class<?>, Object> bindings = ImmutableMap.<Class<?>, Object> builder().put(
-                GlobalMetadata.class, metadata);
-        bindings.put(ParserMetadata.class, metadata.getParserConfiguration());
-
-        if (state.getGroup() != null) {
-            bindings.put(CommandGroupMetadata.class, state.getGroup());
-        }
-
-        bindings.put(CommandMetadata.class, command);
-
-        C c = (C) ParserUtil.injectOptions(commandInstance, command.getAllOptions(), state.getParsedOptions(),
-                command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(), bindings.build());
-
-        return c;
     }
 
     private void validate(ParseState<C> state) {

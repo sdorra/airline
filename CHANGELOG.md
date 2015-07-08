@@ -2,6 +2,8 @@
 
 ## 1.0.2
 
+- Builder improvements
+    - **Breaking** All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance.
 - Parser Improvements
      - Type converter is now configurable
      - Option parsing styles are now configurable

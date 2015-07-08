@@ -40,62 +40,93 @@ import java.util.List;
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class SingleCommand<C>
-{
-    public static <C> SingleCommand<C> singleCommand(Class<C> command)
-    {
+/**
+ * Class for encapsulating single commands
+ *
+ * @param <C>
+ *            Command type
+ */
+public class SingleCommand<C> {
+    /**
+     * Creates a new single command
+     * 
+     * @param command
+     *            Command class
+     * @return Single command parser
+     */
+    public static <C> SingleCommand<C> singleCommand(Class<C> command) {
         return new SingleCommand<C>(command, null);
+    }
+
+    /**
+     * Creates a new single command
+     * 
+     * @param command
+     *            Command class
+     * @param parserConfig
+     *            Parser configuration to use, if {@code null} the default
+     *            configuration is used
+     * @return Single command parser
+     */
+    public static <C> SingleCommand<C> singleCommand(Class<C> command, ParserMetadata<C> parserConfig) {
+        return new SingleCommand<C>(command, parserConfig);
     }
 
     private final ParserMetadata<C> parserConfig;
     private final CommandMetadata commandMetadata;
 
-    private SingleCommand(Class<C> command, ParserMetadata<C> parserConfig)
-    {
+    private SingleCommand(Class<C> command, ParserMetadata<C> parserConfig) {
         checkNotNull(command, "command is null");
-        this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<C>defaultConfiguration();
+        this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<C> defaultConfiguration();
 
         commandMetadata = MetadataLoader.loadCommand(command);
     }
 
-    public CommandMetadata getCommandMetadata()
-    {
+    /**
+     * Gets the command metadata
+     * 
+     * @return Command metadata
+     */
+    public CommandMetadata getCommandMetadata() {
         return commandMetadata;
     }
 
-    public C parse(String... args)
-    {
+    /**
+     * Gets the parser configuration
+     * 
+     * @return Parser configuration
+     */
+    public ParserMetadata<C> getParserConfiguration() {
+        return parserConfig;
+    }
+
+    public C parse(String... args) {
         return parse(ImmutableList.copyOf(args));
     }
-    
-    public C parse(Iterable<String> args)
-    {
+
+    public C parse(Iterable<String> args) {
         checkNotNull(args, "args is null");
-        
+
         Parser<C> parser = new Parser<C>();
+        
+        // TODO Rest of logic including validate method can move to Parser
         ParseState<C> state = parser.parseCommand(parserConfig, commandMetadata, args);
         validate(state);
 
         CommandMetadata command = state.getCommand();
 
-        return createInstance(command.getType(),
-                command.getAllOptions(),
-                state.getParsedOptions(),
-                command.getArguments(),
-                state.getParsedArguments(),
-                command.getMetadataInjections(),
-                ImmutableMap.<Class<?>, Object>of(CommandMetadata.class, commandMetadata));
+        return createInstance(command.getType(), command.getAllOptions(), state.getParsedOptions(),
+                command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(),
+                ImmutableMap.<Class<?>, Object> of(CommandMetadata.class, commandMetadata));
     }
-    
-    private void validate(ParseState<C> state)
-    {
+
+    private void validate(ParseState<C> state) {
         CommandMetadata command = state.getCommand();
         if (command == null) {
             List<String> unparsedInput = state.getUnparsedInput();
             if (unparsedInput.isEmpty()) {
                 throw new ParseCommandMissingException();
-            }
-            else {
+            } else {
                 throw new ParseCommandUnrecognizedException(unparsedInput);
             }
         }
@@ -104,7 +135,7 @@ public class SingleCommand<C>
         if (state.getParsedArguments().isEmpty() && arguments != null && arguments.isRequired()) {
             throw new ParseArgumentsMissingException(arguments.getTitle());
         }
-        
+
         if (!state.getUnparsedInput().isEmpty()) {
             throw new ParseArgumentsUnexpectedException(state.getUnparsedInput());
         }
