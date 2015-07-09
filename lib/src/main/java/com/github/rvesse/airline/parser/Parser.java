@@ -370,6 +370,13 @@ public class Parser {
             return;
         if (option.getAllowedValues().contains(tokenStr))
             return;
+        if (option.isIgnoreCase()) {
+            for (String value : option.getAllowedValues()) {
+                if (value.toUpperCase().equals(tokenStr.toUpperCase())) {
+                    return;
+                }
+            }
+        }
         throw new ParseOptionIllegalValueException(option.getTitle(), tokenStr, option.getAllowedValues());
     }
 
