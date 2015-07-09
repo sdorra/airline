@@ -1,15 +1,31 @@
 # Airline - Change Log
 
-## 1.0.2
+## 2.0.0
+
+2.0.0 represents substantial breaking changes over 1.x which were made to make the library more configurable and extensible
 
 - Builder improvements
-    - **Breaking** All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance.
+    - All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance.
 - Parser Improvements
-     - Type converter is now configurable
-     - Option parsing styles are now configurable
+     - Type converter is now configurable i.e. allows you to control how Airline turns string arguments into Java objects
+     - Option parsing styles are now fully configurable (default behaviour remains as 1.x which uses the first 3 styles):
+         - Classic GNU Get Opt Style
+         - Long GNU Get Opt Style
+         - Standard whitespace separated style
+         - List value style i.e. `--name a,b,c` for higher arity options
+         - Pair value style i.e. `--name a=b` for arity 2 options
+     - Alias Improvements
+         - Can now support optional alias chaining i.e. aliases can reference other aliases
 - Metadata Improvements
      - Parsing specific metadata moved to `ParserMetadata` class which is accessible via `GlobalMetadata.getParserConfiguration()`
      - `GlobalMetadata` is now a generic class taking the command type as the type parameter
+
+## 1.0.2
+
+- Various minor improvements from Christian Raedel
+    - Long style option parser `--name=value` now also accepts colon separated values e.g. `--name:value`
+    - `allowedValues` on `@Option` can now be set to use case insensitive comparison
+    - `TrueColor` can be instantiated from a hex value
 
 ## 1.0.1
 

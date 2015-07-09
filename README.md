@@ -61,6 +61,8 @@ Sets the option `-a`/`--alpha` option to the value `bc`
 
 May be used with any option provided the option name does not contain an `=`
 
+You can also use `:` as an alternative separator
+
 #### Whitespace separated
 
     myapp command -a bc
@@ -81,7 +83,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `1.0.1`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `1.0.2`
 
 Use the following maven dependency declaration:
 
@@ -89,11 +91,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `1.1.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes)
+Snapshot artifacts of the latest source are also available using the version `1.0.3-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).  There is also a `2.0.0-SNAPSHOT` which represents a more significant refactoring of some of the functionality with the aim of making the library more configurable and extensible.
 
 Please note that the `1.0.x` release line represents significant breaking changes from the previous `0.9.x` releases, please review the Change Log before attempting to upgrade an application that uses an older version.
 
