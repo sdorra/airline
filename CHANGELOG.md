@@ -2,7 +2,10 @@
 
 ## 1.0.2
 
-
+- Various minor improvements from Christian Raedel
+    - Long style option parser `--name=value` now also accepts colon separated values e.g. `--name:value`
+    - `allowedValues` on `@Option` can now be set to use case insensitive comparison
+    - `TrueColor` can be instantiated from a hex value
 
 ## 1.0.1
 
