@@ -12,7 +12,7 @@ public class TestPing
         ping();
         ping("-c", "5");
         ping("--count", "9");
-        ping("--count:8");
+        ping("--count=8");
 
         // show help
         ping("-h");
