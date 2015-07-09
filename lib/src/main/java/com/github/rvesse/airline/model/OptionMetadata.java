@@ -20,6 +20,7 @@ public class OptionMetadata {
     private final int arity, completionBehaviour;
     private final boolean required, hidden, overrides, sealed;
     private final Set<String> allowedValues;
+    private final boolean ignoreCase;
     private Set<Accessor> accessors;
 
     //@formatter:off
@@ -32,7 +33,8 @@ public class OptionMetadata {
                           boolean hidden, 
                           boolean overrides, 
                           boolean sealed,
-                          Iterable<String> allowedValues, 
+                          Iterable<String> allowedValues,
+                          boolean ignoreCase,
                           int completionBehaviours,
                           String completionCommand,
                           Iterable<Field> path) {
@@ -53,6 +55,7 @@ public class OptionMetadata {
         this.sealed = sealed;
         this.completionBehaviour = completionBehaviours;
         this.completionCommand = completionCommand;
+        this.ignoreCase = ignoreCase;
 
         if (allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(allowedValues);
@@ -96,6 +99,7 @@ public class OptionMetadata {
             accessors.addAll(other.getAccessors());
         }
         this.accessors = ImmutableSet.copyOf(accessors);
+        this.ignoreCase = option.ignoreCase;
     }
 
     public OptionType getOptionType() {
@@ -159,6 +163,10 @@ public class OptionMetadata {
 
     public Set<String> getAllowedValues() {
         return allowedValues;
+    }
+
+    public boolean isIgnoreCase() {
+        return ignoreCase;
     }
 
     @Override
@@ -333,6 +341,7 @@ public class OptionMetadata {
                                     child.overrides,
                                     child.sealed,
                                     child.allowedValues != null ? child.allowedValues : parent.allowedValues,
+                child.ignoreCase,
                                     child.completionBehaviour,
                                     child.completionCommand,
                                     null);

@@ -18,10 +18,10 @@
 
 package com.github.rvesse.airline;
 
+import com.github.rvesse.airline.model.OptionMetadata;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import com.github.rvesse.airline.model.OptionMetadata;
 
 import static java.lang.annotation.ElementType.FIELD;
 
@@ -100,6 +100,13 @@ public @interface Option {
      * @return Allowed values
      */
     String[] allowedValues() default {};
+
+    /**
+     * If true the case on {@link #allowedValues()} is ignored
+     *
+     * @return Ignore case
+     */
+    boolean ignoreCase() default false;
 
     /**
      * Sets the desired completion behaviour
