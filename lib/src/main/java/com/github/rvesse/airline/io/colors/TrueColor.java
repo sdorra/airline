@@ -17,6 +17,12 @@ public class TrueColor implements AnsiColorProvider {
         this.b = checkColor(blue, "blue");
     }
 
+    public TrueColor(String hex) {
+        this.r = Integer.valueOf(hex.substring(1, 3), 16);
+        this.g = Integer.valueOf(hex.substring(3, 5), 16);
+        this.b = Integer.valueOf(hex.substring(5, 7), 16);
+    }
+
     private int checkColor(int c, String argName) {
         Preconditions.checkArgument(c >= 0 && c <= 255, String.format("%s component was given value %d but only values in the range 0-255 are acceptable", argName, c));
         return c;
@@ -58,6 +64,10 @@ public class TrueColor implements AnsiColorProvider {
     @Override
     public String toString() {
         return String.format("%d,%d,%d", this.r, this.g, this.b);
+    }
+
+    public String toHex() {
+        return String.format("#%02X%02X%02X", this.r, this.g, this.b);
     }
     
     @Override
