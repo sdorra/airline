@@ -79,7 +79,7 @@ public class TestParametersDelegate
     {
 
         DelegatingSetsFieldsOnBothMainParamsAndTheDelegatedParams p = singleCommandParser(DelegatingSetsFieldsOnBothMainParamsAndTheDelegatedParams.class)
-                .parse("command", "-c", "--long-d", "123", "--long-b", "bValue");
+                .parse("-c", "--long-d", "123", "--long-b", "bValue");
         assertFalse(p.isA);
         assertEquals(p.bValue, "bValue");
         assertTrue(p.delegate.isC);
@@ -132,7 +132,7 @@ public class TestParametersDelegate
     public void combinedAndNestedDelegates()
     {
         CombinedAndNestedDelegates p = singleCommandParser(CombinedAndNestedDelegates.class)
-                .parse("command", "-d", "234", "--list", "a", "--list", "b", "-a");
+                .parse("-d", "234", "--list", "a", "--list", "b", "-a");
         assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, newArrayList("value1", "value2", "a", "b"));
         assertFalse(p.nestedDelegate2.nestedDelegate1.leafDelegate.bool);
         assertEquals(p.nestedDelegate2.nestedDelegate1.d, Integer.valueOf(234));
@@ -159,7 +159,7 @@ public class TestParametersDelegate
     @Test
     public void commandTest()
     {
-        CommandTest c = singleCommandParser(CommandTest.class).parse("command", "-a", "a");
+        CommandTest c = singleCommandParser(CommandTest.class).parse("-a", "a");
         assertEquals(c.delegate.a, "a");
     }
 
@@ -182,7 +182,7 @@ public class TestParametersDelegate
     public void nullDelegatesAreAllowed()
     {
 
-        NullDelegatesAreProhibited value = singleCommandParser(NullDelegatesAreProhibited.class).parse("command", "-a");
+        NullDelegatesAreProhibited value = singleCommandParser(NullDelegatesAreProhibited.class).parse("-a");
         assertEquals(value.delegate.a, true);
     }
 
@@ -206,7 +206,7 @@ public class TestParametersDelegate
     @Test
     public void duplicateDelegateAllowed()
     {
-        DuplicateDelegateAllowed value = singleCommandParser(DuplicateDelegateAllowed.class).parse("command", "-a", "value");
+        DuplicateDelegateAllowed value = singleCommandParser(DuplicateDelegateAllowed.class).parse("-a", "value");
         assertEquals(value.d1.a, "value");
         assertEquals(value.d2.a, "value");
     }
@@ -238,7 +238,7 @@ public class TestParametersDelegate
     @Test
     public void duplicateMainParametersAreAllowed()
     {
-        DuplicateMainParametersAreAllowed value = singleCommandParser(DuplicateMainParametersAreAllowed.class).parse("command", "main", "params");
+        DuplicateMainParametersAreAllowed value = singleCommandParser(DuplicateMainParametersAreAllowed.class).parse("main", "params");
         assertEquals(value.delegate1.mainParams1, ImmutableList.of("main", "params"));
         assertEquals(value.delegate2.mainParams1, ImmutableList.of("main", "params"));
     }
@@ -270,6 +270,6 @@ public class TestParametersDelegate
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void conflictingMainParametersAreNotAllowed()
     {
-        singleCommandParser(ConflictingMainParametersAreNotAllowed.class).parse("command", "main", "params");
+        singleCommandParser(ConflictingMainParametersAreNotAllowed.class).parse("main", "params");
     }
 }

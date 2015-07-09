@@ -1,13 +1,13 @@
 package com.github.rvesse.airline.parser;
 
 import com.github.rvesse.airline.Context;
-import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.aliases.AliasResolver;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.google.common.base.Predicate;
@@ -15,11 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import static com.google.common.base.Predicates.compose;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Iterables.find;
@@ -68,7 +64,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
         state = parseOptions(tokens, state, metadata.getOptions());
 
         // Apply aliases
-        tokens = applyAliases(metadata, tokens, state);
+        tokens = applyAliases(tokens, state);
 
         // Parse group
         state = parseGroup(tokens, state);
@@ -77,6 +73,11 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
         state = parseCommand(tokens, state);
 
         return state;
+    }
+    
+    protected PeekingIterator<String> applyAliases(PeekingIterator<String> tokens, ParseState<T> state) {
+        AliasResolver<T> resolver = new AliasResolver<T>();
+        return resolver.resolveAliases(tokens, state);
     }
 
     /**
@@ -171,83 +172,6 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
             }
         }
         return state;
-    }
-
-    protected PeekingIterator<String> applyAliases(GlobalMetadata<T> metadata, PeekingIterator<String> tokens,
-            ParseState<T> state) {
-        Predicate<? super CommandGroupMetadata> findGroupPredicate;
-        Predicate<? super CommandMetadata> findCommandPredicate;
-        // Check if we got an alias
-        if (tokens.hasNext()) {
-            if (state.getParserConfiguration().getAliases().size() > 0) {
-                AliasMetadata alias = find(state.getParserConfiguration().getAliases(),
-                        compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
-                if (alias != null) {
-                    if (!state.getParserConfiguration().aliasesOverrideBuiltIns()) {
-                        // Check we don't have a default group/command with the
-                        // same name as otherwise that would take precedence
-                        findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
-                        findCommandPredicate = compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
-                        if (find(metadata.getCommandGroups(), findGroupPredicate, null) != null
-                                || find(metadata.getDefaultGroupCommands(), findCommandPredicate, null) != null)
-                            alias = null;
-                    }
-
-                    // Apply the alias
-                    if (alias != null) {
-                        // Discard the alias
-                        tokens.next();
-
-                        List<String> newParams = new ArrayList<String>();
-                        List<String> remainingParams = new ArrayList<String>();
-                        while (tokens.hasNext()) {
-                            remainingParams.add(tokens.next());
-                        }
-
-                        // Process alias arguments
-                        Set<Integer> used = new TreeSet<Integer>();
-                        for (String arg : alias.getArguments()) {
-                            if (arg.startsWith("$")) {
-                                // May be a positional parameter
-                                try {
-                                    int num = Integer.parseInt(arg.substring(1));
-                                    num--;
-
-                                    if (num >= 0 && num < remainingParams.size()) {
-                                        // Valid positional parameter
-                                        newParams.add(remainingParams.get(num));
-                                        used.add(num);
-                                        continue;
-                                    }
-                                } catch (NumberFormatException e) {
-                                    // Ignore - the number was invalid so we'll
-                                    // treat it as an ordinary parameter
-                                }
-                            }
-
-                            // Some other parameter
-                            newParams.add(arg);
-                        }
-
-                        // Remove used positional parameters
-                        int removed = 0;
-                        for (int pos : used) {
-                            remainingParams.remove(pos - removed);
-                            removed++;
-                        }
-
-                        // Pass through any remaining parameters
-                        for (String arg : remainingParams) {
-                            newParams.add(arg);
-                        }
-
-                        // Prepare a new tokens iterator
-                        tokens = Iterators.peekingIterator(newParams.iterator());
-                    }
-                }
-            }
-        }
-        return tokens;
     }
 
     private ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,

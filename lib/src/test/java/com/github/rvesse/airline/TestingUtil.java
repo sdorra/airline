@@ -10,6 +10,16 @@ public class TestingUtil
         return SingleCommand.singleCommand(commandClass);
     }
     
+    public static <T> Cli<T> singleCli(Class<T> commandClass)
+    {
+        //@formatter:off
+        CliBuilder<T> builder = Cli.<T>builder("parser")
+                                   .withCommand(commandClass);
+        //@formatter:off
+        
+        return builder.build();
+    }
+    
     public static <T> Cli<T> singleAbbreviatedCommandParser(Class<T> commandClass)
     {
         //@formatter:off

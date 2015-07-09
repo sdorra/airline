@@ -90,7 +90,7 @@ public class TestOverrides {
         assertNotNull(argsData);
         
         // Check that the overridden option gets propagated to all classes in the hierarchy
-        ArgsMergeOverride cmd = parser.parse("ArgsMergeOverride", "--hidden");
+        ArgsMergeOverride cmd = parser.parse("--hidden");
         assertTrue(cmd.hidden);
         assertTrue(((ArgsMergeParent)cmd).hidden);
     }
@@ -118,7 +118,7 @@ public class TestOverrides {
         assertTrue(hiddenOption.isSealed());
         
         // Check that the overridden option gets propagated to all classes in the hierarchy
-        ArgsMergeSealed cmd = parser.parse("ArgsMergeSealed", "--hidden");
+        ArgsMergeSealed cmd = parser.parse("--hidden");
         assertTrue(cmd.hidden);
         assertTrue(((ArgsMergeParent)cmd).hidden);
     }
@@ -163,7 +163,7 @@ public class TestOverrides {
         assertEquals(testOption.getJavaType(), ArgsMergeTypeParent.C.class);
         
         // Check that the overridden option gets propagated to all classes in the hierarchy
-        ArgsMergeNarrowingTypeChange cmd = parser.parse("ArgsMergeNarrowingTypeChange", "--test", "12345");
+        ArgsMergeNarrowingTypeChange cmd = parser.parse("--test", "12345");
         assertEquals(cmd.test.value, 12345);
         assertEquals(((ArgsMergeTypeParent)cmd).test.value, 12345);
         

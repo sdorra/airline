@@ -38,7 +38,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected TypeConverter typeConverter = new DefaultTypeConverter();
     protected final Map<String, AliasBuilder<C>> aliases = newHashMap();
     protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
-    protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
+    protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     protected final List<OptionParser<C>> optionParsers = newArrayList();
     protected String argsSeparator;
     
@@ -220,6 +220,11 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         this.aliasesOverrideBuiltIns = true;
         return this;
     }
+    
+    public ParserBuilder<C> withAliasesChaining() {
+        this.aliasesMayChain = true;
+        return this;
+    }
 
     public ParserBuilder<C> withCommandAbbreviation() {
         this.allowAbbreviatedCommands = true;
@@ -355,6 +360,6 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         }
 
         return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, allowAbbreviatedCommands,
-                allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns, argsSeparator);
+                allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns, aliasesMayChain, argsSeparator);
     }
 }

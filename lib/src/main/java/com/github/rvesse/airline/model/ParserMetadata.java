@@ -22,7 +22,7 @@ public class ParserMetadata<T> {
      */
     public static final String DEFAULT_ARGUMENTS_SEPARATOR = "--";
 
-    private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns;
+    private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     private final List<OptionParser<T>> optionParsers;
     private final List<AliasMetadata> aliases;
     private final TypeConverter typeConverter;
@@ -31,7 +31,8 @@ public class ParserMetadata<T> {
 
     public ParserMetadata(CommandFactory<T> commandFactory, List<OptionParser<T>> optionParsers,
             TypeConverter typeConverter, boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions,
-            List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns, String argumentsSeparator) {
+            List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns, boolean aliasesMayChain,
+            String argumentsSeparator) {
         Preconditions.checkNotNull(optionParsers, "optionParsers cannot be null");
         Preconditions.checkNotNull(aliases, "aliases cannot be null");
 
@@ -47,6 +48,7 @@ public class ParserMetadata<T> {
         // Aliases
         this.aliases = ImmutableList.copyOf(aliases);
         this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
+        this.aliasesMayChain = aliasesMayChain;
 
         // Arguments Separator
         if (StringUtils.isNotEmpty(argumentsSeparator)) {
@@ -92,6 +94,16 @@ public class ParserMetadata<T> {
      */
     public boolean aliasesOverrideBuiltIns() {
         return aliasesOverrideBuiltIns;
+    }
+
+    /**
+     * Gets whether aliases may chain i.e. whether one alias may reference
+     * another
+     * 
+     * @return True if they can chain, false otherwise
+     */
+    public boolean aliasesMayChain() {
+        return aliasesMayChain;
     }
 
     /**
