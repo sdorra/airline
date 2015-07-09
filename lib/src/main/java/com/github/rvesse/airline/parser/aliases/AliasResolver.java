@@ -15,10 +15,17 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.AbstractParser;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
+/**
+ * Resolves aliases
+ *
+ * @param <T>
+ *            Command type
+ */
 public class AliasResolver<T> extends AbstractParser<T> {
 
     public PeekingIterator<String> resolveAliases(PeekingIterator<String> tokens, ParseState<T> state) {
@@ -43,10 +50,10 @@ public class AliasResolver<T> extends AbstractParser<T> {
             // Nothing further to do if no aliases found
             if (alias == null)
                 return tokens;
-            
+
             // Check for circular references
             if (!aliasesSeen.add(alias.getName())) {
-                
+                throw new ParseAliasCircularReferenceException(alias.getName(), aliasesSeen);
             }
 
             // Can we override built-ins?
@@ -114,7 +121,7 @@ public class AliasResolver<T> extends AbstractParser<T> {
             // Prepare a new tokens iterator
             tokens = Iterators.peekingIterator(newParams.iterator());
         } while (state.getParserConfiguration().aliasesMayChain());
-        
+
         return tokens;
     }
 }

@@ -1,4 +1,4 @@
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.parser.aliases;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,6 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
+import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.AliasMetadata;
