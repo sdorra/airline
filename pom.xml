@@ -55,9 +55,9 @@
 
     <!-- Dependency Versions -->
     <dependency.javax-inject>1</dependency.javax-inject>
-    <dependency.guava>18.0</dependency.guava>
     <dependency.testng>6.8.8</dependency.testng>
     <dependency.commons-lang3>3.3.2</dependency.commons-lang3>
+    <dependency.commons-collections4>4.0</dependency.commons-collections4>
   </properties>
 
   <modules>
@@ -74,15 +74,15 @@
       </dependency>
 
       <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${dependency.guava}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>${dependency.commons-lang3}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>${dependency.commons-collections4}</version>
       </dependency>
 
       <!-- for testing -->

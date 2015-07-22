@@ -2,23 +2,26 @@ package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.parser.ParserUtil;
 import com.github.rvesse.airline.parser.errors.ParseException;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import javax.swing.plaf.ListUI;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.ListUtils;
 
 public class Accessor
 {
@@ -29,15 +32,15 @@ public class Accessor
 
     public Accessor(Field... path)
     {
-        this(ImmutableList.copyOf(path));
+        this(IteratorUtils.arrayIterator(path, 0));
     }
 
-    public Accessor(Iterable<Field> path)
+    public Accessor(Iterator<Field> path)
     {
-        Preconditions.checkNotNull(path, "path is null");
-        Preconditions.checkArgument(!Iterables.isEmpty(path), "path is empty");
+        if(path == null) throw new NullPointerException("path is null");
+        if (!path.hasNext()) throw new IllegalArgumentException("path is empty");
 
-        this.path = ImmutableList.copyOf(path);
+        this.path = ListUtils.unmodifiableList(IteratorUtils.toList(path));
         this.name = this.path.get(0).getDeclaringClass().getSimpleName() + "." + Joiner.on('.').join(Iterables.transform(this.path, new Function<Field, String>()
         {
             public String apply(Field field)
@@ -93,7 +96,7 @@ public class Accessor
 
     public void addValues(Object commandInstance, Iterable<?> values)
     {
-        if (Iterables.isEmpty(values)) {
+        if (!values.iterator().hasNext()) {
             return;
         }
 
@@ -104,7 +107,7 @@ public class Accessor
         field.setAccessible(true);
         if (Collection.class.isAssignableFrom(field.getType())) {
             Collection<Object> collection = getOrCreateCollectionField(name, instance, field);
-            Iterables.addAll(collection, values);
+            CollectionUtils.addAll(collection, values);
         }
         else {
             try {

@@ -1,7 +1,6 @@
 package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
-import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -18,9 +17,9 @@ import java.lang.reflect.Method;
 public class DefaultTypeConverter implements TypeConverter {
     @Override
     public Object convert(String name, Class<?> type, String value) {
-        Preconditions.checkNotNull(name, "name is null");
-        Preconditions.checkNotNull(type, "type is null");
-        Preconditions.checkNotNull(value, "value is null");
+        if (name == null) throw new NullPointerException("name is null");
+        if (type == null) throw new NullPointerException("type is null");
+        if (value == null) throw new NullPointerException("value is null");
 
         // Firstly try the standard Java types
         ConvertResult result = tryConvertBasicTypes(type, value);

@@ -18,11 +18,12 @@
 
 package com.github.rvesse.airline;
 
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.ListUtils;
+
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.command.CliParser;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 public class Cli<C> {
     /**
@@ -33,7 +34,8 @@ public class Cli<C> {
      * @return CLI Builder
      */
     public static <T> CliBuilder<T> builder(String name) {
-        Preconditions.checkNotNull(name, "name is null");
+        if (name == null)
+            throw new NullPointerException("name cannot be null");
         return new CliBuilder<T>(name);
     }
 
@@ -46,7 +48,8 @@ public class Cli<C> {
      *            Metadata
      */
     public Cli(GlobalMetadata<C> metadata) {
-        Preconditions.checkNotNull(metadata);
+        if (metadata == null)
+            throw new NullPointerException("metadata cannot be null");
         this.metadata = metadata;
     }
 
@@ -55,7 +58,7 @@ public class Cli<C> {
     }
 
     public C parse(String... args) {
-        return parse(ImmutableList.copyOf(args));
+        return parse(ListUtils.unmodifiableList(IteratorUtils.toList(IteratorUtils.arrayIterator(args))));
     }
 
     private C parse(Iterable<String> args) {

@@ -2,8 +2,6 @@ package com.github.rvesse.airline.builder;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Abstract base class for builders
  *
@@ -21,7 +19,8 @@ public abstract class AbstractBuilder<T> {
      *            Parameter
      */
     protected final void checkNotNull(String value, String paramName) {
-        Preconditions.checkNotNull(value, "%s cannot be null", paramName);
+        if (value == null)
+            throw new NullPointerException(String.format("%s cannot be null", paramName));
     }
 
     /**
@@ -33,7 +32,8 @@ public abstract class AbstractBuilder<T> {
      *            Parameter
      */
     protected final void checkNotEmpty(String value, String paramName) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(value), "%s cannot be null/empty", paramName);
+        if (StringUtils.isEmpty(value))
+            throw new IllegalArgumentException(String.format("%s cannot be null/empty", paramName));
     }
 
     /**
@@ -46,8 +46,8 @@ public abstract class AbstractBuilder<T> {
      *            Parameter
      */
     protected final void checkNotBlank(String value, String paramName) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(value) && !StringUtils.isWhitespace(value),
-                "%s cannot be null/empty/whitespace", paramName);
+        if (StringUtils.isBlank(value))
+            throw new IllegalArgumentException(String.format("%s cannot be null/empty/whitespace", paramName));
     }
 
     /**
