@@ -1,10 +1,14 @@
-# Airline
+# Airline 2
 
 Airline is a Java library providing an annotation-based framework for parsing command line interfaces.
 
 It supports both simple single commands through to complex git style interfaces with groups.
 
-This is a substantially improved fork of the original [airline library](https://github.com/airlift/airline) created based on improvements predominantly developed by myself plus some taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork.
+This is a substantially rewritten fork of the original [airline library](https://github.com/airlift/airline) created based on improvements predominantly developed by myself plus some taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork.
+
+## Breaking Changes versus 1.x
+
+Airline 2 contains significant breaking changes from Airline 1.x, please see `Migrating.md` in this folder for more details on how to migrate code forward
 
 ## Usage
 
@@ -31,50 +35,6 @@ Or:
 
     myapp --global-option group --group-option command --command-option arguments
     
-### Option Styles
-    
-Airline supports several option styles and will automatically use the relevant parsing mode depending on how the user passes in the option and how your options are configured.
-
-#### Classic GNU getopt style
-
-    myapp command -abc
-    
-Could do one of the following three things:
-
-- Set options `-a`, `-b` and `-c`
-- Set option `-a` to value `bc`
-- Set options `-a` and sets `-b` to value c
-
-Options are processed left to right and as soon as an option with an non-zero arity is seen the remainder of the token up to the next whitespace is considered as the value for the last option seen.  So as in this example exact behaviour will depend on your option definitions.
-
-This option style is only supported for options with a `-N` name where `N` is any single character.
-
-#### Long GNU getopt style
-
-    myapp command -a=bc
-
-Or:
-
-    myapp command --alpha=bc 
-   
-Sets the option `-a`/`--alpha` option to the value `bc`
-
-May be used with any option provided the option name does not contain an `=`
-
-You can also use `:` as an alternative separator
-
-#### Whitespace separated
-
-    myapp command -a bc
-    
-Or:
-
-    myapp command --alpha bc
-
-Sets the option `-a`/`--alpha` to the value `bc`
-
-May be used with any option
-
 ## License
 
 Airline is licensed under the Apache Software License Version 2.0, see provided **License.txt**
@@ -95,9 +55,9 @@ Use the following maven dependency declaration:
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `1.0.3-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).  There is also a `2.0.0-SNAPSHOT` which represents a more significant refactoring of some of the functionality with the aim of making the library more configurable and extensible.
+Snapshot artifacts of the latest source are also available using the version `1.0.3-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
-Please note that the `1.0.x` release line represents significant breaking changes from the previous `0.9.x` releases, please review the Change Log before attempting to upgrade an application that uses an older version.
+`2.0.0-SNAPSHOT` represents a more significant rewrite with the aim of making the library more configurable and extensible.
 
 ## Build Status
 

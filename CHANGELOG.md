@@ -4,6 +4,9 @@
 
 2.0.0 represents substantial breaking changes over 1.x which were made to make the library more configurable and extensible
 
+- Dependency Changes
+    - Removed Guava
+    - Added Apache Commons Collections 4
 - Builder improvements
     - All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance.
 - Parser Improvements
@@ -14,6 +17,7 @@
          - Standard whitespace separated style
          - List value style i.e. `--name a,b,c` for higher arity options
          - Pair value style i.e. `--name a=b` for arity 2 options
+         - Users can define their own custom option parsers as desired
      - Alias Improvements
          - Can now support optional alias chaining i.e. aliases can reference other aliases
 - Metadata Improvements
