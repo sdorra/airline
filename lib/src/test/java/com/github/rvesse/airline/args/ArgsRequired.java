@@ -18,6 +18,7 @@
 
 package com.github.rvesse.airline.args;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.rvesse.airline.Arguments;
@@ -27,5 +28,5 @@ import com.github.rvesse.airline.Command;
 public class ArgsRequired
 {
     @Arguments(description = "List of files", required = true)
-    public List<String> parameters = com.google.common.collect.Lists.newArrayList();
+    public List<String> parameters = new ArrayList<>();
 }

@@ -18,19 +18,18 @@
 
 package com.github.rvesse.airline.args;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 @Command(name = "Args2")
 public class Args2
 {
     @Arguments(description = "List of parameters")
-    public List<String> parameters = com.google.common.collect.Lists.newArrayList();
+    public List<String> parameters = new ArrayList<>();
 
     @Option(name = {"-log", "-verbose"}, description = "Level of verbosity")
     public Integer verbose = 1;
@@ -42,5 +41,5 @@ public class Args2
     public boolean debug = false;
 
     @Option(name = "-host", description = "The host")
-    public List<String> hosts = newArrayList();
+    public List<String> hosts = new ArrayList<>();
 }

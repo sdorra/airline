@@ -18,6 +18,7 @@
 
 package com.github.rvesse.airline.args;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.rvesse.airline.Arguments;
@@ -29,7 +30,7 @@ public class CommandLineArgs
 {
 
     @Arguments(description = "The XML suite files to run")
-    public List<String> suiteFiles = com.google.common.collect.Lists.newArrayList();
+    public List<String> suiteFiles = new ArrayList<>();
 
     @Option(name = {"-log", "-verbose"}, description = "Level of verbosity")
     public Integer verbose;

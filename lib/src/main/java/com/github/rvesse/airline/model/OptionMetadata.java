@@ -2,16 +2,14 @@ package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.OptionType;
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.apache.commons.collections4.SetUtils;
 
 public class OptionMetadata {
     private final OptionType optionType;
@@ -39,13 +37,17 @@ public class OptionMetadata {
                           String completionCommand,
                           Iterable<Field> path) {
     //@formatter:on
-        Preconditions.checkNotNull(optionType, "optionType is null");
-        Preconditions.checkNotNull(options, "options is null");
-        Preconditions.checkArgument(!Iterables.isEmpty(options), "options is empty");
-        Preconditions.checkNotNull(title, "title is null");
+        if (optionType == null)
+            throw new NullPointerException("optionType cannot be null");
+        if (options == null)
+            throw new NullPointerException("options cannot be null");
+        if (!options.iterator().hasNext())
+            throw new NullPointerException("options cannot be empty");
+        if (title == null)
+            throw new NullPointerException("title cannot be null");
 
         this.optionType = optionType;
-        this.options = ImmutableSet.copyOf(options);
+        this.options = AirlineUtils.unmodifiableSetCopy(options);
         this.title = title;
         this.description = description;
         this.arity = arity;
@@ -58,21 +60,22 @@ public class OptionMetadata {
         this.ignoreCase = ignoreCase;
 
         if (allowedValues != null) {
-            this.allowedValues = ImmutableSet.copyOf(allowedValues);
+            this.allowedValues = AirlineUtils.unmodifiableSetCopy(allowedValues);
         } else {
             this.allowedValues = null;
         }
 
         if (path != null) {
-            this.accessors = ImmutableSet.of(new Accessor(path));
+            this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
         }
     }
 
     public OptionMetadata(Iterable<OptionMetadata> options) {
-        Preconditions.checkNotNull(options, "options is null");
-        Preconditions.checkArgument(!Iterables.isEmpty(options), "options is empty");
+        if (options == null)
+            throw new NullPointerException("options cannot be null");
+        if (!options.iterator().hasNext())
+            throw new IllegalArgumentException("options cannot be empty");
 
-        Preconditions.checkArgument(options.iterator().hasNext());
         OptionMetadata option = options.iterator().next();
 
         this.optionType = option.optionType;
@@ -85,7 +88,7 @@ public class OptionMetadata {
         this.overrides = option.overrides;
         this.sealed = option.sealed;
         if (option.allowedValues != null) {
-            this.allowedValues = ImmutableSet.copyOf(option.allowedValues);
+            this.allowedValues = AirlineUtils.unmodifiableSetCopy(option.allowedValues);
         } else {
             this.allowedValues = null;
         }
@@ -94,11 +97,13 @@ public class OptionMetadata {
 
         Set<Accessor> accessors = new LinkedHashSet<Accessor>();
         for (OptionMetadata other : options) {
-            Preconditions.checkArgument(option.equals(other), "Duplicate options definitions: %s, %s", option, other);
+            if (!option.equals(other))
+                throw new IllegalArgumentException(
+                        String.format("Duplicate options definitions: %s, %s", option, other));
 
             accessors.addAll(other.getAccessors());
         }
-        this.accessors = ImmutableSet.copyOf(accessors);
+        this.accessors = SetUtils.unmodifiableSet(accessors);
         this.ignoreCase = option.ignoreCase;
     }
 
@@ -137,11 +142,11 @@ public class OptionMetadata {
     public boolean isSealed() {
         return sealed;
     }
-    
+
     public int getCompletionBehaviours() {
         return completionBehaviour;
     }
-    
+
     public String getCompletionCommand() {
         return completionCommand;
     }
@@ -298,7 +303,9 @@ public class OptionMetadata {
         if (!parentType.equals(childType)) {
             if (!parentType.isAssignableFrom(childType)) {
                 if (childType.isAssignableFrom(parentType)) {
-                    // A widening conversion exists but this is illegal however we can give a slightly more informative error in this case
+                    // A widening conversion exists but this is illegal however
+                    // we can give a slightly more informative error in this
+                    // case
                     throw new IllegalArgumentException(
                             String.format(
                                     "Cannot change the Java type from %s to %s when overriding option %s as this is a widening type change - only narrowing type changes are permitted",
@@ -351,24 +358,7 @@ public class OptionMetadata {
         // parsed value propagates to all classes in the hierarchy
         Set<Accessor> accessors = new LinkedHashSet<>(child.accessors);
         accessors.addAll(parent.accessors);
-        merged.accessors = ImmutableSet.copyOf(accessors);
+        merged.accessors = AirlineUtils.unmodifiableSetCopy(accessors);
         return merged;
-    }
-
-    public static Function<OptionMetadata, Set<String>> optionsGetter() {
-        return new Function<OptionMetadata, Set<String>>() {
-            public Set<String> apply(OptionMetadata input) {
-                return input.getOptions();
-            }
-        };
-    }
-
-    public static Predicate<OptionMetadata> isHiddenPredicate() {
-        return new Predicate<OptionMetadata>() {
-            @Override
-            public boolean apply( OptionMetadata input) {
-                return !input.isHidden();
-            }
-        };
     }
 }

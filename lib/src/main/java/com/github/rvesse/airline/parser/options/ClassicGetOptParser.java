@@ -2,11 +2,12 @@ package com.github.rvesse.airline.parser.options;
 
 import java.util.List;
 
+import org.apache.commons.collections4.iterators.PeekingIterator;
+
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionUnexpectedException;
-import com.google.common.collect.PeekingIterator;
 
 /**
  * An options parsing that parses options given in classic get-opt style where

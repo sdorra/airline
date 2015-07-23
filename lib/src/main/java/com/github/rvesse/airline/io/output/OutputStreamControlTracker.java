@@ -6,7 +6,6 @@ import java.nio.charset.Charset;
 
 import com.github.rvesse.airline.io.ControlCodeSource;
 import com.github.rvesse.airline.io.ControlTracker;
-import com.google.common.base.Preconditions;
 
 public class OutputStreamControlTracker<T> extends ControlTracker<T> {
 
@@ -19,7 +18,8 @@ public class OutputStreamControlTracker<T> extends ControlTracker<T> {
 
     public OutputStreamControlTracker(OutputStream output, Charset charset, ControlCodeSource<T> provider) {
         super(provider);
-        Preconditions.checkNotNull(output);
+        if (output == null)
+            throw new NullPointerException("output cannot be null");
         this.output = output;
         this.charset = charset;
     }

@@ -7,20 +7,14 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import static com.google.common.collect.Lists.newArrayList;
 
 public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
 
@@ -78,7 +72,7 @@ public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsag
     }
 
     /**
-     * Outputs a documentation section listing the common commands
+     * Outputs a documentation section listing the common commands and groups
      * 
      * @param out
      *            Usage printer
@@ -101,12 +95,14 @@ public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsag
         }
 
         out.append("Commands are:").newline();
-        out.newIndentedPrinter(4).appendTable(
-                Iterables.transform(commands.entrySet(), new Function<Entry<String, String>, Iterable<String>>() {
-                    public Iterable<String> apply(Entry<String, String> entry) {
-                        return ImmutableList.of(entry.getKey(), entry.getValue() != null ? entry.getValue() : "");
-                    }
-                }), 0);
+        List<Iterable<String>> commandDetails = new ArrayList<Iterable<String>>();
+        for (Entry<String, String> details : commands.entrySet()) {
+            List<String> data = new ArrayList<String>();
+            data.add(details.getKey());
+            data.add(details.getValue());
+            commandDetails.add(data);
+        }
+        out.newIndentedPrinter(4).appendTable(commandDetails, 0);
     }
 
     /**
@@ -119,19 +115,20 @@ public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsag
      * @throws IOException
      */
     protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
-        List<String> commandArguments = newArrayList();
-        Collection<String> args = Collections2.transform(sortOptions(global.getOptions()),
-                new Function<OptionMetadata, String>() {
-                    public String apply(OptionMetadata option) {
-                        if (option.isHidden() && !includeHidden()) {
-                            return "";
-                        }
-                        return toUsage(option);
-                    }
-                });
-
-        commandArguments.addAll(args);
-        out.newPrinterWithHangingIndent(8).append("usage:").append(global.getName()).appendWords(commandArguments)
-                .append("<command> [ <args> ]").newline().newline();
+        List<String> commandArguments = new ArrayList<>();
+        for (OptionMetadata option : sortOptions(global.getOptions())) {
+            if (option.isHidden() && !includeHidden()) continue;
+            
+            commandArguments.add(toUsage(option));
+        }
+        //@formatter:off
+        out.newPrinterWithHangingIndent(8)
+           .append("usage:")
+           .append(global.getName())
+           .appendWords(commandArguments)
+           .append("<command> [ <args> ]")
+           .newline()
+           .newline();
+        //@formatter:on
     }
 }

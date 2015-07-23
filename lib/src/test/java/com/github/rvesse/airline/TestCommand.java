@@ -50,13 +50,14 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -234,14 +235,16 @@ public class TestCommand
 
     private void argsBoolean1(String[] params, Boolean expected)
     {
-        List<String> values = ImmutableList.<String>builder().add(params).build();
+        List<String> values = new ArrayList<String>();
+        values.addAll(AirlineUtils.arrayToList(params));
         ArgsBooleanArity args = singleCommandParser(ArgsBooleanArity.class).parse(values);
         assertEquals(args.debug, expected);
     }
 
     private void argsBoolean0(String[] params, Boolean expected)
     {
-        List<String> values = ImmutableList.<String>builder().add(params).build();
+        List<String> values = new ArrayList<String>();
+        values.addAll(AirlineUtils.arrayToList(params));
         ArgsBooleanArity0 args = singleCommandParser(ArgsBooleanArity0.class).parse(values);
         assertEquals(args.debug, expected);
     }

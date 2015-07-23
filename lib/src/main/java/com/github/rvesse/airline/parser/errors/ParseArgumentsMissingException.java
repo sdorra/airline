@@ -20,7 +20,7 @@ package com.github.rvesse.airline.parser.errors;
 
 import java.util.List;
 
-import com.google.common.base.Joiner;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Exception thrown when required arguments are missing
@@ -32,7 +32,7 @@ public class ParseArgumentsMissingException extends ParseException {
     private final List<String> argumentTitles;
 
     public ParseArgumentsMissingException(List<String> argumentTitles) {
-        super("Required arguments are missing: '%s'", Joiner.on(',').join(argumentTitles));
+        super("Required arguments are missing: '%s'", StringUtils.join(argumentTitles, ','));
         this.argumentTitles = argumentTitles;
     }
 

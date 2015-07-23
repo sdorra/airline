@@ -1,12 +1,10 @@
 package com.github.rvesse.airline.builder;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -24,8 +22,6 @@ import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.parser.options.StandardOptionParser;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 /**
  * Builder for parser configurations
@@ -36,12 +32,12 @@ import com.google.common.collect.Lists;
 public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
 
     protected TypeConverter typeConverter = new DefaultTypeConverter();
-    protected final Map<String, AliasBuilder<C>> aliases = newHashMap();
+    protected final Map<String, AliasBuilder<C>> aliases = new HashMap<>();
     protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
-    protected final List<OptionParser<C>> optionParsers = newArrayList();
+    protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
     protected String argsSeparator;
-    
+
     public static <T> ParserMetadata<T> defaultConfiguration() {
         return new ParserBuilder<T>().build();
     }
@@ -65,7 +61,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
 
     public AliasBuilder<C> getAlias(final String name) {
         checkNotBlank(name, "Alias name");
-        Preconditions.checkArgument(aliases.containsKey(name), "Alias %s has not been declared", name);
+        if (!aliases.containsKey(name))
+            throw new IllegalArgumentException(String.format("Alias %s has not been declared", name));
 
         return aliases.get(name);
     }
@@ -220,7 +217,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         this.aliasesOverrideBuiltIns = true;
         return this;
     }
-    
+
     public ParserBuilder<C> withAliasesChaining() {
         this.aliasesMayChain = true;
         return this;
@@ -356,7 +353,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
                 aliasData.add(aliasBuilder.build());
             }
         } else {
-            aliasData = Lists.newArrayList();
+            aliasData = new ArrayList<>();
         }
 
         return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, allowAbbreviatedCommands,

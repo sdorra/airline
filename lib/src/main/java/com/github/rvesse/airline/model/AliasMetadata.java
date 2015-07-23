@@ -4,9 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class AliasMetadata {
 
@@ -14,10 +12,10 @@ public class AliasMetadata {
     private final List<String> arguments;
 
     public AliasMetadata(String name, List<String> arguments) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(name) || !StringUtils.isWhitespace(name),
-                "Alias name cannot be null/empty/whitespace");
+        if (StringUtils.isBlank(name))
+            throw new IllegalArgumentException("Alias name cannot be null/empty/whitespace");
         this.name = name;
-        this.arguments = arguments != null ? ImmutableList.copyOf(arguments) : ImmutableList.<String> of();
+        this.arguments = AirlineUtils.unmodifiableListCopy(arguments);
     }
 
     public String getName() {
@@ -40,16 +38,5 @@ public class AliasMetadata {
         }
         builder.append("] }");
         return builder.toString();
-    }
-    
-    public static Function<AliasMetadata, String> nameGetter()
-    {
-        return new Function<AliasMetadata, String>()
-        {
-            public String apply(AliasMetadata input)
-            {
-                return input.getName();
-            }
-        };
     }
 }

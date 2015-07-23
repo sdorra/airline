@@ -1,9 +1,11 @@
 package com.github.rvesse.airline.parser.command;
 
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
-import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
@@ -18,12 +20,14 @@ import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
 import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
-import com.google.common.collect.ImmutableMap;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
 
 public class SingleCommandParser<T> extends AbstractCommandParser<T> {
 
     public T parse(ParserMetadata<T> parserConfig, CommandMetadata commandMetadata, Iterable<String> args) {
-        checkNotNull(args, "args is null");
+        if (args == null)
+            throw new NullPointerException("args is null");
 
         ParseState<T> state = tryParse(parserConfig, commandMetadata, args);
         validate(state);
@@ -37,7 +41,7 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
                               command.getArguments(), 
                               state.getParsedArguments(), 
                               command.getMetadataInjections(),
-                              ImmutableMap.<Class<?>, Object> of(CommandMetadata.class, commandMetadata), 
+                              Collections.<Class<?>, Object>unmodifiableMap(AirlineUtils.singletonMap(CommandMetadata.class, commandMetadata)),
                               state.getParserConfiguration().getCommandFactory());
         //@formatter:on
     }
@@ -77,7 +81,8 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
         }
 
         for (OptionMetadata option : command.getAllOptions()) {
-            if (option.isRequired() && !state.getParsedOptions().containsKey(option)) {
+            if (option.isRequired()
+                    && CollectionUtils.find(state.getParsedOptions(), new ParsedOptionFinder(option)) == null) {
                 throw new ParseOptionMissingException(option.getOptions().iterator().next());
             }
         }

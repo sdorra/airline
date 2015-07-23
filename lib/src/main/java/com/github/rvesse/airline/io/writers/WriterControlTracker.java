@@ -5,7 +5,6 @@ import java.io.Writer;
 
 import com.github.rvesse.airline.io.ControlCodeSource;
 import com.github.rvesse.airline.io.ControlTracker;
-import com.google.common.base.Preconditions;
 
 public class WriterControlTracker<T> extends ControlTracker<T> {
 
@@ -13,7 +12,8 @@ public class WriterControlTracker<T> extends ControlTracker<T> {
 
     public WriterControlTracker(Writer writer, ControlCodeSource<T> provider) {
         super(provider);
-        Preconditions.checkNotNull(writer);
+        if (writer == null)
+            throw new NullPointerException("writer cannot be null");
         this.writer = writer;
     }
 

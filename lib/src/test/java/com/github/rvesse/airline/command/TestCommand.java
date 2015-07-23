@@ -22,7 +22,7 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
-import com.google.common.collect.Lists;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import org.testng.annotations.Test;
 
@@ -35,7 +35,6 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
-import static com.google.common.collect.Lists.newArrayList;
 
 public class TestCommand {
     @Test
@@ -97,7 +96,7 @@ public class TestCommand {
 
         assertEquals("remove", aMeta.getName());
 
-        assertEquals(Lists.newArrayList("* The following is a usage example:", "\t$ git remove -i myfile.java"),
+        assertEquals(AirlineUtils.arrayToList(new String[] { "* The following is a usage example:", "\t$ git remove -i myfile.java" }),
                 aMeta.getExamples());
     }
 
@@ -117,7 +116,8 @@ public class TestCommand {
 
         assertEquals("remove", aMeta.getName());
 
-        assertEquals(newArrayList("More details about how this removes files from the index."), aMeta.getDiscussion());
+        assertEquals(AirlineUtils.singletonList("More details about how this removes files from the index."),
+                aMeta.getDiscussion());
     }
 
     @Test

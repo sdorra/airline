@@ -2,12 +2,13 @@ package com.github.rvesse.airline.parser.options;
 
 import java.util.List;
 
+import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.PeekingIterator;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Abstract option parser for options that are specified in {@code --name=value}
@@ -32,7 +33,7 @@ public abstract class AbstractKeyValueOptionParser<T> extends AbstractOptionPars
 
     @Override
     public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state, List<OptionMetadata> allowedOptions) {
-        List<String> parts = ImmutableList.copyOf(Splitter.on(this.separator).limit(2).split(tokens.peek()));
+        List<String> parts = AirlineUtils.unmodifiableListCopy(StringUtils.split(tokens.peek(), new String(new char[] { this.separator }), 2));
         if (parts.size() != 2) {
             return null;
         }

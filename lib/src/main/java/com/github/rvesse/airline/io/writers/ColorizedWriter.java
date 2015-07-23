@@ -6,7 +6,6 @@ import java.io.Writer;
 import com.github.rvesse.airline.io.ControlCodeSource;
 import com.github.rvesse.airline.io.decorations.BasicDecoration;
 import com.github.rvesse.airline.io.decorations.sources.AnsiDecorationSource;
-import com.google.common.base.Preconditions;
 
 /**
  * An writer stream that supports colorization and basic text decorations
@@ -22,8 +21,11 @@ public class ColorizedWriter<T> extends AnsiWriter {
     public ColorizedWriter(Writer writer, ControlCodeSource<T> foregroundColorSource,
             ControlCodeSource<T> backgroundColorSource) {
         super(writer);
-        Preconditions.checkNotNull(foregroundColorSource);
-        Preconditions.checkNotNull(backgroundColorSource);
+        if (foregroundColorSource == null)
+            throw new NullPointerException("foregroundColorSource cannot be null");
+        if (backgroundColorSource == null)
+            throw new NullPointerException("backgroundColorSource cannot be null");
+
         this.foregroundControl = new WriterControlTracker<T>(writer, foregroundColorSource);
         this.backgroundControl = new WriterControlTracker<T>(writer, backgroundColorSource);
         this.registerControls(this.foregroundControl, this.backgroundControl);

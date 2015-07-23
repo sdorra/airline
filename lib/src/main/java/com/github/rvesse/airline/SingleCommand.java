@@ -18,14 +18,13 @@
 
 package com.github.rvesse.airline;
 
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.ListUtils;
 import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.command.SingleCommandParser;
-import com.google.common.collect.ImmutableList;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class for encapsulating single commands
@@ -63,7 +62,7 @@ public class SingleCommand<C> {
     private final CommandMetadata commandMetadata;
 
     private SingleCommand(Class<C> command, ParserMetadata<C> parserConfig) {
-        checkNotNull(command, "command is null");
+        if (command == null) throw new NullPointerException("command is null");
         this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<C> defaultConfiguration();
 
         commandMetadata = MetadataLoader.loadCommand(command);
@@ -88,7 +87,7 @@ public class SingleCommand<C> {
     }
 
     public C parse(String... args) {
-        return parse(ImmutableList.copyOf(args));
+        return parse(ListUtils.unmodifiableList(IteratorUtils.toList(IteratorUtils.arrayIterator(args))));
     }
 
     public C parse(Iterable<String> args) {

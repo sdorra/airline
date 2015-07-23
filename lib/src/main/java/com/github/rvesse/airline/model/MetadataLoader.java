@@ -2,70 +2,118 @@ package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.*;
 import com.github.rvesse.airline.help.Suggester;
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
-import com.google.common.collect.*;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.CommandTypeFinder;
+import com.github.rvesse.airline.utils.predicates.GroupFinder;
 
 import javax.inject.Inject;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.ListUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-
+/**
+ * Helper for loading meta-data
+ *
+ */
 public class MetadataLoader {
+    /**
+     * Loads global meta-data
+     * 
+     * @param name
+     *            CLI name
+     * @param description
+     *            CLI description
+     * @param defaultCommand
+     *            Default Command
+     * @param defaultGroupCommands
+     *            Default Group Commands
+     * @param groups
+     *            Command Groups
+     * @param parserConfig
+     *            Parser Configuration
+     * @return Global meta-data
+     */
     public static <C> GlobalMetadata<C> loadGlobal(String name, String description, CommandMetadata defaultCommand,
             Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups,
             ParserMetadata<C> parserConfig) {
-        ImmutableList.Builder<OptionMetadata> globalOptionsBuilder = ImmutableList.builder();
+        List<OptionMetadata> globalOptions = new ArrayList<>();
         if (defaultCommand != null) {
-            globalOptionsBuilder.addAll(defaultCommand.getGlobalOptions());
+            globalOptions.addAll(defaultCommand.getGlobalOptions());
         }
         for (CommandMetadata command : defaultGroupCommands) {
-            globalOptionsBuilder.addAll(command.getGlobalOptions());
+            globalOptions.addAll(command.getGlobalOptions());
         }
         for (CommandGroupMetadata group : groups) {
             for (CommandMetadata command : group.getCommands()) {
-                globalOptionsBuilder.addAll(command.getGlobalOptions());
+                globalOptions.addAll(command.getGlobalOptions());
             }
         }
-        List<OptionMetadata> globalOptions = mergeOptionSet(globalOptionsBuilder.build());
-        return new GlobalMetadata<C>(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups, parserConfig);
+        globalOptions = ListUtils.unmodifiableList(mergeOptionSet(globalOptions));
+        return new GlobalMetadata<C>(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups,
+                parserConfig);
     }
 
+    /**
+     * Loads command group meta-data
+     * 
+     * @param name
+     *            Group name
+     * @param description
+     *            Group description
+     * @param hidden
+     *            Whether the group is hidden
+     * @param defaultCommand
+     *            Default command for the group
+     * @param commands
+     *            Commands for the group
+     * @return Command group meta-data
+     */
     public static CommandGroupMetadata loadCommandGroup(String name, String description, boolean hidden,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> commands) {
-        ImmutableList.Builder<OptionMetadata> groupOptionsBuilder = ImmutableList.builder();
+        List<OptionMetadata> groupOptions = new ArrayList<OptionMetadata>();
         if (defaultCommand != null) {
-            groupOptionsBuilder.addAll(defaultCommand.getGroupOptions());
+            groupOptions.addAll(defaultCommand.getGroupOptions());
         }
         for (CommandMetadata command : commands) {
-            groupOptionsBuilder.addAll(command.getGroupOptions());
+            groupOptions.addAll(command.getGroupOptions());
         }
-        List<OptionMetadata> groupOptions = mergeOptionSet(groupOptionsBuilder.build());
+        groupOptions = ListUtils.unmodifiableList(mergeOptionSet(groupOptions));
         return new CommandGroupMetadata(name, description, hidden, groupOptions, defaultCommand, commands);
     }
 
-    public static <T> ImmutableList<CommandMetadata> loadCommands(Iterable<Class<? extends T>> defaultCommands) {
-        return ImmutableList.copyOf(Iterables.transform(defaultCommands, new Function<Class<?>, CommandMetadata>() {
-            public CommandMetadata apply(Class<?> commandType) {
-                return loadCommand(commandType);
-            }
-        }));
+    /**
+     * Loads command meta-data
+     * 
+     * @param defaultCommands
+     *            Default command classes
+     * @return Command meta-data
+     */
+    public static <T> List<CommandMetadata> loadCommands(Iterable<Class<? extends T>> defaultCommands) {
+        List<CommandMetadata> commandMetadata = new ArrayList<CommandMetadata>();
+        Iterator<Class<? extends T>> iter = defaultCommands.iterator();
+        while (iter.hasNext()) {
+            commandMetadata.add(loadCommand(iter.next()));
+        }
+        return commandMetadata;
     }
 
+    /**
+     * Loads command meta-data
+     * 
+     * @param commandType
+     *            Command class
+     * @return Command meta-data
+     */
     public static CommandMetadata loadCommand(Class<?> commandType) {
         if (commandType == null) {
             return null;
         }
         Command command = null;
-        List<Group> groups = Lists.newArrayList();
+        List<Group> groups = new ArrayList<>();
 
         for (Class<?> cls = commandType; command == null && !Object.class.equals(cls); cls = cls.getSuperclass()) {
             command = cls.getAnnotation(Command.class);
@@ -77,8 +125,9 @@ public class MetadataLoader {
                 groups.add(cls.getAnnotation(Group.class));
             }
         }
-        Preconditions
-                .checkArgument(command != null, "Command %s is not annotated with @Command", commandType.getName());
+        if (command == null)
+            throw new IllegalArgumentException(String.format("Command %s is not annotated with @Command",
+                    commandType.getName()));
         String name = command.name();
         String description = command.description().isEmpty() ? null : command.description();
         List<String> groupNames = Arrays.asList(command.groupNames());
@@ -98,14 +147,14 @@ public class MetadataLoader {
         //@formatter:off
         CommandMetadata commandMetadata = new CommandMetadata(name, 
                                                               description, 
-                                                              command.discussion().length == 0 ? null : Lists.newArrayList(command.discussion()), 
-                                                              command.examples().length == 0 ? null : Lists.newArrayList(command.examples()),
+                                                              command.discussion().length == 0 ? null : AirlineUtils.arrayToList(command.discussion()), 
+                                                              command.examples().length == 0 ? null : AirlineUtils.arrayToList(command.examples()),
                                                               hidden, 
                                                               injectionMetadata.globalOptions, 
                                                               injectionMetadata.groupOptions,
                                                               injectionMetadata.commandOptions, 
                                                               injectionMetadata.defaultOption,
-                                                              Iterables.getFirst(injectionMetadata.arguments, null),
+                                                              AirlineUtils.first(injectionMetadata.arguments, null),
                                                               injectionMetadata.metadataInjections, 
                                                               commandType, 
                                                               groupNames, 
@@ -116,18 +165,42 @@ public class MetadataLoader {
         return commandMetadata;
     }
 
+    /**
+     * Loads suggester meta-data
+     * 
+     * @param suggesterClass
+     *            Suggester class
+     * @return Suggester meta-data
+     */
     public static SuggesterMetadata loadSuggester(Class<? extends Suggester> suggesterClass) {
         InjectionMetadata injectionMetadata = loadInjectionMetadata(suggesterClass);
         return new SuggesterMetadata(suggesterClass, injectionMetadata.metadataInjections);
     }
 
+    /**
+     * Loads injection meta-data
+     * 
+     * @param type
+     *            Class
+     * @return Injection meta-data
+     */
     public static InjectionMetadata loadInjectionMetadata(Class<?> type) {
         InjectionMetadata injectionMetadata = new InjectionMetadata();
-        loadInjectionMetadata(type, injectionMetadata, ImmutableList.<Field> of());
+        loadInjectionMetadata(type, injectionMetadata, Collections.<Field> emptyList());
         injectionMetadata.compact();
         return injectionMetadata;
     }
 
+    /**
+     * Loads injection meta-data
+     * 
+     * @param type
+     *            Class
+     * @param injectionMetadata
+     *            Injection meta-data
+     * @param fields
+     *            Fields
+     */
     public static void loadInjectionMetadata(Class<?> type, InjectionMetadata injectionMetadata, List<Field> fields) {
         if (type.isInterface()) {
             return;
@@ -135,7 +208,8 @@ public class MetadataLoader {
         for (Class<?> cls = type; !Object.class.equals(cls); cls = cls.getSuperclass()) {
             for (Field field : cls.getDeclaredFields()) {
                 field.setAccessible(true);
-                ImmutableList<Field> path = concat(fields, field);
+                List<Field> path = new ArrayList<>(fields);
+                path.add(field);
 
                 Inject injectAnnotation = field.getAnnotation(Inject.class);
                 if (injectAnnotation != null) {
@@ -182,12 +256,12 @@ public class MetadataLoader {
                         name = field.getName();
                     }
 
-                    List<String> options = ImmutableList.copyOf(optionAnnotation.name());
+                    List<String> options = AirlineUtils.arrayToList(optionAnnotation.name());
                     String description = optionAnnotation.description();
 
                     int arity = optionAnnotation.arity();
-                    Preconditions.checkArgument(arity >= 0 || arity == Integer.MIN_VALUE,
-                            "Invalid arity for option %s", name);
+                    if (arity < 0 && arity != Integer.MIN_VALUE)
+                        throw new IllegalArgumentException(String.format("Invalid arity for option %s", name));
 
                     if (optionAnnotation.arity() >= 0) {
                         arity = optionAnnotation.arity();
@@ -204,7 +278,7 @@ public class MetadataLoader {
                     boolean hidden = optionAnnotation.hidden();
                     boolean override = optionAnnotation.override();
                     boolean sealed = optionAnnotation.sealed();
-                    List<String> allowedValues = ImmutableList.copyOf(optionAnnotation.allowedValues());
+                    List<String> allowedValues = AirlineUtils.arrayToList(optionAnnotation.allowedValues());
                     if (allowedValues.isEmpty()) {
                         allowedValues = null;
                     }
@@ -221,7 +295,7 @@ public class MetadataLoader {
                                                                        override, 
                                                                        sealed, 
                                                                        allowedValues,
-                            ignoreCase,
+                                                                       ignoreCase,
                                                                        optionAnnotation.completionBehaviour(),
                                                                        optionAnnotation.completionCommand(),
                                                                        path);
@@ -286,12 +360,12 @@ public class MetadataLoader {
                                         "Field %s cannot be annotated with @Arguments because there is a field with @DefaultOption present",
                                         field));
 
-                    ImmutableList.Builder<String> titlesBuilder = ImmutableList.<String> builder();
+                    List<String> titles = new ArrayList<>();
 
                     if (!(argumentsAnnotation.title().length == 1 && argumentsAnnotation.title()[0].equals(""))) {
-                        titlesBuilder.add(argumentsAnnotation.title());
+                        titles.addAll(AirlineUtils.arrayToList(argumentsAnnotation.title()));
                     } else {
-                        titlesBuilder.add(field.getName());
+                        titles.add(field.getName());
                     }
 
                     String description = argumentsAnnotation.description();
@@ -300,7 +374,7 @@ public class MetadataLoader {
                     int arity = argumentsAnnotation.arity() <= 0 ? Integer.MIN_VALUE : argumentsAnnotation.arity();
 
                     //@formatter:off
-                    injectionMetadata.arguments.add(new ArgumentsMetadata(titlesBuilder.build(), 
+                    injectionMetadata.arguments.add(new ArgumentsMetadata(titles, 
                                                                           description, 
                                                                           usage,
                                                                           required, 
@@ -315,26 +389,23 @@ public class MetadataLoader {
     }
 
     private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options) {
-        Multimap<OptionMetadata, OptionMetadata> metadataIndex = Multimaps.newMultimap(
-                Maps.<OptionMetadata, Collection<OptionMetadata>> newLinkedHashMap(),
-                new Supplier<List<OptionMetadata>>() {
-                    public List<OptionMetadata> get() {
-                        return Lists.newArrayList();
-                    }
-                });
+        Map<OptionMetadata, List<OptionMetadata>> metadataIndex = new HashMap<>();
         for (OptionMetadata option : options) {
-            metadataIndex.put(option, option);
+            List<OptionMetadata> list = metadataIndex.get(option);
+            if (list == null) {
+                list = new ArrayList<OptionMetadata>();
+                metadataIndex.put(option, list);
+            }
+            list.add(option);
         }
 
-        options = ImmutableList.copyOf(transform(metadataIndex.asMap().values(),
-                new Function<Collection<OptionMetadata>, OptionMetadata>() {
-                    @Override
-                    public OptionMetadata apply(Collection<OptionMetadata> options) {
-                        return new OptionMetadata(options);
-                    }
-                }));
+        options = new ArrayList<OptionMetadata>();
+        for (List<OptionMetadata> ops : metadataIndex.values()) {
+            options.add(new OptionMetadata(ops));
+        }
+        options = ListUtils.unmodifiableList(options);
 
-        Map<String, OptionMetadata> optionIndex = Maps.newLinkedHashMap();
+        Map<String, OptionMetadata> optionIndex = new LinkedHashMap<>();
         for (OptionMetadata option : options) {
             for (String optionName : option.getOptions()) {
                 if (optionIndex.containsKey(optionName)) {
@@ -351,9 +422,9 @@ public class MetadataLoader {
     }
 
     private static List<OptionMetadata> overrideOptionSet(List<OptionMetadata> options) {
-        options = ImmutableList.copyOf(options);
+        options = ListUtils.unmodifiableList(options);
 
-        Map<Set<String>, OptionMetadata> optionIndex = newHashMap();
+        Map<Set<String>, OptionMetadata> optionIndex = new HashMap<>();
         for (OptionMetadata option : options) {
             Set<String> names = option.getOptions();
             if (optionIndex.containsKey(names)) {
@@ -364,7 +435,7 @@ public class MetadataLoader {
                 // Need to check there isn't another option with partial overlap
                 // of names, this is considered an illegal override
                 for (Set<String> existingNames : optionIndex.keySet()) {
-                    Set<String> intersection = Sets.intersection(names, existingNames);
+                    Set<String> intersection = AirlineUtils.intersection(names, existingNames);
                     if (intersection.size() > 0) {
                         throw new IllegalArgumentException(
                                 String.format(
@@ -378,7 +449,7 @@ public class MetadataLoader {
             }
         }
 
-        return ImmutableList.copyOf(optionIndex.values());
+        return ListUtils.unmodifiableList(IteratorUtils.toList(optionIndex.values().iterator()));
     }
 
     private static void tryOverrideOptions(Map<Set<String>, OptionMetadata> optionIndex, Set<String> names,
@@ -417,10 +488,6 @@ public class MetadataLoader {
         optionIndex.put(names, merged);
     }
 
-    private static <T> ImmutableList<T> concat(Iterable<T> iterable, T item) {
-        return ImmutableList.<T> builder().addAll(iterable).add(item).build();
-    }
-
     public static void loadCommandsIntoGroupsByAnnotation(List<CommandMetadata> allCommands,
             List<CommandGroupMetadata> commandGroups, List<CommandMetadata> defaultCommandGroup) {
         List<CommandMetadata> newCommands = new ArrayList<CommandMetadata>();
@@ -434,14 +501,11 @@ public class MetadataLoader {
             // now add the command to any groupNames specified in the Command
             // annotation
             for (String groupName : command.getGroupNames()) {
-                CommandGroupMetadata group = find(commandGroups,
-                        compose(equalTo(groupName), CommandGroupMetadata.nameGetter()), null);
+                CommandGroupMetadata group = CollectionUtils.find(commandGroups, new GroupFinder(groupName));
                 if (group != null) {
                     group.addCommand(command);
                     added = true;
                 } else {
-                    ImmutableList.Builder<OptionMetadata> groupOptionsBuilder = ImmutableList.builder();
-                    groupOptionsBuilder.addAll(command.getGroupOptions());
                     CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", false, null,
                             Collections.singletonList(command));
                     commandGroups.add(newGroup);
@@ -472,8 +536,7 @@ public class MetadataLoader {
                 // load default command if needed
                 if (!groupAnno.defaultCommand().equals(Group.DEFAULT.class)) {
                     defaultCommandClass = groupAnno.defaultCommand();
-                    defaultCommand = find(allCommands,
-                            compose(equalTo(defaultCommandClass), CommandMetadata.typeGetter()), null);
+                    defaultCommand = CollectionUtils.find(allCommands, new CommandTypeFinder(defaultCommandClass));
                     if (null == defaultCommand) {
                         defaultCommand = loadCommand(defaultCommandClass);
                         newCommands.add(defaultCommand);
@@ -484,7 +547,7 @@ public class MetadataLoader {
                 List<CommandMetadata> groupCommands = new ArrayList<CommandMetadata>(groupAnno.commands().length);
                 CommandMetadata groupCommand = null;
                 for (Class commandClass : groupAnno.commands()) {
-                    groupCommand = find(allCommands, compose(equalTo(commandClass), CommandMetadata.typeGetter()), null);
+                    groupCommand = CollectionUtils.find(allCommands, new CommandTypeFinder(commandClass));
                     if (null == groupCommand) {
                         groupCommand = loadCommand(commandClass);
                         newCommands.add(groupCommand);
@@ -492,8 +555,8 @@ public class MetadataLoader {
                     }
                 }
 
-                CommandGroupMetadata groupMetadata = find(commandGroups,
-                        compose(equalTo(groupAnno.name()), CommandGroupMetadata.nameGetter()), null);
+                CommandGroupMetadata groupMetadata = CollectionUtils.find(commandGroups,
+                        new GroupFinder(groupAnno.name()));
                 if (null == groupMetadata) {
                     groupMetadata = loadCommandGroup(groupAnno.name(), groupAnno.description(), groupAnno.hidden(),
                             defaultCommand, groupCommands);
@@ -511,12 +574,12 @@ public class MetadataLoader {
     }
 
     private static class InjectionMetadata {
-        private List<OptionMetadata> globalOptions = newArrayList();
-        private List<OptionMetadata> groupOptions = newArrayList();
-        private List<OptionMetadata> commandOptions = newArrayList();
+        private List<OptionMetadata> globalOptions = new ArrayList<>();
+        private List<OptionMetadata> groupOptions = new ArrayList<>();
+        private List<OptionMetadata> commandOptions = new ArrayList<>();
         private OptionMetadata defaultOption = null;
-        private List<ArgumentsMetadata> arguments = newArrayList();
-        private List<Accessor> metadataInjections = newArrayList();
+        private List<ArgumentsMetadata> arguments = new ArrayList<>();
+        private List<Accessor> metadataInjections = new ArrayList<>();
 
         private void compact() {
             globalOptions = overrideOptionSet(globalOptions);
@@ -524,15 +587,21 @@ public class MetadataLoader {
             commandOptions = overrideOptionSet(commandOptions);
             if (defaultOption != null) {
                 for (OptionMetadata option : commandOptions) {
-                    if (Sets.intersection(option.getOptions(), defaultOption.getOptions()).size() > 0) {
-                        defaultOption = option;
-                        break;
+                    boolean found = false;
+                    for (String opt : defaultOption.getOptions()) {
+                        if (option.getOptions().contains(opt)) {
+                            defaultOption = option;
+                            found = true;
+                            break;
+                        }
                     }
+                    if (found)
+                        break;
                 }
             }
 
             if (arguments.size() > 1) {
-                arguments = ImmutableList.of(new ArgumentsMetadata(arguments));
+                arguments = ListUtils.unmodifiableList(AirlineUtils.singletonList(new ArgumentsMetadata(arguments)));
             }
         }
     }

@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import com.github.rvesse.airline.io.ControlCodeSource;
 import com.github.rvesse.airline.io.decorations.BasicDecoration;
 import com.github.rvesse.airline.io.decorations.sources.AnsiDecorationSource;
-import com.google.common.base.Preconditions;
 
 /**
  * An output stream that supports colorization and some basic text decorations
@@ -24,8 +23,11 @@ public class ColorizedOutputStream<T> extends AnsiOutputStream {
     public ColorizedOutputStream(OutputStream output, ControlCodeSource<T> foregroundColorSource,
             ControlCodeSource<T> backgroundColorSource) {
         super(output);
-        Preconditions.checkNotNull(foregroundColorSource);
-        Preconditions.checkNotNull(backgroundColorSource);
+        if (foregroundColorSource == null)
+            throw new NullPointerException("foregroundColorSource cannot be null");
+        if (backgroundColorSource == null)
+            throw new NullPointerException("backgroundColorSource cannot be null");
+        
         this.foregroundControl = new OutputStreamControlTracker<T>(output, foregroundColorSource);
         this.backgroundControl = new OutputStreamControlTracker<T>(output, backgroundColorSource);
         this.registerControls(this.foregroundControl, this.backgroundControl);

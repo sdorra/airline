@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.utils.predicates;
 
 import java.util.Collection;
 

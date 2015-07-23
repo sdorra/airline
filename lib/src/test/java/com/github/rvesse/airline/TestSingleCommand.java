@@ -44,8 +44,10 @@ import com.github.rvesse.airline.command.CommandAdd;
 import com.github.rvesse.airline.command.CommandCommit;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.CommandFinder;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -56,9 +58,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -139,7 +138,7 @@ public class TestSingleCommand
     public void repeatedArgs()
     {
         SingleCommand<Args1> parser = singleCommand(Args1.class);
-        CommandMetadata command = find(ImmutableList.of(parser.getCommandMetadata()), compose(equalTo("Args1"), CommandMetadata.nameGetter()));
+        CommandMetadata command = CollectionUtils.find(AirlineUtils.singletonList(parser.getCommandMetadata()), new CommandFinder("Args1"));
         assertEquals(command.getAllOptions().size(), 8);
     }
 

@@ -9,7 +9,6 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.base.Preconditions;
 
 /**
  * Abstract command group usage generator for generators that use a
@@ -23,7 +22,8 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
             Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             boolean includeHidden) {
         super(optionComparator, commandComparator, includeHidden);
-        Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
+        if (columnSize <= 0)
+            throw new IllegalArgumentException("columnSize must be greater than 0");
         this.columnSize = columnSize;
     }
 
@@ -49,7 +49,8 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
      * @return Usage Printer
      */
     protected UsagePrinter createUsagePrinter(OutputStream out) {
-        Preconditions.checkNotNull(out, "StringBuilder cannot be null");
+        if (out == null)
+            throw new NullPointerException("out cannot be null");
         return new UsagePrinter(new OutputStreamWriter(out), columnSize);
     }
 

@@ -1,12 +1,14 @@
 package com.github.rvesse.airline.parser.options;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections4.iterators.PeekingIterator;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.PeekingIterator;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * An options parser that expects the name and value(s) to be white space
@@ -16,7 +18,8 @@ import com.google.common.collect.PeekingIterator;
 public class StandardOptionParser<T> extends AbstractOptionParser<T> {
 
     @Override
-    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state, List<OptionMetadata> allowedOptions) {
+    public ParseState<T> parseOptions(PeekingIterator<String> tokens, ParseState<T> state,
+            List<OptionMetadata> allowedOptions) {
         OptionMetadata option = findOption(state, allowedOptions, tokens.peek());
         if (option == null) {
             return null;
@@ -36,7 +39,7 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
                 state = state.withOptionValue(option, value).popContext();
             }
         } else {
-            ImmutableList.Builder<Object> values = ImmutableList.builder();
+            List<Object> values = new ArrayList<Object>();
 
             int count = 0;
 
@@ -57,7 +60,7 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
             }
 
             if (count == option.getArity() || hasSeparator || foundNextOption) {
-                state = state.withOptionValue(option, values.build()).popContext();
+                state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();
             }
         }
         return state;

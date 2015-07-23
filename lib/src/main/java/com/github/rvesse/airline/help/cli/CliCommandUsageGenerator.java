@@ -1,9 +1,9 @@
 package com.github.rvesse.airline.help.cli;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
-import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -16,8 +16,7 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
 
@@ -105,7 +104,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         }
         exitPrinter.append(commandName).append(" command exits with one of the following values:").newline().newline();
 
-        for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
+        for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
             // Print the exit code
             exitPrinter.append(exit.getKey().toString());
             exitPrinter.newline();
@@ -138,7 +137,11 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         out.append("EXAMPLES").newline();
         UsagePrinter examplePrinter = out.newIndentedPrinter(8);
 
-        examplePrinter.appendTable(Iterables.partition(command.getExamples(), 1), 1);
+        List<Iterable<String>> examplesIters = new ArrayList<>();
+        for (String example : command.getExamples()) {
+            examplesIters.add(AirlineUtils.singletonList(example));
+        }
+        examplePrinter.appendTable(examplesIters, 1);
         examplePrinter.flush();
     }
 
@@ -280,7 +283,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
             String commandName, CommandMetadata command) throws IOException {
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
-        List<OptionMetadata> options = newArrayList();
+        List<OptionMetadata> options = new ArrayList<>();
         if (programName != null) {
             synopsis.append(programName).appendWords(toSynopsisUsage(sortOptions(command.getGlobalOptions())));
             options.addAll(command.getGlobalOptions());

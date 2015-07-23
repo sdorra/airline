@@ -56,15 +56,14 @@ import com.github.rvesse.airline.help.ronn.RonnCommandUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnGlobalUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.CommandFinder;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -222,7 +221,7 @@ public class TestHelp {
         Cli<Runnable> gitParser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(gitParser.getMetadata(), ImmutableList.<String>of(), out);
+        Help.help(gitParser.getMetadata(), Collections.<String>emptyList(), out);
         assertEquals(new String(out.toByteArray(), utf8), 
                 "usage: git [ -v ] <command> [ <args> ]\n" +
                 "\n" +
@@ -234,7 +233,7 @@ public class TestHelp {
                 "See 'git help <command>' for more information on a specific command.\n");
 
         out = new ByteArrayOutputStream();
-        Help.help(gitParser.getMetadata(), ImmutableList.of("add"), out);
+        Help.help(gitParser.getMetadata(), AirlineUtils.singletonList("add"), out);
         assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
                 "        git add - Add file contents to the index\n" +
@@ -259,7 +258,7 @@ public class TestHelp {
                 "\n");
 
         out = new ByteArrayOutputStream();
-        Help.help(gitParser.getMetadata(), ImmutableList.of("remote"), out);
+        Help.help(gitParser.getMetadata(), AirlineUtils.singletonList("remote"), out);
         assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
                 "        git remote - Manage set of tracked repositories\n" +
@@ -283,7 +282,7 @@ public class TestHelp {
                 "\n");
         
         out = new ByteArrayOutputStream();
-        Help.help(gitParser.getMetadata(), ImmutableList.of("remote", "add"), out);
+        Help.help(gitParser.getMetadata(), AirlineUtils.arrayToList(new String[] { "remote", "add" }), out);
         assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
                 "        git remote add - Adds a remote\n" +
@@ -322,7 +321,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("Args1"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("Args1"), out);
         testStringAssert(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test Args1 - args1 description\n" +
@@ -380,7 +379,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("Args2"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("Args2"), out);
         assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
                 "        test Args2 -\n" +
@@ -477,7 +476,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("ArgsArityString"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("ArgsArityString"), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test ArgsArityString -\n" +
@@ -512,7 +511,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("ArgsBooleanArity"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("ArgsBooleanArity"), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test ArgsBooleanArity -\n" +
@@ -539,7 +538,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("ArgsInherited"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("ArgsInherited"), out);
         assertEquals(new String(out.toByteArray(), utf8), "NAME\n" +
                 "        test ArgsInherited -\n" +
                 "\n" +
@@ -586,7 +585,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("ArgsRequired"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("ArgsRequired"), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test ArgsRequired -\n" +
@@ -618,7 +617,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("OptionsRequired"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("OptionsRequired"), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test OptionsRequired -\n" +
@@ -649,7 +648,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("OptionsHidden"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("OptionsHidden"), out);
         assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
                 "        test OptionsHidden -\n" +
@@ -677,7 +676,7 @@ public class TestHelp {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CliCommandUsageGenerator generator = new CliCommandUsageGenerator(true);
-        CommandMetadata metadata = find(parser.getMetadata().getDefaultGroupCommands(), compose(equalTo("OptionsHidden"), CommandMetadata.nameGetter()), null);
+        CommandMetadata metadata = CollectionUtils.find(parser.getMetadata().getDefaultGroupCommands(), new CommandFinder("OptionsHidden"));
         Assert.assertNotNull(metadata);
         generator.usage("test", null, "OptionsHidden", metadata, out);
         
@@ -710,7 +709,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("GlobalOptionsHidden"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("GlobalOptionsHidden"), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test GlobalOptionsHidden -\n" +
@@ -737,7 +736,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        Help.help(parser.getMetadata(), Collections.<String>emptyList(), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "usage: test <command> [ <args> ]\n" +
                 "\n" +
@@ -748,7 +747,7 @@ public class TestHelp {
                 "See 'test help <command>' for more information on a specific command.\n");
 
         out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.of("CommandHidden"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("CommandHidden"), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test CommandHidden -\n" +
@@ -776,7 +775,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        Help.help(parser.getMetadata(), Collections.<String>emptyList(), out);
         Assert.assertEquals(new String(out.toByteArray(), utf8),
                 "usage: test <command> [ <args> ]\n" +
                 "\n" +
@@ -805,7 +804,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.<String>of(), out);
+        Help.help(parser.getMetadata(), Collections.<String>emptyList(), out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "usage: test <command> [ <args> ]\n" +
                 "\n" +
@@ -856,7 +855,7 @@ public class TestHelp {
             .build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Help.help(parser.getMetadata(), ImmutableList.<String>of("remove"), out);
+        Help.help(parser.getMetadata(), AirlineUtils.singletonList("remove"), out);
 
         String discussion = "DISCUSSION\n" +
         "        More details about how this removes files from the index.\n" +

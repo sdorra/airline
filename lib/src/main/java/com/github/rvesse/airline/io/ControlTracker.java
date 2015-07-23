@@ -2,8 +2,6 @@ package com.github.rvesse.airline.io;
 
 import java.io.IOException;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Class used to track the state of a control allowing it to be lazily written
  * to the output only if necessary and ensuring it can be appropriately reset
@@ -19,7 +17,8 @@ public abstract class ControlTracker<T> {
     private boolean requireWrite = false;
 
     public ControlTracker(ControlCodeSource<T> provider) {
-        Preconditions.checkNotNull(provider);
+        if (provider == null)
+            throw new NullPointerException("provider cannot be null");
         this.provider = provider;
     }
 

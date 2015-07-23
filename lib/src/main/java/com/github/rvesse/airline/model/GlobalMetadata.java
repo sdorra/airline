@@ -1,17 +1,16 @@
 package com.github.rvesse.airline.model;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Represents metadata about a CLI
  */
 public class GlobalMetadata<T> {
-    
+
     private final String name;
     private final String description;
     private final List<OptionMetadata> options;
@@ -23,16 +22,17 @@ public class GlobalMetadata<T> {
     public GlobalMetadata(String name, String description, Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> defaultGroupCommands,
             Iterable<CommandGroupMetadata> commandGroups, ParserMetadata<T> parserConfig) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(name) && !StringUtils.isWhitespace(name),
-                "Program name cannot be null/empty/whitespace");
-        Preconditions.checkNotNull(parserConfig);
+        if (StringUtils.isBlank(name))
+            throw new IllegalArgumentException("Program name cannot be null/empty/whitespace");
+        if (parserConfig == null)
+            throw new NullPointerException("parseConfig cannot be null");
 
         this.name = name;
         this.description = description;
-        this.options = ImmutableList.copyOf(options);
+        this.options = AirlineUtils.unmodifiableListCopy(options);
         this.defaultCommand = defaultCommand;
-        this.defaultGroupCommands = ImmutableList.copyOf(defaultGroupCommands);
-        this.commandGroups = ImmutableList.copyOf(commandGroups);
+        this.defaultGroupCommands = AirlineUtils.unmodifiableListCopy(defaultGroupCommands);
+        this.commandGroups = AirlineUtils.unmodifiableListCopy(commandGroups);
         this.parserConfig = parserConfig;
     }
 

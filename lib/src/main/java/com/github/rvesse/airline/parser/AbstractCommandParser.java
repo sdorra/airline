@@ -10,15 +10,17 @@ import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.AliasResolver;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.parser.options.OptionParser;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.AbbreviatedCommandFinder;
+import com.github.rvesse.airline.utils.predicates.AbbreviatedGroupFinder;
+import com.github.rvesse.airline.utils.predicates.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.GroupFinder;
 
 import java.util.List;
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.iterators.PeekingIterator;
 
 /**
  * Abstract implementation of a parser for commands that can cope with both CLI
@@ -39,7 +41,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
      * @return Parser State
      */
     protected ParseState<T> tryParse(GlobalMetadata<T> metadata, String... args) {
-        return tryParse(metadata, ImmutableList.copyOf(args));
+        return tryParse(metadata, AirlineUtils.unmodifiableListCopy(args));
     }
 
     /**
@@ -52,7 +54,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
      * @return Parser State
      */
     protected ParseState<T> tryParse(GlobalMetadata<T> metadata, Iterable<String> args) {
-        PeekingIterator<String> tokens = Iterators.peekingIterator(args.iterator());
+        PeekingIterator<String> tokens = new PeekingIterator<String>(args.iterator());
 
         //@formatter:off
         ParseState<T> state = ParseState.<T> newInstance()
@@ -74,7 +76,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
 
         return state;
     }
-    
+
     protected PeekingIterator<String> applyAliases(PeekingIterator<String> tokens, ParseState<T> state) {
         AliasResolver<T> resolver = new AliasResolver<T>();
         return resolver.resolveAliases(tokens, state);
@@ -92,7 +94,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
      * @return Parser State
      */
     protected ParseState<T> tryParse(ParserMetadata<T> parserConfig, CommandMetadata command, Iterable<String> args) {
-        PeekingIterator<String> tokens = Iterators.peekingIterator(args.iterator());
+        PeekingIterator<String> tokens = new PeekingIterator<String>(args.iterator());
         //@formatter:off
         ParseState<T> state = ParseState.<T> newInstance()
                                         .pushContext(Context.GLOBAL)
@@ -106,7 +108,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
     }
 
     protected ParseState<T> parseCommand(PeekingIterator<String> tokens, ParseState<T> state) {
-        Predicate<? super CommandMetadata> findCommandPredicate;
+        Predicate<CommandMetadata> findCommandPredicate;
         List<CommandMetadata> expectedCommands = state.getGlobal().getDefaultGroupCommands();
         if (state.getGroup() != null) {
             expectedCommands = state.getGroup().getCommands();
@@ -114,12 +116,12 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
 
         if (tokens.hasNext()) {
             //@formatter:off
-            findCommandPredicate = (Predicate<? super CommandMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
+            findCommandPredicate = state.getParserConfiguration().allowsAbbreviatedCommands() 
                                    ? new AbbreviatedCommandFinder(tokens.peek(), expectedCommands)
-                                   : compose(equalTo(tokens.peek()), CommandMetadata.nameGetter()));
+                                   : new CommandFinder(tokens.peek());
             //@formatter:on
-            CommandMetadata command = find(expectedCommands, findCommandPredicate, state.getGroup() != null ? state
-                    .getGroup().getDefaultCommand() : null);
+            CommandMetadata command = AirlineUtils.find(expectedCommands, findCommandPredicate,
+                    state.getGroup() != null ? state.getGroup().getDefaultCommand() : null);
 
             boolean usingDefault = false;
             if (command == null && state.getGroup() == null && state.getGlobal().getDefaultCommand() != null) {
@@ -156,14 +158,14 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
     }
 
     protected ParseState<T> parseGroup(PeekingIterator<String> tokens, ParseState<T> state) {
-        Predicate<? super CommandGroupMetadata> findGroupPredicate;
+        Predicate<CommandGroupMetadata> findGroupPredicate;
         if (tokens.hasNext()) {
             //@formatter:off
-            findGroupPredicate = (Predicate<? super CommandGroupMetadata>) (state.getParserConfiguration().allowsAbbreviatedCommands() 
+            findGroupPredicate = state.getParserConfiguration().allowsAbbreviatedCommands() 
                                  ? new AbbreviatedGroupFinder(tokens.peek(), state.getGlobal().getCommandGroups()) 
-                                 : compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter()));
+                                 : new GroupFinder(tokens.peek());
             //@formatter:on
-            CommandGroupMetadata group = find(state.getGlobal().getCommandGroups(), findGroupPredicate, null);
+            CommandGroupMetadata group = CollectionUtils.find(state.getGlobal().getCommandGroups(), findGroupPredicate);
             if (group != null) {
                 tokens.next();
                 state = state.withGroup(group).pushContext(Context.GROUP);

@@ -2,9 +2,7 @@ package com.github.rvesse.airline.model;
 
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CommandGroupMetadata {
     private final String name;
@@ -19,9 +17,9 @@ public class CommandGroupMetadata {
         this.name = name;
         this.description = description;
         this.hidden = hidden;
-        this.options = ImmutableList.copyOf(options);
+        this.options = AirlineUtils.unmodifiableListCopy(options);
         this.defaultCommand = defaultCommand;
-        this.commands = Lists.newArrayList(commands);
+        this.commands = AirlineUtils.listCopy(commands);
     }
 
     public String getName() {
@@ -45,7 +43,7 @@ public class CommandGroupMetadata {
     }
 
     public List<CommandMetadata> getCommands() {
-        return ImmutableList.copyOf(commands);
+        return AirlineUtils.unmodifiableListCopy(commands);
     }
 
     public void addCommand(CommandMetadata command) {
@@ -66,13 +64,5 @@ public class CommandGroupMetadata {
         sb.append(", commands=").append(commands);
         sb.append('}');
         return sb.toString();
-    }
-
-    public static Function<CommandGroupMetadata, String> nameGetter() {
-        return new Function<CommandGroupMetadata, String>() {
-            public String apply(CommandGroupMetadata input) {
-                return input.getName();
-            }
-        };
     }
 }

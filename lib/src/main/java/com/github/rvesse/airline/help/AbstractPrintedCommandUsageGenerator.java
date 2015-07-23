@@ -7,7 +7,6 @@ import java.util.Comparator;
 
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.base.Preconditions;
 
 /**
  * Abstract command usage generator for generators that use a
@@ -20,7 +19,8 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     public AbstractPrintedCommandUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
             boolean includeHidden) {
         super(optionComparator, includeHidden);
-        Preconditions.checkArgument(columns > 0, "columns must be greater than 0");
+        if (columns <= 0)
+            throw new IllegalArgumentException("columns must be greater than 0");
         this.columnSize = columns;
     }
 
@@ -50,7 +50,8 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      * @return Usage Printer
      */
     protected UsagePrinter createUsagePrinter(OutputStream out) {
-        Preconditions.checkNotNull(out, "OutputStream cannot be null");
+        if (out == null)
+            throw new NullPointerException("out cannot be null");
         OutputStreamWriter writer = new OutputStreamWriter(out);
         return new UsagePrinter(writer, columnSize);
     }

@@ -1,6 +1,6 @@
 package com.github.rvesse.airline;
 
-import com.google.common.base.Joiner;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 
 public class TestPing
@@ -21,7 +21,7 @@ public class TestPing
 
     private void ping(String... args)
     {
-        System.out.println("$ ping " + Joiner.on(' ').join(args));
+        System.out.println("$ ping " + StringUtils.join(args, ' '));
         Ping.main(args);
         System.out.println();
     }

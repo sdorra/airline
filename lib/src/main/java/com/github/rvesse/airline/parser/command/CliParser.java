@@ -2,7 +2,11 @@ package com.github.rvesse.airline.parser.command;
 
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
@@ -19,13 +23,14 @@ import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
 import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
 
 public class CliParser<T> extends AbstractCommandParser<T> {
 
     public T parse(GlobalMetadata<T> metadata, Iterable<String> args) {
-        Preconditions.checkNotNull(args, "args is null");
+        if (args == null)
+            throw new NullPointerException("args cannot be null");
 
         ParseState<T> state = tryParse(metadata, args);
 
@@ -43,8 +48,8 @@ public class CliParser<T> extends AbstractCommandParser<T> {
 
         CommandMetadata command = state.getCommand();
 
-        ImmutableMap.Builder<Class<?>, Object> bindings = ImmutableMap.<Class<?>, Object> builder().put(
-                GlobalMetadata.class, metadata);
+        Map<Class<?>, Object> bindings = new HashMap<Class<?>, Object>();
+        bindings.put(GlobalMetadata.class, metadata);
 
         if (state.getGroup() != null) {
             bindings.put(CommandGroupMetadata.class, state.getGroup());
@@ -53,7 +58,7 @@ public class CliParser<T> extends AbstractCommandParser<T> {
         if (state.getCommand() != null) {
             bindings.put(CommandMetadata.class, state.getCommand());
         }
-        
+
         bindings.put(ParserMetadata.class, state.getParserConfiguration());
 
         //@formatter:off
@@ -63,7 +68,7 @@ public class CliParser<T> extends AbstractCommandParser<T> {
                               command.getArguments(), 
                               state.getParsedArguments(), 
                               command.getMetadataInjections(), 
-                              bindings.build(),
+                              AirlineUtils.unmodifiableMapCopy(bindings),
                               state.getParserConfiguration().getCommandFactory());
         //@formatter:on
     }
@@ -103,7 +108,8 @@ public class CliParser<T> extends AbstractCommandParser<T> {
         }
 
         for (OptionMetadata option : command.getAllOptions()) {
-            if (option.isRequired() && !state.getParsedOptions().containsKey(option)) {
+            if (option.isRequired()
+                    && CollectionUtils.find(state.getParsedOptions(), new ParsedOptionFinder(option)) == null) {
                 throw new ParseOptionMissingException(option.getOptions().iterator().next());
             }
         }

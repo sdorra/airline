@@ -1,13 +1,13 @@
 package com.github.rvesse.airline.parser.aliases;
 
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.iterators.PeekingIterator;
 
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
@@ -16,9 +16,9 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.AbstractParser;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
+import com.github.rvesse.airline.utils.predicates.AliasFinder;
+import com.github.rvesse.airline.utils.predicates.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.GroupFinder;
 
 /**
  * Resolves aliases
@@ -44,8 +44,7 @@ public class AliasResolver<T> extends AbstractParser<T> {
 
         do {
             // Try to find an alias
-            AliasMetadata alias = find(state.getParserConfiguration().getAliases(),
-                    compose(equalTo(tokens.peek()), AliasMetadata.nameGetter()), null);
+            AliasMetadata alias = CollectionUtils.find(state.getParserConfiguration().getAliases(), new AliasFinder(tokens.peek()));
 
             // Nothing further to do if no aliases found
             if (alias == null)
@@ -63,10 +62,10 @@ public class AliasResolver<T> extends AbstractParser<T> {
                 // would take precedence
                 if (state.getGlobal() != null) {
                     GlobalMetadata<T> metadata = state.getGlobal();
-                    findGroupPredicate = compose(equalTo(tokens.peek()), CommandGroupMetadata.nameGetter());
-                    findCommandPredicate = compose(equalTo(tokens.peek()), CommandMetadata.nameGetter());
-                    if (find(metadata.getCommandGroups(), findGroupPredicate, null) != null
-                            || find(metadata.getDefaultGroupCommands(), findCommandPredicate, null) != null)
+                    findGroupPredicate = new GroupFinder(tokens.peek());
+                    findCommandPredicate = new CommandFinder(tokens.peek());
+                    if (CollectionUtils.find(metadata.getCommandGroups(), findGroupPredicate) != null
+                            || CollectionUtils.find(metadata.getDefaultGroupCommands(), findCommandPredicate) != null)
                         return tokens;
                 }
             }
@@ -119,7 +118,7 @@ public class AliasResolver<T> extends AbstractParser<T> {
             }
 
             // Prepare a new tokens iterator
-            tokens = Iterators.peekingIterator(newParams.iterator());
+            tokens = new PeekingIterator<String>(newParams.iterator());
         } while (state.getParserConfiguration().aliasesMayChain());
 
         return tokens;

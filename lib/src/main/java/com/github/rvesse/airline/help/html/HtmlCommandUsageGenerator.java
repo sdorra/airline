@@ -1,11 +1,10 @@
 package com.github.rvesse.airline.help.html;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -18,8 +17,6 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * A usage generator that generates HTML documentation
@@ -38,7 +35,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     /**
      * List of stylesheet URLs
      */
-    protected final List<String> stylesheetUrls = newArrayList();
+    protected final List<String> stylesheetUrls = new ArrayList<>();
 
     public HtmlCommandUsageGenerator() {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, false, DEFAULT_STYLESHEET);
@@ -143,7 +140,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         writer.append(commandName).append(" command exits with one of the following values:");
         writer.append("</p>\n");
 
-        for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
+        for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
             writer.append("<div class=\"row\">\n");
             writer.append("<div class=\"span8 offset1\">\n");
 
@@ -352,22 +349,22 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             CommandMetadata command) throws IOException {
         writer.append("<h1 class=\"text-info\">SYNOPSIS</h1>\n").append(NEWLINE);
 
-        List<OptionMetadata> options = newArrayList();
+        List<OptionMetadata> options = new ArrayList<>();
         writer.append("<div class=\"row\">\n");
         writer.append("<div class=\"span8 offset1\">\n");
 
         if (programName != null) {
             writer.append(programName).append(" ")
-                    .append(htmlize(Joiner.on(" ").join(toSynopsisUsage(sortOptions(command.getGlobalOptions())))));
+                    .append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getGlobalOptions())), ' ')));
             options.addAll(command.getGlobalOptions());
         }
         if (groupName != null) {
             writer.append(groupName).append(" ")
-                    .append(htmlize(Joiner.on(" ").join(toSynopsisUsage(sortOptions(command.getGroupOptions())))));
+                    .append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getGroupOptions())), ' ')));
             options.addAll(command.getGroupOptions());
         }
         writer.append(command.getName()).append(" ")
-                .append(htmlize(Joiner.on(" ").join(toSynopsisUsage(sortOptions(command.getCommandOptions())))));
+                .append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getCommandOptions())), ' ')));
         options.addAll(command.getCommandOptions());
 
         // command arguments (optional)
