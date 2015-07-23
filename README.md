@@ -8,7 +8,7 @@ This is a substantially rewritten fork of the original [airline library](https:/
 
 ## Breaking Changes versus 1.x
 
-Airline 2 contains significant breaking changes from Airline 1.x, please see `Migrating.md` in this folder for more details on how to migrate code forward
+Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward
 
 ## Usage
 
