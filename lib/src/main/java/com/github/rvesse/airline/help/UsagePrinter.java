@@ -64,7 +64,8 @@ public class UsagePrinter {
                 while (column >= columnSizes.size()) {
                     columnSizes.add(0);
                 }
-                columnSizes.set(column, Math.max(value.length(), columnSizes.get(column)));
+                int valueLength = value != null ? value.length() : 0;
+                columnSizes.set(column, Math.max(valueLength, columnSizes.get(column)));
                 column++;
             }
         }
@@ -79,8 +80,12 @@ public class UsagePrinter {
             StringBuilder line = new StringBuilder();
             for (String value : row) {
                 int columnSize = columnSizes.get(column);
-                line.append(value);
-                line.append(spaces(columnSize - value.length()));
+                if (value != null) {
+                    line.append(value);
+                    line.append(spaces(columnSize - value.length()));
+                } else {
+                    line.append(spaces(columnSize));
+                }
                 line.append("   ");
                 column++;
             }

@@ -16,4 +16,7 @@ public class CommandWithGroupsAnnotation
     @Option(name = "-i")
     public Boolean interactive = false;
     
+    @Option(name = "-v", type = OptionType.GROUP)
+    public boolean verbose = false;
+    
 }

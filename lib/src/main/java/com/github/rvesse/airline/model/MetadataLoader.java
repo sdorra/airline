@@ -98,7 +98,7 @@ public class MetadataLoader {
         while (iter.hasNext()) {
             commandMetadata.add(loadCommand(iter.next()));
         }
-        return ListUtils.unmodifiableList(commandMetadata);
+        return commandMetadata;
     }
 
     /**
@@ -506,9 +506,6 @@ public class MetadataLoader {
                     group.addCommand(command);
                     added = true;
                 } else {
-                    // TODO Should we propagate group options from commands to
-                    // groups? This wasn't done previously so probably nobody
-                    // cared
                     CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", false, null,
                             Collections.singletonList(command));
                     commandGroups.add(newGroup);
