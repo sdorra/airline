@@ -2,13 +2,13 @@ package com.github.rvesse.airline;
 
 import com.github.rvesse.airline.parser.ParserUtil;
 import com.github.rvesse.airline.parser.errors.ParseException;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import javax.swing.plaf.ListUI;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
@@ -32,23 +30,31 @@ public class Accessor
 
     public Accessor(Field... path)
     {
-        this(IteratorUtils.arrayIterator(path, 0));
+        this(AirlineUtils.arrayToList(path));
+    }
+    
+    public Accessor(Iterable<Field> path) {
+        this(path.iterator());
     }
 
     public Accessor(Iterator<Field> path)
     {
+        this(IteratorUtils.toList(path));
+    }
+    
+    public Accessor(List<Field> path) {
         if(path == null) throw new NullPointerException("path is null");
-        if (!path.hasNext()) throw new IllegalArgumentException("path is empty");
-
-        this.path = ListUtils.unmodifiableList(IteratorUtils.toList(path));
-        this.name = this.path.get(0).getDeclaringClass().getSimpleName() + "." + Joiner.on('.').join(Iterables.transform(this.path, new Function<Field, String>()
-        {
-            public String apply(Field field)
-            {
-                return field.getName();
-            }
-        }));
-
+        if (path.size() == 0) throw new IllegalArgumentException("path is empty");
+        
+        this.path = ListUtils.unmodifiableList(path);
+        StringBuilder nameBuilder = new StringBuilder();
+        
+        // Build the name for the accessor
+        nameBuilder.append(this.path.get(0).getDeclaringClass().getSimpleName());
+        for (Field field : this.path) {
+            nameBuilder.append('.').append(field.getName());
+        }
+        this.name = nameBuilder.toString();
 
         Field field = this.path.get(this.path.size() - 1);
         multiValued = Collection.class.isAssignableFrom(field.getType());
@@ -111,7 +117,7 @@ public class Accessor
         }
         else {
             try {
-                field.set(instance, Iterables.getLast(values));
+                field.set(instance, AirlineUtils.last(values));
             }
             catch (Exception e) {
                 throw new ParseException(e, "Error setting %s for argument %s", field.getName(), name);

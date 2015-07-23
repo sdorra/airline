@@ -18,12 +18,12 @@
 
 package com.github.rvesse.airline;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
 
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.command.CliParser;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class Cli<C> {
     /**
@@ -58,7 +58,7 @@ public class Cli<C> {
     }
 
     public C parse(String... args) {
-        return parse(ListUtils.unmodifiableList(IteratorUtils.toList(IteratorUtils.arrayIterator(args))));
+        return parse(ListUtils.unmodifiableList(AirlineUtils.arrayToList(args)));
     }
 
     private C parse(Iterable<String> args) {

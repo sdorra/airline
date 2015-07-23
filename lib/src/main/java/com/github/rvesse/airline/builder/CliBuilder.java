@@ -95,10 +95,10 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
             defaultCommandMetadata = MetadataLoader.loadCommand(defaultCommand);
         }
 
-        final List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
+        List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
 
-        List<CommandMetadata> defaultCommandGroup = defaultCommandGroupCommands != null ? new ArrayList<>(
-                MetadataLoader.loadCommands(defaultCommandGroupCommands)) : new ArrayList<>();
+        List<CommandMetadata> defaultCommandGroup = defaultCommandGroupCommands != null ? MetadataLoader
+                .loadCommands(defaultCommandGroupCommands) : new ArrayList<CommandMetadata>();
 
         // Currently the default command is required to be in the commands
         // list. If that changes, we'll need to add it here and add checks for
@@ -130,7 +130,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
 
         // Build metadata objects
         GlobalMetadata<C> metadata = MetadataLoader.<C> loadGlobal(name, description, defaultCommandMetadata,
-                ImmutableList.copyOf(defaultCommandGroup), ImmutableList.copyOf(commandGroups),
+                ListUtils.unmodifiableList(defaultCommandGroup), ListUtils.unmodifiableList(commandGroups),
                 this.parserBuilder.build());
 
         return new Cli<C>(metadata);

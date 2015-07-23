@@ -1,17 +1,17 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.collect.Sets.newHashSet;
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ArgumentsMetadata {
     private final List<String> titles;
@@ -21,25 +21,30 @@ public class ArgumentsMetadata {
     private final Set<Accessor> accessors;
     private final int arity;
 
-    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required,
-            int arity, int completionBehaviour, String completionCommand, Iterable<Field> path) {
-        Preconditions.checkNotNull(titles, "title is null");
-        Preconditions.checkNotNull(path, "path is null");
-        Preconditions.checkArgument(!Iterables.isEmpty(path), "path is empty");
+    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required, int arity,
+            int completionBehaviour, String completionCommand, Iterable<Field> path) {
+        if (titles == null)
+            throw new NullPointerException("title cannot be null");
+        if (path == null)
+            throw new NullPointerException("path cannot be null");
+        if (!path.iterator().hasNext())
+            throw new IllegalArgumentException("path cannot be empty");
 
-        this.titles = ImmutableList.copyOf(titles);
+        this.titles = ListUtils.unmodifiableList(IteratorUtils.toList(titles.iterator()));
         this.description = description;
         this.usage = usage;
         this.required = required;
         this.arity = arity <= 0 ? Integer.MIN_VALUE : arity;
         this.completionBehaviour = completionBehaviour;
         this.completionCommand = completionCommand;
-        this.accessors = ImmutableSet.of(new Accessor(path));
+        this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
     }
 
     public ArgumentsMetadata(Iterable<ArgumentsMetadata> arguments) {
-        Preconditions.checkNotNull(arguments, "arguments is null");
-        Preconditions.checkArgument(!Iterables.isEmpty(arguments), "arguments is empty");
+        if (arguments == null)
+            throw new NullPointerException("arguments cannot be null");
+        if (!arguments.iterator().hasNext())
+            throw new IllegalArgumentException("arguments cannot be empty");
 
         ArgumentsMetadata first = arguments.iterator().next();
 
@@ -51,13 +56,15 @@ public class ArgumentsMetadata {
         this.completionBehaviour = first.completionBehaviour;
         this.completionCommand = first.completionCommand;
 
-        Set<Accessor> accessors = newHashSet();
+        Set<Accessor> accessors = new HashSet<>();
         for (ArgumentsMetadata other : arguments) {
-            Preconditions.checkArgument(first.equals(other), "Conflicting arguments definitions: %s, %s", first, other);
+            if (first.equals(other))
+                throw new IllegalArgumentException(String.format("Conflicting arguments definitions: %s, %s", first,
+                        other));
 
             accessors.addAll(other.getAccessors());
         }
-        this.accessors = ImmutableSet.copyOf(accessors);
+        this.accessors = SetUtils.unmodifiableSet(accessors);
     }
 
     public List<String> getTitle() {
@@ -75,7 +82,7 @@ public class ArgumentsMetadata {
     public boolean isRequired() {
         return required;
     }
-    
+
     public int getArity() {
         return arity;
     }
@@ -140,7 +147,7 @@ public class ArgumentsMetadata {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("ArgumentsMetadata");
-        sb.append("{title='").append(Joiner.on(',').join(titles)).append('\'');
+        sb.append("{title='").append(StringUtils.join(titles, ',')).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", usage='").append(usage).append('\'');
         sb.append(", required=").append(required);
