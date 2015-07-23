@@ -1,14 +1,15 @@
 package com.github.rvesse.airline.help;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
 
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.transform;
+import org.apache.commons.collections4.ListUtils;
 
 public class CommandSuggester
         implements Suggester
@@ -19,14 +20,16 @@ public class CommandSuggester
     @Override
     public Iterable<String> suggest()
     {
-        ImmutableList.Builder<String> suggestions = ImmutableList.<String>builder()
-                .addAll(concat(transform(command.getCommandOptions(), OptionMetadata.optionsGetter())));
+        List<String> suggestions = new ArrayList<String>();
+        for (OptionMetadata option : command.getCommandOptions()) {
+            suggestions.addAll(option.getOptions());
+        }
 
         if (command.getArguments() != null) {
             // Include arguments separator
             suggestions.add(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
         }
 
-        return suggestions.build();
+        return ListUtils.unmodifiableList(suggestions);
     }
 }

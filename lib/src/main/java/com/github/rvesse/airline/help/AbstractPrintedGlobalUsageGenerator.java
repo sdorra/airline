@@ -9,7 +9,6 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.base.Preconditions;
 
 /**
  * Abstract global usage generator for generators that use a
@@ -17,14 +16,15 @@ import com.google.common.base.Preconditions;
  */
 public abstract class AbstractPrintedGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
-    private final int columnSize;
+    private final int columns;
 
-    public AbstractPrintedGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
+    public AbstractPrintedGlobalUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
             Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
         super(optionComparator, commandComparator, commandGroupComparator, includeHidden);
-        Preconditions.checkArgument(columnSize > 0, "columnSize must be greater than 0");
-        this.columnSize = columnSize;
+        if (columns <= 0)
+            throw new IllegalArgumentException("columns must be greater than 0");
+        this.columns = columns;
     }
 
     /**
@@ -46,8 +46,9 @@ public abstract class AbstractPrintedGlobalUsageGenerator<T> extends AbstractGlo
      * @return Usage Printer
      */
     protected UsagePrinter createUsagePrinter(OutputStream out) {
-        Preconditions.checkNotNull(out, "StringBuilder cannot be null");
-        return new UsagePrinter(new OutputStreamWriter(out), columnSize);
+        if (out == null)
+            throw new NullPointerException("out cannot be null");
+        return new UsagePrinter(new OutputStreamWriter(out), columns);
     }
 
     @Override

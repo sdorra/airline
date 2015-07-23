@@ -8,23 +8,21 @@ import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+import com.github.rvesse.airline.utils.AirlineTestUtils;
+import com.github.rvesse.airline.utils.predicates.CommandFinder;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.rvesse.airline.OptionType.GLOBAL;
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.MoreObjects.toStringHelper;
-import static com.google.common.base.Predicates.compose;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.github.rvesse.airline.utils.AirlineTestUtils.toStringHelper;
 
 public class TestGalaxyCommandLineParser
 {
@@ -90,7 +88,7 @@ public class TestGalaxyCommandLineParser
         GlobalMetadata<GalaxyCommand> global = cli.getMetadata();
         Assert.assertEquals(global.getOptions().size(), 2);
         
-        CommandMetadata show = find(global.getDefaultGroupCommands(), compose(equalTo("show"), CommandMetadata.nameGetter()), null);
+        CommandMetadata show = CollectionUtils.find(global.getDefaultGroupCommands(), new CommandFinder("show"));
         Assert.assertNotNull(show);
         Assert.assertEquals(show.getCommandOptions().size(), 6);
         Assert.assertEquals(show.getAllOptions().size(), 8);
@@ -130,7 +128,7 @@ public class TestGalaxyCommandLineParser
     }
 
     protected GalaxyCommand parse(String... args) {
-        System.out.println("$ galaxy " + Joiner.on(" ").join(args));
+        System.out.println("$ galaxy " + StringUtils.join(args, ' '));
         GalaxyCommand command = createParser().parse(args);
         return command;
     }
@@ -141,7 +139,7 @@ public class TestGalaxyCommandLineParser
         public boolean debug = false;
 
         @Option(type = GLOBAL, name = "--coordinator", description = "Galaxy coordinator host (overrides GALAXY_COORDINATOR)")
-        public String coordinator = firstNonNull(System.getenv("GALAXY_COORDINATOR"), "http://localhost:64000");
+        public String coordinator = AirlineTestUtils.firstNonNull(System.getenv("GALAXY_COORDINATOR"), "http://localhost:64000");
 
         @Override
         public String toString()
@@ -190,16 +188,16 @@ public class TestGalaxyCommandLineParser
     public static class AgentFilter
     {
         @Option(name = {"-i", "--host"}, description = "Select slots on the given host")
-        public final List<String> host = newArrayList();
+        public final List<String> host = new ArrayList<>();
 
         @Option(name = {"-I", "--ip"}, description = "Select slots at the given IP address")
-        public final List<String> ip = newArrayList();
+        public final List<String> ip = new ArrayList<>();
 
         @Option(name = {"-u", "--uuid"}, description = "Select slot with the given UUID")
-        public final List<String> uuid = newArrayList();
+        public final List<String> uuid = new ArrayList<>();
 
         @Option(name = {"-s", "--state"}, description = "Select 'r{unning}', 's{topped}' or 'unknown' slots")
-        public final List<String> state = newArrayList();
+        public final List<String> state = new ArrayList<>();
 
         @Override
         public String toString()
@@ -267,7 +265,7 @@ public class TestGalaxyCommandLineParser
 
         @Arguments(usage = "<groupId:artifactId[:packaging[:classifier]]:version> @<component:pools:version>",
                 description = "The binary and @configuration to install.  The default packaging is tar.gz")
-        public final List<String> assignment = Lists.newArrayList();
+        public final List<String> assignment = new ArrayList<>();
 
         @Override
         public String toString()
@@ -290,7 +288,7 @@ public class TestGalaxyCommandLineParser
 
         @Arguments(usage = "[<binary-version>] [@<config-version>]",
                 description = "Version of the binary and/or @configuration")
-        public final List<String> versions = Lists.newArrayList();
+        public final List<String> versions = new ArrayList<>();
 
         @Override
         public String toString()

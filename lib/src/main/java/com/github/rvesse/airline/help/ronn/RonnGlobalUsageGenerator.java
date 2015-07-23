@@ -1,14 +1,14 @@
 package com.github.rvesse.airline.help.ronn;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.AbstractGlobalUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
@@ -16,10 +16,6 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * <p>
@@ -69,7 +65,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
 
         outputTitle(global, writer);
 
-        List<OptionMetadata> options = newArrayList();
+        List<OptionMetadata> options = new ArrayList<>();
         if (global.getOptions() != null && global.getOptions().size() > 0) {
             options.addAll(global.getOptions());
             options = sortOptions(options);
@@ -155,7 +151,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
-            
+
             writer.append(NEW_PARA).append("* **").append(group.getName()).append("**").append(NEW_PARA);
             writer.append("  ").append(group.getDescription());
 
@@ -274,7 +270,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
         writer.append(NEW_PARA).append("## SYNOPSIS").append(NEW_PARA);
         writer.append("`").append(global.getName()).append("`");
         if (global.getOptions() != null && global.getOptions().size() > 0) {
-            writer.append(" ").append(Joiner.on(" ").join(toSynopsisUsage(sortOptions(global.getOptions()))));
+            writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(global.getOptions())), ' '));
         }
         if (global.getCommandGroups().size() > 0) {
             writer.append(" [<group>] <command> [command-args]");
@@ -320,7 +316,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
-            
+
             outputGroupCommandUsages(output, writer, global, group);
         }
     }
@@ -402,24 +398,22 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
 
         final String argumentString;
         if (option.getArity() > 0) {
-            argumentString = Joiner.on(" ").join(
-                    Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(String argument) {
-                            return "<" + argument + ">";
-                        }
-                    }));
+            argumentString = String.format("<%s>", option.getTitle());
         } else {
             argumentString = null;
         }
 
-        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(String option) {
-                if (argumentString != null) {
-                    return "`" + option + "` " + argumentString;
-                }
-                return "`" + option + "`";
+        boolean first = true;
+        for (String name : options) {
+            if (!first) {
+                stringBuilder.append(", ");
+            } else {
+                first = false;
             }
-        }));
+            stringBuilder.append('`').append(name).append('`');
+            if (argumentString != null)
+                stringBuilder.append(' ').append(argumentString);
+        }
 
         return stringBuilder.toString();
     }

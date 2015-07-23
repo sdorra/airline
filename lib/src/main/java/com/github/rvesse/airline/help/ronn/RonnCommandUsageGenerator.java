@@ -1,12 +1,10 @@
 package com.github.rvesse.airline.help.ronn;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -17,10 +15,6 @@ import com.github.rvesse.airline.help.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * A command usage generator which generates help in <a
@@ -205,13 +199,13 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String groupName,
             String commandName, CommandMetadata command, String sectionHeader) throws IOException {
         writer.append(NEW_PARA).append(sectionHeader).append("SYNOPSIS").append(NEW_PARA);
-        List<OptionMetadata> options = newArrayList();
+        List<OptionMetadata> options = new ArrayList<>();
         List<OptionMetadata> aOptions;
         if (programName != null) {
             writer.append("`").append(programName).append("`");
             aOptions = command.getGlobalOptions();
             if (aOptions != null && aOptions.size() > 0) {
-                writer.append(" ").append(Joiner.on(" ").join(toSynopsisUsage(sortOptions(aOptions))));
+                writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
                 options.addAll(aOptions);
             }
         }
@@ -219,13 +213,13 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append(" `").append(groupName).append("`");
             aOptions = command.getGroupOptions();
             if (aOptions != null && aOptions.size() > 0) {
-                writer.append(" ").append(Joiner.on(" ").join(toSynopsisUsage(sortOptions(aOptions))));
+                writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
                 options.addAll(aOptions);
             }
         }
         aOptions = command.getCommandOptions();
         writer.append(" `").append(commandName).append("` ")
-                .append(Joiner.on(" ").join(toSynopsisUsage(sortOptions(aOptions))));
+                .append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
         options.addAll(aOptions);
 
         // command arguments (optional)
@@ -265,7 +259,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         writer.append("` command exits with one of the following values:");
         writer.append(NEW_PARA);
 
-        for (Entry<Integer, String> exit : sortExitCodes(Lists.newArrayList(command.getExitCodes().entrySet()))) {
+        for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
             // Print the exit code
             writer.append("* **").append(exit.getKey().toString()).append("**");
 
@@ -311,7 +305,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     protected void outputDiscussion(Writer writer, CommandMetadata command, String sectionHeader) throws IOException {
         if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
             return;
-        
+
         writer.append(NEW_PARA).append(sectionHeader).append("DISCUSSION").append(NEW_PARA);
         for (String discussionPara : command.getDiscussion()) {
             if (StringUtils.isEmpty(discussionPara))
@@ -384,24 +378,22 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         final String argumentString;
         if (option.getArity() > 0) {
-            argumentString = Joiner.on(" ").join(
-                    Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(String argument) {
-                            return "<" + argument + ">";
-                        }
-                    }));
+            argumentString = String.format("<%s>", option.getTitle());
         } else {
             argumentString = null;
         }
 
-        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(String option) {
-                if (argumentString != null) {
-                    return "`" + option + "` " + argumentString;
-                }
-                return "`" + option + "`";
+        boolean first = true;
+        for (String name : options) {
+            if (!first) {
+                stringBuilder.append(", ");
+            } else {
+                first = false;
             }
-        }));
+            stringBuilder.append('`').append(name).append('`');
+            if (argumentString != null)
+                stringBuilder.append(' ').append(argumentString);
+        }
 
         return stringBuilder.toString();
     }

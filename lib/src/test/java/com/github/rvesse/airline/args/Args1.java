@@ -21,9 +21,9 @@ package com.github.rvesse.airline.args;
 import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
-import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
 public class Args1
 {
     @Arguments
-    public List<String> parameters = Lists.newArrayList();
+    public List<String> parameters = new ArrayList<>();
 
     @Option(name = {"-log", "-verbose"}, description = "Level of verbosity")
     public Integer verbose = 1;

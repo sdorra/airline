@@ -4,16 +4,16 @@ import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.rvesse.airline.TestingUtil.singleCommandParser;
-import static com.google.common.collect.Lists.newArrayList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -94,7 +94,7 @@ public class TestParametersDelegate
         public static class LeafDelegate
         {
             @Option(name = "--list")
-            public List<String> list = newArrayList("value1", "value2");
+            public List<String> list = AirlineUtils.arrayToList(new String[] { "value1", "value2" });
 
             @Option(name = "--bool")
             public boolean bool;
@@ -133,7 +133,7 @@ public class TestParametersDelegate
     {
         CombinedAndNestedDelegates p = singleCommandParser(CombinedAndNestedDelegates.class)
                 .parse("-d", "234", "--list", "a", "--list", "b", "-a");
-        assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, newArrayList("value1", "value2", "a", "b"));
+        assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, AirlineUtils.arrayToList(new String[] { "value1", "value2", "a", "b" }));
         assertFalse(p.nestedDelegate2.nestedDelegate1.leafDelegate.bool);
         assertEquals(p.nestedDelegate2.nestedDelegate1.d, Integer.valueOf(234));
         assertFalse(p.nestedDelegate2.isC);
@@ -219,13 +219,13 @@ public class TestParametersDelegate
         public static class Delegate1
         {
             @Arguments
-            public List<String> mainParams1 = newArrayList();
+            public List<String> mainParams1 = new ArrayList<>();
         }
 
         public static class Delegate2
         {
             @Arguments
-            public List<String> mainParams1 = newArrayList();
+            public List<String> mainParams1 = new ArrayList<>();
         }
 
         @Inject
@@ -239,8 +239,8 @@ public class TestParametersDelegate
     public void duplicateMainParametersAreAllowed()
     {
         DuplicateMainParametersAreAllowed value = singleCommandParser(DuplicateMainParametersAreAllowed.class).parse("main", "params");
-        assertEquals(value.delegate1.mainParams1, ImmutableList.of("main", "params"));
-        assertEquals(value.delegate2.mainParams1, ImmutableList.of("main", "params"));
+        assertEquals(value.delegate1.mainParams1, AirlineUtils.arrayToList(new String[] { "main", "params" }));
+        assertEquals(value.delegate2.mainParams1, AirlineUtils.arrayToList(new String[] { "main", "params" }));
     }
 
     // ========================================================================================================================
@@ -251,13 +251,13 @@ public class TestParametersDelegate
         public static class Delegate1
         {
             @Arguments(description = "foo")
-            public List<String> mainParams1 = newArrayList();
+            public List<String> mainParams1 = new ArrayList<>();
         }
 
         public static class Delegate2
         {
             @Arguments(description = "bar")
-            public List<String> mainParams1 = newArrayList();
+            public List<String> mainParams1 = new ArrayList<>();
         }
 
         @Inject

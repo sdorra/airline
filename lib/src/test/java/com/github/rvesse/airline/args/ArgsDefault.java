@@ -20,14 +20,14 @@ package com.github.rvesse.airline.args;
 
 import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Option;
-import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArgsDefault
 {
     @Arguments
-    public List<String> parameters = Lists.newArrayList();
+    public List<String> parameters = new ArrayList<>();
 
     @Option(name = "-log", description = "Level of verbosity")
     public Integer log = 1;

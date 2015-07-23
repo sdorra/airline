@@ -12,8 +12,6 @@ import com.github.rvesse.airline.model.OptionMetadata;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_COMMAND_COMPARATOR;
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newTreeMap;
 
 public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGroupUsageGenerator<T> {
     private final boolean hideGlobalOptions;
@@ -72,7 +70,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      */
     protected void outputOptions(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
             throws IOException {
-        List<OptionMetadata> options = newArrayList();
+        List<OptionMetadata> options = new ArrayList<>();
         options.addAll(group.getOptions());
         if (global != null && !hideGlobalOptions) {
             options.addAll(global.getOptions());
@@ -126,7 +124,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
         }
         List<OptionMetadata> commonGroupOptions = null;
         String commonGroupArgs = null;
-        List<String> allCommandNames = newArrayList();
+        List<String> allCommandNames = new ArrayList<>();
         boolean hasCommandSpecificOptions = false, hasCommandSpecificArgs = false;
         for (CommandMetadata command : commands) {
             if (command.getName().equals(defaultCommand)) {
@@ -135,7 +133,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
                 allCommandNames.add(command.getName());
             }
             if (commonGroupOptions == null) {
-                commonGroupOptions = newArrayList(command.getCommandOptions());
+                commonGroupOptions = new ArrayList<>(command.getCommandOptions());
             }
             if (commonGroupArgs == null) {
                 commonGroupArgs = (command.getArguments() != null ? toUsage(command.getArguments()) : "");
@@ -172,14 +170,14 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
             synopsis.append(" <cmd-args>");
         }
         synopsis.newline();
-        Map<String, String> cmdOptions = newTreeMap();
-        Map<String, String> cmdArguments = newTreeMap();
+        Map<String, String> cmdOptions = new TreeMap<>();
+        Map<String, String> cmdArguments = new TreeMap<>();
 
         for (CommandMetadata command : commands) {
 
             if (!command.isHidden() || this.includeHidden()) {
                 if (hasCommandSpecificOptions) {
-                    List<OptionMetadata> thisCmdOptions = newArrayList(command.getCommandOptions());
+                    List<OptionMetadata> thisCmdOptions = new ArrayList<>(command.getCommandOptions());
                     thisCmdOptions.removeAll(commonGroupOptions);
                     StringBuilder optSB = new StringBuilder();
                     for (String s : toSynopsisUsage(thisCmdOptions)) {

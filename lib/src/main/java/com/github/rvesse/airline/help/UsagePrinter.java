@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.utils.AirlineUtils;
@@ -124,7 +123,7 @@ public class UsagePrinter {
         if (value == null)
             return this;
         if (avoidNewlines) {
-            return appendWords(Splitter.onPattern("\\s+").trimResults().split(value), avoidNewlines);
+            return appendWords(AirlineUtils.arrayToList(value.split("\\s+")), avoidNewlines);
         } else {
             return appendLines(AirlineUtils.arrayToList(StringUtils.split(value, '\n')), avoidNewlines);
         }
@@ -140,7 +139,7 @@ public class UsagePrinter {
             String line = iter.next();
             if (line == null || line.isEmpty())
                 continue;
-            appendWords(Splitter.onPattern("\\s+").trimResults().split(String.valueOf(line)), avoidNewlines);
+            appendWords(AirlineUtils.arrayToList(line.split("\\s+")), avoidNewlines);
             if (iter.hasNext()) {
                 this.newline();
             }

@@ -21,15 +21,15 @@ package com.github.rvesse.airline.args;
 import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Option;
-import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Command(name = "ArgsSingleChar")
 public class ArgsSingleChar
 {
     @Arguments
-    public List<String> parameters = Lists.newArrayList();
+    public List<String> parameters = new ArrayList<>();
 
     @Option(name = {"-l"}, description = "Long")
     public boolean l = false;

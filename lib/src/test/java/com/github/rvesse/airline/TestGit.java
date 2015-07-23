@@ -1,6 +1,6 @@
 package com.github.rvesse.airline;
 
-import com.google.common.base.Joiner;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 
 public class TestGit
@@ -29,7 +29,7 @@ public class TestGit
     
     private void git(String... args)
     {
-        System.out.println("$ git " + Joiner.on(' ').join(args));
+        System.out.println("$ git " + StringUtils.join(args, ' '));
         Git.main(args);
         System.out.println();
     }
