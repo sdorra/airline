@@ -97,7 +97,7 @@ public class OptionMetadata {
 
         Set<Accessor> accessors = new LinkedHashSet<Accessor>();
         for (OptionMetadata other : options) {
-            if (option.equals(other))
+            if (!option.equals(other))
                 throw new IllegalArgumentException(
                         String.format("Duplicate options definitions: %s, %s", option, other));
 

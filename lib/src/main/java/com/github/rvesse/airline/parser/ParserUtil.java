@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -35,6 +36,7 @@ public class ParserUtil {
                 new DefaultCommandFactory<T>());
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T injectOptions(T commandInstance, Iterable<OptionMetadata> options,
             List<Pair<OptionMetadata, Object>> parsedOptions, ArgumentsMetadata arguments,
             Iterable<Object> parsedArguments, Iterable<Accessor> metadataInjection, Map<Class<?>, Object> bindings) {
@@ -46,9 +48,12 @@ public class ParserUtil {
                     values.add(parsedOption.getRight());
             }
             if (option.getArity() > 1 && !values.isEmpty()) {
-                // hack: flatten the collection
-                // TODO What is this doing?
-                //values = AirlineUtils.unmodifiableListCopy(concat((Iterable<Iterable<Object>>) values));
+                // hack: flatten the collections
+                List<Object> flattenedValues = new ArrayList<Object>();
+                for (Object value : values) {
+                    flattenedValues.addAll(IteratorUtils.<Object>toList(((Iterable<Object>) value).iterator()));
+                }
+                values = flattenedValues;
             }
             if (values != null && !values.isEmpty()) {
                 for (Accessor accessor : option.getAccessors()) {

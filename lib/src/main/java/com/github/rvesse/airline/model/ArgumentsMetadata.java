@@ -58,7 +58,7 @@ public class ArgumentsMetadata {
 
         Set<Accessor> accessors = new HashSet<>();
         for (ArgumentsMetadata other : arguments) {
-            if (first.equals(other))
+            if (!first.equals(other))
                 throw new IllegalArgumentException(String.format("Conflicting arguments definitions: %s, %s", first,
                         other));
 

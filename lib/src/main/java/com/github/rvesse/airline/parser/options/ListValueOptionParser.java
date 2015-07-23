@@ -2,6 +2,7 @@ package com.github.rvesse.airline.parser.options;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang3.StringUtils;
@@ -89,8 +90,7 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
                     return state;
 
                 // Consume the value immediately, this option parser will now
-                // either
-                // succeed to parse the option or will error
+                // either succeed to parse the option or will error
                 list = tokens.next();
             }
 
