@@ -20,7 +20,7 @@ package com.github.rvesse.airline.parser.errors;
 
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Exception thrown when the value for an option is not in the list of allowed
@@ -37,7 +37,7 @@ public class ParseOptionIllegalValueException extends ParseException {
                 value, allowedValues);
         this.optionTitle = optionTitle;
         this.illegalValue = value;
-        this.allowedValues = ImmutableSet.copyOf(allowedValues);
+        this.allowedValues = AirlineUtils.unmodifiableSetCopy(allowedValues);
     }
 
     /**

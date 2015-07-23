@@ -15,6 +15,6 @@ public class GroupFinder implements Predicate<CommandGroupMetadata> {
 
     @Override
     public boolean evaluate(CommandGroupMetadata group) {
-        return StringUtils.equals(this.name, group.getName());
+        return group != null && StringUtils.equals(this.name, group.getName());
     }
 }

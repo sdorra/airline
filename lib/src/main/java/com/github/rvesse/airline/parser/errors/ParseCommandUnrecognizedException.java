@@ -18,7 +18,7 @@
 
 package com.github.rvesse.airline.parser.errors;
 
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class ParseCommandUnrecognizedException extends ParseException
     public ParseCommandUnrecognizedException(List<String> unparsedInput)
     {
         super("Command '%s' not recognized", unparsedInput.get(0));
-        this.unparsedInput = ImmutableList.copyOf(unparsedInput);
+        this.unparsedInput = AirlineUtils.unmodifiableListCopy(unparsedInput);
     }
 
     public List<String> getUnparsedInput()

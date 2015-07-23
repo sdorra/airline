@@ -15,7 +15,7 @@ public class CommandFinder implements Predicate<CommandMetadata> {
 
     @Override
     public boolean evaluate(CommandMetadata command) {
-        return StringUtils.equals(this.name, command.getName());
+        return command != null && StringUtils.equals(this.name, command.getName());
     }
 
 }

@@ -2,12 +2,13 @@ package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.Group;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections4.ListUtils;
 
 public class CommandMetadata {
     private final String name;
@@ -47,9 +48,9 @@ public class CommandMetadata {
         this.name = name;
         this.description = description;
         this.hidden = hidden;
-        this.globalOptions = ImmutableList.copyOf(globalOptions);
-        this.groupOptions = ImmutableList.copyOf(groupOptions);
-        this.commandOptions = ImmutableList.copyOf(commandOptions);
+        this.globalOptions = AirlineUtils.unmodifiableListCopy(globalOptions);
+        this.groupOptions = AirlineUtils.unmodifiableListCopy(groupOptions);
+        this.commandOptions = AirlineUtils.unmodifiableListCopy(commandOptions);
         this.defaultOption = defaultOption;
         this.arguments = arguments;
         
@@ -57,7 +58,7 @@ public class CommandMetadata {
             throw new IllegalArgumentException("Command cannot declare both @Arguments and @DefaultOption");
         }
         
-        this.metadataInjections = ImmutableList.copyOf(metadataInjections);
+        this.metadataInjections = AirlineUtils.unmodifiableListCopy(metadataInjections);
         this.type = type;
 
         this.discussion = discussion;
@@ -66,7 +67,7 @@ public class CommandMetadata {
         this.groupNames = groupNames;
         this.groups = groups;
 
-        this.exitCodes = ImmutableMap.copyOf(exitCodes);
+        this.exitCodes = AirlineUtils.unmodifiableMapCopy(exitCodes);
     }
 
     public String getName() {
@@ -82,8 +83,11 @@ public class CommandMetadata {
     }
 
     public List<OptionMetadata> getAllOptions() {
-        return ImmutableList.<OptionMetadata> builder().addAll(globalOptions).addAll(groupOptions)
-                .addAll(commandOptions).build();
+        List<OptionMetadata> allOptions = new ArrayList<OptionMetadata>();
+        allOptions.addAll(globalOptions);
+        allOptions.addAll(groupOptions);
+        allOptions.addAll(commandOptions);
+        return ListUtils.unmodifiableList(allOptions);
     }
 
     public List<String> getExamples() {
@@ -150,22 +154,5 @@ public class CommandMetadata {
         sb.append(", type=").append(type);
         sb.append('}');
         return sb.toString();
-    }
-
-    public static Function<CommandMetadata, String> nameGetter() {
-        return new Function<CommandMetadata, String>() {
-            public String apply(CommandMetadata input) {
-                return input.getName();
-            }
-        };
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static Function<CommandMetadata, Class> typeGetter() {
-        return new Function<CommandMetadata, Class>() {
-            public Class<?> apply(CommandMetadata input) {
-                return input.getType();
-            }
-        };
     }
 }

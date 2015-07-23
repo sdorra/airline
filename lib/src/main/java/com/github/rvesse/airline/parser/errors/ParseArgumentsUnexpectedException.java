@@ -18,7 +18,7 @@
 
 package com.github.rvesse.airline.parser.errors;
 
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class ParseArgumentsUnexpectedException extends ParseException {
 
     public ParseArgumentsUnexpectedException(List<String> unparsedInput) {
         super("Found unexpected parameters: %s", unparsedInput);
-        this.unparsedInput = ImmutableList.copyOf(unparsedInput);
+        this.unparsedInput = AirlineUtils.unmodifiableListCopy(unparsedInput);
     }
 
     public List<String> getUnparsedInput() {

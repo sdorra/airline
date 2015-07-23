@@ -1,16 +1,15 @@
 package com.github.rvesse.airline.help;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.google.common.collect.Lists.newArrayList;
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Helper for printing out usage information
@@ -35,7 +34,8 @@ public class UsagePrinter {
     }
 
     public UsagePrinter(Writer out, int maxSize, int indent, int hangingIndent, AtomicInteger currentPosition) {
-        Preconditions.checkNotNull(out, "Writer cannot be null");
+        if (out == null)
+            throw new NullPointerException("Writer cannot be null");
         this.out = out;
         this.maxSize = maxSize;
         this.indent = indent;
@@ -58,7 +58,7 @@ public class UsagePrinter {
     }
 
     public UsagePrinter appendTable(Iterable<? extends Iterable<String>> table, int rowSpacing) throws IOException {
-        List<Integer> columnSizes = newArrayList();
+        List<Integer> columnSizes = new ArrayList<>();
         for (Iterable<String> row : table) {
             int column = 0;
             for (String value : row) {
@@ -86,7 +86,7 @@ public class UsagePrinter {
                 column++;
             }
             out.append(spaces(indent)).append(trimEnd(line.toString())).append("\n");
-            
+
             for (int i = 0; i < rowSpacing; i++) {
                 out.append('\n');
             }
@@ -96,7 +96,7 @@ public class UsagePrinter {
     }
 
     public static String trimEnd(final String str) {
-        if (Strings.isNullOrEmpty(str)) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
 
@@ -126,7 +126,7 @@ public class UsagePrinter {
         if (avoidNewlines) {
             return appendWords(Splitter.onPattern("\\s+").trimResults().split(value), avoidNewlines);
         } else {
-            return appendLines(Splitter.on('\n').split(value), avoidNewlines);
+            return appendLines(AirlineUtils.arrayToList(StringUtils.split(value, '\n')), avoidNewlines);
         }
     }
 
@@ -180,11 +180,11 @@ public class UsagePrinter {
         }
         return this;
     }
-    
+
     public void flush() throws IOException {
         this.out.flush();
     }
-    
+
     public void close() throws IOException {
         this.out.close();
     }

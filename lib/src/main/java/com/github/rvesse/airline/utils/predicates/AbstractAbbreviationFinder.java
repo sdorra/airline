@@ -1,10 +1,10 @@
-package com.github.rvesse.airline.parser;
+package com.github.rvesse.airline.utils.predicates;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.base.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public abstract class AbstractAbbreviationFinder<T> implements Predicate<T> {
 
@@ -31,7 +31,7 @@ public abstract class AbstractAbbreviationFinder<T> implements Predicate<T> {
     protected abstract boolean isPartialNameMatch(String value, T item);
 
     @Override
-    public final boolean apply(T item) {
+    public final boolean evaluate(T item) {
         return isExact(item) || isAbbreviation(item);
     }
 

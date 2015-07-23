@@ -7,12 +7,13 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ParseState<T> {
     private final List<Context> locationStack;
@@ -20,13 +21,13 @@ public class ParseState<T> {
     private final ParserMetadata<T> parserConfig;
     private final CommandGroupMetadata group;
     private final CommandMetadata command;
-    private final ListMultimap<OptionMetadata, Object> parsedOptions;
+    private final List<Pair<OptionMetadata, Object>> parsedOptions;
     private final List<Object> parsedArguments;
     private final OptionMetadata currentOption;
     private final List<String> unparsedInput;
 
     ParseState(GlobalMetadata<T> global, ParserMetadata<T> parserConfig, CommandGroupMetadata group,
-            CommandMetadata command, ListMultimap<OptionMetadata, Object> parsedOptions, List<Context> locationStack,
+            CommandMetadata command, List<Pair<OptionMetadata, Object>> parsedOptions, List<Context> locationStack,
             List<Object> parsedArguments, OptionMetadata currentOption, List<String> unparsedInput) {
         this.global = global;
         if (global != null) {
@@ -46,28 +47,28 @@ public class ParseState<T> {
     }
 
     public static <T> ParseState<T> newInstance() {
-        return new ParseState<T>(null, null, null, null, ArrayListMultimap.<OptionMetadata, Object> create(),
-                ImmutableList.<Context> of(), ImmutableList.of(), null, ImmutableList.<String> of());
+        return new ParseState<T>(null, null, null, null, new ArrayList<Pair<OptionMetadata, Object>>(),
+                Collections.<Context>emptyList(), Collections.<Object>emptyList(), null, Collections.<String>emptyList());
     }
 
     public ParseState<T> pushContext(Context location) {
-        ImmutableList<Context> locationStack = ImmutableList.<Context> builder().addAll(this.locationStack)
-                .add(location).build();
+        List<Context> locations = AirlineUtils.listCopy(this.locationStack);
+        locations.add(location);
 
-        return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, parsedArguments,
+        return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locations, parsedArguments,
                 currentOption, unparsedInput);
     }
 
     public ParseState<T> popContext() {
-        ImmutableList<Context> locationStack = ImmutableList.copyOf(this.locationStack.subList(0,
+        List<Context> locationStack = AirlineUtils.unmodifiableListCopy(this.locationStack.subList(0,
                 this.locationStack.size() - 1));
         return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, parsedArguments,
                 currentOption, unparsedInput);
     }
 
     public ParseState<T> withOptionValue(OptionMetadata option, Object value) {
-        ImmutableListMultimap<OptionMetadata, Object> newOptions = ImmutableListMultimap
-                .<OptionMetadata, Object> builder().putAll(parsedOptions).put(option, value).build();
+        List<Pair<OptionMetadata, Object>> newOptions = AirlineUtils.listCopy(parsedOptions);
+        newOptions.add(Pair.of(option, value));
 
         return new ParseState<T>(global, parserConfig, group, command, newOptions, locationStack, parsedArguments,
                 currentOption, unparsedInput);
@@ -99,16 +100,16 @@ public class ParseState<T> {
     }
 
     public ParseState<T> withArgument(Object argument) {
-        ImmutableList<Object> newArguments = ImmutableList.<Object> builder().addAll(parsedArguments).add(argument)
-                .build();
+        List<Object> newArguments = AirlineUtils.listCopy(parsedArguments);
+        newArguments.add(argument);
 
         return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, newArguments,
                 currentOption, unparsedInput);
     }
 
     public ParseState<T> withUnparsedInput(String input) {
-        ImmutableList<String> newUnparsedInput = ImmutableList.<String> builder().addAll(unparsedInput).add(input)
-                .build();
+        List<String> newUnparsedInput = AirlineUtils.listCopy(unparsedInput);
+        newUnparsedInput.add(input);
 
         return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, parsedArguments,
                 currentOption, newUnparsedInput);
@@ -145,7 +146,7 @@ public class ParseState<T> {
         return currentOption;
     }
 
-    public ListMultimap<OptionMetadata, Object> getParsedOptions() {
+    public List<Pair<OptionMetadata, Object>> getParsedOptions() {
         return parsedOptions;
     }
 

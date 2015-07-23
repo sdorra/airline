@@ -1,21 +1,17 @@
 package com.github.rvesse.airline.help;
 
-import static com.google.common.collect.Iterables.transform;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public class AbstractUsageGenerator {
 
@@ -105,7 +101,7 @@ public class AbstractUsageGenerator {
      * @return
      */
     protected String toDefaultCommand(String command) {
-        if (Strings.isNullOrEmpty(command)) {
+        if (StringUtils.isEmpty(command)) {
             return "";
         }
         StringBuilder stringBuilder = new StringBuilder();
@@ -125,15 +121,13 @@ public class AbstractUsageGenerator {
      * @return
      */
     protected List<String> toSynopsisUsage(List<OptionMetadata> options) {
-        return ImmutableList.copyOf(transform(options, new Function<OptionMetadata, String>() {
-            public String apply(OptionMetadata option) {
-                if (option.isHidden() && !includeHidden()) {
-                    return "";
-                }
-
-                return toUsage(option);
-            }
-        }));
+        List<String> synopsisOptions = new ArrayList<String>();
+        for (OptionMetadata option : options) {
+            if (option.isHidden() && !includeHidden)
+                continue;
+            synopsisOptions.add(toUsage(option));
+        }
+        return ListUtils.unmodifiableList(synopsisOptions);
     }
 
     protected String toUsage(ArgumentsMetadata arguments) {
@@ -175,21 +169,20 @@ public class AbstractUsageGenerator {
 
         final String argumentString;
         if (option.getArity() > 0) {
-            argumentString = Joiner.on(" ").join(
-                    transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(String argument) {
-                            return "<" + argument + ">";
-                        }
-                    }));
+            argumentString = String.format("<%s>", option.getTitle());
         } else {
             argumentString = null;
         }
 
-        Joiner.on(" | ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(String option) {
-                return option;
+        boolean first = true;
+        for (String name : options) {
+            if (!first) {
+                stringBuilder.append(" | ");
+            } else {
+                first = false;
             }
-        }));
+            stringBuilder.append(name);
+        }
 
         if (options.size() > 1) {
             stringBuilder.append('}');
@@ -234,24 +227,33 @@ public class AbstractUsageGenerator {
 
         final String argumentString;
         if (option.getArity() > 0) {
-            argumentString = Joiner.on(" ").join(
-                    Lists.transform(ImmutableList.of(option.getTitle()), new Function<String, String>() {
-                        public String apply(String argument) {
-                            return "<" + argument + ">";
-                        }
-                    }));
+            argumentString = String.format("<%s>", option.getTitle());
         } else {
             argumentString = null;
         }
 
-        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-            public String apply(String option) {
-                if (argumentString != null) {
-                    return option + " " + argumentString;
-                }
-                return option;
+        boolean first = true;
+        for (String name : options) {
+            if (!first) {
+                stringBuilder.append(", ");
+            } else {
+                first = false;
             }
-        }));
+            stringBuilder.append(name);
+            if (argumentString != null)
+                stringBuilder.append(' ').append(argumentString);
+        }
+
+        //@formatter:off
+//        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
+//            public String apply(String option) {
+//                if (argumentString != null) {
+//                    return option + " " + argumentString;
+//                }
+//                return option;
+//            }
+//        }));
+        //@formatter:on
 
         return stringBuilder.toString();
     }

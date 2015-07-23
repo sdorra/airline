@@ -6,16 +6,17 @@ import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ListMultimap;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.collect.Iterables.concat;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ParserUtil {
-    
+
     public static <T> T createInstance(Class<T> type) {
         if (type != null) {
             try {
@@ -28,22 +29,26 @@ public class ParserUtil {
     }
 
     public static <T> T createInstance(Class<?> type, Iterable<OptionMetadata> options,
-            ListMultimap<OptionMetadata, Object> parsedOptions, ArgumentsMetadata arguments,
+            List<Pair<OptionMetadata, Object>> parsedOptions, ArgumentsMetadata arguments,
             Iterable<Object> parsedArguments, Iterable<Accessor> metadataInjection, Map<Class<?>, Object> bindings) {
         return createInstance(type, options, parsedOptions, arguments, parsedArguments, metadataInjection, bindings,
                 new DefaultCommandFactory<T>());
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T injectOptions(T commandInstance, Iterable<OptionMetadata> options,
-            ListMultimap<OptionMetadata, Object> parsedOptions, ArgumentsMetadata arguments,
+            List<Pair<OptionMetadata, Object>> parsedOptions, ArgumentsMetadata arguments,
             Iterable<Object> parsedArguments, Iterable<Accessor> metadataInjection, Map<Class<?>, Object> bindings) {
         // inject options
         for (OptionMetadata option : options) {
-            List<?> values = parsedOptions.get(option);
+            List<Object> values = new ArrayList<>();
+            for (Pair<OptionMetadata, Object> parsedOption : parsedOptions) {
+                if (option.equals(parsedOption.getLeft()))
+                    values.add(parsedOption.getRight());
+            }
             if (option.getArity() > 1 && !values.isEmpty()) {
                 // hack: flatten the collection
-                values = ImmutableList.copyOf(concat((Iterable<Iterable<Object>>) values));
+                // TODO What is this doing?
+                //values = AirlineUtils.unmodifiableListCopy(concat((Iterable<Iterable<Object>>) values));
             }
             if (values != null && !values.isEmpty()) {
                 for (Accessor accessor : option.getAccessors()) {
@@ -63,7 +68,7 @@ public class ParserUtil {
             Object injectee = bindings.get(accessor.getJavaType());
 
             if (injectee != null) {
-                accessor.addValues(commandInstance, ImmutableList.of(injectee));
+                accessor.addValues(commandInstance, ListUtils.unmodifiableList(AirlineUtils.singletonList(injectee)));
             }
         }
 
@@ -71,7 +76,7 @@ public class ParserUtil {
     }
 
     public static <T> T createInstance(Class<?> type, Iterable<OptionMetadata> options,
-            ListMultimap<OptionMetadata, Object> parsedOptions, ArgumentsMetadata arguments,
+            List<Pair<OptionMetadata, Object>> parsedOptions, ArgumentsMetadata arguments,
             Iterable<Object> parsedArguments, Iterable<Accessor> metadataInjection, Map<Class<?>, Object> bindings,
             CommandFactory<T> commandFactory) {
         // create the command instance

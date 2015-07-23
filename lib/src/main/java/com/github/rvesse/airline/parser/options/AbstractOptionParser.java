@@ -1,15 +1,16 @@
 package com.github.rvesse.airline.parser.options;
 
-import static com.google.common.collect.Iterables.find;
-
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections4.Predicate;
+
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.parser.AbbreviatedOptionFinder;
 import com.github.rvesse.airline.parser.AbstractParser;
 import com.github.rvesse.airline.parser.ParseState;
-import com.google.common.base.Predicate;
+import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.AbbreviatedOptionFinder;
+import com.github.rvesse.airline.utils.predicates.OptionFinder;
 
 /**
  * Abstract option parser that provides some useful helper methods to derived
@@ -49,20 +50,14 @@ public abstract class AbstractOptionParser<T> extends AbstractParser<T> implemen
      */
     protected final OptionMetadata findOption(ParseState<T> state, List<OptionMetadata> options, final String name,
             OptionMetadata defaultValue) {
-        Predicate<? super OptionMetadata> findOptionPredicate;
+        Predicate<OptionMetadata> findOptionPredicate;
         if (state.getParserConfiguration().allowsAbbreviatedOptions()) {
             findOptionPredicate = new AbbreviatedOptionFinder(name, options);
         } else {
-            findOptionPredicate = new Predicate<OptionMetadata>() {
-
-                @Override
-                public boolean apply(OptionMetadata op) {
-                    return op.getOptions().contains(name);
-                }
-            };
+            findOptionPredicate = new OptionFinder(name);
         }
 
-        return find(options, findOptionPredicate, defaultValue);
+        return AirlineUtils.find(options, findOptionPredicate, defaultValue);
     }
 
     protected boolean hasShortNamePrefix(String name) {

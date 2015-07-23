@@ -9,8 +9,7 @@ import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.parser.options.OptionParser;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Represents metadata about the parser configuration
@@ -33,8 +32,10 @@ public class ParserMetadata<T> {
             TypeConverter typeConverter, boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions,
             List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns, boolean aliasesMayChain,
             String argumentsSeparator) {
-        Preconditions.checkNotNull(optionParsers, "optionParsers cannot be null");
-        Preconditions.checkNotNull(aliases, "aliases cannot be null");
+        if (optionParsers == null)
+            throw new NullPointerException("optionParsers cannot be null");
+        if (aliases == null)
+            throw new NullPointerException("aliases cannot be null");
 
         // Command parsing
         this.commandFactory = commandFactory != null ? commandFactory : new DefaultCommandFactory<T>();
@@ -42,18 +43,18 @@ public class ParserMetadata<T> {
 
         // Option Parsing
         this.typeConverter = typeConverter != null ? typeConverter : new DefaultTypeConverter();
-        this.optionParsers = ImmutableList.copyOf(optionParsers);
+        this.optionParsers = AirlineUtils.unmodifiableListCopy(optionParsers);
         this.allowAbbreviatedOptions = allowAbbreviatedOptions;
 
         // Aliases
-        this.aliases = ImmutableList.copyOf(aliases);
+        this.aliases = AirlineUtils.unmodifiableListCopy(aliases);
         this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
         this.aliasesMayChain = aliasesMayChain;
 
         // Arguments Separator
         if (StringUtils.isNotEmpty(argumentsSeparator)) {
-            Preconditions.checkArgument(StringUtils.containsWhitespace(argumentsSeparator),
-                    "argumentsSeparator cannot contain any whitespace");
+            if (StringUtils.containsWhitespace(argumentsSeparator))
+                throw new IllegalArgumentException("argumentsSeparator cannot contain any whitespace");
         }
         this.argsSeparator = StringUtils.isNotEmpty(argumentsSeparator) ? argumentsSeparator
                 : DEFAULT_ARGUMENTS_SEPARATOR;

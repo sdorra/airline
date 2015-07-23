@@ -11,39 +11,38 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.SuggesterMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.suggester.SuggestionParser;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
-import static com.google.common.collect.Lists.newArrayList;
 
 @Command(name = "suggest")
-public class SuggestCommand<T>
-        implements Runnable, Callable<Void>
-{
-    private static final Map<Context, Class<? extends Suggester>> BUILTIN_SUGGESTERS = ImmutableMap.<Context, Class<? extends Suggester>>builder()
-            .put(Context.GLOBAL, GlobalSuggester.class)
-            .put(Context.GROUP, GroupSuggester.class)
-            .put(Context.COMMAND, CommandSuggester.class)
-            .build();
+public class SuggestCommand<T> implements Runnable, Callable<Void> {
+    private static final Map<Context, Class<? extends Suggester>> BUILTIN_SUGGESTERS = new HashMap<>();
+
+    static {
+        BUILTIN_SUGGESTERS.put(Context.GLOBAL, GlobalSuggester.class);
+        BUILTIN_SUGGESTERS.put(Context.GROUP, GroupSuggester.class);
+        BUILTIN_SUGGESTERS.put(Context.COMMAND, CommandSuggester.class);
+    }
 
     @Inject
     public GlobalMetadata<T> metadata;
 
     @Arguments
-    public List<String> arguments = newArrayList();
+    public List<String> arguments = new ArrayList<>();
 
-    @VisibleForTesting
-    public Iterable<String> generateSuggestions()
-    {
+    public Iterable<String> generateSuggestions() {
         SuggestionParser<T> parser = new SuggestionParser<T>();
         ParseState<T> state = parser.parse(metadata, arguments);
 
@@ -52,8 +51,8 @@ public class SuggestCommand<T>
             SuggesterMetadata suggesterMetadata = MetadataLoader.loadSuggester(suggesterClass);
 
             if (suggesterMetadata != null) {
-                ImmutableMap.Builder<Class<?>, Object> bindings = ImmutableMap.<Class<?>, Object>builder()
-                        .put(GlobalMetadata.class, metadata);
+                Map<Class<?>, Object> bindings = new HashMap<Class<?>, Object>();
+                bindings.put(GlobalMetadata.class, metadata);
 
                 if (state.getGroup() != null) {
                     bindings.put(CommandGroupMetadata.class, state.getGroup());
@@ -64,29 +63,23 @@ public class SuggestCommand<T>
                 }
 
                 Suggester suggester = createInstance(suggesterMetadata.getSuggesterClass(),
-                        ImmutableList.<OptionMetadata>of(),
-                        null,
-                        null,
-                        null,
-                        suggesterMetadata.getMetadataInjections(),
-                        bindings.build());
+                        Collections.<OptionMetadata> emptyList(), null, null, null,
+                        suggesterMetadata.getMetadataInjections(), AirlineUtils.unmodifiableMapCopy(bindings));
 
                 return suggester.suggest();
             }
         }
 
-        return ImmutableList.of();
+        return Collections.emptyList();
     }
 
     @Override
-    public void run()
-    {
-        System.out.println(Joiner.on("\n").join(generateSuggestions()));
+    public void run() {
+        System.out.println(StringUtils.join(generateSuggestions(), '\n'));
     }
 
     @Override
-    public Void call()
-    {
+    public Void call() {
         run();
         return null;
     }

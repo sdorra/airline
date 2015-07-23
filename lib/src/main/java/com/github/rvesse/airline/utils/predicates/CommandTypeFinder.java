@@ -12,13 +12,13 @@ public class CommandTypeFinder implements Predicate<CommandMetadata> {
     }
 
     @Override
-    public boolean evaluate(CommandMetadata arg0) {
-        if (arg0 == null)
+    public boolean evaluate(CommandMetadata command) {
+        if (command == null)
             return false;
         if (this.cls == null) {
-            return arg0.getClass() == null;
+            return command.getClass() == null;
         } else {
-            return this.cls.equals(arg0.getClass());
+            return this.cls.equals(command.getClass());
         }
     }
 }

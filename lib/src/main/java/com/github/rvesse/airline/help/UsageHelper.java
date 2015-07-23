@@ -3,7 +3,6 @@ package com.github.rvesse.airline.help;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.google.common.collect.ComparisonChain;
 
 import java.util.Comparator;
 import java.util.Map.Entry;
@@ -25,10 +24,14 @@ public class UsageHelper {
             String option2 = o2.getOptions().iterator().next();
             option2 = option2.replaceFirst("^-+", "");
 
-            return ComparisonChain.start().compare(option1.toLowerCase(), option2.toLowerCase())
-                    .compare(option2, option1) // print lower case letters
-                                               // before upper case
-                    .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
+            int c = option1.toLowerCase().compareTo(option2.toLowerCase());
+            if (c == 0) {
+                c = option2.compareTo(option1);
+                if (c == 0) {
+                    c = Integer.compare(System.identityHashCode(option1), System.identityHashCode(option2));
+                }
+            }
+            return c;
         }
     };
 
@@ -40,21 +43,29 @@ public class UsageHelper {
      */
     public static final Comparator<CommandMetadata> DEFAULT_COMMAND_COMPARATOR = new Comparator<CommandMetadata>() {
         @Override
-        public int compare(CommandMetadata o1, CommandMetadata o2) {
-            return ComparisonChain.start().compare(o1.getName().toLowerCase(), o2.getName().toLowerCase())
-                    .compare(o2.getName(), o1.getName()) // print lower case
-                                                         // letters before upper
-                                                         // case
-                    .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
+        public int compare(CommandMetadata command1, CommandMetadata command2) {
+            int c = command1.getName().toLowerCase().compareTo(command2.getName().toLowerCase());
+            if (c == 0) {
+                c = command2.getName().compareTo(command1.getName());
+                if (c == 0) {
+                    c = Integer.compare(System.identityHashCode(command1), System.identityHashCode(command2));
+                }
+            }
+            return c;
         }
     };
 
     public static final Comparator<CommandGroupMetadata> DEFAULT_COMMAND_GROUP_COMPARATOR = new Comparator<CommandGroupMetadata>() {
         @Override
-        public int compare(CommandGroupMetadata o1, CommandGroupMetadata o2) {
-            return ComparisonChain.start().compare(o1.getName().toLowerCase(), o2.getName().toLowerCase())
-                    .compare(o2.getName(), o1.getName())
-                    .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
+        public int compare(CommandGroupMetadata group1, CommandGroupMetadata group2) {
+            int c = group1.getName().toLowerCase().compareTo(group2.getName().toLowerCase());
+            if (c == 0) {
+                c = group2.getName().compareTo(group1.getName());
+                if (c == 0) {
+                    c = Integer.compare(System.identityHashCode(group1), System.identityHashCode(group2));
+                }
+            }
+            return c;
         }
     };
 
@@ -68,8 +79,14 @@ public class UsageHelper {
     public static final Comparator<Entry<Integer, String>> DEFAULT_EXIT_CODE_COMPARATOR = new Comparator<Entry<Integer, String>>() {
         @Override
         public int compare(Entry<Integer, String> o1, Entry<Integer, String> o2) {
-            return ComparisonChain.start().compare(o1.getKey(), o2.getKey()).compare(o1.getValue(), o2.getValue())
-                    .compare(System.identityHashCode(o1), System.identityHashCode(o2)).result();
+            int c = Integer.compare(o1.getKey(), o2.getKey());
+            if (c == 0) {
+                c = o1.getValue().compareTo(o2.getValue());
+                if (c == 0) {
+                    c = Integer.compare(System.identityHashCode(o1), System.identityHashCode(o2));
+                }
+            }
+            return c;
         }
     };
 }

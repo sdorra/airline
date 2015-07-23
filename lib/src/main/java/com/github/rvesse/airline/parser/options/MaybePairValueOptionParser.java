@@ -3,13 +3,13 @@ package com.github.rvesse.airline.parser.options;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.PeekingIterator;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * An options parser that expects the name and values to be white space
@@ -47,13 +47,13 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
     }
 
     public MaybePairValueOptionParser(char separator) {
-        Preconditions.checkArgument(!Character.isWhitespace(separator),
-                "Pair separator character cannot be a whitespace character");
+        if (Character.isWhitespace(separator))
+            throw new IllegalArgumentException("Pair separator character cannot be a whitespace character");
         this.separator = separator;
     }
 
     protected final List<String> getValues(String list) {
-        return new ArrayList<String>(Splitter.on(this.separator).limit(2).splitToList(list));
+        return AirlineUtils.arrayToList(StringUtils.split(list, new String(new char[] { this.separator }), 2));
     }
 
     @Override
@@ -108,14 +108,14 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
         }
 
         // Parse the values and assign to option
-        ImmutableList.Builder<Object> values = ImmutableList.builder();
+        List<Object> values = new ArrayList<Object>();
 
         for (String value : pairValues) {
             checkValidValue(option, value);
             values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value));
         }
 
-        state = state.withOptionValue(option, values.build()).popContext();
+        state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();
 
         return state;
     }
