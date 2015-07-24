@@ -9,7 +9,7 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 public class AllowedValuesRestrictionFactory implements OptionRestrictionFactory {
 
     @Override
-    public <T extends Annotation> OptionRestriction createOptionRestriction(T annotation) {
+    public OptionRestriction createOptionRestriction(Annotation annotation) {
         if (annotation instanceof AllowedValues) {
             AllowedValues allowedValues = (AllowedValues) annotation;
             return new com.github.rvesse.airline.restrictions.AllowedValues(allowedValues.ignoreCase(),
@@ -18,5 +18,4 @@ public class AllowedValuesRestrictionFactory implements OptionRestrictionFactory
 
         return null;
     }
-
 }

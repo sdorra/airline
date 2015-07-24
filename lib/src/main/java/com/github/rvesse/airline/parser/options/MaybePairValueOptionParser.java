@@ -111,7 +111,7 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
         List<Object> values = new ArrayList<Object>();
 
         for (String value : pairValues) {
-            checkValidValue(option, value);
+            checkValidValue(state, option, value);
             values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value));
         }
 

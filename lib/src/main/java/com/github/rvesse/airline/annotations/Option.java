@@ -56,11 +56,6 @@ public @interface Option {
     String description() default "";
 
     /**
-     * Whether this option is required.
-     */
-    boolean required() default false;
-
-    /**
      * How many parameter values this option will consume. For example, an arity
      * of 2 will allow "-pair value1 value2".
      */
@@ -93,21 +88,6 @@ public @interface Option {
      * @return True if sealed, false otherwise
      */
     boolean sealed() default false;
-
-    /**
-     * If provided restricts the values for the option to the given set of
-     * values
-     * 
-     * @return Allowed values
-     */
-    String[] allowedValues() default {};
-
-    /**
-     * If true the case on {@link #allowedValues()} is ignored
-     *
-     * @return Ignore case
-     */
-    boolean ignoreCase() default false;
 
     /**
      * Sets the desired completion behaviour

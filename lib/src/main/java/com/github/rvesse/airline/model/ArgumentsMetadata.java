@@ -1,13 +1,17 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
+import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.IsRequiredArgumentFinder;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -17,12 +21,12 @@ public class ArgumentsMetadata {
     private final List<String> titles;
     private final String description, usage, completionCommand;
     private final int completionBehaviour;
-    private final boolean required;
     private final Set<Accessor> accessors;
+    private final List<ArgumentsRestriction> restrictions;
     private final int arity;
 
     public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required, int arity,
-            int completionBehaviour, String completionCommand, Iterable<Field> path) {
+            int completionBehaviour, String completionCommand, Iterable<ArgumentsRestriction> restrictions, Iterable<Field> path) {
         if (titles == null)
             throw new NullPointerException("title cannot be null");
         if (path == null)
@@ -33,10 +37,10 @@ public class ArgumentsMetadata {
         this.titles = ListUtils.unmodifiableList(IteratorUtils.toList(titles.iterator()));
         this.description = description;
         this.usage = usage;
-        this.required = required;
         this.arity = arity <= 0 ? Integer.MIN_VALUE : arity;
         this.completionBehaviour = completionBehaviour;
         this.completionCommand = completionCommand;
+        this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions) : Collections.<ArgumentsRestriction>emptyList();
         this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
     }
 
@@ -51,10 +55,10 @@ public class ArgumentsMetadata {
         this.titles = first.titles;
         this.description = first.description;
         this.usage = first.usage;
-        this.required = first.required;
         this.arity = first.arity;
         this.completionBehaviour = first.completionBehaviour;
         this.completionCommand = first.completionCommand;
+        this.restrictions = first.restrictions;
 
         Set<Accessor> accessors = new HashSet<>();
         for (ArgumentsMetadata other : arguments) {
@@ -80,7 +84,7 @@ public class ArgumentsMetadata {
     }
 
     public boolean isRequired() {
-        return required;
+        return CollectionUtils.exists(this.restrictions, new IsRequiredArgumentFinder());
     }
 
     public int getArity() {
@@ -106,6 +110,10 @@ public class ArgumentsMetadata {
     public Class<?> getJavaType() {
         return accessors.iterator().next().getJavaType();
     }
+    
+    public List<ArgumentsRestriction> getRestrictions() {
+        return this.restrictions;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -118,9 +126,6 @@ public class ArgumentsMetadata {
 
         ArgumentsMetadata that = (ArgumentsMetadata) o;
 
-        if (required != that.required) {
-            return false;
-        }
         if (description != null ? !description.equals(that.description) : that.description != null) {
             return false;
         }
@@ -139,7 +144,6 @@ public class ArgumentsMetadata {
         int result = titles.hashCode();
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (usage != null ? usage.hashCode() : 0);
-        result = 31 * result + (required ? 1 : 0);
         return result;
     }
 
@@ -150,7 +154,6 @@ public class ArgumentsMetadata {
         sb.append("{title='").append(StringUtils.join(titles, ',')).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", usage='").append(usage).append('\'');
-        sb.append(", required=").append(required);
         sb.append(", accessors=").append(accessors);
         sb.append('}');
         return sb.toString();

@@ -2,13 +2,17 @@ package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.predicates.IsRequiredOptionFinder;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 
 public class OptionMetadata {
@@ -16,9 +20,8 @@ public class OptionMetadata {
     private final Set<String> options;
     private final String title, description, completionCommand;
     private final int arity, completionBehaviour;
-    private final boolean required, hidden, overrides, sealed;
-    private final Set<String> allowedValues;
-    private final boolean ignoreCase;
+    private final boolean hidden, overrides, sealed;
+    private final List<OptionRestriction> restrictions;
     private Set<Accessor> accessors;
 
     //@formatter:off
@@ -27,14 +30,12 @@ public class OptionMetadata {
                           String title, 
                           String description, 
                           int arity,
-                          boolean required, 
                           boolean hidden, 
                           boolean overrides, 
                           boolean sealed,
-                          Iterable<String> allowedValues,
-                          boolean ignoreCase,
                           int completionBehaviours,
                           String completionCommand,
+                          Iterable<OptionRestriction> restrictions,
                           Iterable<Field> path) {
     //@formatter:on
         if (optionType == null)
@@ -51,19 +52,12 @@ public class OptionMetadata {
         this.title = title;
         this.description = description;
         this.arity = arity;
-        this.required = required;
         this.hidden = hidden;
         this.overrides = overrides;
         this.sealed = sealed;
         this.completionBehaviour = completionBehaviours;
         this.completionCommand = completionCommand;
-        this.ignoreCase = ignoreCase;
-
-        if (allowedValues != null) {
-            this.allowedValues = AirlineUtils.unmodifiableSetCopy(allowedValues);
-        } else {
-            this.allowedValues = null;
-        }
+        this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions) : Collections.<OptionRestriction>emptyList();
 
         if (path != null) {
             this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
@@ -83,17 +77,12 @@ public class OptionMetadata {
         this.title = option.title;
         this.description = option.description;
         this.arity = option.arity;
-        this.required = option.required;
         this.hidden = option.hidden;
         this.overrides = option.overrides;
         this.sealed = option.sealed;
-        if (option.allowedValues != null) {
-            this.allowedValues = AirlineUtils.unmodifiableSetCopy(option.allowedValues);
-        } else {
-            this.allowedValues = null;
-        }
         this.completionBehaviour = option.completionBehaviour;
         this.completionCommand = option.completionCommand;
+        this.restrictions = option.restrictions;
 
         Set<Accessor> accessors = new LinkedHashSet<Accessor>();
         for (OptionMetadata other : options) {
@@ -104,7 +93,6 @@ public class OptionMetadata {
             accessors.addAll(other.getAccessors());
         }
         this.accessors = SetUtils.unmodifiableSet(accessors);
-        this.ignoreCase = option.ignoreCase;
     }
 
     public OptionType getOptionType() {
@@ -128,7 +116,7 @@ public class OptionMetadata {
     }
 
     public boolean isRequired() {
-        return required;
+        return CollectionUtils.exists(this.restrictions, new IsRequiredOptionFinder());
     }
 
     public boolean isHidden() {
@@ -165,13 +153,9 @@ public class OptionMetadata {
         }
         return accessors;
     }
-
-    public Set<String> getAllowedValues() {
-        return allowedValues;
-    }
-
-    public boolean isIgnoreCase() {
-        return ignoreCase;
+    
+    public List<OptionRestriction> getRestrictions() {
+        return this.restrictions;
     }
 
     @Override
@@ -191,16 +175,10 @@ public class OptionMetadata {
         if (hidden != that.hidden) {
             return false;
         }
-        if (required != that.required) {
-            return false;
-        }
         if (overrides != that.overrides) {
             return false;
         }
         if (sealed != that.sealed) {
-            return false;
-        }
-        if (allowedValues != null ? !allowedValues.equals(that.allowedValues) : that.allowedValues != null) {
             return false;
         }
         if (description != null ? !description.equals(that.description) : that.description != null) {
@@ -226,11 +204,9 @@ public class OptionMetadata {
         result = 31 * result + title.hashCode();
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + arity;
-        result = 31 * result + (required ? 1 : 0);
         result = 31 * result + (hidden ? 1 : 0);
         result = 31 * result + (overrides ? 1 : 0);
         result = 31 * result + (sealed ? 1 : 0);
-        result = 31 * result + (allowedValues != null ? allowedValues.hashCode() : 0);
         return result;
     }
 
@@ -243,23 +219,9 @@ public class OptionMetadata {
         sb.append(", title='").append(title).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", arity=").append(arity);
-        sb.append(", required=").append(required);
         sb.append(", hidden=").append(hidden);
         sb.append(", override=").append(overrides);
         sb.append(", sealed=").append(sealed);
-        sb.append(", allowedValues=");
-        if (allowedValues != null) {
-            sb.append("{");
-            Iterator<String> iter = allowedValues.iterator();
-            while (iter.hasNext()) {
-                sb.append("'").append(iter.next()).append("'");
-                if (iter.hasNext())
-                    sb.append(", ");
-            }
-            sb.append("}");
-        } else {
-            sb.append("{}");
-        }
         sb.append(", accessors=").append(accessors);
         sb.append('}');
         return sb.toString();
@@ -343,14 +305,12 @@ public class OptionMetadata {
                                     child.title != null ? child.title : parent.title,
                                     child.description != null ? child.description : parent.description, 
                                     child.arity, 
-                                    child.required,
                                     child.hidden, 
                                     child.overrides,
                                     child.sealed,
-                                    child.allowedValues != null ? child.allowedValues : parent.allowedValues,
-                child.ignoreCase,
                                     child.completionBehaviour,
                                     child.completionCommand,
+                                    child.restrictions,
                                     null);
         //@formatter:on
 

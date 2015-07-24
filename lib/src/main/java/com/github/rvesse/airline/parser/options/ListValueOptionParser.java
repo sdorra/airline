@@ -106,7 +106,7 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
             // Parse individual values and assign to option
             if (option.getArity() == 1) {
                 // Arity 1 option
-                checkValidValue(option, listValues.get(0));
+                checkValidValue(state, option, listValues.get(0));
                 Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
                         listValues.get(0));
                 state = state.withOptionValue(option, value).popContext();
@@ -115,7 +115,7 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
                 List<Object> values = new ArrayList<Object>();
 
                 for (String value : listValues) {
-                    checkValidValue(option, value);
+                    checkValidValue(state, option, value);
                     values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value));
                 }
 

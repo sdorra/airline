@@ -49,7 +49,7 @@ public abstract class AbstractKeyValueOptionParser<T> extends AbstractOptionPars
 
         // update state
         state = state.pushContext(Context.OPTION).withOption(option);
-        checkValidValue(option, parts.get(1));
+        checkValidValue(state, option, parts.get(1));
         Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), parts.get(1));
         state = state.withOption(option).withOptionValue(option, value).popContext();
 

@@ -6,5 +6,6 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 
 public interface OptionRestrictionFactory {
 
-    public <T extends Annotation> OptionRestriction createOptionRestriction(T annotation);
+    public OptionRestriction createOptionRestriction(Annotation annotation);
+    
 }

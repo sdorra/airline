@@ -9,6 +9,9 @@ import com.github.rvesse.airline.annotations.Groups;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.help.Suggester;
+import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.CommandTypeFinder;
 import com.github.rvesse.airline.utils.predicates.GroupFinder;
@@ -282,15 +285,17 @@ public class MetadataLoader {
                         }
                     }
 
-                    boolean required = optionAnnotation.required();
                     boolean hidden = optionAnnotation.hidden();
                     boolean override = optionAnnotation.override();
                     boolean sealed = optionAnnotation.sealed();
-                    List<String> allowedValues = AirlineUtils.arrayToList(optionAnnotation.allowedValues());
-                    if (allowedValues.isEmpty()) {
-                        allowedValues = null;
+
+                    // Find and create restrictions
+                    List<OptionRestriction> restrictions = new ArrayList<OptionRestriction>();
+                    for (Annotation annotation : field.getAnnotations()) {
+                        OptionRestriction restriction = RestrictionRegistry.getOptionRestriction(annotation);
+                        if (restriction != null)
+                            restrictions.add(restriction);
                     }
-                    boolean ignoreCase = optionAnnotation.ignoreCase();
 
                     //@formatter:off
                     OptionMetadata optionMetadata = new OptionMetadata(optionType, 
@@ -298,14 +303,12 @@ public class MetadataLoader {
                                                                        name, 
                                                                        description, 
                                                                        arity,
-                                                                       required, 
                                                                        hidden, 
                                                                        override, 
                                                                        sealed, 
-                                                                       allowedValues,
-                                                                       ignoreCase,
                                                                        optionAnnotation.completionBehaviour(),
                                                                        optionAnnotation.completionCommand(),
+                                                                       restrictions,
                                                                        path);
                     //@formatter:on
                     switch (optionType) {
@@ -381,6 +384,13 @@ public class MetadataLoader {
                     boolean required = argumentsAnnotation.required();
                     int arity = argumentsAnnotation.arity() <= 0 ? Integer.MIN_VALUE : argumentsAnnotation.arity();
 
+                    List<ArgumentsRestriction> restrictions = new ArrayList<>();
+                    for (Annotation annotation : field.getAnnotations()) {
+                        ArgumentsRestriction restriction = RestrictionRegistry.getArgumentsRestriction(annotation);
+                        if (restriction != null)
+                            restrictions.add(restriction);
+                    }
+
                     //@formatter:off
                     injectionMetadata.arguments.add(new ArgumentsMetadata(titles, 
                                                                           description, 
@@ -389,6 +399,7 @@ public class MetadataLoader {
                                                                           arity,
                                                                           argumentsAnnotation.completionBehaviour(), 
                                                                           argumentsAnnotation.completionCommand(),
+                                                                          restrictions,
                                                                           path));
                     //@formatter:on
                 }

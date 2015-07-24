@@ -34,7 +34,7 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
         } else if (option.getArity() == 1) {
             if (tokens.hasNext()) {
                 String tokenStr = tokens.next();
-                checkValidValue(option, tokenStr);
+                checkValidValue(state, option, tokenStr);
                 value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
                 state = state.withOptionValue(option, value).popContext();
             }
@@ -54,7 +54,7 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
                 if (hasSeparator || foundNextOption)
                     break;
                 String tokenStr = tokens.next();
-                checkValidValue(option, tokenStr);
+                checkValidValue(state, option, tokenStr);
                 values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr));
                 ++count;
             }

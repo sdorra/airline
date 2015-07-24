@@ -64,13 +64,13 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
                 // if current token has more characters, this is the value;
                 // otherwise it is the next token
                 if (!remainingToken.isEmpty()) {
-                    checkValidValue(option, remainingToken);
+                    checkValidValue(state, option, remainingToken);
                     Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
                             remainingToken);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 } else if (tokens.hasNext()) {
                     String tokenStr = tokens.next();
-                    checkValidValue(option, tokenStr);
+                    checkValidValue(state, option, tokenStr);
                     Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 }

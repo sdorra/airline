@@ -23,12 +23,12 @@ import java.util.Set;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
- * Exception thrown when the value for an option is not in the list of allowed
- * values
+ * Exception thrown when the value for an option is not in a specific set of
+ * allowed values
  */
 public class ParseOptionIllegalValueException extends ParseException {
     private static final long serialVersionUID = 810812151673279427L;
-    
+
     private final String optionTitle, illegalValue;
     private final Set<String> allowedValues;
 
