@@ -21,8 +21,8 @@ package com.github.rvesse.airline.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 @Command(name = "commits", description = "Record changes to the repository")
 public class CommandCommits extends CommandCommit

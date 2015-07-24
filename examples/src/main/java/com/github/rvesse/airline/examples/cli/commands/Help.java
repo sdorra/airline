@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import com.github.rvesse.airline.Arguments;
-import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.CompletionBehaviour;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 import com.github.rvesse.airline.model.GlobalMetadata;
 

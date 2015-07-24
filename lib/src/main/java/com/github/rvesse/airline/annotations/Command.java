@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

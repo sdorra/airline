@@ -1,4 +1,4 @@
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.annotations;
 
 public enum OptionType
 {

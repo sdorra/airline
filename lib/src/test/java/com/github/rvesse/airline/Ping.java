@@ -2,10 +2,10 @@ package com.github.rvesse.airline;
 
 import javax.inject.Inject;
 
-import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.HelpOption;
-import com.github.rvesse.airline.Option;
 import com.github.rvesse.airline.SingleCommand;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 @Command(name = "ping", description = "network test utility")
 public class Ping

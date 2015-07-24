@@ -1,7 +1,7 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
-import com.github.rvesse.airline.OptionType;
+import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.lang.reflect.Field;

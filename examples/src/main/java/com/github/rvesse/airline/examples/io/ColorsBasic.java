@@ -1,6 +1,6 @@
 package com.github.rvesse.airline.examples.io;
 
-import com.github.rvesse.airline.Command;
+import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.examples.ExampleExecutor;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 import com.github.rvesse.airline.io.colors.BasicColor;

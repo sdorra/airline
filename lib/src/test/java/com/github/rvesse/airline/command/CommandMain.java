@@ -18,9 +18,9 @@
 
 package com.github.rvesse.airline.command;
 
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Option;
 
-import static com.github.rvesse.airline.OptionType.GLOBAL;
+import static com.github.rvesse.airline.annotations.OptionType.GLOBAL;
 
 public class CommandMain
 {

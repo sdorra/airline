@@ -16,19 +16,13 @@ import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
 public class IsRequired extends AbstractRestriction {
 
     @Override
-    public <T> void validate(ParseState<T> state, OptionMetadata option) {
-        if (!option.isRequired())
-            return;
-
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
         if (CollectionUtils.find(state.getParsedOptions(), new ParsedOptionFinder(option)) == null)
             throw new ParseOptionMissingException(AirlineUtils.first(option.getOptions()));
     }
 
     @Override
-    public <T> void validate(ParseState<T> state, ArgumentsMetadata arguments) {
-        if (!arguments.isRequired())
-            return;
-
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
         if (state.getParsedArguments().isEmpty())
             throw new ParseArgumentsMissingException(arguments.getTitle());
     }

@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.annotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import com.github.rvesse.airline.CompletionBehaviour;
 
 import static java.lang.annotation.ElementType.FIELD;
 

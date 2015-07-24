@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 import com.github.rvesse.airline.help.cli.bash.BashCompletionGenerator;
 import com.github.rvesse.airline.model.GlobalMetadata;

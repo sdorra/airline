@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.annotations;
 
+import com.github.rvesse.airline.CompletionBehaviour;
 import com.github.rvesse.airline.model.OptionMetadata;
 
 import java.lang.annotation.Retention;

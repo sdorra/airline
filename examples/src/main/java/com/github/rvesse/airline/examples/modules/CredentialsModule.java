@@ -1,6 +1,6 @@
 package com.github.rvesse.airline.examples.modules;
 
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Option;
 
 public class CredentialsModule {
 

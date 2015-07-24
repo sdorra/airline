@@ -1,4 +1,4 @@
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.annotations;
 
 import static java.lang.annotation.ElementType.FIELD;
 

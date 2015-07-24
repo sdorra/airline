@@ -1,4 +1,4 @@
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;

@@ -5,6 +5,7 @@ import com.github.rvesse.airline.parser.ParseState;
 
 public interface ArgumentsRestriction {
 
+    public abstract <T> void preValidate(ParseState<T> state, ArgumentsMetadata arguments, String value);
     
-    public abstract <T> void validate(ParseState<T> state, ArgumentsMetadata arguments);
+    public abstract <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments);
 }

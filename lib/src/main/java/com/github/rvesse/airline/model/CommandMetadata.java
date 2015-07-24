@@ -1,7 +1,7 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
-import com.github.rvesse.airline.Group;
+import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.ArrayList;

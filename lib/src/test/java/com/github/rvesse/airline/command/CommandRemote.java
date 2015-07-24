@@ -19,7 +19,7 @@ package com.github.rvesse.airline.command;
 
 import javax.inject.Inject;
 
-import com.github.rvesse.airline.Command;
+import com.github.rvesse.airline.annotations.Command;
 
 @Command(name = "remote",
          description = "A command whose name is similar to other command names")

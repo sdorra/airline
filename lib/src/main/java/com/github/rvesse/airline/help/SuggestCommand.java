@@ -1,8 +1,8 @@
 package com.github.rvesse.airline.help;
 
-import com.github.rvesse.airline.Arguments;
-import com.github.rvesse.airline.Command;
 import com.github.rvesse.airline.Context;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;

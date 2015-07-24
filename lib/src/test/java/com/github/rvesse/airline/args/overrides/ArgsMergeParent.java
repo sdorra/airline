@@ -1,6 +1,6 @@
 package com.github.rvesse.airline.args.overrides;
 
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Option;
 
 public abstract class ArgsMergeParent {
 

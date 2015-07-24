@@ -18,8 +18,8 @@
 
 package com.github.rvesse.airline.args;
 
-import com.github.rvesse.airline.Arguments;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Option;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,7 +12,7 @@ public abstract class AbstractRestriction implements GlobalRestriction, OptionRe
     }
 
     @Override
-    public <T> void validate(ParseState<T> state, OptionMetadata option) {
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
         // Does no validation
     }
     
@@ -22,8 +22,12 @@ public abstract class AbstractRestriction implements GlobalRestriction, OptionRe
     }
 
     @Override
-    public <T> void validate(ParseState<T> state, ArgumentsMetadata arguments) {
+    public <T> void preValidate(ParseState<T> state, ArgumentsMetadata arguments, String value) {
         // Does no validation
     }
 
+    @Override
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
+        // Does no validation
+    }
 }

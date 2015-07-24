@@ -3,6 +3,12 @@ package com.github.rvesse.airline.command;
 import java.util.List;
 
 import com.github.rvesse.airline.*;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.annotations.Groups;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.OptionType;
 
 @Groups({
         @Group(name = "groupInsideOfGroups", description = "my nested group", defaultCommand = CommandWithGroupsAnnotation.class,commands = {CommandAdd.class})

@@ -1,7 +1,7 @@
 package com.github.rvesse.airline.args.overrides;
 
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 @Command(name = "ArgsMergeOverride")
 public class ArgsMergeOverride extends ArgsMergeAddition {

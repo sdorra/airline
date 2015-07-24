@@ -3,8 +3,8 @@ package com.github.rvesse.airline.examples.io;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.examples.ExampleExecutor;
 import com.github.rvesse.airline.io.colors.TrueColor;
 import com.github.rvesse.airline.io.output.AnsiTrueColorizedOutputStream;

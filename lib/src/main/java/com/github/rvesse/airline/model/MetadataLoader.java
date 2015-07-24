@@ -1,6 +1,13 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.*;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.DefaultOption;
+import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.annotations.Groups;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.help.Suggester;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.CommandTypeFinder;
@@ -11,6 +18,7 @@ import javax.inject.Inject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;

@@ -20,9 +20,9 @@ package com.github.rvesse.airline.command;
 
 import javax.inject.Inject;
 
-import com.github.rvesse.airline.Arguments;
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 import java.util.List;
 

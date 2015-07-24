@@ -20,8 +20,8 @@ package com.github.rvesse.airline.args;
 
 import java.util.List;
 
-import com.github.rvesse.airline.Arguments;
-import com.github.rvesse.airline.Command;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
 
 /**
  * Test restricted argument arity.

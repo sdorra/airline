@@ -18,7 +18,7 @@
 
 package com.github.rvesse.airline.args;
 
-import com.github.rvesse.airline.Command;
+import com.github.rvesse.airline.annotations.Command;
 
 @Command(name="ArgsMultiParagraphDiscussion", discussion= { "First paragraph", "Middle paragraph", "Final paragraph" })
 public class ArgsMultiParagraphDiscussion {

@@ -2,10 +2,10 @@ package com.github.rvesse.airline.command;
 
 import java.util.List;
 
-import com.github.rvesse.airline.Arguments;
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Group;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.annotations.Option;
 
 @Group(name = "singleGroup", description = "a single group", defaultCommand = CommandWithGroupAnnotation.class,commands = {CommandAdd.class})
 @Command(name = "commandWithGroup", description = "A command with a group annotation")

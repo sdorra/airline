@@ -1,9 +1,9 @@
 package com.github.rvesse.airline;
 
-import com.github.rvesse.airline.Arguments;
 import com.github.rvesse.airline.Cli;
-import com.github.rvesse.airline.Command;
-import com.github.rvesse.airline.Option;
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.rvesse.airline.OptionType.GLOBAL;
+import static com.github.rvesse.airline.annotations.OptionType.GLOBAL;
 import static com.github.rvesse.airline.utils.AirlineTestUtils.toStringHelper;
 
 public class TestGalaxyCommandLineParser
