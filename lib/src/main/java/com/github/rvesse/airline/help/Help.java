@@ -15,10 +15,10 @@ import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.utils.predicates.AbbreviatedCommandFinder;
-import com.github.rvesse.airline.utils.predicates.AbbreviatedGroupFinder;
-import com.github.rvesse.airline.utils.predicates.CommandFinder;
-import com.github.rvesse.airline.utils.predicates.GroupFinder;
+import com.github.rvesse.airline.utils.predicates.parser.AbbreviatedCommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.AbbreviatedGroupFinder;
+import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
 
 import java.io.IOException;
 import java.io.OutputStream;

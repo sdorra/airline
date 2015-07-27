@@ -23,10 +23,12 @@ import java.util.List;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 
 @Command(name = "ArgsRequired")
 public class ArgsRequired
 {
-    @Arguments(description = "List of files", required = true)
+    @Arguments(description = "List of files")
+    @Required
     public List<String> parameters = new ArrayList<>();
 }

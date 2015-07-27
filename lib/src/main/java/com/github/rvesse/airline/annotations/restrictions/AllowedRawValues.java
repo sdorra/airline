@@ -23,12 +23,13 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.FIELD;
 
 /**
- * Annotation that marks that the option/arguments are restricted to a given set of values
+ * Annotation that marks that the option/arguments are restricted to a given set
+ * of raw string values
  *
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
-public @interface AllowedValues {
+public @interface AllowedRawValues {
 
     /**
      * If provided restricts the values for the option to the given set of
@@ -44,9 +45,10 @@ public @interface AllowedValues {
      * @return Ignore case
      */
     boolean ignoreCase() default false;
-    
+
     /**
-     * The locale used for comparisons if ignoring case
+     * The locale used for comparisons
+     * 
      * @return Locale BCP47 tag
      */
     String locale() default "en";

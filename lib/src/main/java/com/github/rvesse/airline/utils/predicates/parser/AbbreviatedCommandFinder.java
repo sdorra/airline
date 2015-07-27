@@ -1,8 +1,9 @@
-package com.github.rvesse.airline.utils.predicates;
+package com.github.rvesse.airline.utils.predicates.parser;
 
 import java.util.Collection;
 
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.utils.predicates.AbstractAbbreviationFinder;
 
 public final class AbbreviatedCommandFinder extends AbstractAbbreviationFinder<CommandMetadata> {
 

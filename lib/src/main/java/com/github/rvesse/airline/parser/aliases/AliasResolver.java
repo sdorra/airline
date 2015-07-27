@@ -16,9 +16,9 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.AbstractParser;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
-import com.github.rvesse.airline.utils.predicates.AliasFinder;
-import com.github.rvesse.airline.utils.predicates.CommandFinder;
-import com.github.rvesse.airline.utils.predicates.GroupFinder;
+import com.github.rvesse.airline.utils.predicates.parser.AliasFinder;
+import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
 
 /**
  * Resolves aliases

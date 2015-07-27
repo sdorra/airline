@@ -20,10 +20,12 @@ package com.github.rvesse.airline.args;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
 
 @Command(name="ArgsAllowedValues", description="ArgsAllowedValues description")
 public class ArgsAllowedValues {
 
-    @Option(name = "-mode", arity = 1, description = "A string from a restricted set of values", allowedValues = { "a", "b", "c" })
+    @Option(name = "-mode", arity = 1, description = "A string from a restricted set of values")
+    @AllowedRawValues(allowedValues = { "a", "b", "c" })
     public String mode;
 }

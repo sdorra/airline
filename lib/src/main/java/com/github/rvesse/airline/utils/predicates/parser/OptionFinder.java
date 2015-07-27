@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.utils.predicates;
+package com.github.rvesse.airline.utils.predicates.parser;
 
 import org.apache.commons.collections4.Predicate;
 

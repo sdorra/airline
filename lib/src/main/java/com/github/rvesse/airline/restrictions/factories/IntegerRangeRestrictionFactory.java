@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 import com.github.rvesse.airline.annotations.restrictions.IntegerRange;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.restrictions.Range;
+import com.github.rvesse.airline.restrictions.RangeRestriction;
 
 public class IntegerRangeRestrictionFactory implements OptionRestrictionFactory {
     
@@ -16,7 +16,7 @@ public class IntegerRangeRestrictionFactory implements OptionRestrictionFactory 
         if (annotation instanceof IntegerRange) {
             IntegerRange range = (IntegerRange) annotation;
             
-            return new Range(Integer.valueOf(range.min()), range.minInclusive(), Integer.valueOf(range.max()), range.maxInclusive(), COMPARATOR);
+            return new RangeRestriction(Integer.valueOf(range.min()), range.minInclusive(), Integer.valueOf(range.max()), range.maxInclusive(), COMPARATOR);
         }
         return null;
     }

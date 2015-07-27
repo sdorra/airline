@@ -57,7 +57,7 @@ import com.github.rvesse.airline.help.ronn.RonnGlobalUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.testng.Assert;

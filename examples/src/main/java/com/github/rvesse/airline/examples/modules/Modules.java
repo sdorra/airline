@@ -21,7 +21,7 @@ import com.github.rvesse.airline.examples.ExampleRunnable;
 public class Modules implements ExampleRunnable {
 
     @Inject
-    private HelpOption help;
+    private HelpOption<ExampleRunnable> help;
 
     /**
      * A field marked with {@link Inject} will also be scanned for options

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.examples.ExampleExecutor;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 
@@ -17,7 +18,8 @@ import com.github.rvesse.airline.examples.ExampleRunnable;
 @Command(name = "req-args", description = "A command with required arguments")
 public class RequiredArguments implements ExampleRunnable {
 
-    @Arguments(required = true)
+    @Arguments
+    @Required
     private List<String> args = new ArrayList<String>();
 
     public static void main(String[] args) {

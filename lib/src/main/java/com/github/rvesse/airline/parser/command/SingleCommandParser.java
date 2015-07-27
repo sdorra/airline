@@ -5,8 +5,6 @@ import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -18,10 +16,9 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
 import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
 
 public class SingleCommandParser<T> extends AbstractCommandParser<T> {
 
@@ -81,9 +78,8 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
         }
 
         for (OptionMetadata option : command.getAllOptions()) {
-            if (option.isRequired()
-                    && CollectionUtils.find(state.getParsedOptions(), new ParsedOptionFinder(option)) == null) {
-                throw new ParseOptionMissingException(option.getOptions().iterator().next());
+            for (OptionRestriction restriction : option.getRestrictions()) {
+                restriction.postValidate(state, option);
             }
         }
     }

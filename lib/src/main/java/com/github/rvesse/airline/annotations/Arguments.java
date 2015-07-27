@@ -44,11 +44,6 @@ public @interface Arguments {
     String usage() default "";
 
     /**
-     * Whether these arguments are required.
-     */
-    boolean required() default false;
-
-    /**
      * The arity of the arguments, a value of less than or equal to zero is
      * treated as unlimited
      */

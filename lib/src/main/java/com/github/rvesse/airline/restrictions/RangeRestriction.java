@@ -9,20 +9,21 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
-import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
+import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 /**
  * A restriction that requires the value (after type conversion) to be within a
  * given range
  *
  */
-public class Range extends AbstractRestriction {
+public class RangeRestriction extends AbstractRestriction {
 
     private final Object min, max;
     private final boolean minInclusive, maxInclusive;
     private final Comparator<Object> comparator;
 
-    public Range(Object min, boolean minInclusive, Object max, boolean maxInclusive, Comparator<Object> comparator) {
+    public RangeRestriction(Object min, boolean minInclusive, Object max, boolean maxInclusive,
+            Comparator<Object> comparator) {
         if (comparator == null)
             throw new NullPointerException("comparator cannot be null");
         this.min = min;
@@ -44,6 +45,10 @@ public class Range extends AbstractRestriction {
 
     @Override
     public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+        // Not enforced if no range provided
+        if (this.min == null && this.max == null)
+            return;
+
         Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
                 new ParsedOptionFinder(option));
 

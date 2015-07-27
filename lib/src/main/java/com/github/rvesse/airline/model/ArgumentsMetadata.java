@@ -3,7 +3,7 @@ package com.github.rvesse.airline.model;
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.IsRequiredArgumentFinder;
+import com.github.rvesse.airline.utils.predicates.restrictions.IsRequiredArgumentFinder;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -25,7 +25,7 @@ public class ArgumentsMetadata {
     private final List<ArgumentsRestriction> restrictions;
     private final int arity;
 
-    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, boolean required, int arity,
+    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, int arity,
             int completionBehaviour, String completionCommand, Iterable<ArgumentsRestriction> restrictions, Iterable<Field> path) {
         if (titles == null)
             throw new NullPointerException("title cannot be null");

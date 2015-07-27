@@ -16,6 +16,7 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
 
 /**
  * <p>
@@ -218,8 +219,9 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
             writer.append(option.getDescription());
 
             // allowedValues
-            if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(writer, option);
+            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
+            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                outputAllowedValues(writer, option, allowedValues);
             }
         }
     }
@@ -232,19 +234,24 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      *            Writer
      * @param option
      *            Option
+     * @param allowedValues Allowed values restriction
      * @throws IOException
      */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option) throws IOException {
+    protected void outputAllowedValues(Writer writer, OptionMetadata option, AllowedRawValuesRestriction allowedValues) throws IOException {
         writer.append(NEW_PARA).append("  This options value");
         if (option.getArity() == 1) {
             writer.append(" is ");
         } else {
             writer.append("s are ");
         }
-        writer.append("restricted to the following value(s): [");
+        writer.append("restricted to the following");
+        if (allowedValues.ignoresCase()) {
+            writer.append(" case insensitive");
+        }
+        writer.append(" value(s): [");
 
         boolean first = true;
-        for (String value : option.getAllowedValues()) {
+        for (String value : allowedValues.getAllowedValues()) {
             if (first) {
                 first = false;
             } else {

@@ -17,6 +17,7 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
 
 /**
  * A usage generator that generates HTML documentation
@@ -257,8 +258,9 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("</div>\n");
 
             // Allowed values
-            if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(writer, option);
+            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
+            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                outputAllowedValues(writer, option, allowedValues);
             }
         }
 
@@ -309,9 +311,12 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param option
      *            Option meta-data
+     * @param allowedValues
+     *            Allowed values restriction
      * @throws IOException
      */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option) throws IOException {
+    protected void outputAllowedValues(Writer writer, OptionMetadata option, AllowedRawValuesRestriction allowedValues)
+            throws IOException {
         writer.append("<div class=\"row\">\n");
         writer.append("<div class=\"span8 offset3\">\n");
         writer.append("This options value");
@@ -320,10 +325,14 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         } else {
             writer.append("s are ");
         }
-        writer.append("restricted to the following value(s):\n");
+        writer.append("restricted to the following");
+        if (allowedValues.ignoresCase()) {
+            writer.append(" case insensitive");
+        }
+        writer.append(" value(s):\n");
 
         writer.append("<ul>");
-        for (String value : option.getAllowedValues()) {
+        for (String value : allowedValues.getAllowedValues()) {
             writer.append("<li>").append(value).append("</li>\n");
         }
         writer.append("</ul>");

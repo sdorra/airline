@@ -16,6 +16,7 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
@@ -205,8 +206,9 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
             descriptionPrinter.append(option.getDescription()).newline();
 
             // allowedValues
-            if (option.getAllowedValues() != null && option.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(descriptionPrinter, option);
+            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
+            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
+                outputAllowedValues(descriptionPrinter, option, allowedValues);
             }
 
             descriptionPrinter.newline();
@@ -244,9 +246,12 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Description printer
      * @param option
      *            Option meta-data
+     * @param allowedValues
+     *            Allowed values restriction
      * @throws IOException
      */
-    protected void outputAllowedValues(UsagePrinter descriptionPrinter, OptionMetadata option) throws IOException {
+    protected void outputAllowedValues(UsagePrinter descriptionPrinter, OptionMetadata option,
+            AllowedRawValuesRestriction allowedValues) throws IOException {
         descriptionPrinter.newline();
         descriptionPrinter.append("This options value");
         if (option.getArity() == 1) {
@@ -254,10 +259,14 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         } else {
             descriptionPrinter.append("s are ");
         }
-        descriptionPrinter.append("restricted to the following value(s):").newline();
+        descriptionPrinter.append("restricted to the following");
+        if (allowedValues.ignoresCase()) {
+            descriptionPrinter.append(" case insensitive");
+        }
+        descriptionPrinter.append(" value(s):").newline();
 
         UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
-        for (String value : option.getAllowedValues()) {
+        for (String value : allowedValues.getAllowedValues()) {
             allowedValuesPrinter.append(value).newline();
         }
         allowedValuesPrinter.flush();

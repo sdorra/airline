@@ -4,7 +4,7 @@ import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.IsRequiredOptionFinder;
+import com.github.rvesse.airline.utils.predicates.restrictions.IsRequiredOptionFinder;
 
 import java.lang.reflect.Field;
 import java.util.Collections;

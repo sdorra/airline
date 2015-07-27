@@ -8,12 +8,12 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
+import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 /**
  * A restriction that options/arguments are required
  */
-public class IsRequired extends AbstractRestriction {
+public class IsRequiredRestriction extends AbstractRestriction {
 
     @Override
     public <T> void postValidate(ParseState<T> state, OptionMetadata option) {

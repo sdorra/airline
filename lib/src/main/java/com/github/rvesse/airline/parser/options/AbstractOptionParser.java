@@ -9,8 +9,8 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.AbstractParser;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.AbbreviatedOptionFinder;
-import com.github.rvesse.airline.utils.predicates.OptionFinder;
+import com.github.rvesse.airline.utils.predicates.parser.AbbreviatedOptionFinder;
+import com.github.rvesse.airline.utils.predicates.parser.OptionFinder;
 
 /**
  * Abstract option parser that provides some useful helper methods to derived

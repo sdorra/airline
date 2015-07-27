@@ -4,12 +4,13 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.utils.AirlineTestUtils;
-import com.github.rvesse.airline.utils.predicates.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -452,7 +453,8 @@ public class TestGalaxyCommandLineParser
     public static class AgentTerminateCommand
             extends GalaxyCommand
     {
-        @Arguments(title = "agent-id", description = "Agent to terminate", required = true)
+        @Arguments(title = "agent-id", description = "Agent to terminate")
+        @Required
         public String agentId;
 
         @Override

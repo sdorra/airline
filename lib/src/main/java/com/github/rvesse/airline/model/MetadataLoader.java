@@ -13,8 +13,8 @@ import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.CommandTypeFinder;
-import com.github.rvesse.airline.utils.predicates.GroupFinder;
+import com.github.rvesse.airline.utils.predicates.parser.CommandTypeFinder;
+import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
 
 import javax.inject.Inject;
 
@@ -291,8 +291,13 @@ public class MetadataLoader {
 
                     // Find and create restrictions
                     List<OptionRestriction> restrictions = new ArrayList<OptionRestriction>();
-                    for (Annotation annotation : field.getAnnotations()) {
-                        OptionRestriction restriction = RestrictionRegistry.getOptionRestriction(annotation);
+                    for (Class<? extends Annotation> annotationClass : RestrictionRegistry
+                            .getOptionRestrictionAnnotations()) {
+                        Annotation annotation = field.getAnnotation(annotationClass);
+                        if (annotation == null)
+                            continue;
+                        OptionRestriction restriction = RestrictionRegistry.getOptionRestriction(annotationClass,
+                                annotation);
                         if (restriction != null)
                             restrictions.add(restriction);
                     }
@@ -381,12 +386,16 @@ public class MetadataLoader {
 
                     String description = argumentsAnnotation.description();
                     String usage = argumentsAnnotation.usage();
-                    boolean required = argumentsAnnotation.required();
                     int arity = argumentsAnnotation.arity() <= 0 ? Integer.MIN_VALUE : argumentsAnnotation.arity();
 
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();
-                    for (Annotation annotation : field.getAnnotations()) {
-                        ArgumentsRestriction restriction = RestrictionRegistry.getArgumentsRestriction(annotation);
+                    for (Class<? extends Annotation> annotationClass : RestrictionRegistry
+                            .getArgumentsRestrictionAnnotations()) {
+                        Annotation annotation = field.getAnnotation(annotationClass);
+                        if (annotation == null)
+                            continue;
+                        ArgumentsRestriction restriction = RestrictionRegistry.getArgumentsRestriction(annotationClass,
+                                annotation);
                         if (restriction != null)
                             restrictions.add(restriction);
                     }
@@ -395,7 +404,6 @@ public class MetadataLoader {
                     injectionMetadata.arguments.add(new ArgumentsMetadata(titles, 
                                                                           description, 
                                                                           usage,
-                                                                          required, 
                                                                           arity,
                                                                           argumentsAnnotation.completionBehaviour(), 
                                                                           argumentsAnnotation.completionCommand(),

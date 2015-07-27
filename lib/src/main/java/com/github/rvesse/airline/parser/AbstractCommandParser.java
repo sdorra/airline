@@ -11,10 +11,10 @@ import com.github.rvesse.airline.parser.aliases.AliasResolver;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.AbbreviatedCommandFinder;
-import com.github.rvesse.airline.utils.predicates.AbbreviatedGroupFinder;
-import com.github.rvesse.airline.utils.predicates.CommandFinder;
-import com.github.rvesse.airline.utils.predicates.GroupFinder;
+import com.github.rvesse.airline.utils.predicates.parser.AbbreviatedCommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.AbbreviatedGroupFinder;
+import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
+import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
 
 import java.util.List;
 

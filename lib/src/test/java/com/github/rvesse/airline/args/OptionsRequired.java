@@ -20,13 +20,15 @@ package com.github.rvesse.airline.args;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 
 @Command(name = "OptionsRequired")
 public class OptionsRequired
 {
-    @Option(name = "--required", required = true)
+    @Option(name = "--required")
+    @Required
     public String requiredOption;
 
-    @Option(name = "--optional", required = false)
+    @Option(name = "--optional")
     public String optionalOption;
 }

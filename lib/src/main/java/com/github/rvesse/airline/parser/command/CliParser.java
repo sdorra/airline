@@ -24,7 +24,7 @@ import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.ParsedOptionFinder;
+import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 public class CliParser<T> extends AbstractCommandParser<T> {
 
