@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 import com.github.rvesse.airline.annotations.restrictions.IntegerRange;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.restrictions.RangeRestriction;
+import com.github.rvesse.airline.restrictions.common.RangeRestriction;
 
 public class IntegerRangeRestrictionFactory implements OptionRestrictionFactory {
     

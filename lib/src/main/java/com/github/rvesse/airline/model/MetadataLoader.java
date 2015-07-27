@@ -10,6 +10,7 @@ import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.help.Suggester;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 import com.github.rvesse.airline.utils.AirlineUtils;
@@ -46,11 +47,13 @@ public class MetadataLoader {
      *            Command Groups
      * @param parserConfig
      *            Parser Configuration
+     * @param restrictions
+     *            Restrictions
      * @return Global meta-data
      */
     public static <C> GlobalMetadata<C> loadGlobal(String name, String description, CommandMetadata defaultCommand,
             Iterable<CommandMetadata> defaultGroupCommands, Iterable<CommandGroupMetadata> groups,
-            ParserMetadata<C> parserConfig) {
+            Iterable<GlobalRestriction> restrictions, ParserMetadata<C> parserConfig) {
         List<OptionMetadata> globalOptions = new ArrayList<>();
         if (defaultCommand != null) {
             globalOptions.addAll(defaultCommand.getGlobalOptions());
@@ -65,7 +68,7 @@ public class MetadataLoader {
         }
         globalOptions = ListUtils.unmodifiableList(mergeOptionSet(globalOptions));
         return new GlobalMetadata<C>(name, description, globalOptions, defaultCommand, defaultGroupCommands, groups,
-                parserConfig);
+                restrictions, parserConfig);
     }
 
     /**
@@ -292,7 +295,7 @@ public class MetadataLoader {
                     // Find and create restrictions
                     List<OptionRestriction> restrictions = new ArrayList<OptionRestriction>();
                     for (Class<? extends Annotation> annotationClass : RestrictionRegistry
-                            .getOptionRestrictionAnnotations()) {
+                            .getOptionRestrictionAnnotationClasses()) {
                         Annotation annotation = field.getAnnotation(annotationClass);
                         if (annotation == null)
                             continue;
@@ -390,7 +393,7 @@ public class MetadataLoader {
 
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();
                     for (Class<? extends Annotation> annotationClass : RestrictionRegistry
-                            .getArgumentsRestrictionAnnotations()) {
+                            .getArgumentsRestrictionAnnotationClasses()) {
                         Annotation annotation = field.getAnnotation(annotationClass);
                         if (annotation == null)
                             continue;

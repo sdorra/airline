@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.restrictions;
+package com.github.rvesse.airline.restrictions.common;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
+import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 /**

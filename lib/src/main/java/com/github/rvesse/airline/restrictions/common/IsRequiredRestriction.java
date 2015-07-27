@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.restrictions;
+package com.github.rvesse.airline.restrictions.common;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -7,6 +7,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
+import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 

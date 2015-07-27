@@ -2,8 +2,8 @@ package com.github.rvesse.airline.utils.predicates.restrictions;
 
 import org.apache.commons.collections4.Predicate;
 
-import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 
 public class AllowedValuesOptionFinder implements Predicate<OptionRestriction> {
 

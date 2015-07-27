@@ -15,7 +15,7 @@ import com.github.rvesse.airline.help.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 
 /**
  * A command usage generator which generates help in <a

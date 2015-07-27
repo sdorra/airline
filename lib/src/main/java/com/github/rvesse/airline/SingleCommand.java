@@ -18,13 +18,16 @@
 
 package com.github.rvesse.airline;
 
+import java.util.List;
+
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.collections4.ListUtils;
 import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.command.SingleCommandParser;
+import com.github.rvesse.airline.restrictions.GlobalRestriction;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Class for encapsulating single commands
@@ -41,7 +44,7 @@ public class SingleCommand<C> {
      * @return Single command parser
      */
     public static <C> SingleCommand<C> singleCommand(Class<C> command) {
-        return new SingleCommand<C>(command, null);
+        return new SingleCommand<C>(command, null, null);
     }
 
     /**
@@ -55,15 +58,21 @@ public class SingleCommand<C> {
      * @return Single command parser
      */
     public static <C> SingleCommand<C> singleCommand(Class<C> command, ParserMetadata<C> parserConfig) {
-        return new SingleCommand<C>(command, parserConfig);
+        return new SingleCommand<C>(command, null, parserConfig);
     }
 
     private final ParserMetadata<C> parserConfig;
     private final CommandMetadata commandMetadata;
+    private final List<GlobalRestriction> restrictions;
 
-    private SingleCommand(Class<C> command, ParserMetadata<C> parserConfig) {
-        if (command == null) throw new NullPointerException("command is null");
+    private SingleCommand(Class<C> command, Iterable<GlobalRestriction> restrictions, ParserMetadata<C> parserConfig) {
+        if (command == null)
+            throw new NullPointerException("command is null");
         this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<C> defaultConfiguration();
+        this.restrictions = restrictions != null ? IteratorUtils.toList(restrictions.iterator()) : AirlineUtils
+                .arrayToList(GlobalRestriction.DEFAULTS);
+        if (this.restrictions.size() == 0)
+            this.restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
 
         commandMetadata = MetadataLoader.loadCommand(command);
     }
@@ -87,11 +96,11 @@ public class SingleCommand<C> {
     }
 
     public C parse(String... args) {
-        return parse(ListUtils.unmodifiableList(IteratorUtils.toList(IteratorUtils.arrayIterator(args))));
+        return parse(AirlineUtils.arrayToList(args));
     }
 
     public C parse(Iterable<String> args) {
         SingleCommandParser<C> parser = new SingleCommandParser<C>();
-        return parser.parse(parserConfig, commandMetadata, args);
+        return parser.parse(parserConfig, commandMetadata, restrictions, args);
     }
 }

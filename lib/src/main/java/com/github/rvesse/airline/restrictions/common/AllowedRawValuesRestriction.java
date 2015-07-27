@@ -1,4 +1,4 @@
-package com.github.rvesse.airline.restrictions;
+package com.github.rvesse.airline.restrictions.common;
 
 import java.util.LinkedHashSet;
 import java.util.Locale;
@@ -12,6 +12,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
+import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.predicates.LocaleSensitiveStringFinder;
 
 public class AllowedRawValuesRestriction extends AbstractRestriction {

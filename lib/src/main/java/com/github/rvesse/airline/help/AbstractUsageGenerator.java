@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.utils.predicates.restrictions.AllowedValuesOptionFinder;
 
 public class AbstractUsageGenerator {

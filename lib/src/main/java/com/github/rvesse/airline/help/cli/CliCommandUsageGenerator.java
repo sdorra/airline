@@ -16,7 +16,7 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {

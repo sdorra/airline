@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
@@ -18,10 +19,12 @@ public class GlobalMetadata<T> {
     private final List<CommandMetadata> defaultGroupCommands;
     private final List<CommandGroupMetadata> commandGroups;
     private final ParserMetadata<T> parserConfig;
+    private final List<GlobalRestriction> restrictions;
 
     public GlobalMetadata(String name, String description, Iterable<OptionMetadata> options,
             CommandMetadata defaultCommand, Iterable<CommandMetadata> defaultGroupCommands,
-            Iterable<CommandGroupMetadata> commandGroups, ParserMetadata<T> parserConfig) {
+            Iterable<CommandGroupMetadata> commandGroups, Iterable<GlobalRestriction> restrictions,
+            ParserMetadata<T> parserConfig) {
         if (StringUtils.isBlank(name))
             throw new IllegalArgumentException("Program name cannot be null/empty/whitespace");
         if (parserConfig == null)
@@ -33,6 +36,7 @@ public class GlobalMetadata<T> {
         this.defaultCommand = defaultCommand;
         this.defaultGroupCommands = AirlineUtils.unmodifiableListCopy(defaultGroupCommands);
         this.commandGroups = AirlineUtils.unmodifiableListCopy(commandGroups);
+        this.restrictions = AirlineUtils.unmodifiableListCopy(restrictions);
         this.parserConfig = parserConfig;
     }
 
@@ -58,6 +62,10 @@ public class GlobalMetadata<T> {
 
     public List<CommandGroupMetadata> getCommandGroups() {
         return commandGroups;
+    }
+    
+    public List<GlobalRestriction> getRestrictions() {
+        return restrictions;
     }
 
     public ParserMetadata<T> getParserConfiguration() {

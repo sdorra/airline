@@ -13,6 +13,9 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
+import com.github.rvesse.airline.restrictions.GlobalRestriction;
+import com.github.rvesse.airline.restrictions.None;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Builder for CLIs
@@ -28,6 +31,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     protected Class<? extends C> defaultCommand;
     protected final List<Class<? extends C>> defaultCommandGroupCommands = new ArrayList<>();
     protected final Map<String, GroupBuilder<C>> groups = new HashMap<>();
+    protected final List<GlobalRestriction> restrictions = new ArrayList<>();
     protected final ParserBuilder<C> parserBuilder = new ParserBuilder<C>();
 
     public CliBuilder(String name) {
@@ -84,6 +88,37 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         return groups.get(name);
     }
 
+    public CliBuilder<C> withRestriction(GlobalRestriction restriction) {
+        if (restriction != null)
+            restrictions.add(restriction);
+        return this;
+    }
+
+    public CliBuilder<C> withRestrictions(GlobalRestriction... restrictions) {
+        for (GlobalRestriction restriction : restrictions) {
+            if (restriction == null)
+                continue;
+            this.restrictions.add(restriction);
+        }
+        return this;
+    }
+
+    public CliBuilder<C> withNoRestrictions() {
+        restrictions.clear();
+        restrictions.add(new None());
+        return this;
+    }
+
+    public CliBuilder<C> withDefaultRestrictions() {
+        restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
+        return this;
+    }
+
+    public CliBuilder<C> withOnlyDefaultRestrictions() {
+        restrictions.clear();
+        return withDefaultRestrictions();
+    }
+
     public ParserBuilder<C> withParser() {
         return parserBuilder;
     }
@@ -125,13 +160,18 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         // post-processing was an easier, yet uglier, way to go
         MetadataLoader.loadCommandsIntoGroupsByAnnotation(allCommands, commandGroups, defaultCommandGroup);
 
+        // Build restrictions
+        // Use defaults if none specified
+        if (restrictions.size() == 0)
+            withDefaultRestrictions();
+
         if (allCommands.size() == 0)
             throw new IllegalArgumentException("Must specify at least one command to create a CLI");
 
         // Build metadata objects
         GlobalMetadata<C> metadata = MetadataLoader.<C> loadGlobal(name, description, defaultCommandMetadata,
                 ListUtils.unmodifiableList(defaultCommandGroup), ListUtils.unmodifiableList(commandGroups),
-                this.parserBuilder.build());
+                ListUtils.unmodifiableList(restrictions), this.parserBuilder.build());
 
         return new Cli<C>(metadata);
     }

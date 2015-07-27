@@ -1,5 +1,6 @@
 package com.github.rvesse.airline.restrictions;
 
+
 /**
  * A restriction which doesn't actually impose any restrictions
  */

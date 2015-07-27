@@ -16,7 +16,7 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 
 /**
  * <p>
