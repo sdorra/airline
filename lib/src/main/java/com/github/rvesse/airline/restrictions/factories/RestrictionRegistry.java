@@ -21,33 +21,36 @@ public class RestrictionRegistry {
 
     private static final Map<Class<? extends Annotation>, OptionRestrictionFactory> OPTION_RESTRICTION_FACTORIES = new HashMap<>();
     private static final Map<Class<? extends Annotation>, ArgumentsRestrictionFactory> ARGUMENT_RESTRICTION_FACTORIES = new HashMap<>();
-    
+
     private static volatile boolean init = false;
-    
+
     static {
         init();
     }
-    
+
     /**
      * Initializes the default set of restrictions
      */
     static synchronized void init() {
-        if (init) return;
-        
+        if (init)
+            return;
+
         // Default option restrictions
-        OPTION_RESTRICTION_FACTORIES.put(Required.class, new SimpleOptionRestrictionFactory(IsRequiredRestriction.class));
+        OPTION_RESTRICTION_FACTORIES.put(Required.class,
+                new SimpleOptionRestrictionFactory(IsRequiredRestriction.class));
         OPTION_RESTRICTION_FACTORIES.put(Unrestricted.class, new SimpleOptionRestrictionFactory(None.class));
         OPTION_RESTRICTION_FACTORIES.put(AllowedRawValues.class, new AllowedValuesRestrictionFactory());
         OPTION_RESTRICTION_FACTORIES.put(IntegerRange.class, new IntegerRangeRestrictionFactory());
-        
+
         // Default arguments restrictions
-        ARGUMENT_RESTRICTION_FACTORIES.put(Required.class, new SimpleArgumentsRestrictionFactory(IsRequiredRestriction.class));
+        ARGUMENT_RESTRICTION_FACTORIES.put(Required.class, new SimpleArgumentsRestrictionFactory(
+                IsRequiredRestriction.class));
         ARGUMENT_RESTRICTION_FACTORIES.put(Unrestricted.class, new SimpleArgumentsRestrictionFactory(None.class));
         ARGUMENT_RESTRICTION_FACTORIES.put(AllowedRawValues.class, new AllowedValuesRestrictionFactory());
-        
+
         init = true;
     }
-    
+
     /**
      * Resets the registry to its default state
      */
@@ -57,29 +60,37 @@ public class RestrictionRegistry {
         ARGUMENT_RESTRICTION_FACTORIES.clear();
         init();
     }
-    
+
     public static Set<Class<? extends Annotation>> getOptionRestrictionAnnotationClasses() {
         return OPTION_RESTRICTION_FACTORIES.keySet();
     }
 
-    public static void addOptionRestrictionFactory(Class<? extends Annotation> cls, OptionRestrictionFactory factory) {
+    public static void addOptionRestriction(Class<? extends Annotation> cls, OptionRestrictionFactory factory) {
         if (cls == null)
             throw new NullPointerException("cls cannot be null");
         OPTION_RESTRICTION_FACTORIES.put(cls, factory);
     }
 
-    public static <T extends Annotation> OptionRestriction getOptionRestriction(Class<? extends Annotation> cls, T annotation) {
+    public static <T extends Annotation> OptionRestriction getOptionRestriction(Class<? extends Annotation> cls,
+            T annotation) {
         OptionRestrictionFactory factory = OPTION_RESTRICTION_FACTORIES.get(cls);
         if (factory != null)
             return factory.createOptionRestriction(annotation);
         return null;
     }
-    
+
+    public static void addArgumentsRestriction(Class<? extends Annotation> cls, ArgumentsRestrictionFactory factory) {
+        if (cls == null)
+            throw new NullPointerException("cls cannot be null");
+        ARGUMENT_RESTRICTION_FACTORIES.put(cls, factory);
+    }
+
     public static Set<Class<? extends Annotation>> getArgumentsRestrictionAnnotationClasses() {
         return ARGUMENT_RESTRICTION_FACTORIES.keySet();
     }
-    
-    public static <T extends Annotation> ArgumentsRestriction getArgumentsRestriction(Class<? extends Annotation> cls, T annotation) {
+
+    public static <T extends Annotation> ArgumentsRestriction getArgumentsRestriction(Class<? extends Annotation> cls,
+            T annotation) {
         ArgumentsRestrictionFactory factory = ARGUMENT_RESTRICTION_FACTORIES.get(cls);
         if (factory != null)
             return factory.createArgumentsRestriction(annotation);
