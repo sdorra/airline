@@ -28,8 +28,8 @@ public class ParseOptionOutOfRangeException extends ParseException {
      */
     public ParseOptionOutOfRangeException(String optionTitle, Object value, Object min, boolean minInclusive,
             Object max, boolean maxInclusive) {
-        super("Value for option '%s' was given as '%s' which is not in the acceptable range: %s", optionTitle, range(
-                min, minInclusive, max, maxInclusive));
+        super("Value for option '%s' was given as '%s' which is not in the acceptable range: %s", optionTitle, value,
+                range(min, minInclusive, max, maxInclusive));
         this.illegalValue = value;
         this.min = min;
         this.minInclusive = minInclusive;

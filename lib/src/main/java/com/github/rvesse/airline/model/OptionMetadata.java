@@ -310,7 +310,7 @@ public class OptionMetadata {
                                     child.sealed,
                                     child.completionBehaviour,
                                     child.completionCommand,
-                                    child.restrictions,
+                                    child.restrictions.size() > 0 ? child.restrictions : parent.restrictions,
                                     null);
         //@formatter:on
 

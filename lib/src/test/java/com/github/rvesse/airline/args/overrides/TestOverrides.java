@@ -172,4 +172,24 @@ public class TestOverrides {
         assertEquals(((ArgsMergeTypeParent)cmd).test.getClass(), ArgsMergeTypeParent.C.class);
         assertTrue(cmd.test.getClass().equals(((ArgsMergeTypeParent)cmd).test.getClass()));
     }
+    
+    @Test
+    public void merging_inherits_restrictions() {
+        SingleCommand<ArgsMergeInheritRestrictions> parser = singleCommandParser(ArgsMergeInheritRestrictions.class);
+        CommandMetadata metadata = parser.getCommandMetadata();
+        
+        OptionMetadata testOption = findByName(metadata, "--required");
+        assertNotNull(testOption);
+        assertTrue(testOption.isRequired());
+    }
+    
+    @Test
+    public void merging_inherits_changing_restrictions() {
+        SingleCommand<ArgsMergeChangeRestrictions> parser = singleCommandParser(ArgsMergeChangeRestrictions.class);
+        CommandMetadata metadata = parser.getCommandMetadata();
+        
+        OptionMetadata testOption = findByName(metadata, "--required");
+        assertNotNull(testOption);
+        assertFalse(testOption.isRequired());
+    }
 }

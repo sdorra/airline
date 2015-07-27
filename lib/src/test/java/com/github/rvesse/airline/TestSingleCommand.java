@@ -37,6 +37,7 @@ import com.github.rvesse.airline.args.ArgsMultipleUnparsed;
 import com.github.rvesse.airline.args.ArgsOutOfMemory;
 import com.github.rvesse.airline.args.ArgsPrivate;
 import com.github.rvesse.airline.args.ArgsRequired;
+import com.github.rvesse.airline.args.ArgsRequiredInheritedUnrestricted;
 import com.github.rvesse.airline.args.ArgsSingleChar;
 import com.github.rvesse.airline.args.Arity1;
 import com.github.rvesse.airline.args.OptionsRequired;
@@ -295,6 +296,12 @@ public class TestSingleCommand
     public void requiredMainParameters()
     {
         singleCommand(ArgsRequired.class).parse();
+    }
+    
+    @Test
+    public void notRequiredMainParameters()
+    {
+        singleCommand(ArgsRequiredInheritedUnrestricted.class).parse();
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = ".*option.*missing.*")

@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  * <p>
  * While this may seem slightly strange this is needed because when overriding
  * options the restrictions lowest in the hierarchy apply so if you want to
- * remove parent restrictions then you have to explicitly state that the option
- * is unrestricted
+ * remove parent restrictions (e.g. make a required option not required) then
+ * you have to explicitly state that the overridden option is unrestricted
  * </p>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)

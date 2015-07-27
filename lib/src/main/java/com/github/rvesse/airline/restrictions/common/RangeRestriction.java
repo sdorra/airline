@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
 import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
@@ -26,7 +27,7 @@ public class RangeRestriction extends AbstractRestriction {
     public RangeRestriction(Object min, boolean minInclusive, Object max, boolean maxInclusive,
             Comparator<Object> comparator) {
         if (comparator == null)
-            throw new NullPointerException("comparator cannot be null");
+            throw new ParseInvalidRestrictionException("comparator cannot be null");
         this.min = min;
         this.minInclusive = minInclusive;
         this.max = max;
@@ -37,10 +38,12 @@ public class RangeRestriction extends AbstractRestriction {
         if (min != null && max != null) {
             int rangeComparison = this.comparator.compare(min, max);
             if (rangeComparison > 0)
-                throw new IllegalArgumentException("min is greater than max");
+                throw new ParseInvalidRestrictionException("min (%s) is greater than max (%s)", min, max);
             if (rangeComparison == 0 && (!minInclusive || !maxInclusive))
-                throw new IllegalArgumentException(
-                        "min and max are same but either minInclusive or maxInclusive was false");
+                throw new ParseInvalidRestrictionException(
+                        "min (%s) and max (%s) compare as equal but either minInclusive or maxInclusive was false",
+                        min, max);
+
         }
     }
 
@@ -58,8 +61,8 @@ public class RangeRestriction extends AbstractRestriction {
 
         for (Pair<OptionMetadata, Object> parsedOption : parsedOptions) {
             if (!inRange(parsedOption.getRight()))
-                throw new ParseOptionOutOfRangeException(option.getTitle(), parsedOption.getRight(), parsedOptions,
-                        minInclusive, parsedOption, maxInclusive);
+                throw new ParseOptionOutOfRangeException(option.getTitle(), parsedOption.getRight(), min, minInclusive,
+                        max, maxInclusive);
         }
     }
 
