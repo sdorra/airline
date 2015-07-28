@@ -2,7 +2,7 @@ package com.github.rvesse.airline.restrictions;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.IntegerRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
 
 @Command(name = "OptionIntegerRange")
 public class OptionIntegerRangeInclusive extends OptionInteger {

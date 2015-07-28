@@ -6,9 +6,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
-import com.github.rvesse.airline.annotations.restrictions.IntegerRange;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.annotations.restrictions.Unrestricted;
+import com.github.rvesse.airline.annotations.restrictions.ranges.ByteRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.DoubleRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.FloatRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.LongRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.ShortRange;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.None;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
@@ -27,6 +32,15 @@ public class RestrictionRegistry {
     static {
         init();
     }
+    
+    private static <T extends OptionRestrictionFactory & ArgumentsRestrictionFactory> void registerCommon(Class<? extends Annotation> cls, T factory) {
+        registerCommon(cls, factory, factory);
+    }
+    
+    private static void registerCommon(Class<? extends Annotation> cls, OptionRestrictionFactory opFactory, ArgumentsRestrictionFactory argFactory) {
+        OPTION_RESTRICTION_FACTORIES.put(cls, opFactory);
+        ARGUMENT_RESTRICTION_FACTORIES.put(cls, argFactory);
+    }
 
     /**
      * Initializes the default set of restrictions
@@ -34,19 +48,23 @@ public class RestrictionRegistry {
     static synchronized void init() {
         if (init)
             return;
-
-        // Default option restrictions
-        OPTION_RESTRICTION_FACTORIES.put(Required.class,
-                new SimpleOptionRestrictionFactory(IsRequiredRestriction.class));
-        OPTION_RESTRICTION_FACTORIES.put(Unrestricted.class, new SimpleOptionRestrictionFactory(None.class));
-        OPTION_RESTRICTION_FACTORIES.put(AllowedRawValues.class, new AllowedValuesRestrictionFactory());
-        OPTION_RESTRICTION_FACTORIES.put(IntegerRange.class, new IntegerRangeRestrictionFactory());
-
-        // Default arguments restrictions
-        ARGUMENT_RESTRICTION_FACTORIES.put(Required.class, new SimpleArgumentsRestrictionFactory(
-                IsRequiredRestriction.class));
-        ARGUMENT_RESTRICTION_FACTORIES.put(Unrestricted.class, new SimpleArgumentsRestrictionFactory(None.class));
-        ARGUMENT_RESTRICTION_FACTORIES.put(AllowedRawValues.class, new AllowedValuesRestrictionFactory());
+        
+        // Basic restrictions
+        registerCommon(Required.class, new SimpleOptionRestrictionFactory(IsRequiredRestriction.class), new SimpleArgumentsRestrictionFactory(IsRequiredRestriction.class));
+        registerCommon(Unrestricted.class, new SimpleOptionRestrictionFactory(None.class), new SimpleArgumentsRestrictionFactory(None.class));
+        
+        // Allowed values restrictions
+        AllowedValuesRestrictionFactory allowedFactory = new AllowedValuesRestrictionFactory();
+        registerCommon(AllowedRawValues.class, allowedFactory, allowedFactory);
+        
+        // Range restrictions
+        RangeRestrictionFactory rangeFactory = new RangeRestrictionFactory();
+        registerCommon(LongRange.class, rangeFactory);
+        registerCommon(IntegerRange.class, rangeFactory);
+        registerCommon(ShortRange.class, rangeFactory);
+        registerCommon(ByteRange.class, rangeFactory);
+        registerCommon(DoubleRange.class, rangeFactory);
+        registerCommon(FloatRange.class, rangeFactory);
 
         init = true;
     }
