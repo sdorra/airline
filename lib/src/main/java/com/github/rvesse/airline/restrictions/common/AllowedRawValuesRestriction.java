@@ -53,7 +53,15 @@ public class AllowedRawValuesRestriction extends AbstractRestriction {
 
         // Check in list of values
         if (!CollectionUtils.exists(this.allowedValues, new LocaleSensitiveStringFinder(value, this.locale)))
-            throw new ParseOptionIllegalValueException(option.getTitle(), value, allowedValues);
+            throw new ParseOptionIllegalValueException(option.getTitle(), value, asObjects(allowedValues));
+    }
+
+    private static Set<Object> asObjects(Set<String> set) {
+        Set<Object> newSet = new LinkedHashSet<Object>();
+        for (String item : set) {
+            newSet.add((Object) item);
+        }
+        return newSet;
     }
 
     @Override
@@ -73,10 +81,7 @@ public class AllowedRawValuesRestriction extends AbstractRestriction {
             } else {
                 title = arguments.getTitle().get(arguments.getTitle().size() - 1);
             }
-            throw new ParseArgumentsIllegalValueException(title, value, allowedValues);
+            throw new ParseArgumentsIllegalValueException(title, value, asObjects(allowedValues));
         }
     }
-
-    // TODO Support validating arguments
-
 }

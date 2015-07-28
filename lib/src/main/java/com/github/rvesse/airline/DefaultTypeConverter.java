@@ -17,9 +17,12 @@ import java.lang.reflect.Method;
 public class DefaultTypeConverter implements TypeConverter {
     @Override
     public Object convert(String name, Class<?> type, String value) {
-        if (name == null) throw new NullPointerException("name is null");
-        if (type == null) throw new NullPointerException("type is null");
-        if (value == null) throw new NullPointerException("value is null");
+        if (name == null)
+            throw new NullPointerException("name is null");
+        if (type == null)
+            throw new NullPointerException("type is null");
+        if (value == null)
+            throw new NullPointerException("value is null");
 
         // Firstly try the standard Java types
         ConvertResult result = tryConvertBasicTypes(type, value);

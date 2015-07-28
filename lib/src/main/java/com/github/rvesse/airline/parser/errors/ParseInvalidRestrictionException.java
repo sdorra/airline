@@ -9,5 +9,9 @@ public class ParseInvalidRestrictionException extends ParseException {
     public ParseInvalidRestrictionException(String string, Object... args) {
         super(string, args);
     }
+    
+    public ParseInvalidRestrictionException(Exception cause, String message, Object... args) {
+        super(cause, message, args);
+    }
 
 }

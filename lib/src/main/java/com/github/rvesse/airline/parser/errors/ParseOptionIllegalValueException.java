@@ -29,17 +29,18 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 public class ParseOptionIllegalValueException extends ParseException {
     private static final long serialVersionUID = 810812151673279427L;
 
-    private final String optionTitle, illegalValue;
-    private final Set<String> allowedValues;
-
-    public ParseOptionIllegalValueException(String optionTitle, String value, Set<String> allowedValues) {
+    private final String optionTitle;
+    private final Object illegalValue;
+    private final Set<Object> allowedValues;
+    
+    public ParseOptionIllegalValueException(String optionTitle, Object value, Set<Object> allowedValues) {
         super("Value for option '%s' was given as '%s' which is not in the list of allowed values: %s", optionTitle,
                 value, allowedValues);
         this.optionTitle = optionTitle;
         this.illegalValue = value;
         this.allowedValues = AirlineUtils.unmodifiableSetCopy(allowedValues);
     }
-
+    
     /**
      * Gets the option title
      * 
@@ -54,7 +55,7 @@ public class ParseOptionIllegalValueException extends ParseException {
      * 
      * @return Illegal value
      */
-    public String getIllegalValue() {
+    public Object getIllegalValue() {
         return illegalValue;
     }
 
@@ -63,7 +64,7 @@ public class ParseOptionIllegalValueException extends ParseException {
      * 
      * @return Allowed values
      */
-    public Set<String> getAllowedValues() {
+    public Set<Object> getAllowedValues() {
         return allowedValues;
     }
 }

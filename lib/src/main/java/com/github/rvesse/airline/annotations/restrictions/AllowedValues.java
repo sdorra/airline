@@ -24,17 +24,19 @@ import static java.lang.annotation.ElementType.FIELD;
 
 /**
  * Annotation that marks that the option/arguments are restricted to a given set
- * of raw string values
+ * of values
  * <p>
- * If you instead want to limit values to be in a set of parsed values then you
- * should use the {@link AllowedValues} annotation instead. However for simple
- * use cases this restriction will always be more efficient.
+ * Unlike {@link AllowedRawValues} this restriction works against the values
+ * after they have been converted into Java objects and thus can provide more
+ * accurate restriction than {@link AllowedValues} can provide. The trade off is
+ * that enforcing this restriction is marginally more complex because it
+ * requires parsing the allowed values.
  * </p>
  *
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
-public @interface AllowedRawValues {
+public @interface AllowedValues {
 
     /**
      * If provided restricts the values for the option to the given set of
@@ -43,18 +45,4 @@ public @interface AllowedRawValues {
      * @return Allowed values
      */
     String[] allowedValues() default {};
-
-    /**
-     * If true the case on {@link #allowedValues()} is ignored
-     *
-     * @return Ignore case
-     */
-    boolean ignoreCase() default false;
-
-    /**
-     * The locale used for comparisons
-     * 
-     * @return Locale BCP47 tag
-     */
-    String locale() default "en";
 }
