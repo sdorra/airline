@@ -26,7 +26,7 @@ import java.util.List;
  * Exception that is thrown when an unrecognized command is supplied
  *
  */
-public class ParseCommandUnrecognizedException extends ParseException
+public class ParseCommandUnrecognizedException extends ParseRestrictionViolatedException
 {
     private static final long serialVersionUID = 7580940207857781141L;
     

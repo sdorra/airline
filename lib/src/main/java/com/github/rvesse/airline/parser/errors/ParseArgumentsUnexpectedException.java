@@ -26,7 +26,7 @@ import java.util.List;
  * Exception that is thrown when a command receives unexpected arguments
  * 
  */
-public class ParseArgumentsUnexpectedException extends ParseException {
+public class ParseArgumentsUnexpectedException extends ParseRestrictionViolatedException {
     private static final long serialVersionUID = -3146629773738933406L;
     
     private final List<String> unparsedInput;

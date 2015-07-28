@@ -75,6 +75,10 @@ public @interface Option {
      * {@link OptionMetadata#override(java.util.Set, OptionMetadata, OptionMetadata)}
      * for legal overrides
      * </p>
+     * <p>
+     * Note that where the child option definition is an exact duplicate of the
+     * parent then overriding is implicitly permitted
+     * </p>
      * 
      * @return True if an override, false otherwise
      */
@@ -93,8 +97,8 @@ public @interface Option {
      * Sets the desired completion behaviour
      * <p>
      * This is used by usage generators that are capable of generating
-     * completion scripts. It indicates any additional completion behaviour
-     * that should apply in addition to completions generated from the
+     * completion scripts. It indicates any additional completion behaviour that
+     * should apply in addition to completions generated from the
      * {@link #allowedValues()} and/or {@link #completionCommand()}. You should
      * use the constants from {@link CompletionBehaviour} as values to this.
      * </p>

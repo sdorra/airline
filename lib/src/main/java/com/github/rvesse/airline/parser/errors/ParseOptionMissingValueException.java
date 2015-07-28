@@ -23,7 +23,7 @@ package com.github.rvesse.airline.parser.errors;
  * are supplied
  * 
  */
-public class ParseOptionMissingValueException extends ParseException {
+public class ParseOptionMissingValueException extends ParseRestrictionViolatedException {
     private static final long serialVersionUID = -731926542936989571L;
     
     private final String optionTitle;

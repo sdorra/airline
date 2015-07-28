@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
  * Exception thrown when required arguments are missing
  * 
  */
-public class ParseArgumentsMissingException extends ParseException {
+public class ParseArgumentsMissingException extends ParseRestrictionViolatedException {
     private static final long serialVersionUID = 6220909299960264997L;
     
     private final List<String> argumentTitles;

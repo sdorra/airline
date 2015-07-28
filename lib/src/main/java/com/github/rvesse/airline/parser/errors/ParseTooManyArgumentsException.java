@@ -4,7 +4,7 @@ package com.github.rvesse.airline.parser.errors;
 /**
  * Error that is thrown if too many arguments are provided
  */
-public class ParseTooManyArgumentsException extends ParseException {
+public class ParseTooManyArgumentsException extends ParseRestrictionViolatedException {
     private static final long serialVersionUID = -4597154963755198959L;
 
     public ParseTooManyArgumentsException(String string, Object... args) {

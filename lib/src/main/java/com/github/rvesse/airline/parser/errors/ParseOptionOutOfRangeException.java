@@ -4,7 +4,7 @@ package com.github.rvesse.airline.parser.errors;
  * Error that indicates that an options value was outside of an acceptable range
  *
  */
-public class ParseOptionOutOfRangeException extends ParseException {
+public class ParseOptionOutOfRangeException extends ParseRestrictionViolatedException {
     private static final long serialVersionUID = 4391651222234661142L;
 
     private final Object illegalValue, min, max;

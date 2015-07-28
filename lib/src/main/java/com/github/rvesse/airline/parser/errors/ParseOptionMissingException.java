@@ -22,7 +22,7 @@ package com.github.rvesse.airline.parser.errors;
  * Exception that is thrown when a required option is missing
  *
  */
-public class ParseOptionMissingException extends ParseException
+public class ParseOptionMissingException extends ParseRestrictionViolatedException
 {
     private static final long serialVersionUID = -2256462221508393062L;
     

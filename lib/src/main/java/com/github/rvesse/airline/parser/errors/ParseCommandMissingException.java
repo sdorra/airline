@@ -22,7 +22,7 @@ package com.github.rvesse.airline.parser.errors;
  * Exception that is thrown when no command is specified
  *
  */
-public class ParseCommandMissingException extends ParseException
+public class ParseCommandMissingException extends ParseRestrictionViolatedException
 {
     private static final long serialVersionUID = -2671426251662153521L;
 

@@ -26,7 +26,7 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * Exception thrown when the value for an option is not in a specific set of
  * allowed values
  */
-public class ParseOptionIllegalValueException extends ParseException {
+public class ParseOptionIllegalValueException extends ParseRestrictionViolatedException {
     private static final long serialVersionUID = 810812151673279427L;
 
     private final String optionTitle;
