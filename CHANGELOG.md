@@ -9,6 +9,15 @@
     - Added Apache Commons Collections 4
 - Builder improvements
     - All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance.
+- Annotation Changes
+    - `OptionMetadata` had `required`, `allowedValues` and `ignoreCase` removed.  These are now denoted via separate annotations
+    - `ArgumentsMetadata` had `required` removed, this is now denoted via separate annotations
+    - New restriction annotations for expressing restrictions on options and arguments
+        - `@Required` to indicate required options/arguments
+        - `@AllowedRawValues` for limiting the string values an option can receive
+        - `@LongRange`, `@IntegerRange`, `@ShortRange`, `@ByteRange`, `@DoubleRange` and `@FloatRange` for indicating that arguments once converted to the appropriate value type must fall within a given range
+        - `@Unrestricted` to indicate that restrictions inherited from an overridden option should be removed
+        - Custom restrictions can be created and registered such that they are automatically enforced by Airline
 - Parser Improvements
      - Type converter is now configurable i.e. allows you to control how Airline turns string arguments into Java objects
      - Option parsing styles are now fully configurable (default behaviour remains as 1.x which uses the first 3 styles):

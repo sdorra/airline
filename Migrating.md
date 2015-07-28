@@ -118,7 +118,7 @@ A new restrictions framework is introduced which allows much more complex restri
 | -------------- | ---------------- | -------------- | --------------- |
 | `IsRequiredRestriction` | Options and Arguments | `@Required` | Indicates that options/arguments are required |
 | `AllowedRawValuesRestriction` | Options and Arguments | `@AllowedRawValues` | Indicates that the raw string values passed to options/arguments must be in a given set of values.  May be configured to use custom locale and case insensitive comparisons as desired |
-| `RangeRestriction` | Options and Arguments | `@IntegerRange` | Indicates that the instantiated values for options/arguments must fall within a range of values. |
+| `RangeRestriction` | Options and Arguments | `@LongRange`, `@IntegerRange`, `@ShortRange`, `@ByteRange`, `@DoubleRange`, `@FloatRange` | Indicates that the instantiated values for options/arguments must fall within a range of values |
 | `None` | Global, Options and Arguments | `@Unrestricted` | Indicates that no restrictions apply, primarily useful if you need to override restrictions inherited from a parent option |
 
 Option and argument restrictions are automatically discovered by examining the annotations present on fields marked with `@Option` and `@Arguments`.  The `RestrictionRegistry` is used to map annotations into instances of `OptionRestriction` or `ArgumentsRestriction` as appropriate.
