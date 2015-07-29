@@ -1,14 +1,14 @@
 package com.github.rvesse.airline.restrictions;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.TestingUtil;
 import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
+import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 
 
-public class TestRequiredGroups {
+public class TestRequired {
     
     @Test
     public void require_some_good() {
@@ -65,5 +65,32 @@ public class TestRequiredGroups {
     public void require_one_bad_multiple_03() {
         SingleCommand<One> parser = TestingUtil.singleCommandParser(One.class);
         parser.parse("-b", "test", "-c", "test2");
+    }
+    
+    @Test
+    public void required_if_good_unneeded_missing() {
+        SingleCommand<If> parser = TestingUtil.singleCommandParser(If.class);
+        parser.parse();
+    }
+    
+    @Test
+    public void required_if_good_unneeded_present() {
+        SingleCommand<If> parser = TestingUtil.singleCommandParser(If.class);
+        parser.parse("-b", "test");
+    }
+    
+    @Test
+    public void required_if_good_needed() {
+        SingleCommand<If> parser = TestingUtil.singleCommandParser(If.class);
+        parser.parse("-a", "test", "-b", "test2");
+        parser.parse("--alpha", "test", "-b", "test2");
+        parser.parse("-a", "test", "--bravo", "test2");
+        parser.parse("--alpha", "test", "--bravo", "test2");
+    }
+    
+    @Test(expectedExceptions = ParseOptionMissingException.class)
+    public void required_if_bad_needed() {
+        SingleCommand<If> parser = TestingUtil.singleCommandParser(If.class);
+        parser.parse("-a", "test");
     }
 }

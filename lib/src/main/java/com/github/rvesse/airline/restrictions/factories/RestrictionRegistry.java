@@ -13,6 +13,7 @@ import com.github.rvesse.airline.annotations.restrictions.Port;
 import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
 import com.github.rvesse.airline.annotations.restrictions.RequireSome;
 import com.github.rvesse.airline.annotations.restrictions.Required;
+import com.github.rvesse.airline.annotations.restrictions.RequiredOnlyIf;
 import com.github.rvesse.airline.annotations.restrictions.Unrestricted;
 import com.github.rvesse.airline.annotations.restrictions.ranges.ByteRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.DoubleRange;
@@ -72,10 +73,11 @@ public class RestrictionRegistry {
         registerCommon(DoubleRange.class, rangeFactory);
         registerCommon(FloatRange.class, rangeFactory);
         
-        // Group restrictions
+        // Advanced requirement restrictions
         RequireFromRestrictionFactory requireFactory = new RequireFromRestrictionFactory();
         OPTION_RESTRICTION_FACTORIES.put(RequireOnlyOne.class, requireFactory);
         OPTION_RESTRICTION_FACTORIES.put(RequireSome.class, requireFactory);
+        OPTION_RESTRICTION_FACTORIES.put(RequiredOnlyIf.class, new RequiredOnlyIfRestrictionFactory());
         
         // Occurrences restrictions
         OccurrencesRestrictionFactory occurrenceFactory = new OccurrencesRestrictionFactory();
