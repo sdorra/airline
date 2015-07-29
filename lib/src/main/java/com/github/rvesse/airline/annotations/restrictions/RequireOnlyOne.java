@@ -11,14 +11,14 @@ import java.lang.annotation.Target;
  * tag.
  * <p>
  * By using the same tag across several annotated options you can state that you
- * require at least one of those options to be present. If you require at least
- * one from some set of options you should instead use
+ * require only one of those options to be present. If you require one/more from
+ * some set of options you should instead use the less restrictive
  * {@link RequireSome}
  * </p>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
-public @interface MutuallyExclusiveWith {
+public @interface RequireOnlyOne {
 
     /**
      * Provides a tag used to identify some set of options

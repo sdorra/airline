@@ -7,6 +7,8 @@ import java.util.Set;
 
 import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
 import com.github.rvesse.airline.annotations.restrictions.Port;
+import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
+import com.github.rvesse.airline.annotations.restrictions.RequireSome;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.annotations.restrictions.Unrestricted;
 import com.github.rvesse.airline.annotations.restrictions.ranges.ByteRange;
@@ -66,6 +68,11 @@ public class RestrictionRegistry {
         registerCommon(ByteRange.class, rangeFactory);
         registerCommon(DoubleRange.class, rangeFactory);
         registerCommon(FloatRange.class, rangeFactory);
+        
+        // Group restrictions
+        RequireFromRestrictionFactory requireFactory = new RequireFromRestrictionFactory();
+        OPTION_RESTRICTION_FACTORIES.put(RequireOnlyOne.class, requireFactory);
+        OPTION_RESTRICTION_FACTORIES.put(RequireSome.class, requireFactory);
         
         // Specialized restrictions
         registerCommon(Port.class, new PortRestrictionFactory());

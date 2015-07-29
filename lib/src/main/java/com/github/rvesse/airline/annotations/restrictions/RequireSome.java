@@ -10,9 +10,8 @@ import java.lang.annotation.Target;
  * required, the set of options are identified by a user defined tag.
  * <p>
  * By using the same tag across several annotated options you can state that you
- * require at least one of those options to be present. If you require at most
- * one of some set of options you should instead use
- * {@link MutuallyExclusiveWith}
+ * require at least one of those options to be present. If you require only one
+ * from some set of options you should instead use {@link RequireOnlyOne}
  * </p>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
