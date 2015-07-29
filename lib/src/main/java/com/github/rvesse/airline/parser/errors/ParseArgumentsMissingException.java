@@ -35,6 +35,11 @@ public class ParseArgumentsMissingException extends ParseRestrictionViolatedExce
         super("Required arguments are missing: '%s'", StringUtils.join(argumentTitles, ','));
         this.argumentTitles = argumentTitles;
     }
+    
+    public ParseArgumentsMissingException(String message, List<String> argumentTitles, Object... args) {
+        super(message, args);
+        this.argumentTitles = argumentTitles;
+    }
 
     /**
      * Gets the argument title

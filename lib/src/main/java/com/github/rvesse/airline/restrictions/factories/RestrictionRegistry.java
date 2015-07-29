@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
+import com.github.rvesse.airline.annotations.restrictions.MaxOccurrences;
+import com.github.rvesse.airline.annotations.restrictions.MinOccurrences;
+import com.github.rvesse.airline.annotations.restrictions.Once;
 import com.github.rvesse.airline.annotations.restrictions.Port;
 import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
 import com.github.rvesse.airline.annotations.restrictions.RequireSome;
@@ -73,6 +76,12 @@ public class RestrictionRegistry {
         RequireFromRestrictionFactory requireFactory = new RequireFromRestrictionFactory();
         OPTION_RESTRICTION_FACTORIES.put(RequireOnlyOne.class, requireFactory);
         OPTION_RESTRICTION_FACTORIES.put(RequireSome.class, requireFactory);
+        
+        // Occurrences restrictions
+        OccurrencesRestrictionFactory occurrenceFactory = new OccurrencesRestrictionFactory();
+        registerCommon(Once.class, occurrenceFactory);
+        registerCommon(MaxOccurrences.class, occurrenceFactory);
+        registerCommon(MinOccurrences.class, occurrenceFactory);
         
         // Specialized restrictions
         registerCommon(Port.class, new PortRestrictionFactory());
