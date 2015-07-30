@@ -14,6 +14,10 @@
 
   <name>Airline - Library</name>
   <description>Java library provided an annotation-based framework for parsing Git like command line structures</description>
+  
+  <properties>
+    <license.header.path>${project.parent.basedir}</license.header.path>
+  </properties>
 
   <dependencies>
     <dependency>

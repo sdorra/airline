@@ -8,6 +8,10 @@
   <artifactId>airline-examples</artifactId>
   <name>Airline - Examples</name>
   <description>Provides a variety of examples of using Airline</description>
+  
+  <properties>
+    <license.header.path>${project.parent.basedir}</license.header.path>
+  </properties>
 
   <dependencies>
     <dependency>
