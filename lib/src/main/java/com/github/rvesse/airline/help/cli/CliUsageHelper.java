@@ -1,6 +1,22 @@
+/**
+ * Copyright (C) 2010-15 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.rvesse.airline.help.cli;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,9 +32,9 @@ import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 
-public class CliUsageGeneratorHelper extends AbstractUsageGenerator {
+public class CliUsageHelper extends AbstractUsageGenerator {
 
-    public CliUsageGeneratorHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
+    public CliUsageHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
         super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
     }
 
@@ -77,6 +93,7 @@ public class CliUsageGeneratorHelper extends AbstractUsageGenerator {
         // Print preamble if present
         if (!StringUtils.isEmpty(hint.getPreamble())) {
             descriptionPrinter.append(hint.getPreamble());
+            descriptionPrinter.newline();
         }
 
         // Print more details if there are some content blocks present
@@ -85,24 +102,42 @@ public class CliUsageGeneratorHelper extends AbstractUsageGenerator {
             switch (hint.getFormat()) {
             case TABLE:
             case TABLE_WITH_HEADERS:
-                // TODO Print as table
-                // UsagePrinter tablePrinter =
-                // descriptionPrinter.newIndentedPrinter(4);
-                // tablePrinter.appendTable(table, rowSpacing)
+                // Print as table
+                // Convert to form that appendTable() understands
+                // i.e. columns -> rows
+                int maxRows = 0;
+                for (int col = 0; col < hint.numContentBlocks(); col++) {
+                    maxRows = Math.max(maxRows, hint.getContentBlock(col).length);
+                }
+                List<List<String>> rows = new ArrayList<List<String>>();
+                for (int row = 0; row < maxRows; row++) {
+                    List<String> rowData = new ArrayList<String>();
+                    for (int col = 0; col < hint.numContentBlocks(); col++) {
+                        String[] colData = hint.getContentBlock(col);
+                        rowData.add(row < colData.length ? colData[row] : null);
+                    }
+                    rows.add(rowData);
+                }
+                
+                // Print out table
+                UsagePrinter tablePrinter = descriptionPrinter.newIndentedPrinter(4);
+                tablePrinter.appendTable(rows, 1);
+                tablePrinter.flush();
                 break;
             case LIST:
                 // Print first content block as an indented list list
                 UsagePrinter listPrinter = descriptionPrinter.newIndentedPrinter(4);
                 for (String item : hint.getContentBlock(0)) {
-                    descriptionPrinter.append(item).newline();
+                    listPrinter.append(item).newline();
                 }
                 listPrinter.flush();
                 break;
             default:
-                // Print first content block as text
-                descriptionPrinter.newline();
-                for (String line : hint.getContentBlock(0)) {
-                    descriptionPrinter.append(line).newline();
+                // Print content blocks as text
+                for (int i = 0; i < hint.numContentBlocks(); i++) {
+                    for (String line : hint.getContentBlock(i)) {
+                        descriptionPrinter.append(line).newline();
+                    }
                 }
                 break;
             }

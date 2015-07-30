@@ -28,11 +28,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
 
 /**
  * A usage generator that generates HTML documentation
@@ -273,9 +275,10 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("</div>\n");
 
             // Allowed values
-            AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
-            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(writer, option, allowedValues);
+            for (OptionRestriction restriction : option.getRestrictions()) {
+                if (restriction instanceof HelpHint) {
+                    outputOptionRestriction(writer, option, restriction, (HelpHint) restriction);
+                }
             }
         }
 
@@ -326,31 +329,95 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param option
      *            Option meta-data
-     * @param allowedValues
-     *            Allowed values restriction
+     * @param restriction
+     *            Restriction
+     * @param hint
+     *            Help hint
      * @throws IOException
      */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option, AbstractAllowedValuesRestriction allowedValues)
-            throws IOException {
+    protected void outputOptionRestriction(Writer writer, OptionMetadata option, OptionRestriction restriction,
+            HelpHint hint) throws IOException {
         writer.append("<div class=\"row\">\n");
         writer.append("<div class=\"span8 offset3\">\n");
-        writer.append("This options value");
-        if (option.getArity() == 1) {
-            writer.append(" is ");
-        } else {
-            writer.append("s are ");
-        }
-        writer.append("restricted to the following");
-        if (allowedValues.ignoresCase()) {
-            writer.append(" case insensitive");
-        }
-        writer.append(" value(s):\n");
 
-        writer.append("<ul>");
-        for (String value : allowedValues.getAllowedValues()) {
-            writer.append("<li>").append(value).append("</li>\n");
+        // Append preamble if present
+        if (!StringUtils.isEmpty(hint.getPreamble())) {
+            writer.append(htmlize(hint.getPreamble()));
+            writer.append(NEWLINE);
         }
-        writer.append("</ul>");
+
+        if (hint.numContentBlocks() > 0) {
+            // Append help content
+            switch (hint.getFormat()) {
+            case EXAMPLES:
+                // Treat as code examples
+                String[] examples = hint.getContentBlock(0);
+                for (int i = 0; i < examples.length; i++) {
+                    writer.append("<pre>");
+                    writer.append(examples[i]);
+                    writer.append("</pre>").append(NEWLINE);
+
+                    for (int j = 1; j < hint.numContentBlocks(); j++) {
+                        String[] explanations = hint.getContentBlock(j);
+                        if (i < explanations.length) {
+                            writer.append("<p>").append(NEWLINE);
+                            writer.append(htmlize(explanations[i]));
+                            writer.append("</p>").append(NEWLINE);
+                        }
+                    }
+                }
+                break;
+            case LIST:
+                // Treat as a list
+                writer.append("<ul>").append(NEWLINE);
+                for (String item : hint.getContentBlock(0)) {
+                    writer.append("<li>");
+                    writer.append(htmlize(item));
+                    writer.append("</li>").append(NEWLINE);
+                }
+                writer.append("</ul>");
+                break;
+            case TABLE:
+            case TABLE_WITH_HEADERS:
+                // Find max rows
+                boolean useHeaders = hint.getFormat() == HelpFormat.TABLE_WITH_HEADERS;
+                int maxRows = 0;
+                for (int col = 0; col < hint.numContentBlocks(); col++) {
+                    maxRows = Math.max(maxRows, hint.getContentBlock(col).length);
+                }
+                writer.append("<table>").append(NEWLINE);
+
+                // Output table rows
+                for (int row = 0; row < maxRows; row++) {
+                    writer.append("<tr>").append(NEWLINE);
+                    for (int col = 0; col < hint.numContentBlocks(); col++) {
+                        String[] colData = hint.getContentBlock(col);
+                        writer.append(useHeaders ? "<th>" : "<td>");
+                        if (row < colData.length) {
+                            writer.append(htmlize(colData[row]));
+                        }
+                        writer.append(useHeaders ? "</th>" : "</td>");
+                        writer.append(NEWLINE);
+                    }
+                    useHeaders = false;
+                    writer.append("</tr>").append(NEWLINE);
+                }
+
+                writer.append("</table>").append(NEWLINE);
+                break;
+            default:
+                // Treat as paragraphs of text
+                for (int i = 0; i < hint.numContentBlocks(); i++) {
+                    for (String para : hint.getContentBlock(i)) {
+                        writer.append("<p>").append(NEWLINE);
+                        writer.append(htmlize(para));
+                        writer.append("</p>").append(NEWLINE);
+                    }
+                }
+                break;
+            }
+        }
+
         writer.append("</div>\n");
         writer.append("</div>\n");
     }

@@ -105,6 +105,8 @@ public class AbstractUsageGenerator {
      * @return HTMLized string
      */
     protected final String htmlize(final String value) {
+        if (StringUtils.isEmpty(value))
+            return "";
         return value.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>");
     }
 

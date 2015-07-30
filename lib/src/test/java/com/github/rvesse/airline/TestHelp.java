@@ -428,7 +428,7 @@ public class TestHelp {
                 "        -mode <mode>\n" +
                 "            A string from a restricted set of values\n" +
                 "\n" +
-                "            This options value is restricted to the following value(s):\n" +
+                "            This options value is restricted to the following set of values:\n" +
                 "                a\n" +
                 "                b\n" +
                 "                c\n" +
@@ -457,7 +457,7 @@ public class TestHelp {
                 "* `-mode` <mode>:\n" +
                 "A string from a restricted set of values\n" +
                 "\n" +
-                "  This options value is restricted to the following value(s): [a, b, c]");
+                "  This options value is restricted to the following set of values: [a, b, c]");
         
         //@formatter:on
     }
@@ -950,7 +950,7 @@ public class TestHelp {
                 "\n" +
                 "`git` [ -v ] [<group>] <command> [command-args]\n" +
                 "\n" +
-                "## GLOBAL OPTIONS\n" +
+                "## OPTIONS\n" +
                 "\n" +
                 "* `-v`:\n" +
                 "Verbose mode\n" +
@@ -1101,7 +1101,7 @@ public class TestHelp {
                 "\n" +
                 "`git` [ -v ] [<group>] <command> [command-args]\n" +
                 "\n" +
-                "## GLOBAL OPTIONS\n" +
+                "## OPTIONS\n" +
                 "\n" +
                 "* `-v`:\n" +
                 "Verbose mode\n" +

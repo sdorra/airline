@@ -34,7 +34,7 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
     
-    private final CliUsageGeneratorHelper helper;
+    private final CliUsageHelper helper;
 
     public CliCommandUsageGenerator() {
         this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, false);
@@ -58,9 +58,9 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         helper = createHelper(optionComparator, includeHidden);
     }
 
-    protected CliUsageGeneratorHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
+    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
             boolean includeHidden) {
-        return new CliUsageGeneratorHelper(optionComparator, includeHidden);
+        return new CliUsageHelper(optionComparator, includeHidden);
     }
 
     @Override

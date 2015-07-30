@@ -30,7 +30,7 @@ import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARAT
 
 public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
     
-    private final CliUsageGeneratorHelper helper;
+    private final CliUsageHelper helper;
 
     public CliGlobalUsageGenerator() {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
@@ -59,9 +59,9 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
         helper = createHelper(optionComparator, includeHidden);
     }
 
-    protected CliUsageGeneratorHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
+    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
             boolean includeHidden) {
-        return new CliUsageGeneratorHelper(optionComparator, includeHidden);
+        return new CliUsageHelper(optionComparator, includeHidden);
     }
 
     @Override

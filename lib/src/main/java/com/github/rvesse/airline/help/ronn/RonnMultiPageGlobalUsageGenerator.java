@@ -44,19 +44,19 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerator<T> {
 
     public RonnMultiPageGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, true));
+        this(ManSections.GENERAL_COMMANDS, false, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, true));
     }
 
     public RonnMultiPageGlobalUsageGenerator(int manSection) {
-        this(manSection, new RonnCommandUsageGenerator(manSection, false, true));
+        this(manSection, false, new RonnCommandUsageGenerator(manSection, false, true));
     }
 
     public RonnMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden) {
-        this(manSection, new RonnCommandUsageGenerator(manSection, includeHidden, true));
+        this(manSection, includeHidden, new RonnCommandUsageGenerator(manSection, includeHidden, true));
     }
 
-    protected RonnMultiPageGlobalUsageGenerator(int manSection, CommandUsageGenerator commandUsageGenerator) {
-        super(manSection, commandUsageGenerator);
+    protected RonnMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden, CommandUsageGenerator commandUsageGenerator) {
+        super(manSection, includeHidden, commandUsageGenerator);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
     }
 
     protected void outputReferenceToSuite(GlobalMetadata<T> global, Writer writer) throws IOException {
-        writer.append(NEW_PARA).append("## ").append(global.getName().toUpperCase()).append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append("## ").append(global.getName().toUpperCase()).append(RonnUsageHelper.NEW_PARA);
         writer.append("Part of the `").append(global.getName()).append("(").append(Integer.toString(this.manSection))
                 .append(")` suite");
     }

@@ -26,12 +26,12 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.CommandUsageGenerator;
+import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractGlobalUsageGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
 
 /**
  * <p>
@@ -49,30 +49,29 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
 
     protected final CommandUsageGenerator commandUsageGenerator;
     protected final int manSection;
-    /**
-     * Constant for a new paragraph
-     */
-    protected static final String NEW_PARA = "\n\n";
-    /**
-     * Constant for a horizontal rule
-     */
-    protected static final String HORIZONTAL_RULE = "---";
+    protected final RonnUsageHelper helper;
 
     public RonnGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, false));
+        this(ManSections.GENERAL_COMMANDS, false, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, false));
     }
 
     public RonnGlobalUsageGenerator(int manSection) {
-        this(manSection, new RonnCommandUsageGenerator(manSection, false, false));
+        this(manSection, false, new RonnCommandUsageGenerator(manSection, false, false));
     }
 
     public RonnGlobalUsageGenerator(int manSection, boolean includeHidden) {
-        this(manSection, new RonnCommandUsageGenerator(manSection, includeHidden, false));
+        this(manSection, includeHidden, new RonnCommandUsageGenerator(manSection, includeHidden, false));
     }
 
-    protected RonnGlobalUsageGenerator(int manSection, CommandUsageGenerator commandUsageGenerator) {
+    protected RonnGlobalUsageGenerator(int manSection, boolean includeHidden, CommandUsageGenerator commandUsageGenerator) {
+        super(includeHidden);
         this.commandUsageGenerator = commandUsageGenerator;
         this.manSection = manSection;
+        this.helper = createHelper(includeHidden);
+    }
+
+    protected RonnUsageHelper createHelper(boolean includeHidden) {
+        return new RonnUsageHelper(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
 
     @Override
@@ -89,19 +88,19 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
         outputSynopsis(writer, global);
 
         if (options.size() > 0) {
-            outputGlobalOptions(writer, options);
+            helper.outputOptions(writer, options, "## ");
         }
 
         // TODO If we add Discussion and Examples to global meta-data reinstate
         // this
         //@formatter:off
 //        if (global.getDiscussion() != null) {
-//            writer.append(NEW_PARA).append("## DISCUSSION").append(NEW_PARA);
+//            writer.append(RonnUsageHelper.NEW_PARA).append("## DISCUSSION").append(RonnUsageHelper.NEW_PARA);
 //            writer.append(global.getDiscussion());
 //        }
 //
 //        if (global.getExamples() != null && !global.getExamples().isEmpty()) {
-//            writer.append(NEW_PARA).append("## EXAMPLES");
+//            writer.append(RonnUsageHelper.NEW_PARA).append("## EXAMPLES");
 //
 //            // this will only work for "well-formed" examples
 //            for (int i = 0; i < global.getExamples().size(); i += 3) {
@@ -111,7 +110,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
 //                    aText = aText.substring(1).trim();
 //                }
 //
-//                writer.append(NEW_PARA).append("* ").append(aText).append(":\n");
+//                writer.append(RonnUsageHelper.NEW_PARA).append("* ").append(aText).append(":\n");
 //            }
 //        }
         //@formatter:on
@@ -150,16 +149,16 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      * @throws IOException
      */
     protected void outputGroupCommandList(Writer writer, GlobalMetadata<T> global) throws IOException {
-        writer.append(NEW_PARA).append("## COMMAND GROUPS").append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append("## COMMAND GROUPS").append(RonnUsageHelper.NEW_PARA);
         writer.append("Commands are grouped as follows:");
 
         if (global.getDefaultGroupCommands().size() > 0) {
-            writer.append(NEW_PARA).append("* Default (no <group> specified)");
+            writer.append(RonnUsageHelper.NEW_PARA).append("* Default (no <group> specified)");
             for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
                 if (command.isHidden() && !this.includeHidden())
                     continue;
 
-                writer.append(NEW_PARA).append("  * `").append(getCommandName(global, null, command)).append("`:\n");
+                writer.append(RonnUsageHelper.NEW_PARA).append("  * `").append(getCommandName(global, null, command)).append("`:\n");
                 writer.append("  ").append(command.getDescription());
             }
         }
@@ -168,14 +167,14 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
             if (group.isHidden() && !this.includeHidden())
                 continue;
 
-            writer.append(NEW_PARA).append("* **").append(group.getName()).append("**").append(NEW_PARA);
+            writer.append(RonnUsageHelper.NEW_PARA).append("* **").append(group.getName()).append("**").append(RonnUsageHelper.NEW_PARA);
             writer.append("  ").append(group.getDescription());
 
             for (CommandMetadata command : sortCommands(group.getCommands())) {
                 if (command.isHidden() && !this.includeHidden())
                     continue;
 
-                writer.append(NEW_PARA).append("  * `").append(getCommandName(global, group.getName(), command))
+                writer.append(RonnUsageHelper.NEW_PARA).append("  * `").append(getCommandName(global, group.getName(), command))
                         .append("`:\n");
                 writer.append("  ").append(command.getDescription());
             }
@@ -198,83 +197,15 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      * @throws IOException
      */
     protected void outputCommandList(Writer writer, GlobalMetadata<T> global) throws IOException {
-        writer.append(NEW_PARA).append("## COMMANDS");
+        writer.append(RonnUsageHelper.NEW_PARA).append("## COMMANDS");
 
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden() && !this.includeHidden())
                 continue;
 
-            writer.append(NEW_PARA).append("* `").append(getCommandName(global, null, command)).append("`:\n");
+            writer.append(RonnUsageHelper.NEW_PARA).append("* `").append(getCommandName(global, null, command)).append("`:\n");
             writer.append(command.getDescription());
         }
-    }
-
-    /**
-     * Outputs a documentation section detailing the available global options
-     * 
-     * @param writer
-     *            Writer
-     * @param options
-     *            Options
-     * @throws IOException
-     */
-    protected void outputGlobalOptions(Writer writer, List<OptionMetadata> options) throws IOException {
-        writer.append(NEW_PARA).append("## GLOBAL OPTIONS");
-        options = sortOptions(options);
-
-        for (OptionMetadata option : options) {
-            // skip hidden options
-            if (option.isHidden() && !this.includeHidden())
-                continue;
-
-            // option names
-            writer.append(NEW_PARA).append("* ").append(toDescription(option)).append(":\n");
-
-            // description
-            writer.append(option.getDescription());
-
-            // allowedValues
-            AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
-            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(writer, option, allowedValues);
-            }
-        }
-    }
-
-    /**
-     * Outputs a documentation section detailing the allowed values for an
-     * option
-     * 
-     * @param writer
-     *            Writer
-     * @param option
-     *            Option
-     * @param allowedValues Allowed values restriction
-     * @throws IOException
-     */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option, AbstractAllowedValuesRestriction allowedValues) throws IOException {
-        writer.append(NEW_PARA).append("  This options value");
-        if (option.getArity() == 1) {
-            writer.append(" is ");
-        } else {
-            writer.append("s are ");
-        }
-        writer.append("restricted to the following");
-        if (allowedValues.ignoresCase()) {
-            writer.append(" case insensitive");
-        }
-        writer.append(" value(s): [");
-
-        boolean first = true;
-        for (String value : allowedValues.getAllowedValues()) {
-            if (first) {
-                first = false;
-            } else {
-                writer.append(", ");
-            }
-            writer.append(value);
-        }
-        writer.append("]");
     }
 
     /**
@@ -289,7 +220,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      * @throws IOException
      */
     protected void outputSynopsis(Writer writer, GlobalMetadata<T> global) throws IOException {
-        writer.append(NEW_PARA).append("## SYNOPSIS").append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append("## SYNOPSIS").append(RonnUsageHelper.NEW_PARA);
         writer.append("`").append(global.getName()).append("`");
         if (global.getOptions() != null && global.getOptions().size() > 0) {
             writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(global.getOptions())), ' '));
@@ -329,7 +260,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      * @throws IOException
      */
     protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global) throws IOException {
-        writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append(RonnUsageHelper.HORIZONTAL_RULE).append(RonnUsageHelper.NEW_PARA);
 
         // Default group usages
         outputDefaultGroupCommandUsages(output, writer, global);
@@ -381,7 +312,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
             writer.flush();
             output.flush();
             commandUsageGenerator.usage(global.getName(), group.getName(), command.getName(), command, output);
-            writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
+            writer.append(RonnUsageHelper.NEW_PARA).append(RonnUsageHelper.HORIZONTAL_RULE).append(RonnUsageHelper.NEW_PARA);
         }
     }
 
@@ -406,7 +337,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
             writer.flush();
             output.flush();
             commandUsageGenerator.usage(global.getName(), null, command.getName(), command, output);
-            writer.append(NEW_PARA).append(HORIZONTAL_RULE).append(NEW_PARA);
+            writer.append(RonnUsageHelper.NEW_PARA).append(RonnUsageHelper.HORIZONTAL_RULE).append(RonnUsageHelper.NEW_PARA);
         }
     }
 

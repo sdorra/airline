@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.CompletionBehaviour;
@@ -32,6 +33,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
+import com.github.rvesse.airline.utils.predicates.restrictions.AllowedValuesOptionFinder;
 
 public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
@@ -422,7 +424,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
                     writer.append("ARG_GENERATED_VALUES=$( ").append(option.getCompletionCommand()).append(" )")
                             .append(NEWLINE);
                 }
-                AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
+                AbstractAllowedValuesRestriction allowedValues = (AbstractAllowedValuesRestriction) CollectionUtils.find(option.getRestrictions(), new AllowedValuesOptionFinder());
                 if (allowedValues != null && allowedValues.getAllowedValues().size() > 0) {
                     writeWordListVariable(writer, 8, "ARG_VALUES", allowedValues.getAllowedValues().iterator());
                 }

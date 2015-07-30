@@ -26,11 +26,10 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
 
 /**
  * A command usage generator which generates help in <a
@@ -42,14 +41,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
     private final int manSection;
     private final boolean standalone;
-    /**
-     * Constant for new paragraph
-     */
-    protected static final String NEW_PARA = "\n\n";
-    /**
-     * Constant for horizontal rule
-     */
-    protected static final String HORIZONTAL_RULE = "---";
+    private final RonnUsageHelper helper;
 
     public RonnCommandUsageGenerator() {
         this(ManSections.GENERAL_COMMANDS, false, true);
@@ -73,6 +65,11 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         super(includeHidden);
         this.manSection = manSection;
         this.standalone = standalone;
+        this.helper = createHelper(includeHidden);
+    }
+
+    protected RonnUsageHelper createHelper(boolean includeHidden) {
+        return new RonnUsageHelper(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
 
     @Override
@@ -125,78 +122,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      */
     protected void outputOptions(Writer writer, CommandMetadata command, List<OptionMetadata> options,
             String sectionHeader) throws IOException {
-        writer.append(NEW_PARA).append(sectionHeader).append("OPTIONS");
-        options = sortOptions(options);
-
-        for (OptionMetadata option : options) {
-            // skip hidden options
-            if (option.isHidden() && !this.includeHidden()) {
-                continue;
-            }
-
-            // option names
-            writer.append(NEW_PARA).append("* ").append(toDescription(option)).append(":\n");
-
-            // description
-            writer.append(option.getDescription());
-
-            // allowedValues
-            AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
-            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(writer, option, allowedValues);
-            }
-        }
-
-        if (command.getArguments() != null) {
-            // Arguments separator
-            writer.append(NEW_PARA).append("* `").append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).append("`:\n");
-
-            // description
-            writer.append("This option can be used to separate command-line options from the "
-                    + "list of arguments (useful when arguments might be mistaken for command-line options).");
-
-            // arguments name
-            writer.append(NEW_PARA).append("* ").append(toDescription(command.getArguments())).append(":\n");
-
-            // description
-            writer.append(command.getArguments().getDescription());
-        }
-    }
-
-    /**
-     * Outputs a documentation section detailing the allowed values for an
-     * option
-     * 
-     * @param writer
-     *            Writer
-     * @param option
-     *            Option meta-data
-     * @param allowedValues Allowed values restriction
-     * @throws IOException
-     */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option, AbstractAllowedValuesRestriction allowedValues) throws IOException {
-        writer.append(NEW_PARA).append("  This options value");
-        if (option.getArity() == 1) {
-            writer.append(" is ");
-        } else {
-            writer.append("s are ");
-        }
-        writer.append("restricted to the following");
-        if (allowedValues.ignoresCase()) {
-            writer.append(" case insensitive");
-        }
-        writer.append(" value(s): [");
-
-        boolean first = true;
-        for (String value : allowedValues.getAllowedValues()) {
-            if (first) {
-                first = false;
-            } else {
-                writer.append(", ");
-            }
-            writer.append(value);
-        }
-        writer.append("]");
+        helper.outputOptions(writer, options, sectionHeader);
+        helper.outputArguments(writer, command);
     }
 
     /**
@@ -220,7 +147,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      */
     protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String groupName,
             String commandName, CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(NEW_PARA).append(sectionHeader).append("SYNOPSIS").append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("SYNOPSIS").append(RonnUsageHelper.NEW_PARA);
         List<OptionMetadata> options = new ArrayList<>();
         List<OptionMetadata> aOptions;
         if (programName != null) {
@@ -250,7 +177,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
 
         if (!this.standalone) {
-            writer.append(NEW_PARA).append(command.getDescription());
+            writer.append(RonnUsageHelper.NEW_PARA).append(command.getDescription());
         }
         return options;
     }
@@ -275,11 +202,11 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      */
     protected void outputExitCodes(Writer writer, String programName, String groupName, String commandName,
             CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(NEW_PARA).append(sectionHeader).append("EXIT STATUS");
-        writer.append(NEW_PARA).append("The `");
+        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("EXIT STATUS");
+        writer.append(RonnUsageHelper.NEW_PARA).append("The `");
         writeFullCommandName(programName, groupName, commandName, writer);
         writer.append("` command exits with one of the following values:");
-        writer.append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA);
 
         for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
             // Print the exit code
@@ -306,10 +233,10 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @throws IOException
      */
     protected void outputExamples(Writer writer, CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(NEW_PARA).append(sectionHeader).append("EXAMPLES");
+        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("EXAMPLES");
 
         for (String example : command.getExamples()) {
-            writer.append(NEW_PARA).append(example);
+            writer.append(RonnUsageHelper.NEW_PARA).append(example);
         }
     }
 
@@ -328,11 +255,11 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
             return;
 
-        writer.append(NEW_PARA).append(sectionHeader).append("DISCUSSION").append(NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("DISCUSSION").append(RonnUsageHelper.NEW_PARA);
         for (String discussionPara : command.getDiscussion()) {
             if (StringUtils.isEmpty(discussionPara))
                 continue;
-            writer.append(discussionPara).append(NEW_PARA);
+            writer.append(discussionPara).append(RonnUsageHelper.NEW_PARA);
         }
     }
 
