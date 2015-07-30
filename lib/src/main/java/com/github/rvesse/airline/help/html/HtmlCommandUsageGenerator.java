@@ -26,13 +26,13 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.help.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
 
 /**
  * A usage generator that generates HTML documentation
@@ -273,7 +273,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("</div>\n");
 
             // Allowed values
-            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
+            AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
             if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
                 outputAllowedValues(writer, option, allowedValues);
             }
@@ -330,7 +330,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Allowed values restriction
      * @throws IOException
      */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option, AllowedRawValuesRestriction allowedValues)
+    protected void outputAllowedValues(Writer writer, OptionMetadata option, AbstractAllowedValuesRestriction allowedValues)
             throws IOException {
         writer.append("<div class=\"row\">\n");
         writer.append("<div class=\"span8 offset3\">\n");

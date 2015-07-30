@@ -24,6 +24,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.annotations.restrictions.PortType;
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
@@ -33,7 +35,7 @@ import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class PortRestriction extends AbstractRestriction {
+public class PortRestriction extends AbstractRestriction implements HelpHint {
     private static final int MIN_PORT = 0, MAX_PORT = 65535;
 
     private Set<PortType> acceptablePorts = new HashSet<>();
@@ -143,5 +145,35 @@ public class PortRestriction extends AbstractRestriction {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+        if (this.acceptablePorts.contains(PortType.ANY)) {
+            return new String[] { String.format(
+                    "This options value represents a port and must fall in the port range %s", PortType.ANY.toString()) };
+        } else {
+            return new String[] { String.format(
+                    "This options value represents a port and must fall in one of the following port ranges: %s",
+                    PortType.toRangesString(this.acceptablePorts)) };
+
+        }
     }
 }

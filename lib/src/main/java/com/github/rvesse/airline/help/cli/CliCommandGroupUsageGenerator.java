@@ -18,8 +18,8 @@ package com.github.rvesse.airline.help.cli;
 import java.io.IOException;
 import java.util.*;
 
-import com.github.rvesse.airline.help.AbstractPrintedCommandGroupUsageGenerator;
-import com.github.rvesse.airline.help.UsagePrinter;
+import com.github.rvesse.airline.help.common.AbstractPrintedCommandGroupUsageGenerator;
+import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;

@@ -15,78 +15,51 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
-import java.util.LinkedHashSet;
 import java.util.Locale;
-import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.SetUtils;
-
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.predicates.LocaleSensitiveStringFinder;
 
-public class AllowedRawValuesRestriction extends AbstractRestriction {
+public class AllowedRawValuesRestriction extends AbstractAllowedValuesRestriction {
 
-    private final Set<String> allowedValues = new LinkedHashSet<String>();
     private final Locale locale;
-    private final boolean caseInsensitive;
 
     public AllowedRawValuesRestriction(boolean ignoreCase, Locale locale, String... values) {
+        super(ignoreCase);
         if (locale == null)
             locale = Locale.ENGLISH;
         this.locale = locale;
-        this.caseInsensitive = ignoreCase;
         for (String value : values) {
             if (ignoreCase)
                 value = value.toLowerCase(locale);
-            allowedValues.add(value);
+            rawValues.add(value);
         }
-    }
-
-    public Set<String> getAllowedValues() {
-        return SetUtils.unmodifiableSet(this.allowedValues);
-    }
-
-    public boolean ignoresCase() {
-        return this.caseInsensitive;
-    }
-
-    public Locale usesLocale() {
-        return locale;
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
         // Not enforced if no values specified
-        if (allowedValues.isEmpty())
+        if (rawValues.isEmpty())
             return;
 
         // Check in list of values
-        if (!CollectionUtils.exists(this.allowedValues, new LocaleSensitiveStringFinder(value, this.locale)))
-            throw new ParseOptionIllegalValueException(option.getTitle(), value, asObjects(allowedValues));
-    }
-
-    private static Set<Object> asObjects(Set<String> set) {
-        Set<Object> newSet = new LinkedHashSet<Object>();
-        for (String item : set) {
-            newSet.add((Object) item);
-        }
-        return newSet;
+        if (!CollectionUtils.exists(this.rawValues, new LocaleSensitiveStringFinder(value, this.locale)))
+            throw new ParseOptionIllegalValueException(option.getTitle(), value, asObjects(rawValues));
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, ArgumentsMetadata arguments, String value) {
         // Not enforced if no values specified
-        if (allowedValues.isEmpty())
+        if (rawValues.isEmpty())
             return;
 
         // Check in list of values
-        if (!CollectionUtils.exists(this.allowedValues, new LocaleSensitiveStringFinder(value, this.locale))) {
+        if (!CollectionUtils.exists(this.rawValues, new LocaleSensitiveStringFinder(value, this.locale))) {
             // Determine appropriate title
             String title;
             if (state.getParsedArguments().size() == 0) {
@@ -96,7 +69,7 @@ public class AllowedRawValuesRestriction extends AbstractRestriction {
             } else {
                 title = arguments.getTitle().get(arguments.getTitle().size() - 1);
             }
-            throw new ParseArgumentsIllegalValueException(title, value, asObjects(allowedValues));
+            throw new ParseArgumentsIllegalValueException(title, value, asObjects(rawValues));
         }
     }
 }

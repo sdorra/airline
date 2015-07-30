@@ -26,12 +26,12 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.CompletionBehaviour;
-import com.github.rvesse.airline.help.AbstractGlobalUsageGenerator;
+import com.github.rvesse.airline.help.common.AbstractGlobalUsageGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
 
 public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
@@ -422,7 +422,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
                     writer.append("ARG_GENERATED_VALUES=$( ").append(option.getCompletionCommand()).append(" )")
                             .append(NEWLINE);
                 }
-                AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
+                AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
                 if (allowedValues != null && allowedValues.getAllowedValues().size() > 0) {
                     writeWordListVariable(writer, 8, "ARG_VALUES", allowedValues.getAllowedValues().iterator());
                 }

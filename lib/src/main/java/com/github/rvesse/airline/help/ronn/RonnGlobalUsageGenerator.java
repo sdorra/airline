@@ -25,13 +25,13 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.help.AbstractGlobalUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
+import com.github.rvesse.airline.help.common.AbstractGlobalUsageGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.AbstractAllowedValuesRestriction;
 
 /**
  * <p>
@@ -234,7 +234,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
             writer.append(option.getDescription());
 
             // allowedValues
-            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
+            AbstractAllowedValuesRestriction allowedValues = getOptionAllowedValues(option);
             if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
                 outputAllowedValues(writer, option, allowedValues);
             }
@@ -252,7 +252,7 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      * @param allowedValues Allowed values restriction
      * @throws IOException
      */
-    protected void outputAllowedValues(Writer writer, OptionMetadata option, AllowedRawValuesRestriction allowedValues) throws IOException {
+    protected void outputAllowedValues(Writer writer, OptionMetadata option, AbstractAllowedValuesRestriction allowedValues) throws IOException {
         writer.append(NEW_PARA).append("  This options value");
         if (option.getArity() == 1) {
             writer.append(" is ");

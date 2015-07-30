@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help;
+package com.github.rvesse.airline.help.common;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,20 +26,20 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
 /**
- * Abstract command group usage generator for generators that use a
+ * Abstract global usage generator for generators that use a
  * {@link UsagePrinter} to generate the documentation
  */
-public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends AbstractCommandGroupUsageGenerator<T> {
+public abstract class AbstractPrintedGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
-    private final int columnSize;
+    private final int columns;
 
-    public AbstractPrintedCommandGroupUsageGenerator(int columnSize,
-            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
-            boolean includeHidden) {
-        super(optionComparator, commandComparator, includeHidden);
-        if (columnSize <= 0)
-            throw new IllegalArgumentException("columnSize must be greater than 0");
-        this.columnSize = columnSize;
+    public AbstractPrintedGlobalUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
+            Comparator<? super CommandMetadata> commandComparator,
+            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
+        super(optionComparator, commandComparator, commandGroupComparator, includeHidden);
+        if (columns <= 0)
+            throw new IllegalArgumentException("columns must be greater than 0");
+        this.columns = columns;
     }
 
     /**
@@ -47,14 +47,11 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
      * 
      * @param global
      *            Global Metadata
-     * @param group
-     *            Group Metadata
      * @param out
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata group, UsagePrinter out)
-            throws IOException;
+    protected abstract void usage(GlobalMetadata<T> global, UsagePrinter out) throws IOException;
 
     /**
      * Creates a usage printer for the given stream
@@ -66,13 +63,13 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
     protected UsagePrinter createUsagePrinter(OutputStream out) {
         if (out == null)
             throw new NullPointerException("out cannot be null");
-        return new UsagePrinter(new OutputStreamWriter(out), columnSize);
+        return new UsagePrinter(new OutputStreamWriter(out), columns);
     }
 
     @Override
-    public void usage(GlobalMetadata<T> global, CommandGroupMetadata group, OutputStream out) throws IOException {
+    public void usage(GlobalMetadata<T> global, OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
-        usage(global, group, printer);
+        usage(global, printer);
         printer.flush();
     }
 

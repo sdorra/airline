@@ -19,18 +19,18 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
-import com.github.rvesse.airline.help.AbstractPrintedGlobalUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
-import com.github.rvesse.airline.help.UsagePrinter;
+import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
+import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
-
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
 public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
+    
+    private final CliUsageGeneratorHelper helper;
 
     public CliGlobalUsageGenerator() {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
@@ -56,6 +56,12 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
             Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
         super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
+        helper = createHelper(optionComparator, includeHidden);
+    }
+
+    protected CliUsageGeneratorHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
+            boolean includeHidden) {
+        return new CliUsageGeneratorHelper(optionComparator, includeHidden);
     }
 
     @Override
@@ -69,7 +75,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
         // Options
         List<OptionMetadata> options = sortOptions(global.getOptions());
         if (options.size() > 0) {
-            outputOptions(out, options);
+            helper.outputOptions(out, options);
         }
 
         // Command list
@@ -100,77 +106,6 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
                 outputCommandDescription(commandPrinter, group, command);
             }
         }
-    }
-
-    /**
-     * Outputs a documentation section detailing options and their usages
-     * 
-     * @param out
-     *            Usage printer
-     * @param options
-     *            Options
-     * @throws IOException
-     */
-    protected void outputOptions(UsagePrinter out, List<OptionMetadata> options) throws IOException {
-        out.append("OPTIONS").newline();
-
-        for (OptionMetadata option : options) {
-
-            if (option.isHidden() && !this.includeHidden()) {
-                continue;
-            }
-
-            // option names
-            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append(toDescription(option)).newline();
-
-            // description
-            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-            descriptionPrinter.append(option.getDescription()).newline();
-
-            // allowedValues
-            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
-            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(descriptionPrinter, option, allowedValues);
-            }
-
-            descriptionPrinter.newline();
-        }
-
-        // Note - Global meta-data does not allow arguments, those are command
-        // specific hence their omission
-    }
-
-    /**
-     * Outputs a documentation section detailing the allowed values for an
-     * option
-     * 
-     * @param out
-     *            Usage printer
-     * @param option
-     *            Option meta-data
-     * @param allowedValues Allowed values restriction
-     * @throws IOException
-     */
-    protected void outputAllowedValues(UsagePrinter out, OptionMetadata option, AllowedRawValuesRestriction allowedValues) throws IOException {
-        out.newline();
-        out.append("This options value");
-        if (option.getArity() == 1) {
-            out.append(" is ");
-        } else {
-            out.append("s are ");
-        }
-        out.append("restricted to the following");
-        if (allowedValues.ignoresCase()) {
-            out.append(" case insensitive");
-        }
-        out.append(" value(s):").newline();
-
-        UsagePrinter allowedValuesPrinter = out.newIndentedPrinter(4);
-        for (String value : allowedValues.getAllowedValues()) {
-            allowedValuesPrinter.append(value).newline();
-        }
-        allowedValuesPrinter.flush();
     }
 
     /**

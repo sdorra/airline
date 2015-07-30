@@ -16,7 +16,7 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
-import com.github.rvesse.airline.help.Suggester;
+import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.List;

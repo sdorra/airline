@@ -23,7 +23,7 @@ import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.annotations.Groups;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
-import com.github.rvesse.airline.help.Suggester;
+import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;

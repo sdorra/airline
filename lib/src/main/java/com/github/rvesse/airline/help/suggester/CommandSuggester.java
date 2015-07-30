@@ -13,32 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help;
+package com.github.rvesse.airline.help.suggester;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 import javax.inject.Inject;
 
 import org.apache.commons.collections4.ListUtils;
 
-import com.github.rvesse.airline.model.CommandGroupMetadata;
-import com.github.rvesse.airline.model.CommandMetadata;
-import com.github.rvesse.airline.model.OptionMetadata;
-
-public class GroupSuggester implements Suggester {
+public class CommandSuggester
+        implements Suggester
+{
     @Inject
-    public CommandGroupMetadata group;
+    public CommandMetadata command;
 
     @Override
-    public Iterable<String> suggest() {
+    public Iterable<String> suggest()
+    {
         List<String> suggestions = new ArrayList<String>();
-        for (CommandMetadata command : group.getCommands()) {
-            suggestions.add(command.getName());
-        }
-        for (OptionMetadata option : group.getOptions()) {
+        for (OptionMetadata option : command.getCommandOptions()) {
             suggestions.addAll(option.getOptions());
         }
+
+        if (command.getArguments() != null) {
+            // Include arguments separator
+            suggestions.add(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
+        }
+
         return ListUtils.unmodifiableList(suggestions);
     }
 }

@@ -166,4 +166,42 @@ public class AirlineUtils {
             return defaultValue;
         return value;
     }
+
+    /**
+     * Formats the range for display
+     * 
+     * @param min
+     *            Minimum (may be null for no minimum)
+     * @param minInclusive
+     *            Whether the minimum is inclusive
+     * @param max
+     *            Maximum (may be null for no maximum)
+     * @param maxInclusive
+     *            Whether the maximum is inclusive
+     * @return Human readable range
+     */
+    public static String toRangeString(Object min, boolean minInclusive, Object max, boolean maxInclusive) {
+        StringBuilder builder = new StringBuilder();
+    
+        if (min != null) {
+            if (max != null) {
+                // min < value < max
+                builder.append(min);
+                builder.append(minInclusive ? " <=" : " <");
+                builder.append(" value ");
+            } else {
+                // value > min
+                builder.append("value ");
+                builder.append(minInclusive ? ">= " : ">");
+                builder.append(min);
+            }
+        }
+        if (max != null) {
+            // [min <] value < max
+            builder.append(maxInclusive ? "<= " : "< ");
+            builder.append(max);
+        }
+    
+        return builder.toString();
+    }
 }

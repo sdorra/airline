@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help;
+package com.github.rvesse.airline.help.common;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +22,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.github.rvesse.airline.help.CommandUsageGenerator;
+import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 

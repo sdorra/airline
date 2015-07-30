@@ -15,9 +15,9 @@
  */
 package com.github.rvesse.airline.help.cli;
 
-import com.github.rvesse.airline.help.AbstractPrintedGlobalUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
-import com.github.rvesse.airline.help.UsagePrinter;
+import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
+import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;

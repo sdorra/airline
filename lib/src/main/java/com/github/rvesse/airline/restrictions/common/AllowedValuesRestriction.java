@@ -31,15 +31,15 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class AllowedValuesRestriction extends AbstractRestriction {
+public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
 
     private final Set<String> rawValues = new LinkedHashSet<>();
 
     public AllowedValuesRestriction(String... rawValues) {
+        super(false);
         this.rawValues.addAll(AirlineUtils.arrayToList(rawValues));
     }
 

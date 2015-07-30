@@ -25,16 +25,16 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.help.AbstractPrintedCommandUsageGenerator;
-import com.github.rvesse.airline.help.UsagePrinter;
+import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
+import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
+    
+    private final CliUsageGeneratorHelper helper;
 
     public CliCommandUsageGenerator() {
         this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, false);
@@ -55,6 +55,12 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     public CliCommandUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
             boolean includeHidden) {
         super(columns, optionComparator, includeHidden);
+        helper = createHelper(optionComparator, includeHidden);
+    }
+
+    protected CliUsageGeneratorHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
+            boolean includeHidden) {
+        return new CliUsageGeneratorHelper(optionComparator, includeHidden);
     }
 
     @Override
@@ -71,7 +77,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         // Options
         ArgumentsMetadata arguments = command.getArguments();
         if (options.size() > 0 || arguments != null) {
-            outputOptions(out, command, options, arguments);
+            outputOptionsAndArguments(out, command, options, arguments);
         }
 
         // Discussion
@@ -199,92 +205,10 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Arguments meta-data
      * @throws IOException
      */
-    protected void outputOptions(UsagePrinter out, CommandMetadata command, List<OptionMetadata> options,
+    protected void outputOptionsAndArguments(UsagePrinter out, CommandMetadata command, List<OptionMetadata> options,
             ArgumentsMetadata arguments) throws IOException {
-        options = sortOptions(options);
-
-        out.append("OPTIONS").newline();
-
-        for (OptionMetadata option : options) {
-            // skip hidden options
-            if (option.isHidden() && !this.includeHidden()) {
-                continue;
-            }
-
-            // option names
-            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append(toDescription(option)).newline();
-            optionPrinter.flush();
-
-            // description
-            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-            descriptionPrinter.append(option.getDescription()).newline();
-
-            // allowedValues
-            AllowedRawValuesRestriction allowedValues = getOptionAllowedValues(option);
-            if (allowedValues != null && allowedValues.getAllowedValues().size() > 0 && option.getArity() >= 1) {
-                outputAllowedValues(descriptionPrinter, option, allowedValues);
-            }
-
-            descriptionPrinter.newline();
-            descriptionPrinter.flush();
-        }
-
-        if (arguments != null) {
-            // Arguments separator option
-            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).newline();
-            optionPrinter.flush();
-
-            // description
-            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-            descriptionPrinter.append(
-                    "This option can be used to separate command-line options from the "
-                            + "list of argument, (useful when arguments might be mistaken for command-line options)")
-                    .newline();
-            descriptionPrinter.newline();
-
-            // arguments name(s)
-            optionPrinter.append(toDescription(arguments)).newline();
-
-            // description
-            descriptionPrinter.append(arguments.getDescription()).newline();
-            descriptionPrinter.newline();
-            descriptionPrinter.flush();
-        }
-    }
-
-    /**
-     * Outputs a documentation section detailing allowed values for an option
-     * 
-     * @param descriptionPrinter
-     *            Description printer
-     * @param option
-     *            Option meta-data
-     * @param allowedValues
-     *            Allowed values restriction
-     * @throws IOException
-     */
-    protected void outputAllowedValues(UsagePrinter descriptionPrinter, OptionMetadata option,
-            AllowedRawValuesRestriction allowedValues) throws IOException {
-        descriptionPrinter.newline();
-        descriptionPrinter.append("This options value");
-        if (option.getArity() == 1) {
-            descriptionPrinter.append(" is ");
-        } else {
-            descriptionPrinter.append("s are ");
-        }
-        descriptionPrinter.append("restricted to the following");
-        if (allowedValues.ignoresCase()) {
-            descriptionPrinter.append(" case insensitive");
-        }
-        descriptionPrinter.append(" value(s):").newline();
-
-        UsagePrinter allowedValuesPrinter = descriptionPrinter.newIndentedPrinter(4);
-        for (String value : allowedValues.getAllowedValues()) {
-            allowedValuesPrinter.append(value).newline();
-        }
-        allowedValuesPrinter.flush();
+        helper.outputOptions(out, options);
+        helper.outputArguments(out, arguments);
     }
 
     /**

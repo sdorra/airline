@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help;
+package com.github.rvesse.airline.help.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,15 +21,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
-import com.github.rvesse.airline.utils.predicates.restrictions.AllowedValuesOptionFinder;
 
 public class AbstractUsageGenerator {
 
@@ -262,22 +260,6 @@ public class AbstractUsageGenerator {
                 stringBuilder.append(' ').append(argumentString);
         }
 
-        //@formatter:off
-//        Joiner.on(", ").appendTo(stringBuilder, transform(options, new Function<String, String>() {
-//            public String apply(String option) {
-//                if (argumentString != null) {
-//                    return option + " " + argumentString;
-//                }
-//                return option;
-//            }
-//        }));
-        //@formatter:on
-
         return stringBuilder.toString();
     }
-    
-    protected AllowedRawValuesRestriction getOptionAllowedValues(OptionMetadata option) {
-        return (AllowedRawValuesRestriction) CollectionUtils.find(option.getRestrictions(), new AllowedValuesOptionFinder());
-    }
-
 }

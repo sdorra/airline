@@ -23,6 +23,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
@@ -33,7 +35,7 @@ import com.github.rvesse.airline.utils.predicates.restrictions.RequiredFromFinde
 import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagOptionFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagParsedOptionFinder;
 
-public class RequireFromRestriction extends AbstractRestriction {
+public class RequireFromRestriction extends AbstractRestriction implements HelpHint {
 
     private final String tag;
     private boolean mutuallyExclusive;
@@ -104,5 +106,33 @@ public class RequireFromRestriction extends AbstractRestriction {
 
     public String getTag() {
         return tag;
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+        if (mutuallyExclusive) {
+            return new String[] { String.format(
+                    "This option is part of the group '%s' from which only one option may be specified", this.tag) };
+        } else {
+            return new String[] { String.format(
+                    "This option is part of the group '%s' from which at least one option must be specified", this.tag) };
+        }
     }
 }

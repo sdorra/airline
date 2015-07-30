@@ -20,8 +20,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
@@ -29,7 +32,7 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class RequiredOnlyIfRestriction implements OptionRestriction {
+public class RequiredOnlyIfRestriction implements OptionRestriction, HelpHint {
 
     private final Set<String> names = new LinkedHashSet<>();
 
@@ -56,7 +59,7 @@ public class RequiredOnlyIfRestriction implements OptionRestriction {
         for (Pair<OptionMetadata, Object> otherOption : state.getParsedOptions()) {
             if (otherOption.getLeft().equals(option))
                 continue;
-            
+
             for (String name : this.names) {
                 if (otherOption.getLeft().getOptions().contains(name))
                     throw new ParseOptionMissingException(option.getTitle());
@@ -67,6 +70,30 @@ public class RequiredOnlyIfRestriction implements OptionRestriction {
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
         // Does nothing
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+        return new String[] { String.format(
+                "This option is required if any of the following options are specified: %s",
+                StringUtils.join(this.names, ", ")) };
     }
 
 }

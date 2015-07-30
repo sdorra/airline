@@ -22,6 +22,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
@@ -31,7 +33,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.restrictions.AbstractRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class OccurrencesRestriction extends AbstractRestriction {
+public class OccurrencesRestriction extends AbstractRestriction implements HelpHint {
 
     private final int occurrences;
     private final boolean maximum;
@@ -80,7 +82,33 @@ public class OccurrencesRestriction extends AbstractRestriction {
         if (occurrences >= arguments.getTitle().size())
             return arguments.getTitle().subList(state.getParsedArguments().size(), arguments.getTitle().size());
         return arguments.getTitle().subList(state.getParsedArguments().size(), occurrences);
-        
+
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+        if (this.maximum) {
+            return new String[] { String.format("This option may occur a maximum of %d times", this.occurrences) };
+        } else {
+            return new String[] { String.format("This option must occur a minimum of %d times", this.occurrences) };
+        }
     }
 
 }

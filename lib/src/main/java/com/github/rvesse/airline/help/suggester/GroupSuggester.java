@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help;
+package com.github.rvesse.airline.help.suggester;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,26 +24,19 @@ import org.apache.commons.collections4.ListUtils;
 
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
-import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
-public class GlobalSuggester<T>
-    implements Suggester
-{
+public class GroupSuggester implements Suggester {
     @Inject
-    public GlobalMetadata<T> metadata;
+    public CommandGroupMetadata group;
 
     @Override
-    public Iterable<String> suggest()
-    {
+    public Iterable<String> suggest() {
         List<String> suggestions = new ArrayList<String>();
-        for (CommandGroupMetadata group : metadata.getCommandGroups()) {
-            suggestions.add(group.getName());
-        }
-        for (CommandMetadata command : metadata.getDefaultGroupCommands()) {
+        for (CommandMetadata command : group.getCommands()) {
             suggestions.add(command.getName());
         }
-        for (OptionMetadata option : metadata.getOptions()) {
+        for (OptionMetadata option : group.getOptions()) {
             suggestions.addAll(option.getOptions());
         }
         return ListUtils.unmodifiableList(suggestions);

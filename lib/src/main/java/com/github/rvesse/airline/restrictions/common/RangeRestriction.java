@@ -21,11 +21,14 @@ import java.util.Comparator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
 import com.github.rvesse.airline.restrictions.AbstractRestriction;
+import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 /**
@@ -33,7 +36,7 @@ import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
  * given range
  *
  */
-public class RangeRestriction extends AbstractRestriction {
+public class RangeRestriction extends AbstractRestriction implements HelpHint {
 
     private final Object min, max;
     private final boolean minInclusive, maxInclusive;
@@ -97,6 +100,29 @@ public class RangeRestriction extends AbstractRestriction {
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+        return new String[] { String.format("This options value must fall in the following range: %s",
+                AirlineUtils.toRangeString(this.min, this.minInclusive, this.max, this.maxInclusive)) };
     }
 
 }
