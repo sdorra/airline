@@ -31,11 +31,11 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class PortRestriction extends AbstractRestriction implements HelpHint {
+public class PortRestriction extends AbstractCommonRestriction implements HelpHint {
     private static final int MIN_PORT = 0, MAX_PORT = 65535;
 
     private Set<PortType> acceptablePorts = new HashSet<>();

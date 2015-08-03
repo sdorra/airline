@@ -20,9 +20,9 @@ import java.util.Set;
 
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 
-public abstract class AbstractAllowedValuesRestriction extends AbstractRestriction implements HelpHint {
+public abstract class AbstractAllowedValuesRestriction extends AbstractCommonRestriction implements HelpHint {
 
     protected final Set<String> rawValues = new LinkedHashSet<String>();
     private final boolean caseInsensitive;

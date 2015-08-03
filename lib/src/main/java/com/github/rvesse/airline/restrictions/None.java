@@ -15,9 +15,15 @@
  */
 package com.github.rvesse.airline.restrictions;
 
+import com.github.rvesse.airline.parser.ParseState;
 
 /**
  * A restriction which doesn't actually impose any restrictions
  */
-public class None extends AbstractRestriction {
+public class None extends AbstractCommonRestriction implements GlobalRestriction {
+
+    @Override
+    public <T> void validate(ParseState<T> state) {
+        // Imposes no restrictions
+    }
 }

@@ -19,12 +19,7 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 
-public abstract class AbstractRestriction implements GlobalRestriction, OptionRestriction, ArgumentsRestriction {
-
-    @Override
-    public <T> void validate(ParseState<T> state) {
-        // Does no validation
-    }
+public abstract class AbstractCommonRestriction implements OptionRestriction, ArgumentsRestriction {
 
     @Override
     public <T> void postValidate(ParseState<T> state, OptionMetadata option) {

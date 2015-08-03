@@ -27,7 +27,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
@@ -36,7 +36,7 @@ import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
  * given range
  *
  */
-public class RangeRestriction extends AbstractRestriction implements HelpHint {
+public class RangeRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final Object min, max;
     private final boolean minInclusive, maxInclusive;

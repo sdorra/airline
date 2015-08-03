@@ -28,14 +28,14 @@ import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.RequiredFromFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagOptionFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagParsedOptionFinder;
 
-public class RequireFromRestriction extends AbstractRestriction implements HelpHint {
+public class RequireFromRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final String tag;
     private boolean mutuallyExclusive;

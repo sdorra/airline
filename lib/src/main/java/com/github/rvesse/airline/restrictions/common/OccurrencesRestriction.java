@@ -30,10 +30,10 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
-import com.github.rvesse.airline.restrictions.AbstractRestriction;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class OccurrencesRestriction extends AbstractRestriction implements HelpHint {
+public class OccurrencesRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final int occurrences;
     private final boolean maximum;
