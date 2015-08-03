@@ -15,17 +15,14 @@
  */
 package com.github.rvesse.airline.restrictions.ranges;
 
+import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.ranges.LexicalRange;
 
-public class OptionRangeBase {
-
-    @Option(name = "-i", title = "Integer", arity = 1)
-    public long i;
+@Command(name = "OptionLexicalRange")
+public class OptionLexicalRangeInclusive extends OptionRangeBase {
     
-    @Option(name = "-d", title = "Double", arity = 1)
-    public double d;
-    
-    @Option(name = "-s", title = "String", arity = 1)
+    @Option(name = "-s", title = "String")
+    @LexicalRange(min = "a", max = "d")
     public String s;
-
 }

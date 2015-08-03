@@ -170,4 +170,28 @@ public class TestRangeRestrictions {
         hasRangeRestriction(parser.getCommandMetadata());
         parser.parse("-d", "1.01");
     }
+    
+    @Test
+    public void lexical_range_inclusive() {
+        SingleCommand<? extends OptionRangeBase> parser = TestingUtil.singleCommandParser(OptionLexicalRangeInclusive.class);
+        hasRangeRestriction(parser.getCommandMetadata());
+        parser.parse("-s", "aardvark");
+        parser.parse("-s", "bear");
+        parser.parse("-s", "coyote");
+        parser.parse("-s", "d");
+    }
+    
+    @Test(expectedExceptions = ParseOptionOutOfRangeException.class, expectedExceptionsMessageRegExp = ".*(a <= value <= d).*")
+    public void lexical_range_inclusive_above_max() {
+        SingleCommand<? extends OptionRangeBase> parser = TestingUtil.singleCommandParser(OptionLexicalRangeInclusive.class);
+        hasRangeRestriction(parser.getCommandMetadata());
+        parser.parse("-s", "deer");
+    }
+    
+    @Test(expectedExceptions = ParseOptionOutOfRangeException.class, expectedExceptionsMessageRegExp = ".*(a <= value <= d).*")
+    public void lexical_range_inclusive_below_max() {
+        SingleCommand<? extends OptionRangeBase> parser = TestingUtil.singleCommandParser(OptionLexicalRangeInclusive.class);
+        hasRangeRestriction(parser.getCommandMetadata());
+        parser.parse("-s", "0");
+    }
 }

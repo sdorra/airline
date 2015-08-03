@@ -34,6 +34,7 @@ import com.github.rvesse.airline.annotations.restrictions.ranges.ByteRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.DoubleRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.FloatRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.LexicalRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.LongRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.ShortRange;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
@@ -87,6 +88,7 @@ public class RestrictionRegistry {
         registerCommon(ByteRange.class, rangeFactory);
         registerCommon(DoubleRange.class, rangeFactory);
         registerCommon(FloatRange.class, rangeFactory);
+        registerCommon(LexicalRange.class, rangeFactory);
         
         // Advanced requirement restrictions
         RequireFromRestrictionFactory requireFactory = new RequireFromRestrictionFactory();

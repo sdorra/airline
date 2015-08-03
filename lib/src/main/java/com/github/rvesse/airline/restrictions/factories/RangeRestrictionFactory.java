@@ -17,11 +17,15 @@ package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
 import java.util.Comparator;
+import java.util.Locale;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.annotations.restrictions.ranges.ByteRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.DoubleRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.FloatRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
+import com.github.rvesse.airline.annotations.restrictions.ranges.LexicalRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.LongRange;
 import com.github.rvesse.airline.annotations.restrictions.ranges.ShortRange;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
@@ -31,6 +35,7 @@ import com.github.rvesse.airline.utils.comparators.ByteComparator;
 import com.github.rvesse.airline.utils.comparators.DoubleComparator;
 import com.github.rvesse.airline.utils.comparators.FloatComparator;
 import com.github.rvesse.airline.utils.comparators.IntegerComparator;
+import com.github.rvesse.airline.utils.comparators.LexicalComparator;
 import com.github.rvesse.airline.utils.comparators.LongComparator;
 import com.github.rvesse.airline.utils.comparators.ShortComparator;
 
@@ -79,6 +84,8 @@ public class RangeRestrictionFactory implements OptionRestrictionFactory, Argume
             return createDoubleRange(annotation);
         } else if (annotation instanceof FloatRange) {
             return createFloatRange(annotation);
+        } else if (annotation instanceof LexicalRange) {
+            return createLexicalRange(annotation);
         }
         return createUnknownRange(annotation);
     }
@@ -95,6 +102,13 @@ public class RangeRestrictionFactory implements OptionRestrictionFactory, Argume
      */
     protected RangeRestriction createUnknownRange(Annotation annotation) {
         return null;
+    }
+
+    protected RangeRestriction createLexicalRange(Annotation annotation) {
+        LexicalRange lRange = (LexicalRange) annotation;
+        return new RangeRestriction(StringUtils.isEmpty(lRange.min()) ? null : lRange.min(), lRange.minInclusive(),
+                StringUtils.isEmpty(lRange.max()) ? null : lRange.max(), lRange.maxInclusive(), new LexicalComparator(
+                        Locale.forLanguageTag(lRange.locale())));
     }
 
     protected RangeRestriction createFloatRange(Annotation annotation) {
