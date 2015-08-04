@@ -15,13 +15,15 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
-public class LengthRestriction extends AbstractStringRestriction {
+public class LengthRestriction extends AbstractStringRestriction implements HelpHint {
 
     private final boolean maximum;
     private final int length;
@@ -54,7 +56,8 @@ public class LengthRestriction extends AbstractStringRestriction {
     }
 
     @Override
-    protected <T> ParseRestrictionViolatedException violated(ParseState<T> state, ArgumentsMetadata arguments, String value) {
+    protected <T> ParseRestrictionViolatedException violated(ParseState<T> state, ArgumentsMetadata arguments,
+            String value) {
         if (maximum) {
             return new ParseRestrictionViolatedException(
                     "Argument '%s' was given value '%s' that has length %d which exceeds the maximum permitted length of %d",
@@ -64,6 +67,33 @@ public class LengthRestriction extends AbstractStringRestriction {
             return new ParseRestrictionViolatedException(
                     "Argument '%s' was given value '%s' that has length %d which is below the minimum required length of %d",
                     AirlineUtils.first(arguments.getTitle()), value, value.length(), this.length);
+        }
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+        
+        if (maximum) {
+            return new String[] { String.format("This options value has a maximum length of %d characters", this.length) };
+        } else {
+            return new String[] { String.format("This options value has a minimum length of %d characters", this.length) };
         }
     }
 

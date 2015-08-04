@@ -17,6 +17,8 @@ package com.github.rvesse.airline.restrictions.common;
 
 import java.util.regex.Pattern;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
@@ -28,7 +30,7 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * A restriction which requires the raw values to match a given regular
  * expression
  */
-public class PatternRestriction extends AbstractCommonRestriction {
+public class PatternRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final Pattern pattern;
 
@@ -50,6 +52,30 @@ public class PatternRestriction extends AbstractCommonRestriction {
             throw new ParseRestrictionViolatedException(
                     "Argument '%s' was given value '%s' which does not match the regular expression '%s'",
                     AirlineUtils.first(arguments.getTitle()), value, this.pattern.toString());
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+
+        return new String[] { String.format("This options value must match the regular expression '%s'",
+                this.pattern.toString()) };
     }
 
 }

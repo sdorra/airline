@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
@@ -162,7 +161,7 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
                     String[] descriptions = hint.getContentBlock(d);
                     if (e >= descriptions.length)
                         continue;
-                    
+
                     printer.append(descriptions[e]);
                     printer.newline().newline();
                     printer.flush();
@@ -185,10 +184,10 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
                         if (col > 0)
                             printer.append(" - ");
 
-                        if (col == 0)
+                        if (col == 0 || (row == 0 && hint.getFormat() == HelpFormat.TABLE_WITH_HEADERS))
                             printer.append("**");
                         printer.append(colData[row]);
-                        if (col == 0)
+                        if (col == 0 || (row == 0 && hint.getFormat() == HelpFormat.TABLE_WITH_HEADERS))
                             printer.append("**");
 
                     }

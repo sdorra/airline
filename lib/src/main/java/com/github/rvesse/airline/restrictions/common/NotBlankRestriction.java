@@ -17,13 +17,15 @@ package com.github.rvesse.airline.restrictions.common;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
-public class NotBlankRestriction extends AbstractStringRestriction {
+public class NotBlankRestriction extends AbstractStringRestriction implements HelpHint {
 
     @Override
     protected boolean isValid(String value) {
@@ -41,6 +43,28 @@ public class NotBlankRestriction extends AbstractStringRestriction {
             String value) {
         return new ParseRestrictionViolatedException("Arguments '%s' requires a non-blank value but got value '%s'",
                 AirlineUtils.first(arguments.getTitle()), value);
+    }
+
+    @Override
+    public String getPreamble() {
+        return null;
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return HelpFormat.PROSE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return 1;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0) throw new IndexOutOfBoundsException();
+        
+        return new String[] { "This options value cannot be blank (empty or all whitespace)" };
     }
 
 }
