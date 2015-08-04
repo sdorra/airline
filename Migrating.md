@@ -1,6 +1,8 @@
 # Migrating to Airline 2
 
-Airline 2 is a significant rewrite of Airline and as such there are major breaking changes to be aware of.  This document aims to guide you through the user facing changes, if you are developing in the internals there are lots of other changes which are not covered here.
+Airline 2 is a significant rewrite of Airline and as such there are lots of breaking changes to be aware of.  This document aims to guide you through the user facing changes.
+
+Note that if you are developing in the internals of Airline there are lots of other changes which are not covered here since they are not visible to end users.
 
 ## Defining CLIs
 
@@ -48,11 +50,40 @@ You may now also pass in the `GlobalRestriction`s that should apply, if you don'
 
 All annotations are now located in the `com.github.rvesse.airline.annotations` package or in sub-packages thereof.
 
+### Command Annotation Changes
+
+Some of the extended help fields are no longer available directly on the `@Command` annotation and instead now have their own specific annotations:
+
+- `examples` moved to `@Examples`
+- `discussion` moved to `@Discussion`
+- `exitCodes` and `exitCodeDescriptions` moved to `@ExitCodes`
+
+#### Migrating discussion
+
+For example discussion in Airline 1:
+
+```
+@Command(name = "example", discussion = { "This is some discussion" })
+public class MyCommand {
+
+}
+```
+
+Becomes the following in Airline 2:
+
+```
+@Command(name = "example")
+@Discussion(paragraphs = { "This is some discussion" })
+public class MyCommand {
+
+}
+```
+
 ### Option Annotation Changes
 
-Some fields of the `@Option` annotation that defined restrictions on options have been removed, namely these are the `required`, `allowedValues` and `ignoreCase` attributes.  Restrictions are now instead expressed with specific annotations.
+Some fields of the `@Option` annotation that defined restrictions on options have been removed, namely these are the `required`, `allowedValues` and `ignoreCase` attributes.  Option restrictions are now instead expressed with specific annotations such as `@Required`.
 
-When overriding existing options restrictions are inherited from the parent unless new restriction(s) are defined on the overridden option.  If you simply want to remove all existing restrictions when overriding an option you can add the `@Unrestricted` annotation to the option.
+When overriding existing options restrictions are inherited from the parent unless new restriction(s) are defined on the overridden option.  If you simply want to remove all existing restrictions when overriding an option you can add the `@Unrestricted` annotation to the overridden option.
 
 #### Migrating Required Options
 
@@ -84,7 +115,7 @@ Becomes the following in Airline 2:
 
 Similar to `@Option` the `@Arguments` annotation has changed to have the `required` field removed, as with options you can now simply add the `@Required` annotation instead to indicate that arguments are required.
 
-Arguments now allows for applying other restrictions such as `@AllowedRawValues` to arguments.
+Arguments now allows for applying many different restrictions such as `@AllowedRawValues` to arguments.
 
 ## Metadata Changes
 
@@ -97,6 +128,10 @@ A new `getRestrictions()` method provides access to `GlobalRestriction` instance
 #### Accessing Parser Metadata
 
 Parser settings were previously held directly on `GlobalMetadata`, they are now held in a `ParserMetadata<T>` class which is accessed via the `getParserConfiguration()` method on `GlobalMetadata<T>`
+
+### CommandMetadata
+
+The extended help are no longer expressed directly as fields but as instances of `HelpSection`.  The `getHelpSections()` method provides access to the extended help sections present for a command.
 
 ### OptionMetadata
 
@@ -114,6 +149,8 @@ A `getRestrictions()` method provides access to all the restrictions that are pr
 
 A new restrictions framework is introduced which allows much more complex restrictions to be specified and enforced.
 
+A few examples are given in the following table, there are many more new restrictions supported by Airline 2 than just these shown here:
+
 | Restriction Class | Applicability | Annotation Class | Restriction |
 | -------------- | ---------------- | -------------- | --------------- |
 | `IsRequiredRestriction` | Options and Arguments | `@Required` | Indicates that options/arguments are required |
@@ -129,11 +166,33 @@ Global restrictions are defined when you create a `Cli` or `SingleCommand` insta
 
 You can create your own custom restrictions by doing the following:
 
-- Define an `OptionRestriction` and/or `ArgumentsRestriction` that implements the restriction.  Each restriction interface has a different method signature so a restriction can be implemented that applies to multiple things.
-- Define an annotation that you will use to denote your restriction
-- Define an `OptionRestrictionFactory` and/or `ArgumentsRestrictionFactory` that understands how to convert your annotation into a restriction instance
+- Create a class that implements `OptionRestriction` and/or `ArgumentsRestriction` and enforces your restriction.  Each restriction interface has a different method signature so a restriction can be implemented that applies to multiple things.
+- Create an annotation that you will use to denote your restriction.  Remember to specify the retention for your annotation as `RUNTIME`
+- Create a class that implements `OptionRestrictionFactory` and/or `ArgumentsRestrictionFactory`. This class does the work of converting your annotation into a restriction instance
 - Register your restriction:  
   `RestrictionRegistry.addOptionRestriction(MyAnnotation.class, new MyRestrictionFactory());`
+
+You can now apply your annotation to the option/arguments field you want to restrict.
+  
+## Extended Help
+
+Extended help for commands is now specified via the `HelpSection` interface.  This interface allows for supporting a variety of different extended help formats and the built-in help generators will automatically include discovered help sections in their outputs.
+
+This interface is itself derived from the more basic `HelpHint` interface.  This interface is typically implemented by other classes that serve some function as well as provided some extended help such as `OptionRestriction` implementations.  Again the built-in help generators will automatically include restrictions which provide help hints when formatting help for options and arguments.
+
+Similar to restrictions extra help sections are automatically discovered by examining the annotations present on classes marked with `@Command`.  The `HelpSectionRegistry` is used to map annotations into instances of `HelpSection`.
+
+### Custom Help Sections
+
+You can create your own custom help section by doing the following:
+
+- Create a class that implements `HelpSection`, you can derive from `BasicSection` to get yourself started
+- Create an annotation that you will use to denote your help section.  Remember to specify the retention for your annotation as `RUNTIME`
+- Create a class that implements `HelpSectionFactory`.  This class does the work of converting your annotation into a `HelpSection` instance
+- Register your help section:  
+    `HelpSectionRegistry.addFactory(MyAnnotation.class, new MySectionFactory());`
+
+You can now apply your annotation to command classes for which you wish to provide extra help.
 
 ## Parsing Changes
 
