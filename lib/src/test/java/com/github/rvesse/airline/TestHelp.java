@@ -36,6 +36,7 @@ import com.github.rvesse.airline.args.Args2;
 import com.github.rvesse.airline.args.ArgsAllowedValues;
 import com.github.rvesse.airline.args.ArgsArityString;
 import com.github.rvesse.airline.args.ArgsBooleanArity;
+import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsInherited;
 import com.github.rvesse.airline.args.ArgsMultiLineDescription;
@@ -199,6 +200,59 @@ public class TestHelp {
                 "Middle paragraph\n" +
                 "\n" +
                 "Final paragraph\n" + 
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testExamples() throws IOException {
+        SingleCommand<ArgsExamples> cmd = singleCommand(ArgsExamples.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        ArgsExamples -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsExamples\n" +
+                "\n" +
+                "EXAMPLES\n" +
+                "        ArgsExample\n" +
+                "\n" +
+                "            Does nothing\n" +
+                "\n" +
+                "        ArgsExample foo bar\n" +
+                "\n" + 
+                "            Foos a bar\n" +
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testExamplesRonn() throws IOException {
+        SingleCommand<ArgsExamples> cmd = singleCommand(ArgsExamples.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RonnCommandUsageGenerator generator = new RonnCommandUsageGenerator();
+        generator.usage(null, null, "ArgsExamples", cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "ArgsExamples(1) -- null\n" +
+                "==========\n" +
+                "\n" +
+                "## SYNOPSIS\n" +
+                "\n" +
+                " `ArgsExamples` \n" +
+                "\n" +
+                "## EXAMPLES\n" +
+                "\n" +
+                "    ArgsExample\n" +
+                "\n" +
+                "Does nothing\n" +
+                "\n" +
+                "    ArgsExample foo bar\n" +
+                "\n" + 
+                "Foos a bar\n" +
                 "\n");
         //@formatter:on
     }

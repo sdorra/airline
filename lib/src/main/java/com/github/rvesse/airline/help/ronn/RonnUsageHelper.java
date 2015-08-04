@@ -149,7 +149,25 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
         // Hint content
         switch (hint.getFormat()) {
         case EXAMPLES:
-            // Examples
+            String[] examples = hint.getContentBlock(0);
+            for (int e = 0; e < examples.length; e++) {
+                printer.flush();
+
+                UsagePrinter examplePrinter = printer.newIndentedPrinter(4);
+                examplePrinter.appendOnOneLine(examples[e]);
+                examplePrinter.newline().newline();
+                examplePrinter.flush();
+
+                for (int d = 1; d < hint.numContentBlocks(); d++) {
+                    String[] descriptions = hint.getContentBlock(d);
+                    if (e >= descriptions.length)
+                        continue;
+                    
+                    printer.append(descriptions[e]);
+                    printer.newline().newline();
+                    printer.flush();
+                }
+            }
             break;
         case TABLE:
         case TABLE_WITH_HEADERS:
@@ -166,13 +184,13 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
                             continue;
                         if (col > 0)
                             printer.append(" - ");
-                        
+
                         if (col == 0)
                             printer.append("**");
                         printer.append(colData[row]);
                         if (col == 0)
                             printer.append("**");
-                        
+
                     }
                 }
                 printer.newline();
