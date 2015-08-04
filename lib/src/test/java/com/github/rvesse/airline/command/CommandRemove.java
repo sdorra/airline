@@ -22,19 +22,19 @@ import javax.inject.Inject;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.help.Discussion;
+import com.github.rvesse.airline.annotations.help.Examples;
 
 /**
  * <p></p>
  *
- * @author Michael Grove
  * @since 0
  * @version 0
  */
 @Command(name = "remove",
-         description = "Remove file contents to the index",
-         discussion = "More details about how this removes files from the index.",
-         examples = {"* The following is a usage example:",
-                    "\t$ git remove -i myfile.java"})
+         description = "Remove file contents to the index")
+@Discussion(paragraphs = "More details about how this removes files from the index.")
+@Examples(examples = "$ git remove -i myfile.java", descriptions = "This is a usage example")
 public class CommandRemove {
     @Inject
     public CommandMain commandMain;

@@ -26,6 +26,7 @@ import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractUsageGenerator;
 import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.help.sections.HelpHint;
+import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
@@ -72,8 +73,8 @@ public class CliUsageHelper extends AbstractUsageGenerator {
     /**
      * Outputs documentation about a restriction on an option
      * 
-     * @param descriptionPrinter
-     *            Description printer
+     * @param out
+     *            Usage printer
      * @param option
      *            Option meta-data
      * @param restriction
@@ -82,33 +83,53 @@ public class CliUsageHelper extends AbstractUsageGenerator {
      *            Help hint
      * @throws IOException
      */
-    protected void outputOptionRestriction(UsagePrinter descriptionPrinter, OptionMetadata option,
-            OptionRestriction restriction, HelpHint hint) throws IOException {
-        outputRestriction(descriptionPrinter, hint);
+    protected void outputOptionRestriction(UsagePrinter out, OptionMetadata option, OptionRestriction restriction,
+            HelpHint hint) throws IOException {
+        out.newline();
+        outputHint(out, hint, false);
     }
 
-    protected void outputRestriction(UsagePrinter descriptionPrinter, HelpHint hint) throws IOException {
-        descriptionPrinter.newline();
-
+    protected void outputHint(UsagePrinter out, HelpHint hint, boolean newPara) throws IOException {
         // Print preamble if present
-        if (!StringUtils.isEmpty(hint.getPreamble())) {
-            descriptionPrinter.append(hint.getPreamble());
-            descriptionPrinter.newline();
+        if (!StringUtils.isBlank(hint.getPreamble())) {
+            out.append(hint.getPreamble());
+            out.newline();
+            if (newPara)
+                out.newline();
         }
+        out.flush();
 
         // Print more details if there are some content blocks present
         if (hint.numContentBlocks() > 0) {
             // Decide how to print based on the format
+            int maxRows;
             switch (hint.getFormat()) {
+            case EXAMPLES:
+                // Print as text with indents
+                for (int e = 0; e < hint.getContentBlock(0).length; e++) {
+                    // Example will be in first content block
+                    out.appendOnOneLine(hint.getContentBlock(0)[e]);
+                    out.newline().newline();
+                    out.flush();
+
+                    // Print example description with additional indent
+                    UsagePrinter examplePrinter = out.newIndentedPrinter(4);
+                    for (int d = 1; d < hint.numContentBlocks(); d++) {
+                        String[] descriptions = hint.getContentBlock(d);
+                        if (e >= descriptions.length)
+                            continue;
+                        examplePrinter.append(descriptions[e]);
+                        examplePrinter.newline().newline();
+                    }
+                    examplePrinter.flush();
+                }
+                break;
             case TABLE:
             case TABLE_WITH_HEADERS:
                 // Print as table
                 // Convert to form that appendTable() understands
                 // i.e. columns -> rows
-                int maxRows = 0;
-                for (int col = 0; col < hint.numContentBlocks(); col++) {
-                    maxRows = Math.max(maxRows, hint.getContentBlock(col).length);
-                }
+                maxRows = calculateMaxRows(hint);
                 List<List<String>> rows = new ArrayList<List<String>>();
                 for (int row = 0; row < maxRows; row++) {
                     List<String> rowData = new ArrayList<String>();
@@ -118,15 +139,16 @@ public class CliUsageHelper extends AbstractUsageGenerator {
                     }
                     rows.add(rowData);
                 }
-                
+
                 // Print out table
-                UsagePrinter tablePrinter = descriptionPrinter.newIndentedPrinter(4);
-                tablePrinter.appendTable(rows, 1);
+                UsagePrinter tablePrinter = out.newIndentedPrinter(4);
+                tablePrinter.appendTable(rows, 0);
+                tablePrinter.newline();
                 tablePrinter.flush();
                 break;
             case LIST:
                 // Print first content block as an indented list list
-                UsagePrinter listPrinter = descriptionPrinter.newIndentedPrinter(4);
+                UsagePrinter listPrinter = out.newIndentedPrinter(4);
                 for (String item : hint.getContentBlock(0)) {
                     listPrinter.append(item).newline();
                 }
@@ -136,12 +158,21 @@ public class CliUsageHelper extends AbstractUsageGenerator {
                 // Print content blocks as text
                 for (int i = 0; i < hint.numContentBlocks(); i++) {
                     for (String line : hint.getContentBlock(i)) {
-                        descriptionPrinter.append(line).newline();
+                        out.append(line);
+                        out.newline().newline();
                     }
                 }
                 break;
             }
         }
+    }
+
+    protected int calculateMaxRows(HelpHint hint) {
+        int maxRows = 0;
+        for (int col = 0; col < hint.numContentBlocks(); col++) {
+            maxRows = Math.max(maxRows, hint.getContentBlock(col).length);
+        }
+        return maxRows;
     }
 
     public void outputArguments(UsagePrinter out, ArgumentsMetadata arguments) throws IOException {
@@ -191,6 +222,38 @@ public class CliUsageHelper extends AbstractUsageGenerator {
      */
     protected void outputArgumentsRestriction(UsagePrinter descriptionPrinter, ArgumentsMetadata arguments,
             ArgumentsRestriction restriction, HelpHint hint) throws IOException {
-        outputRestriction(descriptionPrinter, hint);
+        descriptionPrinter.newline();
+        outputHint(descriptionPrinter, hint, false);
+    }
+
+    /**
+     * Outputs a help section
+     * 
+     * @param out
+     *            Usage printer
+     * @param section
+     *            Help section
+     * @throws IOException
+     */
+    public void outputHelpSection(UsagePrinter out, HelpSection section) throws IOException {
+        // Section title
+        if (!StringUtils.isBlank(section.getTitle())) {
+            out.append(section.getTitle().toUpperCase());
+            out.newline();
+        }
+
+        UsagePrinter sectionPrinter = out.newIndentedPrinter(8);
+
+        // Content
+        outputHint(sectionPrinter, section, true);
+
+        // Post-amble
+        if (!StringUtils.isBlank(section.getPostamble())) {
+            sectionPrinter.append(section.getPostamble());
+            sectionPrinter.newline();
+        }
+
+        sectionPrinter.flush();
+        out.flush();
     }
 }

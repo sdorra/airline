@@ -860,10 +860,11 @@ public class TestHelp {
         "\n";
 
         String examples = "EXAMPLES\n" +
-        "        * The following is a usage example:\n\n" +
-        "        \t$ git remove -i myfile.java\n";
+        "        $ git remove -i myfile.java\n\n" +
+        "            This is a usage example";
 
         String usage = new String(out.toByteArray(), utf8);
+        System.out.println(usage);
         assertTrue(usage.contains(discussion), "Expected the discussion section to be present in the help");
         assertTrue(usage.contains(examples), "Expected the examples section to be present in the help");
         //@formatter:on
@@ -1250,22 +1251,19 @@ public class TestHelp {
     
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
-        assertEquals(new String(out.toByteArray(), utf8),
+        testStringAssert(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test - ArgsExitCodes description\n" +
                 "\n" +
                 "SYNOPSIS\n" +
                 "        test\n" +
                 "\n" +
-                "EXIT STATUS\n" +
-                "        The test command exits with one of the following values:\n" +
+                "EXIT CODES\n" +
+                "        This command returns one of the following exit codes:\n" +
                 "\n" +
-                "        0\n" +
-                "            Success\n" +
-                "        1\n" +
-                "\n" +
-                "        2\n" +
-                "            Error 2\n");
+                "            0   Success\n" +
+                "            1\n" +
+                "            2   Error 2\n\n");
         //@formatter:on
     }
 

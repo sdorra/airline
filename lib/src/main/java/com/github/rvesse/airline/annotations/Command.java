@@ -54,68 +54,10 @@ public @interface Command {
     boolean hidden() default false;
 
     /**
-     * An array of lines of text to provide a series of example usages of the
-     * command e.g.
-     * 
-     * <pre>
-     * examples= {&quot;Explain what the command example does&quot;,
-     *     &quot;$ cli group cmd foo.txt file.json&quot;,
-     *     &quot;&quot;,
-     *     &quot;Explain what this command example does&quot;,
-     *     &quot;$ cli group cmd --non-standard-option value foo.txt&quot;}
-     * </pre>
-     * <p>
-     * Blank lines are preserved to give users leverage over how the examples
-     * are displayed in the usage. However individual help generators may still
-     * choose to format the examples as they desire.
-     * </p>
-     * <p>
-     * Example lines are not required to be in any specific order i.e. you can
-     * do example then explanation, explanation then example, multi-line
-     * explanations or whatever you see fit.
-     * </p>
-     * <p>
-     * If you have more free form discussion about the command it should be
-     * placed in the {@link #discussion()} property.
-     * </p>
-     * 
-     * @return Examples
-     */
-    String[] examples() default {};
-
-    /**
-     * An array of lines of text that provides an extended discussion on the
-     * behaviour of the command. Should supplement the shorter description which
-     * is more of a summary where discussion can get into greater detail about
-     * exact behaviour of commands.
-     * 
-     * @return Command discussion
-     */
-    String[] discussion() default {};
-
-    /**
      * The group(s) this command should belong to. if left empty the command
      * will belong to the default command group
      * 
      * @return Command groups
      */
     String[] groupNames() default {};
-
-    /**
-     * The exit codes that this command may return, meanings of the exit codes
-     * may be given using the {@link #exitDescriptions()} property. The data in
-     * these two properties is collated based on array indices.
-     * 
-     * @return Array of exit codes
-     */
-    int[] exitCodes() default {};
-
-    /**
-     * Descriptions of the meanings of the exit codes this command may return,
-     * the exit codes are given by the {@link #exitCodes()} property. The data
-     * in these two properties is collated based on array indices.
-     * 
-     * @return
-     */
-    String[] exitDescriptions() default {};
 }

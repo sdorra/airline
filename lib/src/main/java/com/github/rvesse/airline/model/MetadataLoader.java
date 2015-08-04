@@ -23,6 +23,8 @@ import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.annotations.Groups;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.help.sections.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
@@ -143,6 +145,7 @@ public class MetadataLoader {
         }
         Command command = null;
         List<Group> groups = new ArrayList<>();
+        Map<String, HelpSection> helpSections = new HashMap<>();
 
         for (Class<?> cls = commandType; command == null && !Object.class.equals(cls); cls = cls.getSuperclass()) {
             command = cls.getAnnotation(Command.class);
@@ -153,6 +156,23 @@ public class MetadataLoader {
             if (cls.isAnnotationPresent(Group.class)) {
                 groups.add(cls.getAnnotation(Group.class));
             }
+
+            for (Class<? extends Annotation> helpAnnotationClass : HelpSectionRegistry.getAnnotationClasses()) {
+                Annotation annotation = cls.getAnnotation(helpAnnotationClass);
+                if (annotation == null)
+                    continue;
+                HelpSection section = HelpSectionRegistry.getHelpSection(helpAnnotationClass, annotation);
+                if (section == null)
+                    continue;
+
+                // Because we're going up the class hierarchy the titled section
+                // lowest down the hierarchy should win so if we've already seen
+                // a section with this title ignore it
+                if (helpSections.containsKey(section.getTitle()))
+                    continue;
+
+                helpSections.put(section.getTitle(), section);
+            }
         }
         if (command == null)
             throw new IllegalArgumentException(String.format("Command %s is not annotated with @Command",
@@ -161,23 +181,12 @@ public class MetadataLoader {
         String description = command.description().isEmpty() ? null : command.description();
         List<String> groupNames = Arrays.asList(command.groupNames());
         boolean hidden = command.hidden();
-        Map<Integer, String> exitCodes = new HashMap<>();
-        if (command.exitCodes() != null) {
-            String[] exitDescriptions = command.exitDescriptions() != null ? command.exitDescriptions()
-                    : new String[command.exitCodes().length];
-            for (int i = 0; i < command.exitCodes().length; i++) {
-                String exitDescrip = exitDescriptions.length > i ? exitDescriptions[i] : null;
-                exitCodes.put(command.exitCodes()[i], exitDescrip);
-            }
-        }
 
         InjectionMetadata injectionMetadata = loadInjectionMetadata(commandType);
 
         //@formatter:off
         CommandMetadata commandMetadata = new CommandMetadata(name, 
                                                               description, 
-                                                              command.discussion().length == 0 ? null : AirlineUtils.arrayToList(command.discussion()), 
-                                                              command.examples().length == 0 ? null : AirlineUtils.arrayToList(command.examples()),
                                                               hidden, 
                                                               injectionMetadata.globalOptions, 
                                                               injectionMetadata.groupOptions,
@@ -188,7 +197,7 @@ public class MetadataLoader {
                                                               commandType, 
                                                               groupNames, 
                                                               groups, 
-                                                              exitCodes);
+                                                              AirlineUtils.listCopy(helpSections.values()));
         //@formatter:on
 
         return commandMetadata;

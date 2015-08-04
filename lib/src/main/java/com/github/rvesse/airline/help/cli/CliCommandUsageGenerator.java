@@ -19,18 +19,16 @@ import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARAT
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
 import com.github.rvesse.airline.help.common.UsagePrinter;
+import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.comparators.HelpSectionComparator;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
     
@@ -66,10 +64,27 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     @Override
     protected void usage(String programName, String groupName, String commandName, CommandMetadata command,
             UsagePrinter out) throws IOException {
-        //
         // Name and description
-        //
         outputDescription(out, programName, groupName, commandName, command);
+        
+        // Find the help sections
+        List<HelpSection> preSections = new ArrayList<HelpSection>();
+        List<HelpSection> postSections = new ArrayList<HelpSection>();
+        for (HelpSection section : command.getHelpSections()) {
+            if (section.suggestedOrder() < 0) {
+                preSections.add(section);
+            } else {
+                postSections.add(section);
+            }
+        }
+        HelpSectionComparator comparator = new HelpSectionComparator();
+        Collections.sort(preSections, comparator);
+        Collections.sort(postSections, comparator);
+        
+        // Output pre help sections
+        for (HelpSection section : preSections) {
+            helper.outputHelpSection(out, section);
+        }
 
         // Synopsis
         List<OptionMetadata> options = outputSynopsis(out, programName, groupName, commandName, command);
@@ -80,116 +95,10 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
             outputOptionsAndArguments(out, command, options, arguments);
         }
 
-        // Discussion
-        if (command.getDiscussion() != null && !command.getDiscussion().isEmpty()) {
-            outputDiscussion(out, command);
+        // Output post help sections
+        for (HelpSection section : postSections) {
+            helper.outputHelpSection(out, section);
         }
-
-        // Examples
-        if (command.getExamples() != null && !command.getExamples().isEmpty()) {
-            outputExamples(out, command);
-        }
-
-        // Exit Codes
-        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
-            outputExitCodes(out, programName, groupName, commandName, command);
-        }
-    }
-
-    /**
-     * Outputs a documentation section detailing the exit codes
-     * 
-     * @param out
-     *            Usage printer
-     * @param programName
-     *            Program name
-     * @param groupName
-     *            Group name
-     * @param commandName
-     *            Command name
-     * @param command
-     *            Command meta-data
-     * @throws IOException
-     */
-    protected void outputExitCodes(UsagePrinter out, String programName, String groupName, String commandName,
-            CommandMetadata command) throws IOException {
-        out.append("EXIT STATUS").newline();
-        out.flush();
-
-        UsagePrinter exitPrinter = out.newIndentedPrinter(8);
-        exitPrinter.append("The ");
-        if (programName != null) {
-            exitPrinter.append(programName).append(" ");
-        }
-        if (groupName != null) {
-            exitPrinter.append(groupName).append(" ");
-        }
-        exitPrinter.append(commandName).append(" command exits with one of the following values:").newline().newline();
-
-        for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
-            // Print the exit code
-            exitPrinter.append(exit.getKey().toString());
-            exitPrinter.newline();
-            exitPrinter.flush();
-
-            // Include description if available
-            if (!StringUtils.isEmpty(exit.getValue())) {
-
-                UsagePrinter exitDescripPrinter = exitPrinter.newIndentedPrinter(4);
-                exitDescripPrinter.append(exit.getValue());
-                exitDescripPrinter.flush();
-            }
-
-            exitPrinter.newline();
-            exitPrinter.flush();
-        }
-    }
-
-    /**
-     * Outputs a documentation section detailing examples
-     * 
-     * @param out
-     *            Usage printer
-     * @param command
-     *            Command meta-data
-     * 
-     * @throws IOException
-     */
-    protected void outputExamples(UsagePrinter out, CommandMetadata command) throws IOException {
-        out.append("EXAMPLES").newline();
-        UsagePrinter examplePrinter = out.newIndentedPrinter(8);
-
-        List<Iterable<String>> examplesIters = new ArrayList<>();
-        for (String example : command.getExamples()) {
-            examplesIters.add(AirlineUtils.singletonList(example));
-        }
-        examplePrinter.appendTable(examplesIters, 1);
-        examplePrinter.flush();
-    }
-
-    /**
-     * Outputs a documentation section with discussion
-     * 
-     * @param out
-     *            Usage printer
-     * @param command
-     *            Command meta-data
-     * 
-     * @throws IOException
-     */
-    protected void outputDiscussion(UsagePrinter out, CommandMetadata command) throws IOException {
-        if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
-            return;
-
-        out.append("DISCUSSION").newline();
-        UsagePrinter discussionPrinter = out.newIndentedPrinter(8);
-
-        for (String discussionPara : command.getDiscussion()) {
-            if (StringUtils.isEmpty(discussionPara))
-                continue;
-            discussionPrinter.append(discussionPara).newline().newline();
-        }
-        discussionPrinter.flush();
     }
 
     /**

@@ -17,12 +17,11 @@ package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections4.ListUtils;
 
 public class CommandMetadata {
@@ -38,16 +37,11 @@ public class CommandMetadata {
     private final Class<?> type;
     private final List<String> groupNames;
     private final List<Group> groups;
-    private final Map<Integer, String> exitCodes;
-
-    private final List<String> examples;
-    private final List<String> discussion;
+    private final List<HelpSection> sections;
 
     //@formatter:off
     public CommandMetadata(String name, 
                            String description, 
-                           final List<String> discussion, 
-                           final List<String> examples,
                            boolean hidden, 
                            Iterable<OptionMetadata> globalOptions, 
                            Iterable<OptionMetadata> groupOptions,
@@ -58,7 +52,7 @@ public class CommandMetadata {
                            Class<?> type, 
                            List<String> groupNames, 
                            List<Group> groups,
-                           Map<Integer, String> exitCodes) {
+                           List<HelpSection> sections) {
     //@formatter:on
         this.name = name;
         this.description = description;
@@ -68,21 +62,17 @@ public class CommandMetadata {
         this.commandOptions = AirlineUtils.unmodifiableListCopy(commandOptions);
         this.defaultOption = defaultOption;
         this.arguments = arguments;
-        
+
         if (this.defaultOption != null && this.arguments != null) {
             throw new IllegalArgumentException("Command cannot declare both @Arguments and @DefaultOption");
         }
-        
+
         this.metadataInjections = AirlineUtils.unmodifiableListCopy(metadataInjections);
         this.type = type;
-
-        this.discussion = discussion;
-        this.examples = examples;
-
         this.groupNames = groupNames;
         this.groups = groups;
 
-        this.exitCodes = AirlineUtils.unmodifiableMapCopy(exitCodes);
+        this.sections = AirlineUtils.unmodifiableListCopy(sections);
     }
 
     public String getName() {
@@ -105,12 +95,13 @@ public class CommandMetadata {
         return ListUtils.unmodifiableList(allOptions);
     }
 
-    public List<String> getExamples() {
-        return examples;
-    }
-
-    public List<String> getDiscussion() {
-        return discussion;
+    /**
+     * Gets the additional help sections
+     * 
+     * @return Help sections
+     */
+    public List<HelpSection> getHelpSections() {
+        return sections;
     }
 
     public List<OptionMetadata> getGlobalOptions() {
@@ -124,7 +115,7 @@ public class CommandMetadata {
     public List<OptionMetadata> getCommandOptions() {
         return commandOptions;
     }
-    
+
     public OptionMetadata getDefaultOption() {
         return defaultOption;
     }
@@ -148,25 +139,19 @@ public class CommandMetadata {
     public List<Group> getGroups() {
         return groups;
     }
-
-    public Map<Integer, String> getExitCodes() {
-        return exitCodes;
-    }
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("CommandMetadata");
-        sb.append("{name='").append(name).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", discussion='").append(discussion).append('\'');
-        sb.append(", examples='").append(examples).append('\'');
-        sb.append(", globalOptions=").append(globalOptions);
-        sb.append(", groupOptions=").append(groupOptions);
-        sb.append(", commandOptions=").append(commandOptions);
-        sb.append(", arguments=").append(arguments);
-        sb.append(", metadataInjections=").append(metadataInjections);
-        sb.append(", type=").append(type);
+        sb.append("CommandMetadata {").append('\n');
+        sb.append(" name='").append(name).append('\'').append('\n');
+        sb.append(" , description='").append(description).append('\'').append('\n');
+        sb.append(" , sections=").append(sections).append('\n');
+        sb.append(" , globalOptions=").append(globalOptions).append('\n');
+        sb.append(" , groupOptions=").append(groupOptions).append('\n');
+        sb.append(" , commandOptions=").append(commandOptions).append('\n');
+        sb.append(" , arguments=").append(arguments).append('\n');
+        sb.append(" , metadataInjections=").append(metadataInjections).append('\n');
+        sb.append(" , type=").append(type).append('\n');
         sb.append('}');
         return sb.toString();
     }

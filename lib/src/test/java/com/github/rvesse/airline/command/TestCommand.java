@@ -17,13 +17,19 @@ package com.github.rvesse.airline.command;
 
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.builder.CliBuilder;
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.help.sections.common.DiscussionSection;
+import com.github.rvesse.airline.help.sections.common.ExamplesSection;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static com.github.rvesse.airline.TestingUtil.singleCommandParser;
@@ -76,6 +82,13 @@ public class TestCommand {
         assertEquals(commit.author, "cbeust");
         assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
     }
+    
+    private HelpSection findHelpSection(Collection<HelpSection> sections, Class<? extends HelpSection> cls) {
+        for (HelpSection section : sections) {
+            if (section.getClass().equals(cls)) return section;
+        }
+        return null;
+    }
 
     @Test
     public void testExample() {
@@ -93,8 +106,14 @@ public class TestCommand {
 
         assertEquals("remove", aMeta.getName());
 
-        assertEquals(AirlineUtils.arrayToList(new String[] { "* The following is a usage example:", "\t$ git remove -i myfile.java" }),
-                aMeta.getExamples());
+        HelpSection section = findHelpSection(aMeta.getHelpSections(), ExamplesSection.class);
+        Assert.assertNotNull(section);
+        assertEquals(section.getFormat(), HelpFormat.EXAMPLES);
+        assertEquals(section.numContentBlocks(), 2);
+        assertEquals(section.getContentBlock(0).length, 1);
+        assertEquals(section.getContentBlock(1).length, 1);
+        assertEquals(section.getContentBlock(0)[0], "$ git remove -i myfile.java");
+        assertEquals(section.getContentBlock(1)[0], "This is a usage example");
     }
 
     @Test
@@ -113,8 +132,12 @@ public class TestCommand {
 
         assertEquals("remove", aMeta.getName());
 
-        assertEquals(AirlineUtils.singletonList("More details about how this removes files from the index."),
-                aMeta.getDiscussion());
+        HelpSection section = findHelpSection(aMeta.getHelpSections(), DiscussionSection.class);
+        Assert.assertNotNull(section);
+        assertEquals(section.getFormat(), HelpFormat.PROSE);
+        assertEquals(section.numContentBlocks(), 1);
+        assertEquals(section.getContentBlock(0).length, 1);
+        assertEquals(section.getContentBlock(0)[0], "More details about how this removes files from the index.");
     }
 
     @Test

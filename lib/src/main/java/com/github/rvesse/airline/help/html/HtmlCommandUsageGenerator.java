@@ -22,8 +22,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
@@ -94,6 +92,8 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         // Name and description of command
         outputDescription(writer, programName, groupName, command);
+        
+        // TODO Output pre help sections
 
         // Synopsis
         List<OptionMetadata> options = outputSynopsis(writer, programName, groupName, command);
@@ -104,20 +104,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             outputOptions(writer, options, command.getArguments());
         }
 
-        // Discussion
-        if (command.getDiscussion() != null && !command.getDiscussion().isEmpty()) {
-            outputDiscussion(writer, command);
-        }
-
-        // Examples
-        if (command.getExamples() != null && !command.getExamples().isEmpty()) {
-            outputExamples(writer, command);
-        }
-
-        // Exit Codes
-        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
-            outputExitCodes(writer, programName, groupName, commandName, command);
-        }
+        // TODO Output post help sections
 
         writer.append("</body>\n");
         writer.append("</html>\n");
@@ -125,119 +112,6 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         // Flush the output
         writer.flush();
         output.flush();
-    }
-
-    /**
-     * Outputs a documentation section detailing the exit codes
-     * 
-     * @param writer
-     *            Writer
-     * @param programName
-     *            Program name
-     * @param groupName
-     *            Group name
-     * @param commandName
-     *            Command name
-     * @param command
-     *            Command meta-data
-     * @throws IOException
-     */
-    protected void outputExitCodes(Writer writer, String programName, String groupName, String commandName,
-            CommandMetadata command) throws IOException {
-        writer.append(NEWLINE);
-        writer.append("<h1 class=\"text-info\">EXIT STATUS</h1>\n").append(NEWLINE);
-
-        writer.append("<p>\n");
-        writer.append("  The ");
-        if (programName != null) {
-            writer.append(programName).append(" ");
-        }
-        if (groupName != null) {
-            writer.append(groupName).append(" ");
-        }
-        writer.append(commandName).append(" command exits with one of the following values:");
-        writer.append("</p>\n");
-
-        for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
-            writer.append("<div class=\"row\">\n");
-            writer.append("<div class=\"span8 offset1\">\n");
-
-            // Print the exit code
-            writer.append(exit.getKey().toString());
-
-            // Include description if available
-            if (!StringUtils.isEmpty(exit.getValue())) {
-                writer.append("</div>\n");
-                writer.append("</div>\n");
-
-                writer.append("<div class=\"row\">\n");
-                writer.append("<div class=\"span8 offset2\">\n");
-
-                writer.append(htmlize(exit.getValue()));
-
-                writer.append("</div>\n");
-                writer.append("</div>\n");
-            } else {
-                writer.append("</div>\n");
-                writer.append("</div>\n");
-            }
-        }
-    }
-
-    /**
-     * Outputs a documentation section detailing the examples
-     * 
-     * @param writer
-     *            Writer
-     * @param command
-     *            Command meta-data
-     * @throws IOException
-     */
-    protected void outputExamples(Writer writer, CommandMetadata command) throws IOException {
-        writer.append(NEWLINE);
-        writer.append("<h1 class=\"text-info\">EXAMPLES</h1>\n").append(NEWLINE);
-
-        writer.append("<div class=\"row\">\n");
-        writer.append("<div class=\"span12 offset1\">\n");
-
-        // this will only work for "well-formed" examples
-        for (String example : command.getExamples()) {
-            writer.append("<p>\n");
-            writer.append(example);
-            writer.append("</p>\n");
-        }
-
-        writer.append("</div>\n");
-        writer.append("</div>\n");
-    }
-
-    /**
-     * Outputs a documentation section with the discussion
-     * 
-     * @param writer
-     *            Writer
-     * @param command
-     *            Command meta-data
-     * @throws IOException
-     */
-    protected void outputDiscussion(Writer writer, CommandMetadata command) throws IOException {
-        if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
-            return;
-
-        writer.append(NEWLINE);
-        writer.append("<h1 class=\"text-info\">DISCUSSION</h1>\n").append(NEWLINE);
-
-        writer.append("<div class=\"row\">\n");
-        writer.append("<div class=\"span8 offset1\">\n");
-        for (String discussionPara : command.getDiscussion()) {
-            if (StringUtils.isEmpty(discussionPara))
-                continue;
-            writer.append("<p>\n");
-            writer.append(htmlize(discussionPara));
-            writer.append("</p>\n");
-        }
-        writer.append("</div>\n");
-        writer.append("</div>\n");
     }
 
     /**

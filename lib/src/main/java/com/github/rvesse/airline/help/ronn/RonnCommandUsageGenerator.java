@@ -22,8 +22,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
@@ -84,6 +82,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         Writer writer = new OutputStreamWriter(output);
 
         SECTION_HEADER = outputTitle(writer, programName, groupName, commandName, command, SECTION_HEADER);
+        
+        // TODO Output pre help sections
 
         List<OptionMetadata> options = outputSynopsis(writer, programName, groupName, commandName, command,
                 SECTION_HEADER);
@@ -91,15 +91,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (options.size() > 0 || command.getArguments() != null) {
             outputOptions(writer, command, options, SECTION_HEADER);
         }
-        if (command.getDiscussion() != null && !command.getDiscussion().isEmpty()) {
-            outputDiscussion(writer, command, SECTION_HEADER);
-        }
-        if (command.getExamples() != null && !command.getExamples().isEmpty()) {
-            outputExamples(writer, command, SECTION_HEADER);
-        }
-        if (command.getExitCodes() != null && !command.getExitCodes().isEmpty()) {
-            outputExitCodes(writer, programName, groupName, commandName, command, SECTION_HEADER);
-        }
+        
+        // TODO Output post help sections
 
         // Flush the output
         writer.flush();
@@ -180,87 +173,6 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append(RonnUsageHelper.NEW_PARA).append(command.getDescription());
         }
         return options;
-    }
-
-    /**
-     * Outputs an exit codes section for the documentation
-     * 
-     * @param writer
-     *            Writer
-     * @param programName
-     *            Program name
-     * @param groupName
-     *            Group name
-     * @param commandName
-     *            Command name
-     * @param command
-     *            Command meta-data
-     * @param sectionHeader
-     *            Section header
-     * 
-     * @throws IOException
-     */
-    protected void outputExitCodes(Writer writer, String programName, String groupName, String commandName,
-            CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("EXIT STATUS");
-        writer.append(RonnUsageHelper.NEW_PARA).append("The `");
-        writeFullCommandName(programName, groupName, commandName, writer);
-        writer.append("` command exits with one of the following values:");
-        writer.append(RonnUsageHelper.NEW_PARA);
-
-        for (Entry<Integer, String> exit : sortExitCodes(new ArrayList<>(command.getExitCodes().entrySet()))) {
-            // Print the exit code
-            writer.append("* **").append(exit.getKey().toString()).append("**");
-
-            // Include description if available
-            if (!StringUtils.isEmpty(exit.getValue())) {
-                writer.append(" - ").append(exit.getValue());
-            }
-
-            writer.append('\n');
-        }
-    }
-
-    /**
-     * Outputs an examples section for the documentation
-     * 
-     * @param writer
-     *            Writer
-     * @param command
-     *            Command meta-data
-     * @param sectionHeader
-     *            Section header
-     * @throws IOException
-     */
-    protected void outputExamples(Writer writer, CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("EXAMPLES");
-
-        for (String example : command.getExamples()) {
-            writer.append(RonnUsageHelper.NEW_PARA).append(example);
-        }
-    }
-
-    /**
-     * Outputs a discussion section for the documentation
-     * 
-     * @param writer
-     *            Writer
-     * @param command
-     *            Command meta-data
-     * @param sectionHeader
-     *            Section header
-     * @throws IOException
-     */
-    protected void outputDiscussion(Writer writer, CommandMetadata command, String sectionHeader) throws IOException {
-        if (command.getDiscussion() == null || command.getDiscussion().isEmpty())
-            return;
-
-        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("DISCUSSION").append(RonnUsageHelper.NEW_PARA);
-        for (String discussionPara : command.getDiscussion()) {
-            if (StringUtils.isEmpty(discussionPara))
-                continue;
-            writer.append(discussionPara).append(RonnUsageHelper.NEW_PARA);
-        }
     }
 
     /**

@@ -16,8 +16,10 @@
 package com.github.rvesse.airline.args;
 
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.help.ExitCodes;
 
-@Command(name = "ArgsExitCodes", description = "ArgsExitCodes description", exitCodes = { 0, 1, 2}, exitDescriptions = { "Success", "", "Error 2" })
+@Command(name = "ArgsExitCodes", description = "ArgsExitCodes description")
+@ExitCodes(codes = { 0, 1, 2}, descriptions = { "Success", "", "Error 2" })
 public class ArgsExitCodes
 {
 }
