@@ -24,8 +24,10 @@ import java.util.Map.Entry;
 
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.utils.comparators.HelpSectionComparator;
 
 /**
  * Abstract command usage generator
@@ -77,5 +79,28 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
             Collections.sort(exitCodes, exitCodeComparator);
         }
         return exitCodes;
+    }
+
+    /**
+     * Finds the help sections
+     * 
+     * @param command
+     *            Command meta-data
+     * @param preSections
+     *            Sections that should be placed before base content
+     * @param postSections
+     *            Sections that should be placed after base content
+     */
+    protected void findHelpSections(CommandMetadata command, List<HelpSection> preSections, List<HelpSection> postSections) {
+        for (HelpSection section : command.getHelpSections()) {
+            if (section.suggestedOrder() < 0) {
+                preSections.add(section);
+            } else {
+                postSections.add(section);
+            }
+        }
+        HelpSectionComparator comparator = new HelpSectionComparator();
+        Collections.sort(preSections, comparator);
+        Collections.sort(postSections, comparator);
     }
 }

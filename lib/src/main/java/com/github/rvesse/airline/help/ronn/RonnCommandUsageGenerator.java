@@ -22,10 +22,12 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
+import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
@@ -73,7 +75,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     @Override
     public void usage(String programName, String groupName, String commandName, CommandMetadata command,
             OutputStream output) throws IOException {
-        String SECTION_HEADER = "## ";
+        String sectionHeader = "## ";
 
         // Fall back to metadata declared name if necessary
         if (commandName == null)
@@ -81,18 +83,29 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         Writer writer = new OutputStreamWriter(output);
 
-        SECTION_HEADER = outputTitle(writer, programName, groupName, commandName, command, SECTION_HEADER);
-        
-        // TODO Output pre help sections
+        sectionHeader = outputTitle(writer, programName, groupName, commandName, command, sectionHeader);
+
+        // Find the help sections
+        List<HelpSection> preSections = new ArrayList<HelpSection>();
+        List<HelpSection> postSections = new ArrayList<HelpSection>();
+        findHelpSections(command, preSections, postSections);
+
+        // Output pre help sections
+        for (HelpSection section : preSections) {
+            helper.outputHelpSection(writer, section, sectionHeader);
+        }
 
         List<OptionMetadata> options = outputSynopsis(writer, programName, groupName, commandName, command,
-                SECTION_HEADER);
+                sectionHeader);
 
         if (options.size() > 0 || command.getArguments() != null) {
-            outputOptions(writer, command, options, SECTION_HEADER);
+            outputOptions(writer, command, options, sectionHeader);
         }
-        
-        // TODO Output post help sections
+
+        // Output post help sections
+        for (HelpSection section : postSections) {
+            helper.outputHelpSection(writer, section, sectionHeader);
+        }
 
         // Flush the output
         writer.flush();
@@ -140,7 +153,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      */
     protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String groupName,
             String commandName, CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("SYNOPSIS").append(RonnUsageHelper.NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("SYNOPSIS")
+                .append(RonnUsageHelper.NEW_PARA);
         List<OptionMetadata> options = new ArrayList<>();
         List<OptionMetadata> aOptions;
         if (programName != null) {

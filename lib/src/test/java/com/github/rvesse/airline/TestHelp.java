@@ -50,6 +50,7 @@ import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
+import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnCommandUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnGlobalUsageGenerator;
 import com.github.rvesse.airline.help.ronn.RonnMultiPageGlobalUsageGenerator;
@@ -455,9 +456,13 @@ public class TestHelp {
                 "## OPTIONS\n" +
                 "\n" +
                 "* `-mode` <mode>:\n" +
-                "A string from a restricted set of values\n" +
+                "  A string from a restricted set of values\n" +
                 "\n" +
-                "  This options value is restricted to the following set of values: [a, b, c]");
+                "  This options value is restricted to the following set of values:\n" +
+                "\n" +
+                "         a\n" +
+                "         b\n" +
+                "         c\n");
         
         //@formatter:on
     }
@@ -673,7 +678,7 @@ public class TestHelp {
         Cli<Object> parser = builder.build();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CliCommandUsageGenerator generator = new CliCommandUsageGenerator(true);
+        AbstractCommandUsageGenerator generator = new CliCommandUsageGenerator(true);
         CommandMetadata metadata = CollectionUtils.find(parser.getMetadata().getDefaultGroupCommands(), new CommandFinder("OptionsHidden"));
         Assert.assertNotNull(metadata);
         generator.usage("test", null, "OptionsHidden", metadata, out);
@@ -954,7 +959,7 @@ public class TestHelp {
                 "## OPTIONS\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "## COMMAND GROUPS\n" +
                 "\n" +
@@ -991,10 +996,10 @@ public class TestHelp {
                 "### OPTIONS\n" +
                 "\n" +
                 "* `-i`:\n" +
-                "Add modified contents interactively.\n" +
+                "  Add modified contents interactively.\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
@@ -1033,10 +1038,10 @@ public class TestHelp {
                 "### OPTIONS\n" +
                 "\n" +
                 "* `-t` <branch>:\n" +
-                "Track only a specific branch\n" +
+                "  Track only a specific branch\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
@@ -1057,10 +1062,10 @@ public class TestHelp {
                 "### OPTIONS\n" +
                 "\n" +
                 "* `-n`:\n" +
-                "Do not query remote heads\n" +
+                "  Do not query remote heads\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
@@ -1105,7 +1110,7 @@ public class TestHelp {
                 "## OPTIONS\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "## COMMAND GROUPS\n" +
                 "\n" +
@@ -1166,10 +1171,10 @@ public class TestHelp {
                 "## OPTIONS\n" +
                 "\n" +
                 "* `-i`:\n" +
-                "Add modified contents interactively.\n" +
+                "  Add modified contents interactively.\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
@@ -1196,10 +1201,10 @@ public class TestHelp {
                 "## OPTIONS\n" +
                 "\n" +
                 "* `-n`:\n" +
-                "Do not query remote heads\n" +
+                "  Do not query remote heads\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
@@ -1226,10 +1231,10 @@ public class TestHelp {
                 "## OPTIONS\n" +
                 "\n" +
                 "* `-t` <branch>:\n" +
-                "Track only a specific branch\n" +
+                "  Track only a specific branch\n" +
                 "\n" +
                 "* `-v`:\n" +
-                "Verbose mode\n" +
+                "  Verbose mode\n" +
                 "\n" +
                 "* `--`:\n" +
                 "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
@@ -1282,13 +1287,13 @@ public class TestHelp {
                 "\n" +
                 " `test` \n" +
                 "\n" +
-                "## EXIT STATUS\n" +
+                "## EXIT CODES\n" +
                 "\n" +
-                "The `test(1)` command exits with one of the following values:\n" +
+                "This command returns one of the following exit codes:\n" +
                 "\n" +
-                "* **0** - Success\n" +
-                "* **1**\n" +
-                "* **2** - Error 2\n");
+                "* ** 0 ** - Success\n" +
+                "* ** 1 **\n" +
+                "* ** 2 ** - Error 2\n");
         //@formatter:on
     }
 

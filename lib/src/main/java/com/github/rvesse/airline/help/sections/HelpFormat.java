@@ -36,15 +36,24 @@ public enum HelpFormat {
      */
     LIST,
     /**
-     * Help format is a table, each content block will represent a column of the table
+     * Help format is a table, each content block will represent a column of the
+     * table
      */
     TABLE,
     /**
-     * Help format is a table where headers are included as the first item of each column
+     * Help format is a table where headers are included as the first item of
+     * each column
      */
     TABLE_WITH_HEADERS,
     /**
-     * Help format is examples, the first content block is the examples and the subsequent content block(s) are explanations for the examples
+     * Help format is examples, the first content block is the examples and the
+     * subsequent content block(s) are explanations for the examples
      */
-    EXAMPLES
+    EXAMPLES,
+    /**
+     * Help represents some non-printable format, this can be used to create
+     * special sections that carry extra data that is used by help generators in
+     * some other way
+     */
+    NONE_PRINTABLE
 }

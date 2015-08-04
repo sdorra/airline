@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractUsageGenerator;
 import com.github.rvesse.airline.help.common.UsagePrinter;
+import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
@@ -90,6 +91,10 @@ public class CliUsageHelper extends AbstractUsageGenerator {
     }
 
     protected void outputHint(UsagePrinter out, HelpHint hint, boolean newPara) throws IOException {
+        // Ignore non-printable help
+        if (hint.getFormat() == HelpFormat.NONE_PRINTABLE)
+            return;
+        
         // Print preamble if present
         if (!StringUtils.isBlank(hint.getPreamble())) {
             out.append(hint.getPreamble());
@@ -167,7 +172,7 @@ public class CliUsageHelper extends AbstractUsageGenerator {
         }
     }
 
-    protected int calculateMaxRows(HelpHint hint) {
+    public static int calculateMaxRows(HelpHint hint) {
         int maxRows = 0;
         for (int col = 0; col < hint.numContentBlocks(); col++) {
             maxRows = Math.max(maxRows, hint.getContentBlock(col).length);
@@ -236,6 +241,9 @@ public class CliUsageHelper extends AbstractUsageGenerator {
      * @throws IOException
      */
     public void outputHelpSection(UsagePrinter out, HelpSection section) throws IOException {
+        if (section.getFormat() == HelpFormat.NONE_PRINTABLE)
+            return;
+
         // Section title
         if (!StringUtils.isBlank(section.getTitle())) {
             out.append(section.getTitle().toUpperCase());

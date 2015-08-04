@@ -19,19 +19,18 @@ import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARAT
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
 import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.utils.comparators.HelpSectionComparator;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
-    
+
     private final CliUsageHelper helper;
 
     public CliCommandUsageGenerator() {
@@ -56,8 +55,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         helper = createHelper(optionComparator, includeHidden);
     }
 
-    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
-            boolean includeHidden) {
+    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
         return new CliUsageHelper(optionComparator, includeHidden);
     }
 
@@ -66,21 +64,12 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
             UsagePrinter out) throws IOException {
         // Name and description
         outputDescription(out, programName, groupName, commandName, command);
-        
+
         // Find the help sections
         List<HelpSection> preSections = new ArrayList<HelpSection>();
         List<HelpSection> postSections = new ArrayList<HelpSection>();
-        for (HelpSection section : command.getHelpSections()) {
-            if (section.suggestedOrder() < 0) {
-                preSections.add(section);
-            } else {
-                postSections.add(section);
-            }
-        }
-        HelpSectionComparator comparator = new HelpSectionComparator();
-        Collections.sort(preSections, comparator);
-        Collections.sort(postSections, comparator);
-        
+        findHelpSections(command, preSections, postSections);
+
         // Output pre help sections
         for (HelpSection section : preSections) {
             helper.outputHelpSection(out, section);

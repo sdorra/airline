@@ -21,11 +21,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.cli.CliUsageHelper;
 import com.github.rvesse.airline.help.common.AbstractUsageGenerator;
+import com.github.rvesse.airline.help.common.UsagePrinter;
+import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
+import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -63,7 +68,7 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
 
             // description
             writer.append(arguments.getDescription());
-            
+
             // Restrictions
             for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
                 if (restriction instanceof HelpHint) {
@@ -75,7 +80,7 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
 
     protected void outputArgumentsRestriction(Writer writer, ArgumentsMetadata arguments,
             ArgumentsRestriction restriction, HelpHint hint) throws IOException {
-        outputRestriction(writer, hint);
+        outputHint(writer, hint, true, 2);
     }
 
     public void outputOptions(Writer writer, List<OptionMetadata> options, String sectionHeader) throws IOException {
@@ -92,7 +97,7 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
             writer.append(NEW_PARA).append("* ").append(toDescription(option)).append(":\n");
 
             // description
-            writer.append(option.getDescription());
+            writer.append("  ").append(option.getDescription());
 
             // Restrictions
             for (OptionRestriction restriction : option.getRestrictions()) {
@@ -119,32 +124,91 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
      */
     protected void outputOptionRestriction(Writer writer, OptionMetadata option, OptionRestriction restriction,
             HelpHint hint) throws IOException {
-        outputRestriction(writer, hint);
+        outputHint(writer, hint, true, 2);
 
     }
 
-    protected void outputRestriction(Writer writer, HelpHint hint) throws IOException {
-        if (!StringUtils.isEmpty(hint.getPreamble())) {
-            writer.append(NEW_PARA).append("  ").append(hint.getPreamble());
+    protected void outputHint(Writer writer, HelpHint hint, boolean requireNewPara, int baseIndent) throws IOException {
+        // Skip non-printable hints
+        if (hint.getFormat() == HelpFormat.NONE_PRINTABLE)
+            return;
+
+        UsagePrinter printer = new UsagePrinter(writer, Integer.MAX_VALUE);
+        if (baseIndent > 0)
+            printer = printer.newIndentedPrinter(baseIndent);
+
+        if (requireNewPara)
+            printer.newline().newline();
+
+        // Pre-amble
+        if (!StringUtils.isBlank(hint.getPreamble())) {
+            printer.append(hint.getPreamble());
+            printer.newline().newline();
         }
 
+        // Hint content
         switch (hint.getFormat()) {
+        case EXAMPLES:
+            // Examples
+            break;
+        case TABLE:
+        case TABLE_WITH_HEADERS:
+            // Table
+            // HACK: Ronn/Markdown doesn't support tables properly so we'll just
+            // print as a list with the first column emboldened
+            int maxRows = CliUsageHelper.calculateMaxRows(hint);
+            for (int row = 0; row < maxRows; row++) {
+                printer.append("* ");
+                for (int col = 0; col < hint.numContentBlocks(); col++) {
+                    String[] colData = hint.getContentBlock(col);
+                    if (row < colData.length) {
+                        if (StringUtils.isEmpty(colData[row]))
+                            continue;
+                        if (col > 0)
+                            printer.append(" - ");
+                        
+                        if (col == 0)
+                            printer.append("**");
+                        printer.append(colData[row]);
+                        if (col == 0)
+                            printer.append("**");
+                        
+                    }
+                }
+                printer.newline();
+            }
+            break;
         case LIST:
-            writer.append(" [");
-            writer.append(StringUtils.join(hint.getContentBlock(0), ", "));
-            writer.append("]");
+            // List
+            if (!requireNewPara && StringUtils.isBlank(hint.getPreamble()))
+                printer.newline().newline();
+
+            // Nested list so pad inwards
+            String[] items = hint.getContentBlock(0);
+            for (int i = 0; i < items.length; i++) {
+                // HACK: Nested lists are actually broken in RONN
+                // However 7 is the magical number which makes things line up
+                // when RONN generates the TROFF output (go figure)
+                UsagePrinter listPrinter = printer.newIndentedPrinter(7);
+                listPrinter.append(items[i]).newline();
+                listPrinter.flush();
+            }
             break;
         default:
+            // Prose
             for (int i = 0; i < hint.numContentBlocks(); i++) {
                 for (String para : hint.getContentBlock(i)) {
-                    writer.append(NEW_PARA).append("  ");
-                    writer.append(para);
+                    printer.append(para);
+                    printer.newline().newline();
                 }
             }
             break;
         }
+
+        printer.flush();
+        writer.flush();
     }
-    
+
     @Override
     protected String toDescription(OptionMetadata option) {
         Set<String> options = option.getOptions();
@@ -170,5 +234,39 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
         }
 
         return stringBuilder.toString();
+    }
+
+    /**
+     * Outputs a help section
+     * 
+     * @param writer
+     *            Writer
+     * @param section
+     *            Help section
+     * @throws IOException
+     */
+    public void outputHelpSection(Writer writer, HelpSection section, String sectionHeader) throws IOException {
+        if (section.getFormat() == HelpFormat.NONE_PRINTABLE)
+            return;
+
+        // Section title
+        if (!StringUtils.isBlank(section.getTitle())) {
+            writer.append(NEW_PARA).append(sectionHeader);
+            writer.append(section.getTitle().toUpperCase());
+            writer.append(NEW_PARA);
+        } else {
+            writer.append(NEW_PARA);
+        }
+
+        // Content
+        outputHint(writer, section, false, 0);
+
+        // Post-amble
+        if (!StringUtils.isBlank(section.getPostamble())) {
+            writer.append(section.getPostamble());
+            writer.append(NEW_PARA);
+        }
+
+        writer.flush();
     }
 }
