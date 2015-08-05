@@ -24,7 +24,10 @@ import org.testng.annotations.Test;
 
 public class TestTroffPrinter {
 
+    private static final String END_LIST = ".IP \"\" 0";
     private static final String BULLET = ".IP \"\\(bu\" 4";
+    private static final String TITLED_BULLET = ".TP";
+    private static final String BREAK = ".br";
     
     @Test
     public void title_01() {
@@ -89,11 +92,11 @@ public class TestTroffPrinter {
         StringWriter strWriter = new StringWriter();
         TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
         
-        printer.startList();
+        printer.startBulletedList();
         printer.println("A");
-        printer.nextListItem();
+        printer.nextBulletedListItem();
         printer.println("B");
-        printer.nextListItem();
+        printer.nextBulletedListItem();
         printer.println("C");
         printer.endList();
         printer.finish();
@@ -106,6 +109,7 @@ public class TestTroffPrinter {
                 "B", 
                 BULLET,
                 "C",
+                END_LIST,
                 ""
             }, '\n');
         //@formatter:on
@@ -117,12 +121,12 @@ public class TestTroffPrinter {
         StringWriter strWriter = new StringWriter();
         TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
         
-        printer.startList();
+        printer.startBulletedList();
         printer.println("A");
-        printer.startList();
+        printer.startBulletedList();
         printer.println("B");
         printer.endList();
-        printer.nextListItem();
+        printer.nextBulletedListItem();
         printer.println("C");
         printer.endList();
         printer.finish();
@@ -140,6 +144,7 @@ public class TestTroffPrinter {
                 ".RE",
                 BULLET,
                 "C",
+                END_LIST,
                 ""
             }, '\n');
         //@formatter:on
@@ -151,9 +156,9 @@ public class TestTroffPrinter {
         StringWriter strWriter = new StringWriter();
         TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
         
-        printer.startList();
+        printer.startBulletedList();
         printer.println("A");
-        printer.startList();
+        printer.startBulletedList();
         printer.println("B");
         printer.endList();
         printer.println("C");
@@ -173,9 +178,139 @@ public class TestTroffPrinter {
                 ".RE",
                 ".IP",
                 "C",
+                END_LIST,
                 ""
             }, '\n');
         //@formatter:on
         Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void titled_list_01() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startTitledList("A");
+        printer.println("Item A");
+        printer.nextTitledListItem("B");
+        printer.println("Item B");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        // - A
+        //   Item A
+        // - B
+        //   Item B
+        String expected = StringUtils.join(new String[] { 
+                TITLED_BULLET,
+                "A", 
+                BREAK,
+                "Item A",
+                TITLED_BULLET, 
+                "B", 
+                BREAK,
+                "Item B",
+                END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void titled_list_02() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startTitledList();
+        printer.print("A");
+        printer.lineBreak();
+        printer.println("Item A");
+        printer.nextTitledListItem("B");
+        printer.println("Item B");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        // - A
+        //   Item A
+        // - B
+        //   Item B
+        String expected = StringUtils.join(new String[] { 
+                TITLED_BULLET,
+                "A", 
+                BREAK,
+                "Item A",
+                TITLED_BULLET, 
+                "B", 
+                BREAK,
+                "Item B",
+                END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void titled_list_03() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startTitledList();
+        printer.printBold("A");
+        printer.lineBreak();
+        printer.println("Item A");
+        printer.nextTitledListItem("B");
+        printer.println("Item B");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        // - A
+        //   Item A
+        // - B
+        //   Item B
+        String expected = StringUtils.join(new String[] { 
+                TITLED_BULLET,
+                "\\fBA\\fR", 
+                BREAK,
+                "Item A",
+                TITLED_BULLET, 
+                "B", 
+                BREAK,
+                "Item B",
+                END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void bad_state_01() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.endList();
+    }
+    
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void bad_state_02() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startBulletedList();
+        printer.nextTitledListItem();
+    }
+    
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void bad_state_03() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startTitledList();
+        printer.nextBulletedListItem();
     }
 }

@@ -16,10 +16,35 @@
 package com.github.rvesse.airline.io.printers;
 
 import java.io.PrintWriter;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class TroffPrinter {
+
+    private static final String REQUEST_FONT_ROMAN = "\\fR";
+
+    private static final String REQUEST_FONT_BOLD = "\\fB";
+    
+    private static final String REQUEST_FONT_ITALIC = "\\fI";
+    
+    private static final String REQUEST_FONT_BOLD_ITALIC = "\\fBI";
+
+    private static final String REQUEST_PARAGRAPH_TITLED = ".TP";
+
+    private static final String REQUEST_PARAGRAPH_CURRENT_INDENTATION = ".IP";
+
+    private static final String REQUEST_PARAGRAPH_NO_INDENTATION = ".IP \"\" 0";
+
+    private static final String REQUEST_RESET_LEFT_MARGIN = ".RE";
+
+    private static final String REQUEST_MOVE_LEFT_MARGIN = ".RS";
+
+    private static final String REQUEST_BREAK = ".br";
+
+    private enum ListType {
+        BULLET, TITLED
+    }
 
     private static final int DEFAULT_INDENTATION = 4;
 
@@ -30,7 +55,8 @@ public class TroffPrinter {
     private boolean newline = true;
     private boolean inSection = false;
     private int indentation = DEFAULT_INDENTATION;
-    
+    private Stack<ListType> lists = new Stack<ListType>();
+
     public TroffPrinter(PrintWriter writer) {
         this(writer, 2);
     }
@@ -85,6 +111,25 @@ public class TroffPrinter {
             newline = true;
         }
     }
+    
+    public void lineBreak() {
+        if (!newline)
+            writer.println();
+        writer.println(REQUEST_BREAK);
+        newline = false;
+    }
+    
+    public void printBold(String value) {
+        print(String.format("%s%s%s", REQUEST_FONT_BOLD, value, REQUEST_FONT_ROMAN));
+    }
+    
+    public void printItalic(String value) {
+        print(String.format("%s%s%s", REQUEST_FONT_ITALIC, value, REQUEST_FONT_ROMAN));
+    }
+    
+    public void printBoldItalic(String value) {
+        print(String.format("%s%s%s", REQUEST_FONT_BOLD_ITALIC, value, REQUEST_FONT_ROMAN));
+    }
 
     private void appendLine(String line) {
         if (StringUtils.isEmpty(line)) {
@@ -99,30 +144,87 @@ public class TroffPrinter {
         newline = true;
     }
 
-    public void startList() {
+    public void startBulletedList() {
         if (!newline)
             writer.println();
 
         if (level > 0) {
-            writer.println(".RS");
-            printBullet();
-        } else {
-            printBullet();
+            writer.println(REQUEST_MOVE_LEFT_MARGIN);
         }
-        level++;
+        lists.push(ListType.BULLET);
+        printBullet();
 
+        level++;
         newline = false;
     }
 
-    public void nextListItem() {
+    /**
+     * Starts a titled list, the next line of text printed will form the title
+     */
+    public void startTitledList() {
+        startTitledList(null);
+    }
+
+    /**
+     * Starts a titled list with the given title
+     * 
+     * @param title
+     */
+    public void startTitledList(String title) {
         if (!newline)
             writer.println();
 
         if (level > 0) {
+            writer.println(REQUEST_MOVE_LEFT_MARGIN);
+        }
+        lists.push(ListType.TITLED);
+        printTitledBullet();
+        
+        newline = false;
+        level++;
+
+        if (title != null) {
+            writer.println(escape(title));
+            writer.println(REQUEST_BREAK);
+        }
+    }
+
+    public void nextBulletedListItem() {
+        if (!newline)
+            writer.println();
+
+        if (level > 0) {
+            if (lists.peek() != ListType.BULLET)
+                throw new IllegalStateException(
+                        "Cannot move to next bulleted list item when currently in a titled list");
             printBullet();
             newline = false;
         } else {
             throw new IllegalStateException("Cannot start a new list item when not currently in a list");
+        }
+    }
+
+    public void nextTitledListItem() {
+        nextTitledListItem(null);
+    }
+
+    public void nextTitledListItem(String title) {
+        if (!newline)
+            writer.println();
+
+        if (level > 0) {
+            if (lists.peek() != ListType.TITLED)
+                throw new IllegalStateException(
+                        "Cannot move to next titled list item when currently in a bulleted list");
+            printTitledBullet();
+            newline = false;
+        } else {
+            throw new IllegalStateException("Cannot start a new titled list item when not currently in a list");
+        }
+
+        if (title != null) {
+            writer.println(escape(title));
+            writer.println(REQUEST_BREAK);
         }
     }
 
@@ -131,22 +233,27 @@ public class TroffPrinter {
             writer.println();
 
         if (level > 1) {
-            writer.println(".RE");
+            // Reset indentation
+            writer.println(REQUEST_RESET_LEFT_MARGIN);
         } else if (level == 1) {
-            // Nothing to do
+            // Reset indentation
+            writer.println(REQUEST_PARAGRAPH_NO_INDENTATION);
         } else {
             throw new IllegalStateException("Cannot end a list when not currently in a list");
         }
 
+        lists.pop();
         level--;
         newline = true;
     }
 
     private void prepareLine() {
         if (level > 0) {
-            writer.println(".IP");
+            // Continue the current indentation
+            writer.println(REQUEST_PARAGRAPH_CURRENT_INDENTATION);
         } else if (inSection) {
-            writer.println(".IP \"\" 0");
+            // When in a section and not in a list don't add extra indentation
+            writer.println(REQUEST_PARAGRAPH_NO_INDENTATION);
         } else {
             writer.println(".");
         }
@@ -157,6 +264,10 @@ public class TroffPrinter {
         writer.println(String.format(".IP %s %d", BULLET, this.indentation));
     }
 
+    protected void printTitledBullet() {
+        writer.println(String.format(REQUEST_PARAGRAPH_TITLED));
+    }
+
     private String asArg(String arg) {
         return String.format("\"%s\"", escapeArg(arg));
     }
@@ -164,6 +275,7 @@ public class TroffPrinter {
     private String escapeArg(String arg) {
         if (arg == null)
             return "";
+        arg = arg.replace("-", "\\-");
         return arg.replace('"', ' ');
     }
 
