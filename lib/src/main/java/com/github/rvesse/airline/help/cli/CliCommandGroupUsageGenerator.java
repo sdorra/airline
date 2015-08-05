@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.*;
 
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandGroupUsageGenerator;
-import com.github.rvesse.airline.help.common.UsagePrinter;
+import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;

@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.help.ronn;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.List;
@@ -26,10 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.cli.CliUsageHelper;
 import com.github.rvesse.airline.help.common.AbstractUsageGenerator;
-import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -132,7 +133,7 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
         if (hint.getFormat() == HelpFormat.NONE_PRINTABLE)
             return;
 
-        UsagePrinter printer = new UsagePrinter(writer, Integer.MAX_VALUE);
+        UsagePrinter printer = new UsagePrinter(new PrintWriter(writer), Integer.MAX_VALUE);
         if (baseIndent > 0)
             printer = printer.newIndentedPrinter(baseIndent);
 

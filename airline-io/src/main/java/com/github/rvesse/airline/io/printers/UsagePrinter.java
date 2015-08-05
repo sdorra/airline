@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help.common;
+package com.github.rvesse.airline.io.printers;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.utils.AirlineUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Helper for printing out usage information
@@ -33,21 +31,21 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * 
  */
 public class UsagePrinter {
-    private final Writer out;
+    private final PrintWriter out;
     private final int maxSize;
     private final int indent;
     private final int hangingIndent;
     private final AtomicInteger currentPosition;
 
-    public UsagePrinter(Writer out) {
+    public UsagePrinter(PrintWriter out) {
         this(out, 79);
     }
 
-    public UsagePrinter(Writer out, int maxSize) {
+    public UsagePrinter(PrintWriter out, int maxSize) {
         this(out, maxSize, 0, 0, new AtomicInteger());
     }
 
-    public UsagePrinter(Writer out, int maxSize, int indent, int hangingIndent, AtomicInteger currentPosition) {
+    public UsagePrinter(PrintWriter out, int maxSize, int indent, int hangingIndent, AtomicInteger currentPosition) {
         if (out == null)
             throw new NullPointerException("Writer cannot be null");
         this.out = out;
@@ -65,13 +63,13 @@ public class UsagePrinter {
         return new UsagePrinter(out, maxSize, indent, hangingIndent + size, currentPosition);
     }
 
-    public UsagePrinter newline() throws IOException {
+    public UsagePrinter newline()  {
         out.append("\n");
         currentPosition.set(0);
         return this;
     }
 
-    public UsagePrinter appendTable(Iterable<? extends Iterable<String>> table, int rowSpacing) throws IOException {
+    public UsagePrinter appendTable(Iterable<? extends Iterable<String>> table, int rowSpacing)  {
         List<Integer> columnSizes = new ArrayList<>();
         for (Iterable<String> row : table) {
             int column = 0;
@@ -127,39 +125,39 @@ public class UsagePrinter {
         return str.substring(0, end);
     }
 
-    public UsagePrinter append(String value) throws IOException {
+    public UsagePrinter append(String value)  {
         return append(value, false);
     }
 
-    public UsagePrinter appendOnOneLine(String value) throws IOException {
+    public UsagePrinter appendOnOneLine(String value)  {
         return append(value, true);
     }
 
-    public UsagePrinter appendWords(Iterable<String> words) throws IOException {
+    public UsagePrinter appendWords(Iterable<String> words)  {
         return appendWords(words, false);
     }
 
-    public UsagePrinter append(String value, boolean avoidNewlines) throws IOException {
+    public UsagePrinter append(String value, boolean avoidNewlines)  {
         if (value == null)
             return this;
         if (avoidNewlines) {
-            return appendWords(AirlineUtils.arrayToList(value.split("\\s+")), avoidNewlines);
+            return appendWords(arrayToList(value.split("\\s+")), avoidNewlines);
         } else {
-            return appendLines(AirlineUtils.arrayToList(StringUtils.split(value, '\n')), avoidNewlines);
+            return appendLines(arrayToList(StringUtils.split(value, '\n')), avoidNewlines);
         }
     }
 
-    public UsagePrinter appendLines(Iterable<String> lines) throws IOException {
+    public UsagePrinter appendLines(Iterable<String> lines)  {
         return appendLines(lines, false);
     }
 
-    public UsagePrinter appendLines(Iterable<String> lines, boolean avoidNewlines) throws IOException {
+    public UsagePrinter appendLines(Iterable<String> lines, boolean avoidNewlines)  {
         Iterator<String> iter = lines.iterator();
         while (iter.hasNext()) {
             String line = iter.next();
             if (line == null || line.isEmpty())
                 continue;
-            appendWords(AirlineUtils.arrayToList(line.split("\\s+")), avoidNewlines);
+            appendWords(arrayToList(line.split("\\s+")), avoidNewlines);
             if (iter.hasNext()) {
                 this.newline();
             }
@@ -167,7 +165,7 @@ public class UsagePrinter {
         return this;
     }
 
-    public UsagePrinter appendWords(Iterable<String> words, boolean avoidNewlines) throws IOException {
+    public UsagePrinter appendWords(Iterable<String> words, boolean avoidNewlines)  {
         int bracketCount = 0;
         for (String word : words) {
             if (null == word || "".equals(word)) {
@@ -200,11 +198,11 @@ public class UsagePrinter {
         return this;
     }
 
-    public void flush() throws IOException {
+    public void flush()  {
         this.out.flush();
     }
 
-    public void close() throws IOException {
+    public void close()  {
         this.out.close();
     }
 
@@ -214,5 +212,13 @@ public class UsagePrinter {
             result.append(" ");
         }
         return result.toString();
+    }
+    
+    private static List<String> arrayToList(String[] values) {
+        List<String> list = new ArrayList<String>();
+        for (String value : values) {
+            list.add(value);
+        }
+        return list;
     }
 }

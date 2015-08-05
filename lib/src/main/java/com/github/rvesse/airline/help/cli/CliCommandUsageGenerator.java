@@ -23,8 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
-import com.github.rvesse.airline.help.common.UsagePrinter;
 import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;

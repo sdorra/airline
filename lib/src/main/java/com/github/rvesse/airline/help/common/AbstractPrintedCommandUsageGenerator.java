@@ -17,9 +17,10 @@ package com.github.rvesse.airline.help.common;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Comparator;
 
+import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
@@ -67,8 +68,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     protected UsagePrinter createUsagePrinter(OutputStream out) {
         if (out == null)
             throw new NullPointerException("out cannot be null");
-        OutputStreamWriter writer = new OutputStreamWriter(out);
-        return new UsagePrinter(writer, columnSize);
+        return new UsagePrinter(new PrintWriter(out), columnSize);
     }
 
     @Override
