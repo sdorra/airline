@@ -64,8 +64,8 @@
   </properties>
 
   <modules>
-    <module>lib</module>
-    <module>examples</module>
+    <module>airline-core</module>
+    <module>airline-examples</module>
     <module>airline-io</module>
   </modules>
 
