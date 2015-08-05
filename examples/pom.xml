@@ -19,6 +19,11 @@
       <artifactId>airline</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-io</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

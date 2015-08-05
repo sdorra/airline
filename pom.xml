@@ -66,6 +66,7 @@
   <modules>
     <module>lib</module>
     <module>examples</module>
+    <module>airline-io</module>
   </modules>
 
   <dependencyManagement>
