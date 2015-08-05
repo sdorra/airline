@@ -16,18 +16,23 @@
 package com.github.rvesse.airline.io.printers;
 
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class TroffPrinter {
 
+    private static final String REQUEST_TABLE_END = ".TE";
+
+    private static final String REQUEST_TABLE_START = ".TS";
+
     private static final String REQUEST_FONT_ROMAN = "\\fR";
 
     private static final String REQUEST_FONT_BOLD = "\\fB";
-    
+
     private static final String REQUEST_FONT_ITALIC = "\\fI";
-    
+
     private static final String REQUEST_FONT_BOLD_ITALIC = "\\fBI";
 
     private static final String REQUEST_PARAGRAPH_TITLED = ".TP";
@@ -45,7 +50,7 @@ public class TroffPrinter {
     private enum ListType {
         BULLET, TITLED
     }
-
+    
     private static final int DEFAULT_INDENTATION = 4;
 
     private static final String BULLET = "\"\\(bu\"";
@@ -58,7 +63,7 @@ public class TroffPrinter {
     private Stack<ListType> lists = new Stack<ListType>();
 
     public TroffPrinter(PrintWriter writer) {
-        this(writer, 2);
+        this(writer, DEFAULT_INDENTATION);
     }
 
     public TroffPrinter(PrintWriter writer, int indentation) {
@@ -111,22 +116,22 @@ public class TroffPrinter {
             newline = true;
         }
     }
-    
+
     public void lineBreak() {
         if (!newline)
             writer.println();
         writer.println(REQUEST_BREAK);
         newline = false;
     }
-    
+
     public void printBold(String value) {
         print(String.format("%s%s%s", REQUEST_FONT_BOLD, value, REQUEST_FONT_ROMAN));
     }
-    
+
     public void printItalic(String value) {
         print(String.format("%s%s%s", REQUEST_FONT_ITALIC, value, REQUEST_FONT_ROMAN));
     }
-    
+
     public void printBoldItalic(String value) {
         print(String.format("%s%s%s", REQUEST_FONT_BOLD_ITALIC, value, REQUEST_FONT_ROMAN));
     }
@@ -179,7 +184,7 @@ public class TroffPrinter {
         }
         lists.push(ListType.TITLED);
         printTitledBullet();
-        
+
         newline = false;
         level++;
 
@@ -247,6 +252,66 @@ public class TroffPrinter {
         newline = true;
     }
 
+    public void printTable(List<List<String>> rows, boolean hasHeader) {
+        if (!newline)
+            writer.println();
+
+        writer.println(REQUEST_TABLE_START);
+        writer.println("box;");
+
+        // Find the maximum number of columns
+        int maxColumns = 0;
+        for (List<String> row : rows) {
+            maxColumns = Math.max(maxColumns, row.size());
+        }
+
+        // Generate format
+        if (hasHeader) {
+            for (int i = 0; i < maxColumns; i++) {
+                writer.print("cb");
+                if (i < maxColumns - 1)
+                    writer.print(" | ");
+            }
+            if (rows.size() == 1)
+                writer.print(" .");
+            writer.println();
+        }
+        if (rows.size() > 1) {
+            for (int i = 0; i < maxColumns; i++) {
+                writer.print("l");
+                if (i < maxColumns - 1)
+                    writer.print(" | ");
+            }
+            writer.println(" .");
+        }
+
+        // Output row data
+        for (int r = 0; r < rows.size(); r++) {
+            List<String> row = rows.get(r);
+            
+            if (r == 1 && hasHeader)  {
+                // Add divider between header and data
+                for (int c = 0; c < maxColumns; c++) {
+                    writer.print("_");
+                    if (c < maxColumns - 1)
+                        writer.print("\t|\t");
+                }
+                writer.println();
+            }
+            
+            for (int c = 0; c < maxColumns; c++) {
+                if (c >= row.size())
+                    break;
+                writer.print(escape(row.get(c)));
+                if (c < row.size() - 1)
+                    writer.print('\t');
+            }
+            writer.println();
+        }
+
+        writer.println(REQUEST_TABLE_END);
+    }
+
     private void prepareLine() {
         if (level > 0) {
             // Continue the current indentation
@@ -289,6 +354,9 @@ public class TroffPrinter {
 
         // Hyphen/Minus must be escaped
         line = line.replace("-", "\\-");
+
+        // Tabs must be escaped
+        line = line.replace("\t", "\\t");
 
         return line;
     }

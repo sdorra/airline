@@ -17,6 +17,8 @@ package com.github.rvesse.airline.io.printers;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
@@ -24,6 +26,8 @@ import org.testng.annotations.Test;
 
 public class TestTroffPrinter {
 
+    private static final String TABLE_END = ".TE";
+    private static final String TABLE_START = ".TS";
     private static final String END_LIST = ".IP \"\" 0";
     private static final String BULLET = ".IP \"\\(bu\" 4";
     private static final String TITLED_BULLET = ".TP";
@@ -282,6 +286,136 @@ public class TestTroffPrinter {
                 BREAK,
                 "Item B",
                 END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void table_01() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        List<List<String>> rows = new ArrayList<List<String>>();
+        List<String> header = new ArrayList<String>();
+        header.add("A");
+        header.add("B");
+        rows.add(header);
+        List<String> row = new ArrayList<String>();
+        row.add("One");
+        rows.add(row);
+        
+        printer.printTable(rows, true);
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] { 
+                TABLE_START,
+                "box;", 
+                "cb | cb",
+                "l | l .",
+                "A\tB", 
+                "_\t|\t_",
+                "One", 
+                TABLE_END,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void table_02() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        List<List<String>> rows = new ArrayList<List<String>>();
+        List<String> header = new ArrayList<String>();
+        header.add("A");
+        header.add("B");
+        rows.add(header);
+        
+        printer.printTable(rows, true);
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] { 
+                TABLE_START,
+                "box;", 
+                "cb | cb .",
+                "A\tB", 
+                TABLE_END,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void table_03() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        List<List<String>> rows = new ArrayList<List<String>>();
+        List<String> header = new ArrayList<String>();
+        header.add("A");
+        header.add("B");
+        rows.add(header);
+        
+        printer.printTable(rows, true);
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] { 
+                TABLE_START,
+                "box;", 
+                "cb | cb .",
+                "A\tB", 
+                TABLE_END,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void table_04() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        List<List<String>> rows = new ArrayList<List<String>>();
+        List<String> header = new ArrayList<String>();
+        header.add("A");
+        header.add("B");
+        rows.add(header);
+        List<String> row = new ArrayList<String>();
+        row.add("One");
+        row.add("Two");
+        row.add("Three");
+        rows.add(row);
+        row = new ArrayList<String>();
+        row.add("One");
+        rows.add(row);
+        row = new ArrayList<String>();
+        rows.add(row);
+        row = new ArrayList<String>();
+        row.add("");
+        row.add("Two");
+        rows.add(row);
+        
+        printer.printTable(rows, true);
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] { 
+                TABLE_START,
+                "box;", 
+                "cb | cb | cb",
+                "l | l | l .",
+                "A\tB", 
+                "_\t|\t_\t|\t_",
+                "One\tTwo\tThree", 
+                "One",
+                "",
+                "\tTwo",
+                TABLE_END,
                 ""
             }, '\n');
         //@formatter:on
