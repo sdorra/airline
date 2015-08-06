@@ -184,8 +184,22 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
             if (group != null) {
                 tokens.next();
                 state = state.withGroup(group).pushContext(Context.GROUP);
-
                 state = parseOptions(tokens, state, state.getGroup().getOptions());
+                
+                // Possibly may have sub-groups specified
+                while (tokens.hasNext() && state.getGroup().getSubGroups().size() > 0) {
+                    //@formatter:off
+                    findGroupPredicate = state.getParserConfiguration().allowsAbbreviatedCommands() 
+                                         ? new AbbreviatedGroupFinder(tokens.peek(), state.getGroup().getSubGroups()) 
+                                         : new GroupFinder(tokens.peek());
+                    //@formatter:on
+                    group = CollectionUtils.find(state.getGroup().getSubGroups(), findGroupPredicate);
+                    if (group != null) {
+                        tokens.next();
+                        state = state.withGroup(group).pushContext(Context.GROUP);
+                        state = parseOptions(tokens, state, state.getGroup().getOptions());
+                    }
+                }
             }
         }
         return state;
