@@ -15,10 +15,17 @@
  */
 package com.github.rvesse.airline.model;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.utils.AirlineUtils;
 
+/**
+ * Represents meta-data about a command group
+ *
+ */
 public class CommandGroupMetadata {
     private final String name;
     private final String description;
@@ -26,44 +33,115 @@ public class CommandGroupMetadata {
     private final List<OptionMetadata> options;
     private final CommandMetadata defaultCommand;
     private final List<CommandMetadata> commands;
+    private final List<CommandGroupMetadata> subGroups;
 
-    public CommandGroupMetadata(String name, String description, boolean hidden, Iterable<OptionMetadata> options,
-            CommandMetadata defaultCommand, Iterable<CommandMetadata> commands) {
+    //@formatter:off
+    public CommandGroupMetadata(String name, 
+                                String description, 
+                                boolean hidden, 
+                                Iterable<OptionMetadata> options,
+                                Iterable<CommandGroupMetadata> subGroups, 
+                                CommandMetadata defaultCommand, 
+                                Iterable<CommandMetadata> commands) {
+    //@formatter:on
+        if (StringUtils.isEmpty(name))
+            throw new IllegalArgumentException("Group name may not be null/empty");
+        if (StringUtils.containsWhitespace(name))
+            throw new IllegalArgumentException("Group name may not contain whitespace");
+        
         this.name = name;
         this.description = description;
         this.hidden = hidden;
         this.options = AirlineUtils.unmodifiableListCopy(options);
+        this.subGroups = AirlineUtils.listCopy(subGroups);
         this.defaultCommand = defaultCommand;
         this.commands = AirlineUtils.listCopy(commands);
     }
 
+    /**
+     * Gets the name of the group
+     * 
+     * @return Name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the description for the group
+     * 
+     * @return Description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Gets whether the group is hidden
+     * 
+     * @return True if hidden, false otherwise
+     */
     public boolean isHidden() {
         return hidden;
     }
 
+    /**
+     * Gets the group options
+     * 
+     * @return Group options
+     */
     public List<OptionMetadata> getOptions() {
         return options;
     }
 
+    /**
+     * Gets the default command for the group
+     * 
+     * @return Default command
+     */
     public CommandMetadata getDefaultCommand() {
         return defaultCommand;
     }
 
+    /**
+     * Gets the commands for the group
+     * 
+     * @return Commands
+     */
     public List<CommandMetadata> getCommands() {
-        return AirlineUtils.unmodifiableListCopy(commands);
+        return Collections.unmodifiableList(commands);
     }
 
+    /**
+     * Adds a command to the group
+     * 
+     * @param command
+     *            Command
+     */
     public void addCommand(CommandMetadata command) {
         if (!commands.contains(command)) {
             commands.add(command);
+        }
+    }
+
+    /**
+     * Gets the sub-groups of this group
+     * 
+     * @return Sub-groups
+     */
+    public List<CommandGroupMetadata> getSubGroups() {
+        return Collections.unmodifiableList(subGroups);
+    }
+
+    /**
+     * Adds a sub-group to the group
+     * 
+     * @param subGroup
+     *            Sub-group
+     */
+    public void addSubGroup(CommandGroupMetadata subGroup) {
+        if (!subGroups.contains(subGroup)) {
+            subGroups.add(subGroup);
         }
     }
 

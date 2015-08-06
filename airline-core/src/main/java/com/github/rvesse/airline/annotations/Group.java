@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface Group
 {
-    public static final class DEFAULT {}
+    public static final class NO_DEFAULT {}
     
     /**
      * Name of the group.
@@ -47,7 +47,7 @@ public @interface Group
     /**
      * Default command class for the group (optional)
      */
-    Class<?> defaultCommand() default DEFAULT.class;
+    Class<?> defaultCommand() default NO_DEFAULT.class;
 
     /**
      * command classes to add to the group (optional)

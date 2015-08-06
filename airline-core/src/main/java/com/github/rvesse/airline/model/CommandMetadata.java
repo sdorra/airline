@@ -22,7 +22,9 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class CommandMetadata {
     private final String name;
@@ -54,6 +56,11 @@ public class CommandMetadata {
                            List<Group> groups,
                            List<HelpSection> sections) {
     //@formatter:on
+        if (StringUtils.isEmpty(name))
+            throw new IllegalArgumentException("Command name may not be null/empty");
+        if (StringUtils.containsWhitespace(name))
+            throw new IllegalArgumentException("Command name may not contain whitespace");
+        
         this.name = name;
         this.description = description;
         this.hidden = hidden;

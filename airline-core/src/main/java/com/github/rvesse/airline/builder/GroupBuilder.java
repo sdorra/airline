@@ -16,7 +16,9 @@
 package com.github.rvesse.airline.builder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,12 +28,13 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
-public class GroupBuilder<C> {
+public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
 
     private final String name;
     private String description = null;
     private Class<? extends C> defaultCommand = null;
     private boolean hidden = false;
+    protected final Map<String, GroupBuilder<C>> subGroups = new HashMap<>();
 
     private final List<Class<? extends C>> commands = new ArrayList<>();
 
@@ -63,6 +66,26 @@ public class GroupBuilder<C> {
     public GroupBuilder<C> withHiddenState(boolean hidden) {
         this.hidden = hidden;
         return this;
+    }
+    
+    public GroupBuilder<C> withSubGroup(String name) {
+        checkNotBlank(name, "Group name");
+
+        if (subGroups.containsKey(name)) {
+            return subGroups.get(name);
+        }
+
+        GroupBuilder<C> group = new GroupBuilder<C>(name);
+        subGroups.put(name, group);
+        return group;
+    }
+
+    public GroupBuilder<C> getSubGroup(final String name) {
+        checkNotBlank(name, "Group name");
+        if (!subGroups.containsKey(name))
+            throw new IllegalArgumentException(String.format("Group %s has not been declared", name));
+
+        return subGroups.get(name);
     }
 
     public GroupBuilder<C> withDefaultCommand(Class<? extends C> defaultCommand) {
@@ -96,7 +119,11 @@ public class GroupBuilder<C> {
     public CommandGroupMetadata build() {
         CommandMetadata groupDefault = MetadataLoader.loadCommand(defaultCommand);
         List<CommandMetadata> groupCommands = MetadataLoader.loadCommands(commands);
+        List<CommandGroupMetadata> subGroups = new ArrayList<CommandGroupMetadata>();
+        for (GroupBuilder<C> builder : this.subGroups.values()) {
+            subGroups.add(builder.build());
+        }
 
-        return MetadataLoader.loadCommandGroup(name, description, hidden, groupDefault, groupCommands);
+        return MetadataLoader.loadCommandGroup(name, description, hidden, subGroups, groupDefault, groupCommands);
     }
 }

@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -104,7 +105,13 @@ public class MetadataLoader {
      * @return Command group meta-data
      */
     public static CommandGroupMetadata loadCommandGroup(String name, String description, boolean hidden,
-            CommandMetadata defaultCommand, Iterable<CommandMetadata> commands) {
+            Iterable<CommandGroupMetadata> subGroups, CommandMetadata defaultCommand, Iterable<CommandMetadata> commands) {
+        // Process the name
+        if (StringUtils.containsWhitespace(name)) {
+            String[] names = StringUtils.split(name);
+            name = names[names.length - 1];
+        }
+
         List<OptionMetadata> groupOptions = new ArrayList<OptionMetadata>();
         if (defaultCommand != null) {
             groupOptions.addAll(defaultCommand.getGroupOptions());
@@ -113,7 +120,7 @@ public class MetadataLoader {
             groupOptions.addAll(command.getGroupOptions());
         }
         groupOptions = ListUtils.unmodifiableList(mergeOptionSet(groupOptions));
-        return new CommandGroupMetadata(name, description, hidden, groupOptions, defaultCommand, commands);
+        return new CommandGroupMetadata(name, description, hidden, groupOptions, subGroups, defaultCommand, commands);
     }
 
     /**
@@ -550,24 +557,59 @@ public class MetadataLoader {
         createGroupsFromAnnotations(allCommands, newCommands, commandGroups, defaultCommandGroup);
 
         for (CommandMetadata command : allCommands) {
-            boolean added = false;
+            boolean addedToTopLevelGroup = false;
 
             // now add the command to any groupNames specified in the Command
             // annotation
             for (String groupName : command.getGroupNames()) {
                 CommandGroupMetadata group = CollectionUtils.find(commandGroups, new GroupFinder(groupName));
                 if (group != null) {
+                    // Add to existing top level group
                     group.addCommand(command);
-                    added = true;
+                    addedToTopLevelGroup = true;
                 } else {
-                    CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", false, null,
-                            Collections.singletonList(command));
-                    commandGroups.add(newGroup);
-                    added = true;
+                    if (StringUtils.containsWhitespace(groupName)) {
+                        // Add to sub-group
+                        String[] groups = StringUtils.split(groupName);
+                        CommandGroupMetadata subGroup = null;
+                        for (int i = 0; i < groups.length; i++) {
+                            if (i == 0) {
+                                // Find/create the necessary top level group
+                                subGroup = CollectionUtils.find(commandGroups, new GroupFinder(groups[i]));
+                                if (subGroup == null) {
+                                    subGroup = new CommandGroupMetadata(groups[i], "", false,
+                                            Collections.<OptionMetadata> emptyList(),
+                                            Collections.<CommandGroupMetadata> emptyList(), null,
+                                            Collections.<CommandMetadata>emptyList());
+                                    commandGroups.add(subGroup);
+                                }
+                            } else {
+                                // Find/create the next sub-group
+                                CommandGroupMetadata nextSubGroup = CollectionUtils.find(subGroup.getSubGroups(), new GroupFinder(groups[i]));
+                                if (nextSubGroup == null) {
+                                    nextSubGroup = new CommandGroupMetadata(groups[i], "", false,
+                                            Collections.<OptionMetadata> emptyList(),
+                                            Collections.<CommandGroupMetadata> emptyList(), null,
+                                            Collections.<CommandMetadata>emptyList());
+                                }
+                                subGroup.addSubGroup(nextSubGroup);
+                                subGroup = nextSubGroup;
+                            }
+                        }
+                        if (subGroup == null) throw new IllegalStateException("Failed to resolve sub-group path");
+                        subGroup.addCommand(command);
+                    } else {
+                        // Add to newly created top level group
+                        CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", false,
+                                Collections.<CommandGroupMetadata> emptyList(), null,
+                                Collections.singletonList(command));
+                        commandGroups.add(newGroup);
+                        addedToTopLevelGroup = true;
+                    }
                 }
             }
 
-            if (added && defaultCommandGroup.contains(command)) {
+            if (addedToTopLevelGroup && defaultCommandGroup.contains(command)) {
                 defaultCommandGroup.remove(command);
             }
         }
@@ -579,8 +621,11 @@ public class MetadataLoader {
     private static void createGroupsFromAnnotations(List<CommandMetadata> allCommands,
             List<CommandMetadata> newCommands, List<CommandGroupMetadata> commandGroups,
             List<CommandMetadata> defaultCommandGroup) {
+
+        // TODO Sort sub-groups by name length then lexically
+        Map<String, CommandGroupMetadata> subGroups = new TreeMap<String, CommandGroupMetadata>();
         for (CommandMetadata command : allCommands) {
-            boolean added = false;
+            boolean addedToTopLevelGroup = false;
 
             // first, create any groups explicitly annotated
             for (Group groupAnno : command.getGroups()) {
@@ -588,7 +633,7 @@ public class MetadataLoader {
                 CommandMetadata defaultCommand = null;
 
                 // load default command if needed
-                if (!groupAnno.defaultCommand().equals(Group.DEFAULT.class)) {
+                if (!groupAnno.defaultCommand().equals(Group.NO_DEFAULT.class)) {
                     defaultCommandClass = groupAnno.defaultCommand();
                     defaultCommand = CollectionUtils.find(allCommands, new CommandTypeFinder(defaultCommandClass));
                     if (null == defaultCommand) {
@@ -609,21 +654,83 @@ public class MetadataLoader {
                     }
                 }
 
+                // Find the group metadata
+                // May already exist as a top level group
                 CommandGroupMetadata groupMetadata = CollectionUtils.find(commandGroups,
                         new GroupFinder(groupAnno.name()));
-                if (null == groupMetadata) {
-                    groupMetadata = loadCommandGroup(groupAnno.name(), groupAnno.description(), groupAnno.hidden(),
-                            defaultCommand, groupCommands);
-                    commandGroups.add(groupMetadata);
+                if (groupMetadata == null) {
+                    // Not a top level group
+
+                    String subGroupPath = null;
+                    if (StringUtils.containsWhitespace(groupAnno.name())) {
+                        // Is this a sub-group we've already seen?
+                        // Make sure to normalize white space in the path
+                        subGroupPath = StringUtils.join(StringUtils.split(groupAnno.name()), " ");
+                        groupMetadata = subGroups.get(subGroupPath);
+                    }
+
+                    if (groupMetadata == null) {
+                        // Newly discovered group
+                        groupMetadata = loadCommandGroup(groupAnno.name(), groupAnno.description(), groupAnno.hidden(),
+                                Collections.<CommandGroupMetadata> emptyList(), defaultCommand, groupCommands);
+                        if (!StringUtils.containsWhitespace(groupAnno.name())) {
+                            // Add as top level group
+                            commandGroups.add(groupMetadata);
+                        } else {
+                            // This is a new sub-group, put aside for now and
+                            // we'll
+                            // build the sub-group tree later
+                            subGroups.put(subGroupPath, groupMetadata);
+                        }
+                    }
                 }
 
                 groupMetadata.addCommand(command);
-                added = true;
+                addedToTopLevelGroup = !StringUtils.containsWhitespace(groupAnno.name());
             }
 
-            if (added && defaultCommandGroup.contains(command)) {
+            if (addedToTopLevelGroup && defaultCommandGroup.contains(command)) {
                 defaultCommandGroup.remove(command);
             }
+        }
+
+        // Add sub-groups into hierarchy as appropriate
+        for (String subGroupPath : subGroups.keySet()) {
+            CommandGroupMetadata subGroup = subGroups.get(subGroupPath);
+            String[] groups = StringUtils.split(subGroupPath);
+            CommandGroupMetadata parentGroup = null;
+            for (int i = 0; i < groups.length - 1; i++) {
+                if (i == 0) {
+                    // Should be a top level group
+                    parentGroup = CollectionUtils.find(commandGroups, new GroupFinder(groups[i]));
+                    if (parentGroup == null) {
+                        // Top level parent group does not exist so create empty
+                        // top level group
+                        parentGroup = new CommandGroupMetadata(groups[i], "", false,
+                                Collections.<OptionMetadata> emptyList(),
+                                Collections.<CommandGroupMetadata> emptyList(), null,
+                                Collections.<CommandMetadata> emptyList());
+                        commandGroups.add(parentGroup);
+                    }
+                } else {
+                    // Should be a sub-group of the current parent
+                    CommandGroupMetadata nextParent = CollectionUtils.find(parentGroup.getSubGroups(), new GroupFinder(
+                            groups[i]));
+                    if (nextParent == null) {
+                        // Next parent group does not exist so create empty
+                        // group
+                        nextParent = new CommandGroupMetadata(groups[i], "", false,
+                                Collections.<OptionMetadata> emptyList(),
+                                Collections.<CommandGroupMetadata> emptyList(), null,
+                                Collections.<CommandMetadata> emptyList());
+                    }
+                    parentGroup.addSubGroup(nextParent);
+                    parentGroup = nextParent;
+                }
+            }
+            if (parentGroup == null)
+                throw new IllegalStateException("Failed to resolve sub-group path");
+            parentGroup.addSubGroup(subGroup);
         }
     }
 
