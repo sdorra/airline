@@ -17,8 +17,10 @@ package com.github.rvesse.airline.builder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
@@ -141,19 +143,17 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     @Override
     public Cli<C> build() {
         CommandMetadata defaultCommandMetadata = null;
+        List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
         if (defaultCommand != null) {
             defaultCommandMetadata = MetadataLoader.loadCommand(defaultCommand);
         }
 
-        List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
-
         List<CommandMetadata> defaultCommandGroup = defaultCommandGroupCommands != null ? MetadataLoader
                 .loadCommands(defaultCommandGroupCommands) : new ArrayList<CommandMetadata>();
 
-        // Currently the default command is required to be in the commands
-        // list. If that changes, we'll need to add it here and add checks for
-        // existence
         allCommands.addAll(defaultCommandGroup);
+        if (defaultCommandMetadata != null)
+            allCommands.add(defaultCommandMetadata);
 
         // Build groups
         List<CommandGroupMetadata> commandGroups;
@@ -165,8 +165,24 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
         } else {
             commandGroups = new ArrayList<>();
         }
+
+        // Find all commands registered in groups and sub-groups, we use this to
+        // check this is a valid CLI with at least 1 command
         for (CommandGroupMetadata group : commandGroups) {
             allCommands.addAll(group.getCommands());
+            if (group.getDefaultCommand() != null)
+                allCommands.add(group.getDefaultCommand());
+
+            // Make sure to scan sub-groups
+            Queue<CommandGroupMetadata> subGroups = new LinkedList<CommandGroupMetadata>();
+            subGroups.addAll(group.getSubGroups());
+            while (!subGroups.isEmpty()) {
+                CommandGroupMetadata subGroup = subGroups.poll();
+                allCommands.addAll(subGroup.getCommands());
+                if (subGroup.getDefaultCommand() != null)
+                    allCommands.add(subGroup.getDefaultCommand());
+                subGroups.addAll(subGroup.getSubGroups());
+            }
         }
 
         // add commands to groups based on the value of groups in the @Command

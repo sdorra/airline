@@ -56,6 +56,9 @@ public class CommandGroupMetadata {
         this.subGroups = AirlineUtils.listCopy(subGroups);
         this.defaultCommand = defaultCommand;
         this.commands = AirlineUtils.listCopy(commands);
+        if (this.defaultCommand != null && !this.commands.contains(this.defaultCommand)) {
+            this.commands.add(this.defaultCommand);
+        }
     }
 
     /**

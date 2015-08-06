@@ -23,8 +23,6 @@ import com.github.rvesse.airline.help.sections.common.DiscussionSection;
 import com.github.rvesse.airline.help.sections.common.ExamplesSection;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
-import com.github.rvesse.airline.utils.AirlineUtils;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
