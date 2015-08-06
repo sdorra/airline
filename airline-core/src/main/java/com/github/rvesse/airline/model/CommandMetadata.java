@@ -162,4 +162,16 @@ public class CommandMetadata {
         sb.append('}');
         return sb.toString();
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        
+        if (!(other instanceof CommandMetadata)) return false;
+        
+        CommandMetadata cmd = (CommandMetadata) other;
+        
+        // TODO This should ideally be more robust
+        return StringUtils.equals(this.name, cmd.name) && this.type.equals(cmd.type);
+    }
 }

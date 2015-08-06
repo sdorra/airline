@@ -32,7 +32,7 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 public class Help implements ExampleRunnable {
 
     @Inject
-    private GlobalMetadata global;
+    private GlobalMetadata<ExampleRunnable> global;
 
     @Arguments(description = "Provides the name of the commands you want to provide help for", completionBehaviour = CompletionBehaviour.CLI_COMMANDS)
     private List<String> commandNames = new ArrayList<String>();

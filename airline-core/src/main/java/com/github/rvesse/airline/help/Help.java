@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 @Command(name = "help", description = "Display help information")
-public class Help<T> implements Runnable, Callable<Void> {   
+public class Help<T> implements Runnable, Callable<Void> {
     @Inject
     public GlobalMetadata<T> global;
 
@@ -141,10 +141,11 @@ public class Help<T> implements Runnable, Callable<Void> {
      *            Whether to include hidden commands and options in the output
      * @throws IOException
      */
-    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, boolean includeHidden) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, boolean includeHidden)
+            throws IOException {
         help(global, commandNames, includeHidden, System.out);
     }
-    
+
     /**
      * Displays plain text format program help to the given output stream
      * 
@@ -156,7 +157,8 @@ public class Help<T> implements Runnable, Callable<Void> {
      *            Output Stream
      * @throws IOException
      */
-    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, OutputStream out) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, OutputStream out)
+            throws IOException {
         help(global, commandNames, false, out);
     }
 
@@ -171,7 +173,8 @@ public class Help<T> implements Runnable, Callable<Void> {
      *            Output Stream
      * @throws IOException
      */
-    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, boolean includeHidden, OutputStream out) throws IOException {
+    public static <T> void help(GlobalMetadata<T> global, List<String> commandNames, boolean includeHidden,
+            OutputStream out) throws IOException {
         if (commandNames.isEmpty()) {
             new CliGlobalUsageSummaryGenerator<T>(includeHidden).usage(global, out);
             return;
@@ -195,20 +198,8 @@ public class Help<T> implements Runnable, Callable<Void> {
                              : new GroupFinder(name);
         //@formatter:on
 
-        // A command in the default group?
-        //@formatter:off
-        findCommandPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
-                               ? new AbbreviatedCommandFinder(name, global.getDefaultGroupCommands())
-                               : new CommandFinder(name);
-        //@formatter:on
-        CommandMetadata command = CollectionUtils.find(global.getDefaultGroupCommands(), findCommandPredicate);
-        if (command != null) {
-            // Command in default group help
-            new CliCommandUsageGenerator(includeHidden).usage(global.getName(), null, command.getName(), command, out);
-            return;
-        }
-
         // A command in a group?
+        CommandMetadata command;
         CommandGroupMetadata group = CollectionUtils.find(global.getCommandGroups(), findGroupPredicate);
         if (group != null) {
             // General group help or specific group command help?
@@ -217,28 +208,69 @@ public class Help<T> implements Runnable, Callable<Void> {
                 new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global, group, out);
                 return;
             } else {
-                // Group command help
-                String commandName = commandNames.get(1);
+                // Group/Sub-Group command help
+                int i = 1;
+                String commandOrSubGroupName = commandNames.get(i);
+
+                while (group.getSubGroups().size() > 0 && i < commandNames.size()) {
+                    commandOrSubGroupName = commandNames.get(i);
+                    
+                    //@formatter:off
+                    findGroupPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
+                                         ? new AbbreviatedGroupFinder(commandOrSubGroupName, group.getSubGroups()) 
+                                         : new GroupFinder(name);
+                    //@formatter:on
+                    CommandGroupMetadata subGroup = CollectionUtils.find(group.getSubGroups(), findGroupPredicate);
+                    if (subGroup != null) {
+                        // Found a valid sub-group
+                        group = subGroup;
+                        i++;
+                    } else {
+                        // No relevant sub-group found
+                        break;
+                    }
+                }
+                if (i >= commandNames.size()) {
+                    // General sub-group help
+                    new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global, group, out);
+                }
+                
+                // Look for a command in the current group/sub-group
+                commandOrSubGroupName = commandNames.get(i);
+
                 //@formatter:off
                 findCommandPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
-                                       ? new AbbreviatedCommandFinder(commandName, group.getCommands())
-                                       : new CommandFinder(commandName);
+                                       ? new AbbreviatedCommandFinder(commandOrSubGroupName, group.getCommands())
+                                       : new CommandFinder(commandOrSubGroupName);
                 //@formatter:on
                 command = CollectionUtils.find(group.getCommands(), findCommandPredicate);
                 if (command != null) {
                     new CliCommandUsageGenerator().usage(global.getName(), group.getName(), command.getName(), command,
                             out);
-
                     return;
                 }
 
                 // Didn't find an appropriate command
                 if (global.getParserConfiguration().allowsAbbreviatedCommands()) {
-                    System.out.println("Unknown command " + name + " " + commandName + " or an ambiguous abbreviation");
+                    System.out.println("Unknown command " + name + " " + commandOrSubGroupName
+                            + " or an ambiguous abbreviation");
                 } else {
-                    System.out.println("Unknown command " + name + " " + commandName);
+                    System.out.println("Unknown command " + name + " " + commandOrSubGroupName);
                 }
             }
+        }
+
+        // A command in the default group?
+        //@formatter:off
+        findCommandPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
+                               ? new AbbreviatedCommandFinder(name, global.getDefaultGroupCommands())
+                               : new CommandFinder(name);
+        //@formatter:on
+        command = CollectionUtils.find(global.getDefaultGroupCommands(), findCommandPredicate);
+        if (command != null) {
+            // Command in default group help
+            new CliCommandUsageGenerator(includeHidden).usage(global.getName(), null, command.getName(), command, out);
+            return;
         }
 
         // Didn't find an appropriate group
