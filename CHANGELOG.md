@@ -8,30 +8,51 @@
     - Removed Guava
     - Added Apache Commons Collections 4
 - Builder improvements
-    - All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance.
+    - All parser related options on `CliBuilder` are now moved to `ParserBuilder` which is access by calling `.withParser()` on the `CliBuilder` instance
+    - Groups now support sub-groups and `GroupBuilder` provides `withSubGroup()` and `getSubGroup()` for working with these
 - Annotation Changes
-    - `OptionMetadata` had `required`, `allowedValues` and `ignoreCase` removed.  These are now denoted via separate annotations
-    - `ArgumentsMetadata` had `required` removed, this is now denoted via separate annotations
+    - Various fields were removed from existing annotations in favour of moving them to separate annotations
+        - `@Command` removes `examples`, `discussion`, `exitCodes` and `exitCodeDescriptions`
+        - `@Option` removes `required`, `allowedValues` and `ignoreCase`
+        - `@Arguments` removes `required`
+    - New annotations for adding extended help to commands
+        - `@Discussion` to add discussion, this replaces the `discussion` field of the `@Command` annotation
+        - `@Examples` to add examples, this replaces the `examples` field of the `@Command annotation
+        - `@ExitCodes` to add exit codes, this replaces the `exitCodes` and `exitCodeDescriptions` fields of the 
+        - Custom extended help sections can be created and registered such that they are automatically discovered by Airline
     - New restriction annotations for expressing restrictions on options and arguments
-        - `@Required` to indicate required options/arguments
-        - `@AllowedRawValues` for limiting the string values an option can receive
-        - `@LongRange`, `@IntegerRange`, `@ShortRange`, `@ByteRange`, `@DoubleRange` and `@FloatRange` for indicating that arguments once converted to the appropriate value type must fall within a given range
-        - `@Unrestricted` to indicate that restrictions inherited from an overridden option should be removed
+        - `@Required` to indicate required options/arguments, this replaces the `required` field on the `@Option` and `@Arguments` annotations
+        - New `@RequiredOnlyIf` for conditionally requiring an option if another option is present
+        - New `@RequireSome` for requiring at least one from some set of options
+        - New `@RequireOnlyOne` for requiring exactly one from some set of options
+        - `@AllowedRawValues` for limiting the raw string values an option can receive, this replaces the `allowedValues` and `ignoreCase` fields on the `@Option` annotation
+        - New `@AllowedValues` for limiting the converted values an option can receive
+        - New `@MaxLength` and `@MinLength` for limiting the length of the raw string values an option can receive
+        - New `@MinOccurrences`, `@MaxOccurrences` and `@Once` for limiting how many times an option can appear
+        - New `@LongRange`, `@IntegerRange`, `@ShortRange`, `@ByteRange`, `@DoubleRange`, `@FloatRange` and `@LexicalRange` for indicating that arguments once converted to the appropriate value type must fall within a given range
+        - New `@Port` for restricting options to some port range(s)
+        - New `@NotEmpty` and `@NotBlank` for requiring the raw string values be non-empty or non-blank (not all whitespace)
+        - New `@Pattern` for requiring that the raw string values conform to some regular expression
+        - New `@Unrestricted` to indicate that restrictions inherited from an overridden option should be removed
         - Custom restrictions can be created and registered such that they are automatically enforced by Airline
 - Parser Improvements
-     - Type converter is now configurable i.e. allows you to control how Airline turns string arguments into Java objects
+     - `TypeConverter` is now an interface and configurable i.e. allows you to control how Airline turns raw string values into Java objects
      - Option parsing styles are now fully configurable (default behaviour remains as 1.x which uses the first 3 styles):
          - Classic GNU Get Opt Style
          - Long GNU Get Opt Style
          - Standard whitespace separated style
          - List value style i.e. `--name a,b,c` for higher arity options
          - Pair value style i.e. `--name a=b` for arity 2 options
-         - Users can define their own custom option parsers as desired
+         - Users can define and register their own custom option parsers as desired
      - Alias Improvements
          - Can now support optional alias chaining i.e. aliases can reference other aliases
 - Metadata Improvements
      - Parsing specific metadata moved to `ParserMetadata` class which is accessible via `GlobalMetadata.getParserConfiguration()`
      - `GlobalMetadata` is now a generic class taking the command type as the type parameter
+- Help Improvements
+    - New `HelpHint` interface which is used by restrictions to provide help
+    - New `HelpSection` interface for adding custom help sections to commands
+    - More advanced and flexible formatting of extra help hints and sections in all existing generators
 
 ## 1.0.2
 
