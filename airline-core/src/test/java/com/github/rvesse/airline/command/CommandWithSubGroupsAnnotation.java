@@ -16,8 +16,19 @@
 package com.github.rvesse.airline.command;
 
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.annotations.Groups;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.OptionType;
 
-@Command(name = "commandWithGroupNames", description = "A command with a group annotation", groupNames = {"singleGroup","singletonGroup"})
-public class CommandWithGroupNames extends AbstractGroupAnnotationCommand
+@Groups({
+        @Group(name = "groupInsideOfGroups subGroup", description = "my nested sub-group", defaultCommand = CommandWithSubGroupsAnnotation.class,commands = {CommandAdd.class})
+})
+@Command(name = "commandWithSubGroupsAnno", description = "A command with a groups annotation defining a sub-group")
+public class CommandWithSubGroupsAnnotation extends AbstractGroupAnnotationCommand
 {
+    
+    @Option(name = "-v", type = OptionType.GROUP)
+    public boolean verbose = false;
+    
 }

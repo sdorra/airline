@@ -17,7 +17,7 @@ package com.github.rvesse.airline.command;
 
 import com.github.rvesse.airline.annotations.Command;
 
-@Command(name = "commandWithGroupNames", description = "A command with a group annotation", groupNames = {"singleGroup","singletonGroup"})
-public class CommandWithGroupNames extends AbstractGroupAnnotationCommand
+@Command(name = "commandWithGroupNames", description = "A command with a group annotation", groupNames = {"singleGroup","parent child"})
+public class CommandWithSubGroupNames extends AbstractGroupAnnotationCommand
 {
 }

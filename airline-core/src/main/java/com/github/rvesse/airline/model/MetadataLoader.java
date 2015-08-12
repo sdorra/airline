@@ -31,6 +31,7 @@ import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.utils.comparators.StringHierarchyComparator;
 import com.github.rvesse.airline.utils.predicates.parser.CommandTypeFinder;
 import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
 
@@ -557,7 +558,7 @@ public class MetadataLoader {
         createGroupsFromAnnotations(allCommands, newCommands, commandGroups, defaultCommandGroup);
 
         for (CommandMetadata command : allCommands) {
-            boolean addedToTopLevelGroup = false;
+            boolean addedToGroup = false;
 
             // now add the command to any groupNames specified in the Command
             // annotation
@@ -566,7 +567,7 @@ public class MetadataLoader {
                 if (group != null) {
                     // Add to existing top level group
                     group.addCommand(command);
-                    addedToTopLevelGroup = true;
+                    addedToGroup = true;
                 } else {
                     if (StringUtils.containsWhitespace(groupName)) {
                         // Add to sub-group
@@ -580,36 +581,39 @@ public class MetadataLoader {
                                     subGroup = new CommandGroupMetadata(groups[i], "", false,
                                             Collections.<OptionMetadata> emptyList(),
                                             Collections.<CommandGroupMetadata> emptyList(), null,
-                                            Collections.<CommandMetadata>emptyList());
+                                            Collections.<CommandMetadata> emptyList());
                                     commandGroups.add(subGroup);
                                 }
                             } else {
                                 // Find/create the next sub-group
-                                CommandGroupMetadata nextSubGroup = CollectionUtils.find(subGroup.getSubGroups(), new GroupFinder(groups[i]));
+                                CommandGroupMetadata nextSubGroup = CollectionUtils.find(subGroup.getSubGroups(),
+                                        new GroupFinder(groups[i]));
                                 if (nextSubGroup == null) {
                                     nextSubGroup = new CommandGroupMetadata(groups[i], "", false,
                                             Collections.<OptionMetadata> emptyList(),
                                             Collections.<CommandGroupMetadata> emptyList(), null,
-                                            Collections.<CommandMetadata>emptyList());
+                                            Collections.<CommandMetadata> emptyList());
                                 }
                                 subGroup.addSubGroup(nextSubGroup);
                                 subGroup = nextSubGroup;
                             }
                         }
-                        if (subGroup == null) throw new IllegalStateException("Failed to resolve sub-group path");
+                        if (subGroup == null)
+                            throw new IllegalStateException("Failed to resolve sub-group path");
                         subGroup.addCommand(command);
+                        addedToGroup = true;
                     } else {
                         // Add to newly created top level group
                         CommandGroupMetadata newGroup = loadCommandGroup(groupName, "", false,
                                 Collections.<CommandGroupMetadata> emptyList(), null,
                                 Collections.singletonList(command));
                         commandGroups.add(newGroup);
-                        addedToTopLevelGroup = true;
+                        addedToGroup = true;
                     }
                 }
             }
 
-            if (addedToTopLevelGroup && defaultCommandGroup.contains(command)) {
+            if (addedToGroup && defaultCommandGroup.contains(command)) {
                 defaultCommandGroup.remove(command);
             }
         }
@@ -622,10 +626,12 @@ public class MetadataLoader {
             List<CommandMetadata> newCommands, List<CommandGroupMetadata> commandGroups,
             List<CommandMetadata> defaultCommandGroup) {
 
-        // TODO Sort sub-groups by name length then lexically
-        Map<String, CommandGroupMetadata> subGroups = new TreeMap<String, CommandGroupMetadata>();
+        // We sort sub-groups by name length then lexically
+        // This means that when we build the groups hierarchy we'll ensure we
+        // build the parent groups first wherever possible
+        Map<String, CommandGroupMetadata> subGroups = new TreeMap<String, CommandGroupMetadata>(new StringHierarchyComparator());
         for (CommandMetadata command : allCommands) {
-            boolean addedToTopLevelGroup = false;
+            boolean addedToGroup = false;
 
             // first, create any groups explicitly annotated
             for (Group groupAnno : command.getGroups()) {
@@ -678,18 +684,17 @@ public class MetadataLoader {
                             commandGroups.add(groupMetadata);
                         } else {
                             // This is a new sub-group, put aside for now and
-                            // we'll
-                            // build the sub-group tree later
+                            // we'll build the sub-group tree later
                             subGroups.put(subGroupPath, groupMetadata);
                         }
                     }
                 }
 
                 groupMetadata.addCommand(command);
-                addedToTopLevelGroup = !StringUtils.containsWhitespace(groupAnno.name());
+                addedToGroup = true;
             }
 
-            if (addedToTopLevelGroup && defaultCommandGroup.contains(command)) {
+            if (addedToGroup && defaultCommandGroup.contains(command)) {
                 defaultCommandGroup.remove(command);
             }
         }
