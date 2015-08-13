@@ -16,11 +16,14 @@
 package com.github.rvesse.airline;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
+import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -89,10 +92,20 @@ public class HelpOption<C> {
             throw new NullPointerException("Usage generator cannot be null");
         try {
             generator.usage(globalMetadata != null ? globalMetadata.getName() : null,
-                    groupMetadata != null ? new String[] { groupMetadata.getName() } : null, commandMetadata.getName(),
+                    groupMetadata != null ? toGroupNames(groupMetadata) : null, commandMetadata.getName(),
                     commandMetadata);
         } catch (IOException e) {
             throw new RuntimeException("Error generating usage documentation", e);
         }
+    }
+    
+    private static String[] toGroupNames(CommandGroupMetadata group) {
+        List<CommandGroupMetadata> groupPath = new ArrayList<CommandGroupMetadata>();
+        groupPath.add(group);
+        while (group.getParent() != null) {
+            group = group.getParent();
+            groupPath.add(0, group);
+        }
+        return UsageHelper.toGroupNames(groupPath);
     }
 }

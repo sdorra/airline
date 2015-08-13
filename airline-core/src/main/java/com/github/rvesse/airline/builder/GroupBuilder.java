@@ -67,7 +67,7 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
         this.hidden = hidden;
         return this;
     }
-    
+
     public GroupBuilder<C> withSubGroup(String name) {
         checkNotBlank(name, "Group name");
 
@@ -116,6 +116,7 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
         return this;
     }
 
+    @Override
     public CommandGroupMetadata build() {
         CommandMetadata groupDefault = MetadataLoader.loadCommand(defaultCommand);
         List<CommandMetadata> groupCommands = MetadataLoader.loadCommands(commands);
@@ -124,6 +125,11 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
             subGroups.add(builder.build());
         }
 
-        return MetadataLoader.loadCommandGroup(name, description, hidden, subGroups, groupDefault, groupCommands);
+        CommandGroupMetadata group = MetadataLoader.loadCommandGroup(name, description, hidden, subGroups,
+                groupDefault, groupCommands);
+        for (CommandGroupMetadata subGroup : subGroups) {
+            subGroup.setParent(group);
+        }
+        return group;
     }
 }

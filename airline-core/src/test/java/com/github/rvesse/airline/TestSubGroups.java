@@ -15,7 +15,11 @@
  */
 package com.github.rvesse.airline;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,6 +29,7 @@ import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
+import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
 
 
@@ -51,6 +56,7 @@ public class TestSubGroups {
         Assert.assertEquals(parentGroup.getSubGroups().size(), 1);
         
         CommandGroupMetadata subGroup = parentGroup.getSubGroups().get(0);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
         Assert.assertEquals(subGroup.getName(), "bar");
         Assert.assertEquals(subGroup.getDefaultCommand().getType(), Help.class);
         
@@ -75,18 +81,21 @@ public class TestSubGroups {
         Assert.assertEquals(global.getCommandGroups().size(), 1);
         
         CommandGroupMetadata parentGroup = global.getCommandGroups().get(0);
+        Assert.assertNull(parentGroup.getParent());
         Assert.assertEquals(parentGroup.getName(), "foo");
         Assert.assertEquals(parentGroup.getCommands().size(), 0);
         Assert.assertEquals(parentGroup.getSubGroups().size(), 2);
         
         CommandGroupMetadata subGroup = CollectionUtils.find(parentGroup.getSubGroups(), new GroupFinder("bar"));
         Assert.assertNotNull(subGroup);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
         Assert.assertEquals(subGroup.getName(), "bar");
         Assert.assertEquals(subGroup.getCommands().size(), 1);
         Assert.assertEquals(subGroup.getDefaultCommand().getType(), Help.class);
         
         subGroup = CollectionUtils.find(parentGroup.getSubGroups(), new GroupFinder("baz"));
         Assert.assertNotNull(subGroup);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
         Assert.assertEquals(subGroup.getName(), "baz");
         Assert.assertEquals(subGroup.getCommands().size(), 0);
         Assert.assertNull(subGroup.getDefaultCommand());
@@ -107,5 +116,70 @@ public class TestSubGroups {
         //@formatter:on
         
         builder.build().parse("foo", "baz");
+    }
+    
+    @Test
+    public void sub_groups_help_01() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder
+            = Cli.<Object>builder("test");
+        builder.withGroup("foo")
+               .withSubGroup("bar")
+               .withDefaultCommand(Help.class);
+        //@formatter:on
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo", "bar" }), false, output);
+        String actual = new String(output.toByteArray());
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] {
+            "NAME",
+            "        test foo bar -",
+            "",
+            "SYNOPSIS",
+            "        test foo bar { help* } [--] <cmd-args>",
+            "",
+            "        Where command-specific arguments <cmd-args> are:",
+            "            help: [ <command>... ]",
+            "",
+            "        * help is the default command",
+            "        See 'test help foo bar <command>' for more information on a specific command.",
+            ""
+        }, '\n');
+        //@formatter:on
+        
+        Assert.assertEquals(actual, expected);
+    }
+    
+    @Test
+    public void sub_groups_help_02() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder
+            = Cli.<Object>builder("test");
+        builder.withGroup("foo")
+               .withSubGroup("bar")
+               .withDefaultCommand(Help.class);
+        //@formatter:on
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo" }), false, output);
+        String actual = new String(output.toByteArray());
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] {
+            "NAME",
+            "        test foo -",
+            "",
+            "SYNOPSIS",
+            "        test foo { bar } [--]",
+            "",
+            "        * bar",
+            "        See 'test help foo bar <command>' for more information on a specific command.",
+            ""
+        }, '\n');
+        //@formatter:on
+        
+        Assert.assertEquals(actual, expected);
     }
 }

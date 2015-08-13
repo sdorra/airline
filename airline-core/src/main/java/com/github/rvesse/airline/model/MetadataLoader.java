@@ -730,12 +730,14 @@ public class MetadataLoader {
                                 Collections.<CommandMetadata> emptyList());
                     }
                     parentGroup.addSubGroup(nextParent);
+                    nextParent.setParent(parentGroup);
                     parentGroup = nextParent;
                 }
             }
             if (parentGroup == null)
                 throw new IllegalStateException("Failed to resolve sub-group path");
             parentGroup.addSubGroup(subGroup);
+            subGroup.setParent(parentGroup);
         }
     }
 

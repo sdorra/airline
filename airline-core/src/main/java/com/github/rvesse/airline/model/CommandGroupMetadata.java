@@ -34,6 +34,7 @@ public class CommandGroupMetadata {
     private final CommandMetadata defaultCommand;
     private final List<CommandMetadata> commands;
     private final List<CommandGroupMetadata> subGroups;
+    private CommandGroupMetadata parentGroup;
 
     //@formatter:off
     public CommandGroupMetadata(String name, 
@@ -48,7 +49,7 @@ public class CommandGroupMetadata {
             throw new IllegalArgumentException("Group name may not be null/empty");
         if (StringUtils.containsWhitespace(name))
             throw new IllegalArgumentException("Group name may not contain whitespace");
-        
+
         this.name = name;
         this.description = description;
         this.hidden = hidden;
@@ -146,6 +147,27 @@ public class CommandGroupMetadata {
         if (!subGroups.contains(subGroup)) {
             subGroups.add(subGroup);
         }
+    }
+
+    /**
+     * Sets the parent for a group
+     * 
+     * @param parent
+     *            Parent group
+     */
+    public void setParent(CommandGroupMetadata parent) {
+        if (this.parentGroup != null && this.parentGroup != parent)
+            throw new IllegalStateException("Parent group is already set");
+        this.parentGroup = parent;
+    }
+
+    /**
+     * Gets the parent group which may be null
+     * 
+     * @return Parent group, null if a top level group
+     */
+    public CommandGroupMetadata getParent() {
+        return this.parentGroup;
     }
 
     @Override

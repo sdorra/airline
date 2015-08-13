@@ -222,7 +222,7 @@ public class Help<T> implements Runnable, Callable<Void> {
                     //@formatter:off
                     findGroupPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
                                          ? new AbbreviatedGroupFinder(commandOrSubGroupName, group.getSubGroups()) 
-                                         : new GroupFinder(name);
+                                         : new GroupFinder(commandOrSubGroupName);
                     //@formatter:on
                     CommandGroupMetadata subGroup = CollectionUtils.find(group.getSubGroups(), findGroupPredicate);
                     if (subGroup != null) {
@@ -235,10 +235,11 @@ public class Help<T> implements Runnable, Callable<Void> {
                         break;
                     }
                 }
-                if (i >= commandNames.size()) {
+                if (i >= commandNames.size() - 1) {
                     // General sub-group help
                     new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global,
                             groupPath.toArray(new CommandGroupMetadata[0]), out);
+                    return;
                 }
 
                 // Look for a command in the current group/sub-group

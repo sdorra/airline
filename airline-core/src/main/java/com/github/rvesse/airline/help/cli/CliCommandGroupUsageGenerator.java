@@ -18,12 +18,14 @@ package com.github.rvesse.airline.help.cli;
 import java.io.IOException;
 import java.util.*;
 
+import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandGroupUsageGenerator;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_COMMAND_COMPARATOR;
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
@@ -163,18 +165,26 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
                 hasCommandSpecificArgs = true;
             }
         }
+        for (CommandGroupMetadata subGroup : group.getSubGroups()) {
+            allCommandNames.add(subGroup.getName());
+            if (commonGroupOptions == null) {
+                commonGroupOptions = new ArrayList<>(subGroup.getOptions());
+            }
+            commonGroupOptions.retainAll(subGroup.getOptions());
+        }
         // Print group summary line
         if (global != null) {
             synopsis.append(global.getName());
-            if (!hideGlobalOptions) {
+            if (!hideGlobalOptions && commands.size() > 0) {
                 synopsis.appendWords(toSynopsisUsage(commands.get(0).getGlobalOptions()));
             }
         }
         for (int i = 0; i < groups.length; i++) {
             synopsis.append(groups[i].getName()).append(" ");
         }
-        
-        synopsis.appendWords(toSynopsisUsage(commands.get(0).getGroupOptions()));
+        if (commands.size() > 0) {
+            synopsis.appendWords(toSynopsisUsage(commands.get(0).getGroupOptions()));
+        }
         synopsis.append(" {").append(allCommandNames.get(0));
         for (int i = 1; i < allCommandNames.size(); i++) {
             synopsis.append(" | ").append(allCommandNames.get(i));
@@ -228,7 +238,8 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
         if (defaultCommand != "") {
             synopsis.newline().append(String.format("* %s is the default command", defaultCommand));
         }
-        synopsis.newline().append("See").append("'" + global.getName()).append("help ").append(group.getName())
+        synopsis.newline().append("See").append("'" + global.getName()).append("help ")
+                .appendWords(UsageHelper.toGroupNames(AirlineUtils.arrayToList(groups)))
                 .appendOnOneLine(" <command>' for more information on a specific command.").newline();
     }
 
