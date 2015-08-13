@@ -29,6 +29,8 @@ import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
+import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
@@ -45,6 +47,8 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -54,14 +58,34 @@ import java.util.*;
  *
  */
 public class MetadataLoader {
+
     public static <C> ParserMetadata<C> loadParser(Class<?> cliClass) {
+        if (cliClass == null)
+            return ParserBuilder.<C> defaultConfiguration();
+
         Annotation annotation = cliClass.getAnnotation(Parser.class);
         if (annotation == null)
             return ParserBuilder.<C> defaultConfiguration();
-        
-        Parser parserConfig = (Parser) annotation;
+
+        return loadParser((Parser) annotation);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static <C> ParserMetadata<C> loadParser(Parser parserConfig) {
         ParserBuilder<C> builder = new ParserBuilder<C>();
-        
+
+        // Factory and converter options
+        if (!parserConfig.typeConverter().equals(DefaultTypeConverter.class)) {
+            builder = builder.withTypeConverter(ParserUtil.createInstance(parserConfig.typeConverter()));
+        } else {
+            builder = builder.withDefaultTypeConverter();
+        }
+        if (!parserConfig.commandFactory().equals(DefaultCommandFactory.class)) {
+            builder = builder.withCommandFactory(ParserUtil.createInstance(parserConfig.commandFactory()));
+        } else {
+            builder = builder.withDefaultCommandFactory();
+        }
+
         // Abbreviation options
         if (parserConfig.allowCommandAbbreviation()) {
             builder = builder.withCommandAbbreviation();
@@ -69,10 +93,10 @@ public class MetadataLoader {
         if (parserConfig.allowOptionAbbreviation()) {
             builder = builder.withOptionAbbreviation();
         }
-        
+
         // Alias options
         if (parserConfig.aliasesOverrideBuiltIns()) {
-            
+            builder = builder.withAliasesOverridingBuiltIns();
         }
         if (parserConfig.aliasesMayChain()) {
             builder = builder.withAliasesChaining();
@@ -80,12 +104,143 @@ public class MetadataLoader {
         for (Alias alias : parserConfig.aliases()) {
             builder.withAlias(alias.name()).withArguments(alias.arguments());
         }
-        
+        if (!StringUtils.isEmpty(parserConfig.userAliasesFile())) {
+            try {
+                if (parserConfig.userAliasesSearchLocation().length > 0) {
+                    builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
+                            parserConfig.userAliasesSearchLocation());
+                } else {
+                    builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
+                            new String[] { new File(".").getAbsolutePath() });
+                }
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Failed to load user aliases based upon Parser annotation", e);
+            }
+        }
+
         // Parsing options
         builder.withArgumentsSeparator(parserConfig.argumentsSeparator());
-        
-        
+        if (parserConfig.defaultParsersFirst() && parserConfig.useDefaultOptionParsers()) {
+            builder = builder.withDefaultOptionParsers();
+        }
+        for (Class<? extends OptionParser> optionParserClass : parserConfig.optionParsers()) {
+            OptionParser<C> optionParser = ParserUtil.createInstance(optionParserClass);
+            builder = builder.withOptionParser(optionParser);
+        }
+        if (!parserConfig.defaultParsersFirst() && parserConfig.useDefaultOptionParsers()) {
+            builder = builder.withDefaultOptionParsers();
+        }
+
         return builder.build();
+    }
+
+    public static <C> GlobalMetadata<C> loadGlobal(Class<?> cliClass) {
+        Annotation annotation = cliClass.getAnnotation(com.github.rvesse.airline.annotations.Cli.class);
+        if (annotation == null)
+            throw new IllegalArgumentException(String.format("Class %s does not have the @Cli annotation", cliClass));
+
+        com.github.rvesse.airline.annotations.Cli cliConfig = (com.github.rvesse.airline.annotations.Cli) annotation;
+
+        // Prepare commands
+        CommandMetadata defaultCommand = null;
+        if (cliConfig.defaultCommand() != null) {
+            defaultCommand = loadCommand(cliConfig.defaultCommand());
+        }
+        List<CommandMetadata> defaultGroupCommands = new ArrayList<CommandMetadata>();
+        for (Class<?> cls : cliConfig.commands()) {
+            defaultGroupCommands.add(loadCommand(cls));
+        }
+
+        // Prepare parser configuration
+        ParserMetadata<C> parserConfig = cliConfig.parserConfiguration() != null ? MetadataLoader
+                .<C> loadParser(cliConfig.parserConfiguration()) : MetadataLoader.<C> loadParser(cliClass);
+
+        // Prepare restrictions
+        List<GlobalRestriction> restrictions = new ArrayList<GlobalRestriction>();
+        for (Class<? extends GlobalRestriction> cls : cliConfig.restrictions()) {
+            restrictions.add(ParserUtil.createInstance(cls));
+        }
+
+        // Prepare groups
+        // We sort sub-groups by name length then lexically
+        // This means that when we build the groups hierarchy we'll ensure we
+        // build the parent groups first wherever possible
+        Map<String, CommandGroupMetadata> subGroups = new TreeMap<String, CommandGroupMetadata>(
+                new StringHierarchyComparator());
+        List<CommandGroupMetadata> groups = new ArrayList<CommandGroupMetadata>();
+        for (Group groupAnno : cliConfig.groups()) {
+            String groupName = groupAnno.name();
+            String subGroupPath = null;
+            if (StringUtils.containsWhitespace(groupName)) {
+                // Normalize the path
+                subGroupPath = StringUtils.join(StringUtils.split(groupAnno.name()), ' ');
+            }
+
+            // Maybe a top level group we've already seen
+            CommandGroupMetadata group = CollectionUtils.find(groups, new GroupFinder(groupName));
+            if (group == null) {
+                // Maybe a sub-group we've already seen
+                group = subGroups.get(subGroupPath);
+            }
+            
+            List<CommandMetadata> groupCommands = new ArrayList<CommandMetadata>();
+            for (Class<?> cls : groupAnno.commands()) {
+                groupCommands.add(loadCommand(cls));
+            }
+
+            if (group == null) {
+                // Newly discovered group
+                //@formatter:off
+                group = loadCommandGroup(subGroupPath,
+                                         groupAnno.description(),
+                                         groupAnno.hidden(),
+                                         Collections.<CommandGroupMetadata>emptyList(),
+                                         groupAnno.defaultCommand() != null ? loadCommand(groupAnno.defaultCommand()) : null, 
+                                         groupCommands);
+                //@formatter:on
+                if (subGroupPath == null) {
+                    groups.add(group);
+                } else {
+                    // Remember sub-groups for later
+                    subGroups.put(subGroupPath, group);
+                }
+            } else {
+                for (CommandMetadata cmd : groupCommands) {
+                    group.addCommand(cmd);
+                }
+            }
+        }
+        // Build sub-group hierarchy
+        buildGroupsHierarchy(groups, subGroups);
+
+        // Find all commands
+        List<CommandMetadata> allCommands = new ArrayList<CommandMetadata>();
+        allCommands.addAll(defaultGroupCommands);
+        if (defaultCommand != null && !defaultGroupCommands.contains(defaultCommand)) {
+            allCommands.add(defaultCommand);
+        }
+        for (CommandGroupMetadata group : groups) {
+            allCommands.addAll(group.getCommands());
+            if (group.getDefaultCommand() != null) {
+                allCommands.add(group.getDefaultCommand());
+            }
+            
+            Queue<CommandGroupMetadata> subGroupsQueue = new LinkedList<CommandGroupMetadata>();
+            subGroupsQueue.addAll(group.getSubGroups());
+            while (subGroupsQueue.size() > 0) {
+                CommandGroupMetadata subGroup = subGroupsQueue.poll();
+                allCommands.addAll(subGroup.getCommands());
+                if (subGroup.getDefaultCommand() != null)
+                    allCommands.add(subGroup.getDefaultCommand());
+                subGroupsQueue.addAll(subGroup.getSubGroups());
+            }
+        }
+
+        // Post-process to find possible further group assignments
+        loadCommandsIntoGroupsByAnnotation(allCommands, groups, defaultGroupCommands);
+
+        return loadGlobal(cliConfig.name(), cliConfig.description(), defaultCommand, defaultGroupCommands, groups,
+                restrictions, parserConfig);
     }
 
     /**
@@ -120,6 +275,17 @@ public class MetadataLoader {
         for (CommandGroupMetadata group : groups) {
             for (CommandMetadata command : group.getCommands()) {
                 globalOptions.addAll(command.getGlobalOptions());
+            }
+
+            // Remember to also search sub-groups for global options
+            Queue<CommandGroupMetadata> subGroups = new LinkedList<CommandGroupMetadata>();
+            subGroups.addAll(group.getSubGroups());
+            while (subGroups.size() > 0) {
+                CommandGroupMetadata subGroup = subGroups.poll();
+                for (CommandMetadata command : subGroup.getCommands()) {
+                    globalOptions.addAll(command.getGlobalOptions());
+                }
+                subGroups.addAll(subGroup.getSubGroups());
             }
         }
         globalOptions = ListUtils.unmodifiableList(mergeOptionSet(globalOptions));
@@ -737,6 +903,11 @@ public class MetadataLoader {
             }
         }
 
+        buildGroupsHierarchy(commandGroups, subGroups);
+    }
+
+    protected static void buildGroupsHierarchy(List<CommandGroupMetadata> commandGroups,
+            Map<String, CommandGroupMetadata> subGroups) {
         // Add sub-groups into hierarchy as appropriate
         for (String subGroupPath : subGroups.keySet()) {
             CommandGroupMetadata subGroup = subGroups.get(subGroupPath);

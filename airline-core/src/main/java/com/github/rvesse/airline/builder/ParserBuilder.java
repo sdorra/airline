@@ -61,6 +61,11 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         this.commandFactory = commandFactory;
         return this;
     }
+    
+    public ParserBuilder<C> withDefaultCommandFactory() {
+        this.commandFactory = null;
+        return this;
+    }
 
     public AliasBuilder<C> withAlias(final String name) {
         checkNotBlank(name, "Alias name");
@@ -254,7 +259,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     }
 
     public ParserBuilder<C> withDefaultTypeConverter() {
-        this.typeConverter = new DefaultTypeConverter();
+        this.typeConverter = null;
         return this;
     }
 

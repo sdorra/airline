@@ -31,9 +31,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Command {
     /**
      * Name of the command
-     * <p>
-     * Command name is split on white space to form a multi-word name
-     * </p>
      * 
      * @return Command name
      */

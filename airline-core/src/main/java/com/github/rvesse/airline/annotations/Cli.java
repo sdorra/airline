@@ -21,11 +21,23 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.github.rvesse.airline.restrictions.GlobalRestriction;
+
 @Target(TYPE)
 @Retention(RUNTIME)
-public @interface Alias {
-
+public @interface Cli {
+    
     String name() default "";
     
-    String[] arguments() default {};
+    String description() default "";
+
+    Parser parserConfiguration();
+    
+    Group[] groups() default {};
+    
+    Class<?> defaultCommand();
+    
+    Class<?>[] commands() default {};
+    
+    Class<? extends GlobalRestriction>[] restrictions() default {};
 }
