@@ -31,15 +31,15 @@ public interface CommandUsageGenerator {
      * 
      * @param programName
      *            Program Name
-     * @param groupName
-     *            Group Name
+     * @param groupNames
+     *            Group Name(s)
      * @param commandName
      *            Command Name
      * @param command
      *            Command Metadata
      * @throws IOException
      */
-    public abstract void usage(String programName, String groupName, String commandName, CommandMetadata command)
+    public abstract void usage(String programName, String[] groupNames, String commandName, CommandMetadata command)
             throws IOException;
 
     /**
@@ -47,8 +47,8 @@ public interface CommandUsageGenerator {
      * 
      * @param programName
      *            Program Name
-     * @param groupName
-     *            Group Name
+     * @param groupNames
+     *            Group Name(s)
      * @param commandName
      *            Command Name
      * @param command
@@ -57,6 +57,6 @@ public interface CommandUsageGenerator {
      *            Stream to output to
      * @throws IOException
      */
-    public abstract void usage(String programName, String groupName, String commandName, CommandMetadata command,
+    public abstract void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             OutputStream output) throws IOException;
 }

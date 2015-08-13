@@ -20,6 +20,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class UsageHelper {
@@ -104,4 +105,12 @@ public class UsageHelper {
             return c;
         }
     };
+
+    public static String[] toGroupNames(List<CommandGroupMetadata> groupPath) {
+        String[] groupNames = new String[groupPath.size()];
+        for (int i = 0; i < groupPath.size(); i++) {
+            groupNames[i] = groupPath.get(i).getName();
+        }
+        return groupNames;
+    }
 }

@@ -45,8 +45,8 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      * 
      * @param programName
      *            Program Name
-     * @param groupName
-     *            Group Name
+     * @param groupNames
+     *            Group Name(s)
      * @param commandName
      *            Command Name
      * @param command
@@ -55,7 +55,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract void usage(String programName, String groupName, String commandName, CommandMetadata command,
+    protected abstract void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             UsagePrinter out) throws IOException;
 
     /**
@@ -72,10 +72,10 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     }
 
     @Override
-    public void usage(String programName, String groupName, String commandName, CommandMetadata command,
+    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
-        usage(programName, groupName, commandName, command, printer);
+        usage(programName, groupNames, commandName, command, printer);
         printer.flush();
     }
 

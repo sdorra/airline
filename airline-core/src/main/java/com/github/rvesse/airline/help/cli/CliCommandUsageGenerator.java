@@ -60,10 +60,10 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     }
 
     @Override
-    protected void usage(String programName, String groupName, String commandName, CommandMetadata command,
+    protected void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             UsagePrinter out) throws IOException {
         // Name and description
-        outputDescription(out, programName, groupName, commandName, command);
+        outputDescription(out, programName, groupNames, commandName, command);
 
         // Find the help sections
         List<HelpSection> preSections = new ArrayList<HelpSection>();
@@ -76,7 +76,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         }
 
         // Synopsis
-        List<OptionMetadata> options = outputSynopsis(out, programName, groupName, commandName, command);
+        List<OptionMetadata> options = outputSynopsis(out, programName, groupNames, commandName, command);
 
         // Options
         ArgumentsMetadata arguments = command.getArguments();
@@ -116,8 +116,8 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Usage printer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param commandName
      *            Command name
      * @param command
@@ -125,7 +125,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      * @return Collection of all options (Global, Group and Command)
      * @throws IOException
      */
-    protected List<OptionMetadata> outputSynopsis(UsagePrinter out, String programName, String groupName,
+    protected List<OptionMetadata> outputSynopsis(UsagePrinter out, String programName, String[] groupNames,
             String commandName, CommandMetadata command) throws IOException {
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
@@ -134,8 +134,9 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
             synopsis.append(programName).appendWords(toSynopsisUsage(sortOptions(command.getGlobalOptions())));
             options.addAll(command.getGlobalOptions());
         }
-        if (groupName != null) {
-            synopsis.append(groupName).appendWords(toSynopsisUsage(sortOptions(command.getGroupOptions())));
+        if (groupNames != null) {
+            synopsis.appendWords(groupNames);
+            synopsis.appendWords(toSynopsisUsage(sortOptions(command.getGroupOptions())));
             options.addAll(command.getGroupOptions());
         }
         synopsis.append(commandName).appendWords(toSynopsisUsage(sortOptions(command.getCommandOptions())));
@@ -157,20 +158,23 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Usage printer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param commandName
      *            Command name
      * @param command
      *            Command meta-data
      * @throws IOException
      */
-    protected void outputDescription(UsagePrinter out, String programName, String groupName, String commandName,
+    protected void outputDescription(UsagePrinter out, String programName, String[] groupNames, String commandName,
             CommandMetadata command) throws IOException {
         out.append("NAME").newline();
 
-        out.newIndentedPrinter(8).append(programName).append(groupName).append(commandName).append("-")
-                .append(command.getDescription()).newline().newline();
+        out = out.newIndentedPrinter(8).append(programName);
+        if (groupNames != null) {
+            out.appendWords(groupNames);
+        }
+        out.append(commandName).append("-").append(command.getDescription()).newline().newline();
     }
 
 }

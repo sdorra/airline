@@ -132,6 +132,10 @@ public class UsagePrinter {
     public UsagePrinter appendOnOneLine(String value)  {
         return append(value, true);
     }
+    
+    public UsagePrinter appendWords(String[] words) {
+        return appendWords(words, false);
+    }
 
     public UsagePrinter appendWords(Iterable<String> words)  {
         return appendWords(words, false);
@@ -163,6 +167,10 @@ public class UsagePrinter {
             }
         }
         return this;
+    }
+    
+    public UsagePrinter appendWords(String[] words, boolean avoidNewlines) {
+        return appendWords(arrayToList(words), avoidNewlines);
     }
 
     public UsagePrinter appendWords(Iterable<String> words, boolean avoidNewlines)  {

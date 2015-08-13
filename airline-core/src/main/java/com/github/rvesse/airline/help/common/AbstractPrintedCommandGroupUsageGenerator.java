@@ -54,7 +54,7 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata group, UsagePrinter out)
+    protected abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups, UsagePrinter out)
             throws IOException;
 
     /**
@@ -71,9 +71,9 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
     }
 
     @Override
-    public void usage(GlobalMetadata<T> global, CommandGroupMetadata group, OutputStream out) throws IOException {
+    public void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups, OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
-        usage(global, group, printer);
+        usage(global, groups, printer);
         printer.flush();
     }
 

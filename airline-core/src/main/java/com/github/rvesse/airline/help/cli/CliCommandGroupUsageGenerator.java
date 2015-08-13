@@ -42,7 +42,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
     public CliCommandGroupUsageGenerator(int columns) {
         this(columns, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
     }
-    
+
     public CliCommandGroupUsageGenerator(int columns, boolean includeHidden) {
         this(columns, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, includeHidden);
     }
@@ -55,19 +55,19 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
     }
 
     @Override
-    protected void usage(GlobalMetadata<T> global, CommandGroupMetadata group, UsagePrinter out) throws IOException {
+    protected void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups, UsagePrinter out) throws IOException {
         // Description and Name
-        outputDescription(out, global, group);
+        outputDescription(out, global, groups);
 
         //
         // SYNOPSIS
         //
-        outputSynopsis(out, global, group);
+        outputSynopsis(out, global, groups);
 
         //
         // OPTIONS
         //
-        outputOptions(out, global, group);
+        outputOptions(out, global, groups);
     }
 
     /**
@@ -78,15 +78,15 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @param group
-     *            Group meta-data
+     * @param groups
+     *            Group(s) meta-data
      * 
      * @throws IOException
      */
-    protected void outputOptions(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
+    protected void outputOptions(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata[] groups)
             throws IOException {
         List<OptionMetadata> options = new ArrayList<>();
-        options.addAll(group.getOptions());
+        options.addAll(groups[groups.length - 1].getOptions());
         if (global != null && !hideGlobalOptions) {
             options.addAll(global.getOptions());
         }
@@ -125,11 +125,12 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      *            Group meta-data
      * @throws IOException
      */
-    protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
+    protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata[] groups)
             throws IOException {
         out.append("SYNOPSIS").newline();
         UsagePrinter synopsis = out.newIndentedPrinter(8).newPrinterWithHangingIndent(8);
 
+        CommandGroupMetadata group = groups[groups.length - 1];
         List<CommandMetadata> commands = sortCommands(group.getCommands());
 
         // Populate group info via an extra for loop through commands
@@ -169,7 +170,11 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
                 synopsis.appendWords(toSynopsisUsage(commands.get(0).getGlobalOptions()));
             }
         }
-        synopsis.append(group.getName()).appendWords(toSynopsisUsage(commands.get(0).getGroupOptions()));
+        for (int i = 0; i < groups.length; i++) {
+            synopsis.append(groups[i].getName()).append(" ");
+        }
+        
+        synopsis.appendWords(toSynopsisUsage(commands.get(0).getGroupOptions()));
         synopsis.append(" {").append(allCommandNames.get(0));
         for (int i = 1; i < allCommandNames.size(); i++) {
             synopsis.append(" | ").append(allCommandNames.get(i));
@@ -238,11 +243,18 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      *            Group meta-data
      * @throws IOException
      */
-    protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata group)
+    protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata[] groups)
             throws IOException {
         out.append("NAME").newline();
 
-        out.newIndentedPrinter(8).append(global.getName()).append(group.getName()).append("-")
-                .append(group.getDescription()).newline().newline();
+        out.newIndentedPrinter(8).append(global.getName()).append(" ");
+        CommandGroupMetadata group = null;
+        for (int i = 0; i < groups.length; i++) {
+            group = groups[i];
+            out.append(group.getName());
+            if (i < groups.length - 1)
+                out.append(" ");
+        }
+        out.append(" - ").append(group.getDescription()).newline().newline();
     }
 }

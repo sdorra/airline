@@ -78,7 +78,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(String programName, String groupName, String commandName, CommandMetadata command,
+    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             OutputStream output) throws IOException {
 
         Writer writer = new OutputStreamWriter(output);
@@ -88,15 +88,15 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         writer.append("<body>\n");
 
         // Page Header i.e. <h1>
-        outputPageHeader(writer, programName, groupName, command);
+        outputPageHeader(writer, programName, groupNames, command);
 
         // Name and description of command
-        outputDescription(writer, programName, groupName, command);
-        
+        outputDescription(writer, programName, groupNames, command);
+
         // TODO Output pre help sections
 
         // Synopsis
-        List<OptionMetadata> options = outputSynopsis(writer, programName, groupName, command);
+        List<OptionMetadata> options = outputSynopsis(writer, programName, groupNames, command);
 
         // Options
         if (options.size() > 0 || command.getArguments() != null) {
@@ -303,14 +303,14 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param command
      *            Command name
      * @return List of all the available options (Global, Group and Command)
      * @throws IOException
      */
-    protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String groupName,
+    protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String[] groupNames,
             CommandMetadata command) throws IOException {
         writer.append("<h1 class=\"text-info\">SYNOPSIS</h1>\n").append(NEWLINE);
 
@@ -319,16 +319,18 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         writer.append("<div class=\"span8 offset1\">\n");
 
         if (programName != null) {
-            writer.append(programName).append(" ")
+            writer.append(htmlize(programName)).append(" ")
                     .append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getGlobalOptions())), ' ')));
             options.addAll(command.getGlobalOptions());
         }
-        if (groupName != null) {
-            writer.append(groupName).append(" ")
-                    .append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getGroupOptions())), ' ')));
+        if (groupNames != null) {
+            for (int i = 0; i < groupNames.length; i++) {
+                writer.append(htmlize(groupNames[i])).append(" ");
+            }
+            writer.append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getGroupOptions())), ' ')));
             options.addAll(command.getGroupOptions());
         }
-        writer.append(command.getName()).append(" ")
+        writer.append(htmlize(command.getName())).append(" ")
                 .append(htmlize(StringUtils.join(toSynopsisUsage(sortOptions(command.getCommandOptions())), ' ')));
         options.addAll(command.getCommandOptions());
 
@@ -352,21 +354,25 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param command
      *            Command meta-data
      * @throws IOException
      */
-    protected void outputDescription(Writer writer, String programName, String groupName, CommandMetadata command)
+    protected void outputDescription(Writer writer, String programName, String[] groupNames, CommandMetadata command)
             throws IOException {
         writer.append("<h2 class=\"text-info\">NAME</h1>\n").append(NEWLINE);
 
         writer.append("<div class=\"row\">");
         writer.append("<div class=\"span8 offset1\">");
-        writer.append(programName).append(" ");
-        writer.append(groupName).append(" ");
-        writer.append(command.getName()).append(" ");
+        writer.append(htmlize(programName)).append(" ");
+        if (groupNames != null) {
+            for (int i = 0; i < groupNames.length; i++) {
+                writer.append(htmlize(groupNames[i])).append(" ");
+            }
+        }
+        writer.append(htmlize(command.getName())).append(" ");
         writer.append("&mdash;");
         writer.append(htmlize(command.getDescription()));
         writer.append("</div>\n");
@@ -382,17 +388,22 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param command
      *            Command meta-data
      * @throws IOException
      */
-    protected void outputPageHeader(Writer writer, String programName, String groupName, CommandMetadata command)
+    protected void outputPageHeader(Writer writer, String programName, String[] groupNames, CommandMetadata command)
             throws IOException {
         writer.append("<hr/>\n");
-        writer.append("<h1 class=\"text-info\">").append(programName).append(" ").append(groupName).append(" ")
-                .append(command.getName()).append(" Manual Page\n");
+        writer.append("<h1 class=\"text-info\">").append(htmlize(programName)).append(" ");
+        if (groupNames != null) {
+            for (int i = 0; i < groupNames.length; i++) {
+                writer.append(htmlize(groupNames[i])).append(" ");
+            }
+        }
+        writer.append(htmlize(command.getName())).append(" Manual Page\n");
         writer.append("<hr/>\n");
     }
 

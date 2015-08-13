@@ -60,9 +60,9 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
     }
 
     @Override
-    public void usage(String programName, String groupName, String commandName, CommandMetadata command)
+    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command)
             throws IOException {
-        usage(programName, groupName, commandName, command, System.out);
+        usage(programName, groupNames, commandName, command, System.out);
     }
 
     /**

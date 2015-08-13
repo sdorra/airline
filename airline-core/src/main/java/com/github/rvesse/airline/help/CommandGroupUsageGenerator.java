@@ -22,7 +22,8 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 
 /**
- * Interface implemented by classes that can generate usage documentation for a command group
+ * Interface implemented by classes that can generate usage documentation for a
+ * command group
  */
 public interface CommandGroupUsageGenerator<T> {
 
@@ -31,18 +32,23 @@ public interface CommandGroupUsageGenerator<T> {
      * 
      * @param global
      *            Global Metadata
+     * @param groups
+     *            Group path to the command
      * @throws IOException
      */
-    public abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata group) throws IOException;
+    public abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups) throws IOException;
 
     /**
      * Generate the help and output it to the stream
      * 
      * @param global
      *            Global metadata
+     * @param groups
+     *            Group path to the command
      * @param out
      *            Stream to output to
      * @throws IOException
      */
-    public abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata group, OutputStream output) throws IOException;
+    public abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups, OutputStream output)
+            throws IOException;
 }

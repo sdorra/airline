@@ -202,10 +202,14 @@ public class Help<T> implements Runnable, Callable<Void> {
         CommandMetadata command;
         CommandGroupMetadata group = CollectionUtils.find(global.getCommandGroups(), findGroupPredicate);
         if (group != null) {
+            List<CommandGroupMetadata> groupPath = new ArrayList<CommandGroupMetadata>();
+            groupPath.add(group);
+
             // General group help or specific group command help?
             if (commandNames.size() == 1) {
                 // General group help
-                new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global, group, out);
+                new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global,
+                        groupPath.toArray(new CommandGroupMetadata[0]), out);
                 return;
             } else {
                 // Group/Sub-Group command help
@@ -214,7 +218,7 @@ public class Help<T> implements Runnable, Callable<Void> {
 
                 while (group.getSubGroups().size() > 0 && i < commandNames.size()) {
                     commandOrSubGroupName = commandNames.get(i);
-                    
+
                     //@formatter:off
                     findGroupPredicate = global.getParserConfiguration().allowsAbbreviatedCommands() 
                                          ? new AbbreviatedGroupFinder(commandOrSubGroupName, group.getSubGroups()) 
@@ -223,6 +227,7 @@ public class Help<T> implements Runnable, Callable<Void> {
                     CommandGroupMetadata subGroup = CollectionUtils.find(group.getSubGroups(), findGroupPredicate);
                     if (subGroup != null) {
                         // Found a valid sub-group
+                        groupPath.add(subGroup);
                         group = subGroup;
                         i++;
                     } else {
@@ -232,9 +237,10 @@ public class Help<T> implements Runnable, Callable<Void> {
                 }
                 if (i >= commandNames.size()) {
                     // General sub-group help
-                    new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global, group, out);
+                    new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global,
+                            groupPath.toArray(new CommandGroupMetadata[0]), out);
                 }
-                
+
                 // Look for a command in the current group/sub-group
                 commandOrSubGroupName = commandNames.get(i);
 
@@ -245,7 +251,7 @@ public class Help<T> implements Runnable, Callable<Void> {
                 //@formatter:on
                 command = CollectionUtils.find(group.getCommands(), findCommandPredicate);
                 if (command != null) {
-                    new CliCommandUsageGenerator().usage(global.getName(), group.getName(), command.getName(), command,
+                    new CliCommandUsageGenerator().usage(global.getName(), UsageHelper.toGroupNames(groupPath), command.getName(), command,
                             out);
                     return;
                 }

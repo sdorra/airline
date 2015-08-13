@@ -41,7 +41,7 @@ public abstract class AbstractCommandGroupUsageGenerator<T> extends AbstractUsag
     }
 
     @Override
-    public void usage(GlobalMetadata<T> global, CommandGroupMetadata group) throws IOException {
-        usage(global, group, System.out);
+    public void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups) throws IOException {
+        usage(global, groups, System.out);
     }
 }

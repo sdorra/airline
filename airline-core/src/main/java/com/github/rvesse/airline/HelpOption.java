@@ -85,10 +85,12 @@ public class HelpOption<C> {
      *            Usage generator
      */
     public void showHelp(CommandUsageGenerator generator) {
-        if (generator == null) throw new NullPointerException("Usage generator cannot be null");
+        if (generator == null)
+            throw new NullPointerException("Usage generator cannot be null");
         try {
             generator.usage(globalMetadata != null ? globalMetadata.getName() : null,
-                    groupMetadata != null ? groupMetadata.getName() : null, commandMetadata.getName(), commandMetadata);
+                    groupMetadata != null ? new String[] { groupMetadata.getName() } : null, commandMetadata.getName(),
+                    commandMetadata);
         } catch (IOException e) {
             throw new RuntimeException("Error generating usage documentation", e);
         }

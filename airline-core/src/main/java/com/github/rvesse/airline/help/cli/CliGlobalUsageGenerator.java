@@ -99,12 +99,24 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             outputCommandDescription(commandPrinter, null, command);
         }
-        for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+        
+        outputGroupCommandsList(commandPrinter, global, global.getCommandGroups());
+    }
+    
+    protected void outputGroupCommandsList(UsagePrinter out, GlobalMetadata<T> global, List<CommandGroupMetadata> groups) throws IOException {
+        if (groups.size() == 0) return;
+        
+        for (CommandGroupMetadata group : sortCommandGroups(groups)) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
 
             for (CommandMetadata command : sortCommands(group.getCommands())) {
-                outputCommandDescription(commandPrinter, group, command);
+                outputCommandDescription(out, group, command);
+            }
+            
+            if (group.getSubGroups().size() > 0) {
+                UsagePrinter subGroupPrinter = out.newIndentedPrinter(4);
+                outputGroupCommandsList(subGroupPrinter, global, group.getSubGroups());
             }
         }
     }

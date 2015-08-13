@@ -73,7 +73,7 @@ public class TestHelp {
     private final Charset utf8 = Charset.forName("utf-8");
 
     /**
-     * Helper method for if you're trying to determine the differences betweeon
+     * Helper method for if you're trying to determine the differences between
      * actual and expected output when debugging a new test and can't visually
      * see the difference e.g. differing white space
      * 

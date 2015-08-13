@@ -73,7 +73,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(String programName, String groupName, String commandName, CommandMetadata command,
+    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             OutputStream output) throws IOException {
         String sectionHeader = "## ";
 
@@ -83,7 +83,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         Writer writer = new OutputStreamWriter(output);
 
-        sectionHeader = outputTitle(writer, programName, groupName, commandName, command, sectionHeader);
+        sectionHeader = outputTitle(writer, programName, groupNames, commandName, command, sectionHeader);
 
         // Find the help sections
         List<HelpSection> preSections = new ArrayList<HelpSection>();
@@ -95,7 +95,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
             helper.outputHelpSection(writer, section, sectionHeader);
         }
 
-        List<OptionMetadata> options = outputSynopsis(writer, programName, groupName, commandName, command,
+        List<OptionMetadata> options = outputSynopsis(writer, programName, groupNames, commandName, command,
                 sectionHeader);
 
         if (options.size() > 0 || command.getArguments() != null) {
@@ -140,8 +140,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param commandName
      *            Command name
      * @param command
@@ -151,7 +151,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @return List of all the available options (global, group and command)
      * @throws IOException
      */
-    protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String groupName,
+    protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String[] groupNames,
             String commandName, CommandMetadata command, String sectionHeader) throws IOException {
         writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("SYNOPSIS")
                 .append(RonnUsageHelper.NEW_PARA);
@@ -165,8 +165,10 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 options.addAll(aOptions);
             }
         }
-        if (groupName != null) {
-            writer.append(" `").append(groupName).append("`");
+        if (groupNames != null) {
+            for (int i = 0; i < groupNames.length; i++) {
+                writer.append(" `").append(groupNames[i]).append("`");
+            }
             aOptions = command.getGroupOptions();
             if (aOptions != null && aOptions.size() > 0) {
                 writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
@@ -196,8 +198,8 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param commandName
      *            Command name
      * @param command
@@ -207,13 +209,13 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @return Section header
      * @throws IOException
      */
-    protected String outputTitle(Writer writer, String programName, String groupName, String commandName,
+    protected String outputTitle(Writer writer, String programName, String[] groupNames, String commandName,
             CommandMetadata command, String sectionHeader) throws IOException {
         if (!this.standalone) {
             writer.append(sectionHeader);
             sectionHeader = "#" + sectionHeader;
         }
-        writeFullCommandName(programName, groupName, commandName, writer);
+        writeFullCommandName(programName, groupNames, commandName, writer);
         if (this.standalone) {
             writer.append(" -- ");
             writer.append(command.getDescription()).append("\n");
@@ -227,21 +229,23 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * 
      * @param programName
      *            Program name
-     * @param groupName
-     *            Group name
+     * @param groupNames
+     *            Group name(s)
      * @param command
      *            Command meta-data
      * @param writer
      *            Writer
      * @throws IOException
      */
-    protected void writeFullCommandName(String programName, String groupName, String commandName, Writer writer)
+    protected void writeFullCommandName(String programName, String[] groupNames, String commandName, Writer writer)
             throws IOException {
         if (programName != null) {
             writer.append(programName).append("-");
         }
-        if (groupName != null) {
-            writer.append(groupName).append("-");
+        if (groupNames != null) {
+            for (int i = 0; i < groupNames.length; i++) {
+                writer.append(groupNames[i]).append("-");
+            }
         }
         writer.append(commandName).append("(").append(Integer.toString(this.manSection)).append(")");
     }
