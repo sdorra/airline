@@ -22,7 +22,8 @@ import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 
 @Groups({
-        @Group(name = "groupInsideOfGroups subGroup", description = "my nested sub-group", defaultCommand = CommandWithSubGroupsAnnotation.class,commands = {CommandAdd.class})
+        @Group(name = "groupInsideOfGroups subGroup", description = "my nested sub-group", defaultCommand = CommandWithSubGroupsAnnotation.class,commands = {CommandAdd.class}),
+        @Group(name = "groupInsideOfGroups", description = "top level group", commands = { CommandWithSubGroupsAnnotation.class })
 })
 @Command(name = "commandWithSubGroupsAnno", description = "A command with a groups annotation defining a sub-group")
 public class CommandWithSubGroupsAnnotation extends AbstractGroupAnnotationCommand

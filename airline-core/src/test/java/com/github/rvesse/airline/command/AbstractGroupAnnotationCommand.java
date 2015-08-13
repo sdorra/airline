@@ -24,6 +24,7 @@ public class AbstractGroupAnnotationCommand {
 
     @Arguments(description = "Patterns of files to be added")
     public List<String> patterns;
+    
     @Option(name = "-i")
     public Boolean interactive = false;
 

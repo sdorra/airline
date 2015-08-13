@@ -120,13 +120,16 @@ public class TestGroupAnnotations {
         Assert.assertEquals(parser.getMetadata().getCommandGroups().size(), 1);
         CommandGroupMetadata group = parser.getMetadata().getCommandGroups().get(0);
         
-        // Group options get added to the group lowest down the tree
-        Assert.assertEquals(group.getOptions().size(), 0);
-        Assert.assertEquals(group.getSubGroups().size(), 1);
-        group = group.getSubGroups().get(0);
-        
+        // Check added to parent group
         Assert.assertEquals(group.getOptions().size(), 1);
         OptionMetadata option = group.getOptions().get(0);
+        Assert.assertEquals("-v", AirlineUtils.first(option.getOptions()));
+        
+        // Check added to sub-group
+        Assert.assertEquals(group.getSubGroups().size(), 1);
+        group = group.getSubGroups().get(0);
+        Assert.assertEquals(group.getOptions().size(), 1);
+        option = group.getOptions().get(0);
         Assert.assertEquals("-v", AirlineUtils.first(option.getOptions()));
     }
 
@@ -295,5 +298,12 @@ public class TestGroupAnnotations {
         Cli<?> parser = Cli.builder("junk").withCommand(CommandWithGroupNames.class).build();
 
         parser.parse("commandWithGroupNames", "-i", "A.java");
+    }
+    
+    @Test(expectedExceptions = ParseCommandUnrecognizedException.class)
+    public void commandRemovedFromDefaultGroupWithSubGroupNames() {
+        Cli<?> parser = Cli.builder("junk").withCommand(CommandWithSubGroupNames.class).build();
+
+        parser.parse("commandWithSubGroupNames", "-i", "A.java");
     }
 }
