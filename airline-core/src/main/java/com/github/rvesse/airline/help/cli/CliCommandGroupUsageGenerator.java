@@ -136,16 +136,15 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
         List<CommandMetadata> commands = sortCommands(group.getCommands());
 
         // Populate group info via an extra for loop through commands
-        String defaultCommand = "";
-        if (group.getDefaultCommand() != null) {
-            defaultCommand = group.getDefaultCommand().getName();
-        }
+        boolean hasDefaultCommand = group.getDefaultCommand() != null;
+
         List<OptionMetadata> commonGroupOptions = null;
         String commonGroupArgs = null;
         List<String> allCommandNames = new ArrayList<>();
+        List<String> groupNames = new ArrayList<>();
         boolean hasCommandSpecificOptions = false, hasCommandSpecificArgs = false;
         for (CommandMetadata command : commands) {
-            if (command.getName().equals(defaultCommand)) {
+            if (group.getDefaultCommand() != null && group.getDefaultCommand().equals(command)) {
                 allCommandNames.add(command.getName() + "*");
             } else {
                 allCommandNames.add(command.getName());
@@ -166,7 +165,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
             }
         }
         for (CommandGroupMetadata subGroup : group.getSubGroups()) {
-            allCommandNames.add(subGroup.getName());
+            groupNames.add(subGroup.getName());
             if (commonGroupOptions == null) {
                 commonGroupOptions = new ArrayList<>(subGroup.getOptions());
             }
@@ -185,9 +184,24 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
         if (commands.size() > 0) {
             synopsis.appendWords(toSynopsisUsage(commands.get(0).getGroupOptions()));
         }
-        synopsis.append(" {").append(allCommandNames.get(0));
-        for (int i = 1; i < allCommandNames.size(); i++) {
-            synopsis.append(" | ").append(allCommandNames.get(i));
+        synopsis.append(" {");
+        if (allCommandNames.size() > 0) {
+            if (groupNames.size() > 0)
+                synopsis.append(" {");
+            for (int i = 0; i < allCommandNames.size(); i++) {
+                synopsis.append(allCommandNames.get(i));
+                if (i < allCommandNames.size() - 1)
+                    synopsis.append(" | ");
+            }
+        }
+        if (groupNames.size() > 0) {
+            if (allCommandNames.size() > 0)
+                synopsis.append("} | {");
+            for (int i = 0; i < groupNames.size(); i++) {
+                synopsis.append(groupNames.get(i)).append(" <sub-command>");
+                if (i < groupNames.size() - 1)
+                    synopsis.append(" | ");
+            }
         }
         synopsis.append("} [--]");
         if (commonGroupOptions.size() > 0) {
@@ -202,6 +216,36 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
         synopsis.newline();
         Map<String, String> cmdOptions = new TreeMap<>();
         Map<String, String> cmdArguments = new TreeMap<>();
+        Map<String, String> subGroups = new TreeMap<>();
+
+        for (CommandGroupMetadata subGroup : group.getSubGroups()) {
+            if (!subGroup.isHidden() || this.includeHidden()) {
+                StringBuilder groupSB = new StringBuilder();
+                for (CommandGroupMetadata subSubGroup : subGroup.getSubGroups()) {
+                    if (groupSB.length() > 0)
+                        groupSB.append(", ");
+                    groupSB.append(subSubGroup.getName()).append(' ').append("<sub-command>");
+                }
+                for (CommandMetadata subCommand : subGroup.getCommands()) {
+                    if (groupSB.length() > 0)
+                        groupSB.append(", ");
+                    groupSB.append(subCommand.getName());
+                    if (subGroup.getDefaultCommand() != null && subGroup.getDefaultCommand().equals(subCommand)) {
+                        groupSB.append("*");
+                        hasDefaultCommand = true;
+                    }
+                }
+                subGroups.put(subGroup.getName(), groupSB.toString());
+            }
+        }
+
+        if (subGroups.size() > 0) {
+            synopsis.newline().append("Where command groups contain the following sub-groups and commands:").newline();
+            UsagePrinter grps = synopsis.newIndentedPrinter(4);
+            for (String groupName : subGroups.keySet()) {
+                grps.append(groupName + ": " + subGroups.get(groupName)).newline();
+            }
+        }
 
         for (CommandMetadata command : commands) {
 
@@ -235,8 +279,8 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
                 args.append(arg + ": " + cmdArguments.get(arg)).newline();
             }
         }
-        if (defaultCommand != "") {
-            synopsis.newline().append(String.format("* %s is the default command", defaultCommand));
+        if (hasDefaultCommand) {
+            synopsis.newline().append("Where * indicates the default command(s)");
         }
         synopsis.newline().append("See").append("'" + global.getName()).append("help ")
                 .appendWords(UsageHelper.toGroupNames(AirlineUtils.arrayToList(groups)))

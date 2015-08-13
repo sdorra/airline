@@ -327,7 +327,7 @@ public class TestHelp {
                 "            add: [ <name> <url>... ]\n" +
                 "            show: [ <remote> ]\n" +
                 "\n" +
-                "        * show is the default command\n" +
+                "        Where * indicates the default command(s)\n" +
                 "        See 'git help remote <command>' for more information on a specific command.\n" +
                 "OPTIONS\n" +
                 "        -v\n" +

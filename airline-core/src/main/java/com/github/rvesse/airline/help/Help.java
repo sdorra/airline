@@ -230,16 +230,16 @@ public class Help<T> implements Runnable, Callable<Void> {
                         groupPath.add(subGroup);
                         group = subGroup;
                         i++;
+                        if (i == commandNames.size()) {
+                            // General sub-group help
+                            new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global,
+                                    groupPath.toArray(new CommandGroupMetadata[0]), out);
+                            return;
+                        }
                     } else {
                         // No relevant sub-group found
                         break;
                     }
-                }
-                if (i >= commandNames.size() - 1) {
-                    // General sub-group help
-                    new CliCommandGroupUsageGenerator<T>(includeHidden).usage(global,
-                            groupPath.toArray(new CommandGroupMetadata[0]), out);
-                    return;
                 }
 
                 // Look for a command in the current group/sub-group

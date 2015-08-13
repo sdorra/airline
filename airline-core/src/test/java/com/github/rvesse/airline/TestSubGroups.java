@@ -17,6 +17,7 @@ package com.github.rvesse.airline;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -129,22 +130,17 @@ public class TestSubGroups {
         //@formatter:on
         
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo", "bar" }), false, output);
+        Help.help(builder.build().getMetadata(), Collections.<String>emptyList(), false, output);
         String actual = new String(output.toByteArray());
         
         //@formatter:off
         String expected = StringUtils.join(new String[] {
-            "NAME",
-            "        test foo bar -",
+            "usage: test <command> [ <args> ]",
             "",
-            "SYNOPSIS",
-            "        test foo bar { help* } [--] <cmd-args>",
+            "Commands are:",
+            "    foo",
             "",
-            "        Where command-specific arguments <cmd-args> are:",
-            "            help: [ <command>... ]",
-            "",
-            "        * help is the default command",
-            "        See 'test help foo bar <command>' for more information on a specific command.",
+            "See 'test help <command>' for more information on a specific command.",
             ""
         }, '\n');
         //@formatter:on
@@ -163,6 +159,40 @@ public class TestSubGroups {
         //@formatter:on
         
         ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo", "bar" }), false, output);
+        String actual = new String(output.toByteArray());
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] {
+            "NAME",
+            "        test foo bar -",
+            "",
+            "SYNOPSIS",
+            "        test foo bar { help* } [--] <cmd-args>",
+            "",
+            "        Where command-specific arguments <cmd-args> are:",
+            "            help: [ <command>... ]",
+            "",
+            "        Where * indicates the default command(s)",
+            "        See 'test help foo bar <command>' for more information on a specific command.",
+            ""
+        }, '\n');
+        //@formatter:on
+        
+        Assert.assertEquals(actual, expected);
+    }
+    
+    @Test
+    public void sub_groups_help_03() throws IOException {
+        //@formatter:off
+        CliBuilder<Object> builder
+            = Cli.<Object>builder("test");
+        builder.withGroup("foo")
+               .withSubGroup("bar")
+               .withDefaultCommand(Help.class);
+        //@formatter:on
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo" }), false, output);
         String actual = new String(output.toByteArray());
         
@@ -172,10 +202,13 @@ public class TestSubGroups {
             "        test foo -",
             "",
             "SYNOPSIS",
-            "        test foo { bar } [--]",
+            "        test foo { bar <sub-command> } [--]",
             "",
-            "        * bar",
-            "        See 'test help foo bar <command>' for more information on a specific command.",
+            "        Where command groups contain the following sub-groups and commands:",
+            "            bar: help*",
+            "",
+            "        Where * indicates the default command(s)",
+            "        See 'test help foo <command>' for more information on a specific command.",
             ""
         }, '\n');
         //@formatter:on
