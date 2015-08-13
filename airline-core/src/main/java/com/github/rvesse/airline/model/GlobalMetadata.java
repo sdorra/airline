@@ -43,7 +43,7 @@ public class GlobalMetadata<T> {
         if (StringUtils.isBlank(name))
             throw new IllegalArgumentException("Program name cannot be null/empty/whitespace");
         if (parserConfig == null)
-            throw new NullPointerException("parseConfig cannot be null");
+            throw new NullPointerException("parserConfig cannot be null");
 
         this.name = name;
         this.description = description;

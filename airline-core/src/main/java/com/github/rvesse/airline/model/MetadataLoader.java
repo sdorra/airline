@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.*;
+import com.github.rvesse.airline.annotations.Alias;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.DefaultOption;
@@ -23,6 +24,8 @@ import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.annotations.Groups;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
+import com.github.rvesse.airline.annotations.Parser;
+import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
@@ -51,6 +54,40 @@ import java.util.*;
  *
  */
 public class MetadataLoader {
+    public static <C> ParserMetadata<C> loadParser(Class<?> cliClass) {
+        Annotation annotation = cliClass.getAnnotation(Parser.class);
+        if (annotation == null)
+            return ParserBuilder.<C> defaultConfiguration();
+        
+        Parser parserConfig = (Parser) annotation;
+        ParserBuilder<C> builder = new ParserBuilder<C>();
+        
+        // Abbreviation options
+        if (parserConfig.allowCommandAbbreviation()) {
+            builder = builder.withCommandAbbreviation();
+        }
+        if (parserConfig.allowOptionAbbreviation()) {
+            builder = builder.withOptionAbbreviation();
+        }
+        
+        // Alias options
+        if (parserConfig.aliasesOverrideBuiltIns()) {
+            
+        }
+        if (parserConfig.aliasesMayChain()) {
+            builder = builder.withAliasesChaining();
+        }
+        for (Alias alias : parserConfig.aliases()) {
+            builder.withAlias(alias.name()).withArguments(alias.arguments());
+        }
+        
+        // Parsing options
+        builder.withArgumentsSeparator(parserConfig.argumentsSeparator());
+        
+        
+        return builder.build();
+    }
+
     /**
      * Loads global meta-data
      * 
@@ -629,7 +666,8 @@ public class MetadataLoader {
         // We sort sub-groups by name length then lexically
         // This means that when we build the groups hierarchy we'll ensure we
         // build the parent groups first wherever possible
-        Map<String, CommandGroupMetadata> subGroups = new TreeMap<String, CommandGroupMetadata>(new StringHierarchyComparator());
+        Map<String, CommandGroupMetadata> subGroups = new TreeMap<String, CommandGroupMetadata>(
+                new StringHierarchyComparator());
         for (CommandMetadata command : allCommands) {
             boolean addedToGroup = false;
 
