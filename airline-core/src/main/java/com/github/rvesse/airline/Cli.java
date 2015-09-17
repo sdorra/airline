@@ -20,6 +20,7 @@ import org.apache.commons.collections4.ListUtils;
 
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.GlobalMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.parser.command.CliParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
@@ -38,6 +39,16 @@ public class Cli<C> {
     }
 
     private final GlobalMetadata<C> metadata;
+
+    /**
+     * Creates a new CLI from a class annotated with the
+     * {@link com.github.rvesse.airline.annotations.Cli} annotation
+     * 
+     * @param cliClass CLI class
+     */
+    public Cli(Class<?> cliClass) {
+        this(MetadataLoader.<C> loadGlobal(cliClass));
+    }
 
     /**
      * Creates a new CLI

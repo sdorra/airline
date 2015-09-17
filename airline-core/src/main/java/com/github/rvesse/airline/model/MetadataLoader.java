@@ -191,7 +191,7 @@ public class MetadataLoader {
             if (group == null) {
                 // Newly discovered group
                 //@formatter:off
-                group = loadCommandGroup(subGroupPath,
+                group = loadCommandGroup(subGroupPath != null ? subGroupPath : groupName,
                                          groupAnno.description(),
                                          groupAnno.hidden(),
                                          Collections.<CommandGroupMetadata>emptyList(),

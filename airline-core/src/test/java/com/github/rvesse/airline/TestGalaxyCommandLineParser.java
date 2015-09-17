@@ -110,7 +110,7 @@ public class TestGalaxyCommandLineParser
         Assert.assertEquals(show.getAllOptions().size(), 8);
     }
 
-    private Cli<GalaxyCommand> createParser()
+    protected Cli<GalaxyCommand> createParser()
     {
         CliBuilder<GalaxyCommand> builder = Cli.<GalaxyCommand>builder("galaxy")
                 .withDescription("cloud management system")

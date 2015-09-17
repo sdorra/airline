@@ -47,7 +47,7 @@ public @interface Cli {
      * 
      * @return Parser Configuration
      */
-    Parser parserConfiguration();
+    Parser parserConfiguration() default @Parser();
 
     /**
      * Defines command groups for the CLI
