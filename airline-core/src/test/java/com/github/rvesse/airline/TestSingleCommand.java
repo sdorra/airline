@@ -23,6 +23,7 @@ import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.args.Args1;
+import com.github.rvesse.airline.args.Args1CustomParser;
 import com.github.rvesse.airline.args.Args2;
 import com.github.rvesse.airline.args.ArgsAllowedValues;
 import com.github.rvesse.airline.args.ArgsArityString;
@@ -36,6 +37,7 @@ import com.github.rvesse.airline.args.ArgsPrivate;
 import com.github.rvesse.airline.args.ArgsRequired;
 import com.github.rvesse.airline.args.ArgsRequiredInheritedUnrestricted;
 import com.github.rvesse.airline.args.ArgsSingleChar;
+import com.github.rvesse.airline.args.ArgsSingleCharCustomParser;
 import com.github.rvesse.airline.args.Arity1;
 import com.github.rvesse.airline.args.OptionsRequired;
 import com.github.rvesse.airline.command.CommandAdd;
@@ -46,6 +48,7 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -60,15 +63,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class TestSingleCommand
-{
+public class TestSingleCommand {
     @Test
-    public void simpleArgs()
-            throws ParseException
-    {
-        Args1 args = singleCommand(Args1.class).parse(
-                "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
-                "-groups", "unit", "a", "b", "c");
+    public void simpleArgs() throws ParseException {
+        Args1 args = singleCommand(Args1.class).parse("-debug", "-log", "2", "-float", "1.2", "-double", "1.3",
+                "-bigdecimal", "1.4", "-groups", "unit", "a", "b", "c");
 
         assertTrue(args.debug);
         assertEquals(args.verbose.intValue(), 2);
@@ -80,12 +79,11 @@ public class TestSingleCommand
     }
 
     @Test
-    public void equalsArgs()
-            throws ParseException
-    {
-        Args1 args = singleCommand(Args1.class).parse(
-                "-debug", "-log=2", "-float=1.2", "-double=1.3", "-bigdecimal=1.4",
-                "-groups=unit", "a", "b", "c");
+    public void simpleArgsCustomParser() throws ParseException {
+        // Using a customised parser
+        // Hence abbreviating the option names is allowed
+        Args1CustomParser args = singleCommand(Args1CustomParser.class).parse("-de", "-log", "2", "-fl", "1.2", "-do",
+                "1.3", "-bigd", "1.4", "-gr", "unit", "a", "b", "c");
 
         assertTrue(args.debug);
         assertEquals(args.verbose.intValue(), 2);
@@ -97,11 +95,22 @@ public class TestSingleCommand
     }
 
     @Test
-    public void classicGetoptArgs()
-            throws ParseException
-    {
-        ArgsSingleChar args = singleCommand(ArgsSingleChar.class).parse(
-                "-lg", "-dsn", "-pa-p", "-2f", "-z", "--Dfoo");
+    public void equalsArgs() throws ParseException {
+        Args1 args = singleCommand(Args1.class).parse("-debug", "-log=2", "-float=1.2", "-double=1.3",
+                "-bigdecimal=1.4", "-groups=unit", "a", "b", "c");
+
+        assertTrue(args.debug);
+        assertEquals(args.verbose.intValue(), 2);
+        assertEquals(args.groups, "unit");
+        assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+        assertEquals(args.floa, 1.2f, 0.1f);
+        assertEquals(args.doub, 1.3f, 0.1f);
+        assertEquals(args.bigd, new BigDecimal("1.4"));
+    }
+
+    @Test
+    public void classicGetoptArgs() throws ParseException {
+        ArgsSingleChar args = singleCommand(ArgsSingleChar.class).parse("-lg", "-dsn", "-pa-p", "-2f", "-z", "--Dfoo");
 
         assertTrue(args.l);
         assertTrue(args.g);
@@ -117,53 +126,58 @@ public class TestSingleCommand
     }
 
     @Test
-    public void classicGetoptFailure()
-            throws ParseException
-    {
-        ArgsSingleChar args = singleCommand(ArgsSingleChar.class).parse(
-                "-lgX");
+    public void classicGetoptFailure1() throws ParseException {
+        ArgsSingleChar args = singleCommand(ArgsSingleChar.class).parse("-lgX");
 
         assertFalse(args.l);
         assertFalse(args.g);
         assertEquals(args.parameters, Arrays.asList("-lgX"));
     }
 
+    @Test
+    public void classicGetoptArgsFailure2() throws ParseException {
+        String[] inputs = { "-lg", "-dsn", "-pa-p", "-2f", "--Dfoo" };
+        ArgsSingleCharCustomParser args = singleCommand(ArgsSingleCharCustomParser.class).parse(inputs);
+
+        // Because our custom parser does not have ClassicGetOptParser enabled
+        // everything should get treated as arguments instead of options
+        for (String input : inputs) {
+            Assert.assertTrue(args.parameters.contains(input), String.format("Expected %s to be treated as an argument", input));
+        }
+    }
+
     /**
-     * Make sure that if there are args with multiple names (e.g. "-log" and "-verbose"),
-     * the usage will only display it once.
+     * Make sure that if there are args with multiple names (e.g. "-log" and
+     * "-verbose"), the usage will only display it once.
      */
     @Test
-    public void repeatedArgs()
-    {
+    public void repeatedArgs() {
         SingleCommand<Args1> parser = singleCommand(Args1.class);
-        CommandMetadata command = CollectionUtils.find(AirlineUtils.singletonList(parser.getCommandMetadata()), new CommandFinder("Args1"));
+        CommandMetadata command = CollectionUtils.find(AirlineUtils.singletonList(parser.getCommandMetadata()),
+                new CommandFinder("Args1"));
         assertEquals(command.getAllOptions().size(), 8);
     }
 
     /**
      * Required options with multiple names should work with all names.
      */
-    private void multipleNames(String option)
-    {
+    private void multipleNames(String option) {
         Args1 args = singleCommand(Args1.class).parse(option, "2");
         assertEquals(args.verbose.intValue(), 2);
     }
 
     @Test
-    public void multipleNames1()
-    {
+    public void multipleNames1() {
         multipleNames("-log");
     }
 
     @Test
-    public void multipleNames2()
-    {
+    public void multipleNames2() {
         multipleNames("-verbose");
     }
 
     @Test
-    public void arityString()
-    {
+    public void arityString() {
         ArgsArityString args = singleCommand(ArgsArityString.class).parse("-pairs", "pair0", "pair1", "rest");
 
         assertEquals(args.pairs.size(), 2);
@@ -174,65 +188,55 @@ public class TestSingleCommand
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void arity2Fail()
-    {
+    public void arity2Fail() {
         singleCommand(ArgsArityString.class).parse("-pairs", "pair0");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void multipleUnparsedFail()
-    {
+    public void multipleUnparsedFail() {
         singleCommand(ArgsMultipleUnparsed.class).parse();
     }
 
     @Test
-    public void privateArgs()
-    {
+    public void privateArgs() {
         ArgsPrivate args = singleCommand(ArgsPrivate.class).parse("-verbose", "3");
         assertEquals(args.getVerbose().intValue(), 3);
     }
 
-    private void argsBoolean1(String[] params, Boolean expected)
-    {
+    private void argsBoolean1(String[] params, Boolean expected) {
         ArgsBooleanArity args = singleCommand(ArgsBooleanArity.class).parse(params);
         assertEquals(args.debug, expected);
     }
 
-    private void argsBoolean0(String[] params, Boolean expected)
-    {
+    private void argsBoolean0(String[] params, Boolean expected) {
         ArgsBooleanArity0 args = singleCommand(ArgsBooleanArity0.class).parse(params);
         assertEquals(args.debug, expected);
     }
 
     @Test
-    public void booleanArity1()
-    {
+    public void booleanArity1() {
         argsBoolean1(new String[] {}, Boolean.FALSE);
-        argsBoolean1(new String[] {"-debug", "true"}, Boolean.TRUE);
+        argsBoolean1(new String[] { "-debug", "true" }, Boolean.TRUE);
     }
 
     @Test
-    public void booleanArity0()
-    {
+    public void booleanArity0() {
         argsBoolean0(new String[] {}, Boolean.FALSE);
-        argsBoolean0(new String[] {"-debug"}, Boolean.TRUE);
+        argsBoolean0(new String[] { "-debug" }, Boolean.TRUE);
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void badParameterShouldThrowParameter1Exception()
-    {
+    public void badParameterShouldThrowParameter1Exception() {
         singleCommand(Args1.class).parse("-log", "foo");
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void badParameterShouldThrowParameter2Exception()
-    {
+    public void badParameterShouldThrowParameter2Exception() {
         singleCommand(Args1.class).parse("-long", "foo");
     }
-    
+
     @Test
-    public void allowedValues1()
-    {
+    public void allowedValues1() {
         ArgsAllowedValues a = singleCommand(ArgsAllowedValues.class).parse("-mode", "a");
         assertEquals(a.mode, "a");
         a = singleCommand(ArgsAllowedValues.class).parse("-mode", "b");
@@ -240,10 +244,9 @@ public class TestSingleCommand
         a = singleCommand(ArgsAllowedValues.class).parse("-mode", "c");
         assertEquals(a.mode, "c");
     }
-    
+
     @Test
-    public void allowedValues2()
-    {
+    public void allowedValues2() {
         ArgsAllowedValues a = singleCommand(ArgsAllowedValues.class).parse("-mode=a");
         assertEquals(a.mode, "a");
         a = singleCommand(ArgsAllowedValues.class).parse("-mode=b");
@@ -251,22 +254,19 @@ public class TestSingleCommand
         a = singleCommand(ArgsAllowedValues.class).parse("-mode=c");
         assertEquals(a.mode, "c");
     }
-    
+
     @Test(expectedExceptions = ParseException.class)
-    public void allowedValuesShouldThrowIfNotAllowed1()
-    {
+    public void allowedValuesShouldThrowIfNotAllowed1() {
         singleCommand(ArgsAllowedValues.class).parse("-mode", "d");
     }
-    
+
     @Test(expectedExceptions = ParseException.class)
-    public void allowedValuesShouldThrowIfNotAllowed2()
-    {
+    public void allowedValuesShouldThrowIfNotAllowed2() {
         singleCommand(ArgsAllowedValues.class).parse("-mode=d");
     }
 
     @Test
-    public void listParameters()
-    {
+    public void listParameters() {
         Args2 a = singleCommand(Args2.class).parse("-log", "2", "-groups", "unit", "a", "b", "c", "-host", "host2");
         assertEquals(a.verbose.intValue(), 2);
         assertEquals(a.groups, "unit");
@@ -275,46 +275,39 @@ public class TestSingleCommand
     }
 
     @Test
-    public void inheritance()
-    {
+    public void inheritance() {
         ArgsInherited args = singleCommand(ArgsInherited.class).parse("-log", "3", "-child", "2");
         assertEquals(args.child.intValue(), 2);
         assertEquals(args.log.intValue(), 3);
     }
 
     @Test
-    public void negativeNumber()
-    {
+    public void negativeNumber() {
         Args1 a = singleCommand(Args1.class).parse("-verbose", "-3");
         assertEquals(a.verbose.intValue(), -3);
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void requiredMainParameters()
-    {
+    public void requiredMainParameters() {
         singleCommand(ArgsRequired.class).parse();
     }
-    
+
     @Test
-    public void notRequiredMainParameters()
-    {
+    public void notRequiredMainParameters() {
         singleCommand(ArgsRequiredInheritedUnrestricted.class).parse();
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = ".*option.*missing.*")
-    public void requiredOptions()
-    {
+    public void requiredOptions() {
         singleCommand(OptionsRequired.class).parse();
     }
 
     @Test
-    public void ignoresOptionalOptions()
-    {
+    public void ignoresOptionalOptions() {
         singleCommand(OptionsRequired.class).parse("--required", "foo");
     }
 
-    private void verifyCommandOrdering(String[] commandNames, Class<?>... commands)
-    {
+    private void verifyCommandOrdering(String[] commandNames, Class<?>... commands) {
         CliBuilder<Object> builder = Cli.builder("foo");
         for (Class<?> command : commands) {
             builder = builder.withCommand(command);
@@ -331,96 +324,75 @@ public class TestSingleCommand
     }
 
     @Test
-    public void commandsShouldBeShownInOrderOfInsertion()
-    {
-        verifyCommandOrdering(new String[] {"add", "commit"}, CommandAdd.class, CommandCommit.class);
-        verifyCommandOrdering(new String[] {"commit", "add"}, CommandCommit.class, CommandAdd.class);
+    public void commandsShouldBeShownInOrderOfInsertion() {
+        verifyCommandOrdering(new String[] { "add", "commit" }, CommandAdd.class, CommandCommit.class);
+        verifyCommandOrdering(new String[] { "commit", "add" }, CommandCommit.class, CommandAdd.class);
     }
 
     @DataProvider
-    public static Object[][] f()
-    {
-        return new Integer[][] {
-                new Integer[] {3, 5, 1},
-                new Integer[] {3, 8, 1},
-                new Integer[] {3, 12, 2},
-                new Integer[] {8, 12, 2},
-                new Integer[] {9, 10, 1},
-        };
+    public static Object[][] f() {
+        return new Integer[][] { new Integer[] { 3, 5, 1 }, new Integer[] { 3, 8, 1 }, new Integer[] { 3, 12, 2 },
+                new Integer[] { 8, 12, 2 }, new Integer[] { 9, 10, 1 }, };
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void arity1Fail()
-    {
+    public void arity1Fail() {
         singleCommand(Arity1.class).parse("-inspect");
     }
 
     @Test
-    public void arity1Success1()
-    {
+    public void arity1Success1() {
         Arity1 arguments = singleCommand(Arity1.class).parse("-inspect", "true");
         assertTrue(arguments.inspect);
     }
 
     @Test
-    public void arity1Success2()
-    {
+    public void arity1Success2() {
         Arity1 arguments = singleCommand(Arity1.class).parse("-inspect", "false");
         assertFalse(arguments.inspect);
     }
 
-    @Test(expectedExceptions = ParseException.class,
-            description = "Verify that the main parameter's type is checked to be a List")
-    public void wrongMainTypeShouldThrow()
-    {
+    @Test(expectedExceptions = ParseException.class, description = "Verify that the main parameter's type is checked to be a List")
+    public void wrongMainTypeShouldThrow() {
         singleCommand(ArgsRequiredWrongMain.class).parse("f2");
     }
 
     @Test(description = "This used to run out of memory")
-    public void oom()
-    {
+    public void oom() {
         singleCommand(ArgsOutOfMemory.class).parse();
     }
 
     @Test
-    public void getParametersShouldNotNpe()
-    {
+    public void getParametersShouldNotNpe() {
         singleCommand(Args1.class).parse();
     }
 
     private static final List<String> V = Arrays.asList("a", "b", "c", "d");
 
     @DataProvider
-    public Object[][] variable()
-    {
-        return new Object[][] {
-                new Object[] {0, V.subList(0, 0), V},
-                new Object[] {1, V.subList(0, 1), V.subList(1, 4)},
-                new Object[] {2, V.subList(0, 2), V.subList(2, 4)},
-                new Object[] {3, V.subList(0, 3), V.subList(3, 4)},
-                new Object[] {4, V.subList(0, 4), V.subList(4, 4)},
-        };
+    public Object[][] variable() {
+        return new Object[][] { new Object[] { 0, V.subList(0, 0), V },
+                new Object[] { 1, V.subList(0, 1), V.subList(1, 4) },
+                new Object[] { 2, V.subList(0, 2), V.subList(2, 4) },
+                new Object[] { 3, V.subList(0, 3), V.subList(3, 4) },
+                new Object[] { 4, V.subList(0, 4), V.subList(4, 4) }, };
     }
 
     @Test
-    public void enumArgs()
-    {
+    public void enumArgs() {
         ArgsEnum args = singleCommand(ArgsEnum.class).parse("-choice", "ONE");
         assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void enumArgsFail()
-    {
+    public void enumArgsFail() {
         singleCommand(ArgsEnum.class).parse("A");
     }
 
     @Test(expectedExceptions = ParseException.class)
-    public void shouldThrowIfUnknownOption()
-    {
+    public void shouldThrowIfUnknownOption() {
         @Command(name = "A")
-        class A
-        {
+        class A {
             @Option(name = "-long")
             public long l;
         }
@@ -428,15 +400,13 @@ public class TestSingleCommand
     }
 
     @Test
-    public void testSingleCommandHelpOption()
-    {
+    public void testSingleCommandHelpOption() {
         CommandTest commandTest = singleCommand(CommandTest.class).parse("-h", "-i", "foo");
         assertTrue(commandTest.helpOption.showHelpIfRequested());
     }
 
     @Command(name = "test", description = "TestCommand")
-    public static class CommandTest
-    {
+    public static class CommandTest {
         @Inject
         public HelpOption<CommandTest> helpOption;
 
