@@ -19,6 +19,7 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.HelpOption;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.builder.CliBuilder;
+import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -43,7 +44,10 @@ import com.github.rvesse.airline.args.OptionsRequired;
 import com.github.rvesse.airline.command.CommandAdd;
 import com.github.rvesse.airline.command.CommandCommit;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
+import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
+import com.github.rvesse.airline.parser.options.StandardOptionParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
 
@@ -79,7 +83,24 @@ public class TestSingleCommand {
     }
 
     @Test
-    public void simpleArgsCustomParser() throws ParseException {
+    public void simpleArgsCustomParserExplicit() throws ParseException {
+        // Using a customised parser
+        // Hence abbreviating the option names is allowed
+        ParserMetadata<Args1> parser = new ParserBuilder<Args1>().withOptionAbbreviation().build();
+        Args1 args = singleCommand(Args1.class, parser).parse("-de", "-log", "2", "-fl", "1.2", "-do", "1.3", "-bigd",
+                "1.4", "-gr", "unit", "a", "b", "c");
+
+        assertTrue(args.debug);
+        assertEquals(args.verbose.intValue(), 2);
+        assertEquals(args.groups, "unit");
+        assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+        assertEquals(args.floa, 1.2f, 0.1f);
+        assertEquals(args.doub, 1.3f, 0.1f);
+        assertEquals(args.bigd, new BigDecimal("1.4"));
+    }
+
+    @Test
+    public void simpleArgsCustomParserAnnotation() throws ParseException {
         // Using a customised parser
         // Hence abbreviating the option names is allowed
         Args1CustomParser args = singleCommand(Args1CustomParser.class).parse("-de", "-log", "2", "-fl", "1.2", "-do",
@@ -109,8 +130,35 @@ public class TestSingleCommand {
     }
 
     @Test
-    public void classicGetoptArgs() throws ParseException {
+    public void classicGetoptArgs1() throws ParseException {
         ArgsSingleChar args = singleCommand(ArgsSingleChar.class).parse("-lg", "-dsn", "-pa-p", "-2f", "-z", "--Dfoo");
+
+        assertTrue(args.l);
+        assertTrue(args.g);
+        assertTrue(args.d);
+        assertEquals(args.s, "n");
+        assertEquals(args.p, "a-p");
+        assertFalse(args.n);
+        assertTrue(args.two);
+        assertEquals(args.f, "-z");
+        assertFalse(args.z);
+        assertEquals(args.dir, null);
+        assertEquals(args.parameters, Arrays.asList("--Dfoo"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void classicGetoptArgs2() throws ParseException {
+        // While the class has a @Parser annotation that doesn't include the
+        // necessary parser the annotation is ignored if we explicitly pass in
+        // another parser configuration in favour of our explicitly passed
+        // configuration
+        ParserMetadata<ArgsSingleCharCustomParser> parser = new ParserBuilder<ArgsSingleCharCustomParser>()
+                .withOptionParsers(new ClassicGetOptParser<ArgsSingleCharCustomParser>(),
+                        new StandardOptionParser<ArgsSingleCharCustomParser>())
+                .build();
+        ArgsSingleCharCustomParser args = singleCommand(ArgsSingleCharCustomParser.class, parser).parse("-lg", "-dsn", "-pa-p",
+                "-2f", "-z", "--Dfoo");
 
         assertTrue(args.l);
         assertTrue(args.g);
@@ -142,7 +190,23 @@ public class TestSingleCommand {
         // Because our custom parser does not have ClassicGetOptParser enabled
         // everything should get treated as arguments instead of options
         for (String input : inputs) {
-            Assert.assertTrue(args.parameters.contains(input), String.format("Expected %s to be treated as an argument", input));
+            Assert.assertTrue(args.parameters.contains(input),
+                    String.format("Expected %s to be treated as an argument", input));
+        }
+    }
+
+    @Test
+    public void classicGetoptArgsFailure3() throws ParseException {
+        String[] inputs = { "-lg", "-dsn", "-pa-p", "-2f", "--Dfoo" };
+        ParserMetadata<ArgsSingleChar> parser = new ParserBuilder<ArgsSingleChar>()
+                .withOptionParser(new StandardOptionParser<ArgsSingleChar>()).build();
+        ArgsSingleChar args = singleCommand(ArgsSingleChar.class, parser).parse(inputs);
+
+        // Because our custom parser does not have ClassicGetOptParser enabled
+        // everything should get treated as arguments instead of options
+        for (String input : inputs) {
+            Assert.assertTrue(args.parameters.contains(input),
+                    String.format("Expected %s to be treated as an argument", input));
         }
     }
 

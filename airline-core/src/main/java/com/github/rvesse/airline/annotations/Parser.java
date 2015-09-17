@@ -33,16 +33,16 @@ import com.github.rvesse.airline.parser.options.OptionParser;
 public @interface Parser {
 
     /**
-     * Controls whether command names may be abbreviated (provided such
-     * abbreviations are unambiguous)
+     * Controls whether command names may be abbreviated provided such
+     * abbreviations are unambiguous (default false)
      * 
      * @return True if command abbreviation allowed, false otherwise
      */
     boolean allowCommandAbbreviation() default false;
 
     /**
-     * Controls whether options names may be abbreviated (provided such
-     * abbreviations are unambiguous)
+     * Controls whether options names may be abbreviated provided such
+     * abbreviations are unambiguous (default false)
      * 
      * @return True if option abbreviation allowed, false otherwise
      */
@@ -61,7 +61,7 @@ public @interface Parser {
 
     /**
      * Controls whether command alises may be chained i.e. can aliases be
-     * defined in terms of other aliases
+     * defined in terms of other aliases (default false)
      * <p>
      * Note that even when enabled circular references are not permitted
      * </p>
@@ -73,7 +73,7 @@ public @interface Parser {
     /**
      * Controls whether aliases are allowed to override built-in commands i.e.
      * if a command and an alias are defined with the same name does the alias
-     * take precedence
+     * take precedence (default false)
      * <p>
      * This is particularly important if you allow users to define aliases since
      * allowing overriding would allow them to change the behaviour from the
@@ -132,7 +132,7 @@ public @interface Parser {
     String userAliasesPrefix() default "";
 
     /**
-     * Sets whether to use the default set of option parsers
+     * Sets whether to use the default set of option parsers (default true)
      * 
      * @return True if default option parsers are used, false otherwise
      */
@@ -140,7 +140,7 @@ public @interface Parser {
 
     /**
      * Sets whether to use the default option parsers first before any
-     * additional option parsers that may be defined
+     * additional option parsers that may be defined (default true)
      * 
      * @return
      */
