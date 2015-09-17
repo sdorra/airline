@@ -20,9 +20,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -61,7 +63,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         this.commandFactory = commandFactory;
         return this;
     }
-    
+
     public ParserBuilder<C> withDefaultCommandFactory() {
         this.commandFactory = null;
         return this;
@@ -109,8 +111,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      */
     public ParserBuilder<C> withUserAliases(String programName) throws IOException {
         // Use default filename and search location
-        return withUserAliases(programName + ".config", null, System.getProperty("user.home") + "/." + programName
-                + "/");
+        return withUserAliases(programName + ".config", null,
+                System.getProperty("user.home") + "/." + programName + "/");
     }
 
     /**
@@ -186,18 +188,44 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      */
     public ParserBuilder<C> withUserAliases(final String filename, final String prefix, final String... searchLocations)
             throws IOException {
+        Properties properties = new Properties();
+
+        // Find the home directory since we will use this
+        File homeDir = null;
+        if (!StringUtils.isEmpty(System.getProperty("user.home"))) {
+            homeDir = new File(System.getProperty("user.home"));
+        }
+
         // Search locations in reverse order overwriting previously found values
         // each time. Thus the first location in the list has highest precedence
-        Properties properties = new Properties();
+        Set<String> loaded = new HashSet<>();
         for (int i = searchLocations.length - 1; i >= 0; i--) {
-            File f = new File(searchLocations[i]);
+            // Check an actual location
+            String loc = searchLocations[i];
+            if (StringUtils.isBlank(loc))
+                continue;
+
+            // Allow use of ~/ or ~\ as reference to user home directory
+            if (loc.startsWith("~" + File.separator)) {
+                if (homeDir == null)
+                    continue;
+                loc = homeDir.getAbsolutePath()
+                        + loc.substring(homeDir.getAbsolutePath().endsWith(File.separator) ? 2 : 1);
+            }
+
+            // Don't read property files multiple times
+            if (loaded.contains(loc))
+                continue;
+
+            File f = new File(loc);
             f = new File(f, filename);
             if (f.exists() && f.isFile() && f.canRead()) {
                 try (FileInputStream input = new FileInputStream(f)) {
                     properties.load(input);
                 } finally {
-                    // No clean up actions, try-with-resources does clean up for
-                    // us
+                    // Remember we've tried to read this file so we don't try
+                    // and read it multiple times
+                    loaded.add(loc);
                 }
             }
         }
@@ -217,7 +245,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         // Generate the aliases
         for (Object key : properties.keySet()) {
             String name = key.toString();
-            if (prefix != null)
+            if (!StringUtils.isBlank(prefix))
                 name = name.substring(prefix.length());
             AliasBuilder<C> alias = this.withAlias(name);
 
@@ -348,7 +376,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * This is useful for disambiguating where arguments may be misinterpreted
      * as options. The default value of this is the standard {@code --} used by
      * many command line tools.
-     * </p>>
+     * </p>
+     * >
      * 
      * @param separator
      * @return

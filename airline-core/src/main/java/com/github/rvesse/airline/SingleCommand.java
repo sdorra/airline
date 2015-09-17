@@ -18,7 +18,6 @@ package com.github.rvesse.airline;
 import java.util.List;
 
 import org.apache.commons.collections4.IteratorUtils;
-import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.ParserMetadata;
@@ -65,7 +64,7 @@ public class SingleCommand<C> {
     private SingleCommand(Class<C> command, Iterable<GlobalRestriction> restrictions, ParserMetadata<C> parserConfig) {
         if (command == null)
             throw new NullPointerException("command is null");
-        this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<C> defaultConfiguration();
+        this.parserConfig = parserConfig != null ? parserConfig : MetadataLoader.<C>loadParser(command);
         this.restrictions = restrictions != null ? IteratorUtils.toList(restrictions.iterator()) : AirlineUtils
                 .arrayToList(GlobalRestriction.DEFAULTS);
         if (this.restrictions.size() == 0)

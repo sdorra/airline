@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.Cli;
@@ -33,12 +34,22 @@ import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 public class TestAliases {
 
     private static final File f = new File("target/test.config");
+    private static String homeDir;
+    
+    @BeforeClass
+    public static void setup() {
+        homeDir = System.getProperty("user.home");
+        
+        // Change home directory for purposes of these tests
+        System.setProperty("user.home", new File("target/").getAbsolutePath());
+    }
 
     @AfterClass
     public static void cleanup() {
         if (f.exists()) {
             f.delete();
         }
+        System.setProperty("user.home", homeDir);
     }
 
     private static void prepareConfig(File f, String... lines) throws IOException {
@@ -134,6 +145,64 @@ public class TestAliases {
                                        .withCommand(Args1.class);
         builder.withParser()
                .withUserAliases(f.getName(), "b.", "target/");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "faz");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "faz");
+    }
+    
+    @Test
+    public void user_aliases_home_dir_01() throws IOException {
+        prepareConfig(f, "foo=Args1 bar");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "~/", "~\\");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+
+    @Test
+    public void user_aliases_home_dir_02() throws IOException {
+        prepareConfig(f, "a.foo=Args1 bar", "b.foo=Args1 faz");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), "b.", "~/", "~\\");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 

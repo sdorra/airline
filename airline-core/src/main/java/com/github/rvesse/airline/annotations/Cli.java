@@ -26,18 +26,54 @@ import com.github.rvesse.airline.restrictions.GlobalRestriction;
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Cli {
-    
+
+    /**
+     * Sets the name of the CLI i.e. the command name users enter to invoke your
+     * CLI
+     * 
+     * @return Name
+     */
     String name() default "";
-    
+
+    /**
+     * Sets the description of the CLI
+     * 
+     * @return Description
+     */
     String description() default "";
 
+    /**
+     * Sets the parser configuration for the CLI
+     * 
+     * @return Parser Configuration
+     */
     Parser parserConfiguration();
-    
-    Group[] groups() default {};
-    
-    Class<?> defaultCommand();
-    
-    Class<?>[] commands() default {};
-    
-    Class<? extends GlobalRestriction>[] restrictions() default {};
+
+    /**
+     * Defines command groups for the CLI
+     * 
+     * @return Command groups
+     */
+    Group[]groups() default {};
+
+    /**
+     * Defines the class that provides the default command for the CLI
+     * 
+     * @return Default command class
+     */
+    Class<?>defaultCommand();
+
+    /**
+     * Defines the classes that provide top-level commands for the CLI
+     * 
+     * @return Top-level command classes
+     */
+    Class<?>[]commands() default {};
+
+    /**
+     * Defines the classes that provide global restrictions for the CLI
+     * 
+     * @return Global restriction classes
+     */
+    Class<? extends GlobalRestriction>[]restrictions() default {};
 }
