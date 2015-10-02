@@ -1,16 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
-
   <groupId>com.github.rvesse</groupId>
   <artifactId>airline-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>2.0.1-SNAPSHOT</version>
 
   <name>Airline - Parent</name>
   <description>Java annotation-based framework for parsing Git like command line structures</description>
@@ -40,12 +34,25 @@
     </license>
   </licenses>
 
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
   <properties>
     <jdk.target>1.7</jdk.target>
+    <license.header.path>${project.basedir}</license.header.path>
 
     <!-- Plugin Versions -->
     <plugin.compiler>3.2</plugin.compiler>
     <plugin.enforcer>1.3.1</plugin.enforcer>
+    <plugin.license>2.11</plugin.license>
     <plugin.jar>2.5</plugin.jar>
     <plugin.source>2.4</plugin.source>
     <plugin.javadoc>2.10.1</plugin.javadoc>
@@ -55,14 +62,15 @@
 
     <!-- Dependency Versions -->
     <dependency.javax-inject>1</dependency.javax-inject>
-    <dependency.guava>18.0</dependency.guava>
     <dependency.testng>6.8.8</dependency.testng>
     <dependency.commons-lang3>3.3.2</dependency.commons-lang3>
+    <dependency.commons-collections4>4.0</dependency.commons-collections4>
   </properties>
 
   <modules>
-    <module>lib</module>
-    <module>examples</module>
+    <module>airline-core</module>
+    <module>airline-examples</module>
+    <module>airline-io</module>
   </modules>
 
   <dependencyManagement>
@@ -74,15 +82,15 @@
       </dependency>
 
       <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${dependency.guava}</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${dependency.commons-lang3}</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${dependency.commons-lang3}</version>
+        <artifactId>commons-collections4</artifactId>
+        <version>${dependency.commons-collections4}</version>
       </dependency>
 
       <!-- for testing -->
@@ -127,6 +135,33 @@
                 </requireJavaVersion>
               </rules>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- License Plugin -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${plugin.license}</version>
+        <configuration>
+          <header>${license.header.path}/license-header.txt</header>
+          <failIfMissing>true</failIfMissing>
+          <aggregate>false</aggregate>
+          <useDefaultMapping>true</useDefaultMapping>
+          <strictCheck>true</strictCheck>
+          <excludes>
+            <exclude>license.txt</exclude>
+            <exclude>pom.xml</exclude>
+            <exclude>**/*.config</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
