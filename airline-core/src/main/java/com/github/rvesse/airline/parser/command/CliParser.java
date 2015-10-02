@@ -93,22 +93,32 @@ public class CliParser<T> extends AbstractCommandParser<T> {
     protected void validate(ParseState<T> state) {
         // Global restrictions
         for (GlobalRestriction restriction : state.getGlobal().getRestrictions()) {
+            if (restriction == null)
+                continue;
             restriction.validate(state);
         }
         CommandMetadata command = state.getCommand();
+        if (command != null) {
 
-        // Argument restrictions
-        ArgumentsMetadata arguments = command.getArguments();
-        if (arguments != null) {
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                restriction.postValidate(state, arguments);
+            // Argument restrictions
+            ArgumentsMetadata arguments = command.getArguments();
+            if (arguments != null) {
+                for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
+                    if (restriction == null)
+                        continue;
+                    restriction.postValidate(state, arguments);
+                }
             }
-        }
 
-        // Option restrictions
-        for (OptionMetadata option : command.getAllOptions()) {
-            for (OptionRestriction restriction : option.getRestrictions()) {
-                restriction.postValidate(state, option);
+            // Option restrictions
+            for (OptionMetadata option : command.getAllOptions()) {
+                if (option == null)
+                    continue;
+                for (OptionRestriction restriction : option.getRestrictions()) {
+                    if (restriction == null)
+                        continue;
+                    restriction.postValidate(state, option);
+                }
             }
         }
     }

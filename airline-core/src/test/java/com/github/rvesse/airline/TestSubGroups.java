@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.builder.GroupBuilder;
 import com.github.rvesse.airline.help.Help;
@@ -214,5 +215,73 @@ public class TestSubGroups {
         //@formatter:on
         
         Assert.assertEquals(actual, expected);
+    }
+    
+    @com.github.rvesse.airline.annotations.Cli(name = "test", groups = { @Group(name = "foo bar", defaultCommand = Help.class, commands = { Help.class }) })
+    private static class SubGroupsCli01 {
+
+    }
+    
+    @Test
+    public void sub_groups_cli_annotation_01() {
+        Cli<Object> cli = new Cli<Object>(SubGroupsCli01.class);
+        GlobalMetadata<Object> global = cli.getMetadata();
+        Assert.assertEquals(global.getDefaultGroupCommands().size(), 0);
+        Assert.assertEquals(global.getCommandGroups().size(), 1);
+        
+        CommandGroupMetadata parentGroup = global.getCommandGroups().get(0);
+        Assert.assertEquals(parentGroup.getName(), "foo");
+        Assert.assertEquals(parentGroup.getCommands().size(), 0);
+        Assert.assertEquals(parentGroup.getSubGroups().size(), 1);
+        
+        CommandGroupMetadata subGroup = parentGroup.getSubGroups().get(0);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
+        Assert.assertEquals(subGroup.getName(), "bar");
+        Assert.assertEquals(subGroup.getDefaultCommand().getType(), Help.class);
+        
+        Object cmd = cli.parse("foo", "bar");
+        Assert.assertTrue(cmd instanceof Help);
+    }
+    
+    @com.github.rvesse.airline.annotations.Cli(name = "test", groups = { @Group(name = "foo bar", defaultCommand = Help.class, commands = { Help.class }), @Group(name = "foo baz") })
+    private static class SubGroupsCli02 {
+
+    }
+    
+    @Test
+    public void sub_groups_cli_annotation_02() {
+        Cli<Object> cli = new Cli<Object>(SubGroupsCli02.class);
+        GlobalMetadata<Object> global = cli.getMetadata();
+        Assert.assertEquals(global.getDefaultGroupCommands().size(), 0);
+        Assert.assertEquals(global.getCommandGroups().size(), 1);
+        
+        CommandGroupMetadata parentGroup = global.getCommandGroups().get(0);
+        Assert.assertNull(parentGroup.getParent());
+        Assert.assertEquals(parentGroup.getName(), "foo");
+        Assert.assertEquals(parentGroup.getCommands().size(), 0);
+        Assert.assertEquals(parentGroup.getSubGroups().size(), 2);
+        
+        CommandGroupMetadata subGroup = CollectionUtils.find(parentGroup.getSubGroups(), new GroupFinder("bar"));
+        Assert.assertNotNull(subGroup);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
+        Assert.assertEquals(subGroup.getName(), "bar");
+        Assert.assertEquals(subGroup.getCommands().size(), 1);
+        Assert.assertEquals(subGroup.getDefaultCommand().getType(), Help.class);
+        
+        subGroup = CollectionUtils.find(parentGroup.getSubGroups(), new GroupFinder("baz"));
+        Assert.assertNotNull(subGroup);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
+        Assert.assertEquals(subGroup.getName(), "baz");
+        Assert.assertEquals(subGroup.getCommands().size(), 0);
+        Assert.assertNull(subGroup.getDefaultCommand());
+        
+        Object cmd = cli.parse("foo", "bar");
+        Assert.assertTrue(cmd instanceof Help);
+    }
+    
+    @Test(expectedExceptions = ParseCommandMissingException.class)
+    public void sub_groups_cli_annotation_03() {
+        Cli<Object> cli = new Cli<Object>(SubGroupsCli02.class);
+        cli.parse("foo", "baz");
     }
 }

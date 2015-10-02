@@ -143,7 +143,7 @@ public class MetadataLoader {
 
         // Prepare commands
         CommandMetadata defaultCommand = null;
-        if (cliConfig.defaultCommand() != null) {
+        if (!cliConfig.defaultCommand().equals(com.github.rvesse.airline.annotations.Cli.NO_DEFAULT.class)) {
             defaultCommand = loadCommand(cliConfig.defaultCommand());
         }
         List<CommandMetadata> defaultGroupCommands = new ArrayList<CommandMetadata>();
@@ -159,6 +159,9 @@ public class MetadataLoader {
         List<GlobalRestriction> restrictions = new ArrayList<GlobalRestriction>();
         for (Class<? extends GlobalRestriction> cls : cliConfig.restrictions()) {
             restrictions.add(ParserUtil.createInstance(cls));
+        }
+        if (cliConfig.includeDefaultRestrictions()) {
+            restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
         }
 
         // Prepare groups
@@ -195,7 +198,7 @@ public class MetadataLoader {
                                          groupAnno.description(),
                                          groupAnno.hidden(),
                                          Collections.<CommandGroupMetadata>emptyList(),
-                                         groupAnno.defaultCommand() != null ? loadCommand(groupAnno.defaultCommand()) : null, 
+                                         !groupAnno.defaultCommand().equals(Group.NO_DEFAULT.class) ? loadCommand(groupAnno.defaultCommand()) : null, 
                                          groupCommands);
                 //@formatter:on
                 if (subGroupPath == null) {

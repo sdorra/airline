@@ -70,22 +70,31 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
     protected void validate(ParseState<T> state, List<GlobalRestriction> restrictions) {
         // Global restrictions
         for (GlobalRestriction restriction : restrictions) {
+            if (restriction == null)
+                continue;
             restriction.validate(state);
         }
         CommandMetadata command = state.getCommand();
-
-        // Arguments restrictions
-        ArgumentsMetadata arguments = command.getArguments();
-        if (arguments != null) {
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                restriction.postValidate(state, arguments);
+        if (command != null) {
+            // Arguments restrictions
+            ArgumentsMetadata arguments = command.getArguments();
+            if (arguments != null) {
+                for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
+                    if (restriction == null)
+                        continue;
+                    restriction.postValidate(state, arguments);
+                }
             }
-        }
 
-        // Option restrictions
-        for (OptionMetadata option : command.getAllOptions()) {
-            for (OptionRestriction restriction : option.getRestrictions()) {
-                restriction.postValidate(state, option);
+            // Option restrictions
+            for (OptionMetadata option : command.getAllOptions()) {
+                if (option == null)
+                    continue;
+                for (OptionRestriction restriction : option.getRestrictions()) {
+                    if (restriction == null)
+                        continue;
+                    restriction.postValidate(state, option);
+                }
             }
         }
     }
