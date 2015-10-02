@@ -19,8 +19,11 @@ import java.lang.annotation.Annotation;
 
 import com.github.rvesse.airline.annotations.help.Discussion;
 import com.github.rvesse.airline.annotations.help.Examples;
+import com.github.rvesse.airline.annotations.help.HideSection;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
+import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.help.sections.common.BasicSection;
 import com.github.rvesse.airline.help.sections.common.DiscussionSection;
 import com.github.rvesse.airline.help.sections.common.ExamplesSection;
 import com.github.rvesse.airline.help.sections.common.ExitCodesSection;
@@ -40,6 +43,9 @@ public class CommonSectionsFactory implements HelpSectionFactory {
         } else if (annotation instanceof ExitCodes) {
             ExitCodes exits = (ExitCodes) annotation;
             return new ExitCodesSection(exits.codes(), exits.descriptions());
+        } else if (annotation instanceof HideSection) {
+            HideSection hide = (HideSection) annotation;
+            return new BasicSection(hide.title(), 0, null, null, HelpFormat.NONE_PRINTABLE, new String[0]);
         }
         return null;
     }

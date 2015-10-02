@@ -4,7 +4,7 @@ Airline is a Java library providing an annotation-based framework for parsing co
 
 It supports both simple single commands through to complex git style interfaces with groups.
 
-This is a substantially rewritten fork of the original [airline library](https://github.com/airlift/airline) created based on improvements predominantly developed by myself plus some taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork.
+This is a substantially rewritten fork of the original [airline library](https://github.com/airlift/airline) created based on improvements predominantly developed by myself plus some minor improvements taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork.
 
 ## Breaking Changes versus 1.x
 
@@ -19,15 +19,36 @@ You then need to use the various annotations to annotate your command classes:
 - `@Command` is used to annotate classes
 - `@Option` is used to annotate fields to indicate they are options
 - `@Arguments` is used to annotate fields that take in arguments
-- `@Inject` can be used to modularize option definitions into separate classes
+- `@Inject` can be used to modularise option definitions into separate classes
 
 Please see the [examples](examples/) module for a range of examples that show off the many features of this library and practical examples of using the annotations.
 
-In your `main(String[] args)` method you then need to create a parser instance either via `SingleCommand.singleCommand()` or by creating an instance of a `Cli` using the `CliBuilder` and then call the `parse()` method passing in the provided `args`.  This will return you an instance of the command the user wants to execute and then you can go ahead and execute that however you want.
+### Single Commands
+
+Simply create a parser instance via `SingleCommand.singleCommand()` passing in a class that is annotated with the `@Command` annotation e.g.
+
+    public static void main(String[] args) {
+        SingleCommand<YourClass> parser = SingleCommand.singleCommand(YourClass.class);
+        YourClass cmd = parser.parse(args);
+        
+         // Execute your command however is appropriate e.g.
+         cmd.run();   
+    }
+
+### Multiple Commands
+
+Create an instance of a `Cli`, this can be done either using the `CliBuilder` or by annotating a class with the `@Cli` annotation.  This is somewhat more complicated so please see the [examples](examples/) module for proper examples.
+
+### Executable JAR
 
 Note that typically you will want to create an executable JAR for your CLI using something like the Maven Shade plugin.  This will then allow you to create a simple wrapper script that invokes your CLI.
 
-Once that is done you can then invoke your application e.g.
+    #!/bin/bash
+    # myapp
+    
+    java -jar my-app.jar $*
+
+If this is done you can then invoke your application e.g.
 
      myapp --global-option command --command-option arguments
      
@@ -43,7 +64,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `1.0.2`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.0.0`
 
 Use the following maven dependency declaration:
 
@@ -51,13 +72,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>1.0.2</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `1.0.3-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
-
-`2.0.0-SNAPSHOT` represents a more significant rewrite with the aim of making the library more configurable and extensible.
+Snapshot artifacts of the latest source are also available using the version `2.0.1-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
 ## Build Status
 

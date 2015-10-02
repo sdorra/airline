@@ -23,6 +23,7 @@ import java.util.Set;
 import com.github.rvesse.airline.annotations.help.Discussion;
 import com.github.rvesse.airline.annotations.help.Examples;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
+import com.github.rvesse.airline.annotations.help.HideSection;
 import com.github.rvesse.airline.help.sections.factories.CommonSectionsFactory;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionFactory;
 
@@ -46,6 +47,7 @@ public class HelpSectionRegistry {
         FACTORIES.put(Discussion.class, commonFactory);
         FACTORIES.put(Examples.class, commonFactory);
         FACTORIES.put(ExitCodes.class, commonFactory);
+        FACTORIES.put(HideSection.class, commonFactory);
 
         init = true;
     }

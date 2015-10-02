@@ -45,7 +45,7 @@ public class TestGitByAnnotation
     private void git(String... args)
     {
         System.out.println("$ git " + StringUtils.join(args, ' '));
-        GitWithCliAnnotation.main(args);
+        GitWithCliAnnotation.run(args);
         System.out.println();
     }
 }

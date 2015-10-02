@@ -152,8 +152,9 @@ public class MetadataLoader {
         }
 
         // Prepare parser configuration
-        ParserMetadata<C> parserConfig = cliConfig.parserConfiguration() != null ? MetadataLoader
-                .<C> loadParser(cliConfig.parserConfiguration()) : MetadataLoader.<C> loadParser(cliClass);
+        ParserMetadata<C> parserConfig = cliConfig.parserConfiguration() != null
+                ? MetadataLoader.<C> loadParser(cliConfig.parserConfiguration())
+                : MetadataLoader.<C> loadParser(cliClass);
 
         // Prepare restrictions
         List<GlobalRestriction> restrictions = new ArrayList<GlobalRestriction>();
@@ -185,7 +186,7 @@ public class MetadataLoader {
                 // Maybe a sub-group we've already seen
                 group = subGroups.get(subGroupPath);
             }
-            
+
             List<CommandMetadata> groupCommands = new ArrayList<CommandMetadata>();
             for (Class<?> cls : groupAnno.commands()) {
                 groupCommands.add(loadCommand(cls));
@@ -227,7 +228,7 @@ public class MetadataLoader {
             if (group.getDefaultCommand() != null) {
                 allCommands.add(group.getDefaultCommand());
             }
-            
+
             Queue<CommandGroupMetadata> subGroupsQueue = new LinkedList<CommandGroupMetadata>();
             subGroupsQueue.addAll(group.getSubGroups());
             while (subGroupsQueue.size() > 0) {
@@ -312,7 +313,8 @@ public class MetadataLoader {
      * @return Command group meta-data
      */
     public static CommandGroupMetadata loadCommandGroup(String name, String description, boolean hidden,
-            Iterable<CommandGroupMetadata> subGroups, CommandMetadata defaultCommand, Iterable<CommandMetadata> commands) {
+            Iterable<CommandGroupMetadata> subGroups, CommandMetadata defaultCommand,
+            Iterable<CommandMetadata> commands) {
         // Process the name
         if (StringUtils.containsWhitespace(name)) {
             String[] names = StringUtils.split(name);
@@ -370,7 +372,14 @@ public class MetadataLoader {
             if (cls.isAnnotationPresent(Group.class)) {
                 groups.add(cls.getAnnotation(Group.class));
             }
+        }
 
+        if (command == null)
+            throw new IllegalArgumentException(
+                    String.format("Command %s is not annotated with @Command", commandType.getName()));
+
+        // Find help sections
+        for (Class<?> cls = commandType; !Object.class.equals(cls); cls = cls.getSuperclass()) {
             for (Class<? extends Annotation> helpAnnotationClass : HelpSectionRegistry.getAnnotationClasses()) {
                 Annotation annotation = cls.getAnnotation(helpAnnotationClass);
                 if (annotation == null)
@@ -382,15 +391,13 @@ public class MetadataLoader {
                 // Because we're going up the class hierarchy the titled section
                 // lowest down the hierarchy should win so if we've already seen
                 // a section with this title ignore it
-                if (helpSections.containsKey(section.getTitle()))
+                if (helpSections.containsKey(section.getTitle().toLowerCase(Locale.ENGLISH)))
                     continue;
 
-                helpSections.put(section.getTitle(), section);
+                helpSections.put(section.getTitle().toLowerCase(Locale.ENGLISH), section);
             }
         }
-        if (command == null)
-            throw new IllegalArgumentException(String.format("Command %s is not annotated with @Command",
-                    commandType.getName()));
+
         String name = command.name();
         String description = command.description().isEmpty() ? null : command.description();
         List<String> groupNames = Arrays.asList(command.groupNames());
@@ -476,8 +483,8 @@ public class MetadataLoader {
 
                 try {
                     @SuppressWarnings("unchecked")
-                    Annotation aGuiceInject = field.getAnnotation((Class<? extends Annotation>) Class
-                            .forName("com.google.inject.Inject"));
+                    Annotation aGuiceInject = field
+                            .getAnnotation((Class<? extends Annotation>) Class.forName("com.google.inject.Inject"));
                     if (aGuiceInject != null) {
                         if (field.getType().equals(GlobalMetadata.class)
                                 || field.getType().equals(CommandGroupMetadata.class)
@@ -560,18 +567,16 @@ public class MetadataLoader {
                     switch (optionType) {
                     case GLOBAL:
                         if (defaultOptionAnnotation != null)
-                            throw new IllegalArgumentException(
-                                    String.format(
-                                            "Field %s which defines a global option cannot be annotated with @DefaultOption as this may only be applied to command options",
-                                            field));
+                            throw new IllegalArgumentException(String.format(
+                                    "Field %s which defines a global option cannot be annotated with @DefaultOption as this may only be applied to command options",
+                                    field));
                         injectionMetadata.globalOptions.add(optionMetadata);
                         break;
                     case GROUP:
                         if (defaultOptionAnnotation != null)
-                            throw new IllegalArgumentException(
-                                    String.format(
-                                            "Field %s which defines a global option cannot be annotated with @DefaultOption as this may only be applied to command options",
-                                            field));
+                            throw new IllegalArgumentException(String.format(
+                                    "Field %s which defines a global option cannot be annotated with @DefaultOption as this may only be applied to command options",
+                                    field));
                         injectionMetadata.groupOptions.add(optionMetadata);
                         break;
                     case COMMAND:
@@ -580,10 +585,9 @@ public class MetadataLoader {
                         if (defaultOptionAnnotation != null) {
                             // Can't have both @DefaultOption and @Arguments
                             if (injectionMetadata.arguments.size() > 0)
-                                throw new IllegalArgumentException(
-                                        String.format(
-                                                "Field %s cannot be annotated with @DefaultOption because there are fields with @Arguments annotations present",
-                                                field));
+                                throw new IllegalArgumentException(String.format(
+                                        "Field %s cannot be annotated with @DefaultOption because there are fields with @Arguments annotations present",
+                                        field));
                             // Can't have more than one @DefaultOption
                             if (injectionMetadata.defaultOption != null)
                                 throw new IllegalArgumentException(String.format(
@@ -591,10 +595,9 @@ public class MetadataLoader {
                                         type));
                             // Arity of associated @Option must be 1
                             if (optionMetadata.getArity() != 1)
-                                throw new IllegalArgumentException(
-                                        String.format(
-                                                "Field %s annotated with @DefaultOption must also have an @Option annotation with an arity of 1",
-                                                field));
+                                throw new IllegalArgumentException(String.format(
+                                        "Field %s annotated with @DefaultOption must also have an @Option annotation with an arity of 1",
+                                        field));
                             injectionMetadata.defaultOption = optionMetadata;
                         }
                         injectionMetadata.commandOptions.add(optionMetadata);
@@ -612,10 +615,9 @@ public class MetadataLoader {
                 if (field.isAnnotationPresent(Arguments.class)) {
                     // Can't have both @DefaultOption and @Arguments
                     if (injectionMetadata.defaultOption != null)
-                        throw new IllegalArgumentException(
-                                String.format(
-                                        "Field %s cannot be annotated with @Arguments because there is a field with @DefaultOption present",
-                                        field));
+                        throw new IllegalArgumentException(String.format(
+                                "Field %s cannot be annotated with @Arguments because there is a field with @DefaultOption present",
+                                field));
 
                     List<String> titles = new ArrayList<>();
 
@@ -677,10 +679,10 @@ public class MetadataLoader {
         for (OptionMetadata option : options) {
             for (String optionName : option.getOptions()) {
                 if (optionIndex.containsKey(optionName)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Fields %s and %s have conflicting definitions of option %s", optionIndex.get(optionName)
-                                    .getAccessors().iterator().next(), option.getAccessors().iterator().next(),
-                            optionName));
+                    throw new IllegalArgumentException(
+                            String.format("Fields %s and %s have conflicting definitions of option %s",
+                                    optionIndex.get(optionName).getAccessors().iterator().next(),
+                                    option.getAccessors().iterator().next(), optionName));
                 }
                 optionIndex.put(optionName, option);
             }
@@ -705,11 +707,10 @@ public class MetadataLoader {
                 for (Set<String> existingNames : optionIndex.keySet()) {
                     Set<String> intersection = AirlineUtils.intersection(names, existingNames);
                     if (intersection.size() > 0) {
-                        throw new IllegalArgumentException(
-                                String.format(
-                                        "Fields %s and %s have overlapping definitions of option %s, options can only be overridden if they have precisely the same set of option names",
-                                        option.getAccessors().iterator().next(), optionIndex.get(existingNames)
-                                                .getAccessors().iterator().next(), intersection));
+                        throw new IllegalArgumentException(String.format(
+                                "Fields %s and %s have overlapping definitions of option %s, options can only be overridden if they have precisely the same set of option names",
+                                option.getAccessors().iterator().next(),
+                                optionIndex.get(existingNames).getAccessors().iterator().next(), intersection));
                     }
                 }
 
@@ -737,19 +738,17 @@ public class MetadataLoader {
         // Parent must not state it is sealed UNLESS it is a duplicate which can
         // happen when using @Inject to inject options via delegates
         if (parent.isSealed() && !isDuplicate)
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Fields %s and %s have conflicting definitions of option %s - parent field %s declares itself as sealed and cannot be overridden",
-                            parentField, childField, names, parentField));
+            throw new IllegalArgumentException(String.format(
+                    "Fields %s and %s have conflicting definitions of option %s - parent field %s declares itself as sealed and cannot be overridden",
+                    parentField, childField, names, parentField));
 
         // Child must explicitly state that it overrides otherwise we cannot
         // override UNLESS it is the case that this is a duplicate which
         // can happen when using @Inject to inject options via delegates
         if (!child.isOverride() && !isDuplicate)
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Fields %s and %s have conflicting definitions of option %s - if you wanted to override this option you must explicitly specify override = true in your child field annotation",
-                            parentField, childField, names));
+            throw new IllegalArgumentException(String.format(
+                    "Fields %s and %s have conflicting definitions of option %s - if you wanted to override this option you must explicitly specify override = true in your child field annotation",
+                    parentField, childField, names));
 
         // Attempt overriding, this will error if the overriding is not possible
         OptionMetadata merged = OptionMetadata.override(names, parent, child);
@@ -931,8 +930,8 @@ public class MetadataLoader {
                     }
                 } else {
                     // Should be a sub-group of the current parent
-                    CommandGroupMetadata nextParent = CollectionUtils.find(parentGroup.getSubGroups(), new GroupFinder(
-                            groups[i]));
+                    CommandGroupMetadata nextParent = CollectionUtils.find(parentGroup.getSubGroups(),
+                            new GroupFinder(groups[i]));
                     if (nextParent == null) {
                         // Next parent group does not exist so create empty
                         // group

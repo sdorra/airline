@@ -38,10 +38,13 @@ import com.github.rvesse.airline.args.ArgsArityString;
 import com.github.rvesse.airline.args.ArgsBooleanArity;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
+import com.github.rvesse.airline.args.ArgsHiddenDiscussion;
 import com.github.rvesse.airline.args.ArgsInherited;
+import com.github.rvesse.airline.args.ArgsInheritedDiscussion;
 import com.github.rvesse.airline.args.ArgsMultiLineDescription;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
 import com.github.rvesse.airline.args.ArgsRequired;
+import com.github.rvesse.airline.args.ArgsRestoredDiscussion;
 import com.github.rvesse.airline.args.CommandHidden;
 import com.github.rvesse.airline.args.GlobalOptionsHidden;
 import com.github.rvesse.airline.args.OptionsHidden;
@@ -200,6 +203,64 @@ public class TestHelp {
                 "Middle paragraph\n" +
                 "\n" +
                 "Final paragraph\n" + 
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testInheritedDiscussion() throws IOException {
+        SingleCommand<ArgsInheritedDiscussion> cmd = singleCommand(ArgsInheritedDiscussion.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        ArgsInheritedDiscussion -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsInheritedDiscussion\n" +
+                "\n" +
+                "DISCUSSION\n" +
+                "        First paragraph\n" +
+                "\n" +
+                "        Middle paragraph\n" +
+                "\n" +
+                "        Final paragraph\n" + 
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testHiddenDiscussion() throws IOException {
+        SingleCommand<ArgsHiddenDiscussion> cmd = singleCommand(ArgsHiddenDiscussion.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        ArgsHiddenDiscussion -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsHiddenDiscussion\n" +
+                "\n");
+        //@formatter:on
+    }
+    
+    public void testRestoredDiscussion() throws IOException {
+        SingleCommand<ArgsRestoredDiscussion> cmd = singleCommand(ArgsRestoredDiscussion.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        ArgsRestoredDiscussion -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsRestoredDiscussion\n" +
+                "\n" +
+                "DISCUSSION\n" +
+                "        Restored\n" +
                 "\n");
         //@formatter:on
     }

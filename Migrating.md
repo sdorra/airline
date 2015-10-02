@@ -40,9 +40,25 @@ builder.withParser()
 
 You can now also define `GlobalRestriction`s using the `withRestriction()` or `withRestrictions()` methods on your `CliBuilder<T>`.  If you don't define any restrictions a default set that provides backwards behavioural compatibility with Airline 1 is used.  This default set can also be explicitly added by calling `withDefaultRestrictions()` on your builder.
 
+## Defining CLIs via Annotation
+
+Previously CLIs could only be defined via the `CliBuilder<T>`, Airline 2 introduces a new `@Cli`  annotation that can be used to define a CLI via a class annotation.
+
+For example the same example as the above could now be defined like so:
+
+    @Cli(name = "cli", 
+             description = "A simple CLI with several commands available in groups", 
+             parser = @Parser(allowOptionAbbreviation = true, allowCommandAbbreviation = true))
+             
+A class annotated in this way can be used to create a `Cli` instance like so:
+
+    Cli<ExampleRunnable> cli = new Cli<ExampleRunnable>(AnnotatedClass.class);
+
 ## Defining Single Commands
 
 Previously you could not specify parser options when defining single commands, you are now able to pass in a `ParserMetadata<T>` in order to specify parser options for single command parsing.
+
+Alternatively you can add the `@Parser` annotation to your class and this will be automatically detected and used unless you pass a `ParserMetadata<T>` explicitly to the `singleCommand()` method.
 
 You may now also pass in the `GlobalRestriction`s that should apply, if you don't define any restrictions a default set that provides backwards behavioural compatibility with Airline 1 is used
 
@@ -131,7 +147,7 @@ Parser settings were previously held directly on `GlobalMetadata`, they are now 
 
 ### CommandMetadata
 
-The extended help are no longer expressed directly as fields but as instances of `HelpSection`.  The `getHelpSections()` method provides access to the extended help sections present for a command.
+The extended help details are no longer expressed directly as fields but as instances of `HelpSection`.  The `getHelpSections()` method provides access to the extended help sections present for a command.
 
 ### OptionMetadata
 
@@ -181,6 +197,12 @@ Extended help for commands is now specified via the `HelpSection` interface.  Th
 This interface is itself derived from the more basic `HelpHint` interface.  This interface is typically implemented by other classes that serve some function as well as provided some extended help such as `OptionRestriction` implementations.  Again the built-in help generators will automatically include restrictions which provide help hints when formatting help for options and arguments.
 
 Similar to restrictions extra help sections are automatically discovered by examining the annotations present on classes marked with `@Command`.  The `HelpSectionRegistry` is used to map annotations into instances of `HelpSection`.
+
+### Help Section Inheritance
+
+Help section annotations are automatically inherited so for example if all your commands have a common set of exit codes you could define these once as an annotation on a super-class and all derives command classes would automatically include that exit code section.  Where annotations for the same section (same section being determined by having the case-insensitive same title) are defined multiple times in the class hierarchy the definition lowest in the hierarchy wins i.e. a derived class can always override help sections inherited from their parents.
+
+If you are extending an annotated class and want to hide a section that you would normally inherit you can do so by adding the `@HideSection(title = "foo")` annotation where `foo` is the title of the section you wish to hide.
 
 ### Custom Help Sections
 

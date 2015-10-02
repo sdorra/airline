@@ -30,7 +30,7 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 public class BashCompletion implements ExampleRunnable {
 
     @Inject
-    private GlobalMetadata global;
+    private GlobalMetadata<ExampleRunnable> global;
     
     @Option(name = "--include-hidden", description = "When set hidden commands and options are shown in help", hidden = true)
     private boolean includeHidden = false;
@@ -38,7 +38,7 @@ public class BashCompletion implements ExampleRunnable {
     @Override
     public int run() {
         try (FileOutputStream out = new FileOutputStream("completions.bash")) {
-            new BashCompletionGenerator(this.includeHidden, false).usage(global, out);
+            new BashCompletionGenerator<ExampleRunnable>(this.includeHidden, false).usage(global, out);
         } catch (IOException e) {
             System.err.println("Error generating completion script: " + e.getMessage());
             e.printStackTrace(System.err);

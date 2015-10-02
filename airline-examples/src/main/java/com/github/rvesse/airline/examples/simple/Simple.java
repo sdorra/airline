@@ -50,7 +50,7 @@ public class Simple implements ExampleRunnable {
      * </p>
      */
     @Inject
-    private HelpOption help;
+    private HelpOption<Simple> help;
 
     @Option(name = { "-f", "--flag" }, description = "An option that requires no arguments")
     private boolean flag = false;

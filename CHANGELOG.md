@@ -2,7 +2,7 @@
 
 ## 2.0.0
 
-2.0.0 represents substantial breaking changes over 1.x which were made to make the library more configurable and extensible
+2.0.0 represents substantial breaking changes over 1.x which were made to make the library more configurable and extensible.  We **strongly** recommend reading the included `Migrating.md` for notes on how to migrate existing Airline powered CLIs forward.
 
 - Dependency Changes
     - Removed Guava
@@ -14,6 +14,9 @@
     - Various fields were removed from existing annotations in favour of moving them to separate annotations
         - `@Command` removes `examples`, `discussion`, `exitCodes` and `exitCodeDescriptions`
         - `@Option` removes `required`, `allowedValues` and `ignoreCase`
+        - `@Group` can now be used to create sub-groups by inserting spaces into group names e.g. `@Group(name = "foo bar")` creates a group `foo` with a sub-group `bar` and applies any other configuration given to the sub-group
+        - New `@Cli` annotation can be used to define a CLI entirely declaratively
+        - New `@Parser` annotation can be used to customise parser for CLIs created with `SingleCommand` or as a field on a `@Cli` annotation
         - `@Arguments` removes `required`
     - New annotations for adding extended help to commands
         - `@Discussion` to add discussion, this replaces the `discussion` field of the `@Command` annotation
@@ -53,6 +56,7 @@
     - New `HelpHint` interface which is used by restrictions to provide help
     - New `HelpSection` interface for adding custom help sections to commands
     - More advanced and flexible formatting of extra help hints and sections in all existing generators
+    - Help supports providing help for sub-groups, help for groups will include information about available sub-groups
 
 ## 1.0.2
 
