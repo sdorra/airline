@@ -21,18 +21,39 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that marks values as being restricted to a given short integer range
+ * Annotation that marks values as being restricted to a given short integer
+ * range
  *
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface ShortRange {
 
+    /**
+     * Minimum value
+     * 
+     * @return Minimum value
+     */
     short min() default Short.MIN_VALUE;
-    
+
+    /**
+     * Maximum value
+     * 
+     * @return Maximum value
+     */
     short max() default Short.MAX_VALUE;
-    
+
+    /**
+     * Whether the minimum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean minInclusive() default true;
-    
+
+    /**
+     * Whether the maximum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean maxInclusive() default true;
 }

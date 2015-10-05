@@ -20,6 +20,17 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that marks an option as being required to occur some minimum
+ * number of times (inclusive)
+ * <p>
+ * If you simply wish to indicate that an option must occur use {@link Required}
+ * instead.
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface MinOccurrences {

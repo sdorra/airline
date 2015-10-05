@@ -20,14 +20,25 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that marks that an options value is restricted to a minimum length
+ * (which is inclusive)
+ * <p>
+ * If you simply wish to require that an option have a non-empty value then use
+ * {@link NotEmpty} instead
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface MinLength {
 
     /**
-     * Minimum required length
+     * Minimum required length (inclusive)
      * 
-     * @return Minimum length
+     * @return Minimum length (inclusive)
      */
     public int length() default 0;
 }

@@ -20,7 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that indicates the exit codes for a command
+ * Annotation that indicates the exit codes section for a commands help
+ * 
  * @author rvesse
  *
  */
@@ -35,14 +36,14 @@ public @interface ExitCodes {
      * 
      * @return Array of exit codes
      */
-    int[] codes() default {};
+    int[]codes() default {};
 
     /**
      * Descriptions of the meanings of the exit codes this command may return,
-     * the exit codes are given by the {@link #codes()} property. The data
-     * in these two properties is collated based on array indices.
+     * the exit codes are given by the {@link #codes()} property. The data in
+     * these two properties is collated based on array indices.
      * 
      * @return
      */
-    String[] descriptions() default {};
+    String[]descriptions() default {};
 }

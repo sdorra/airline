@@ -20,6 +20,13 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that marks an option as being restricted to occurring some maximum
+ * number of times (inclusive)
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface MaxOccurrences {
@@ -30,7 +37,7 @@ public @interface MaxOccurrences {
      * Zero or negative values are ignored
      * </p>
      * 
-     * @return Max occurrences
+     * @return Max occurrences (inclusive)
      */
     public int occurrences() default 0;
 }

@@ -20,14 +20,21 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that marks that an options value is restricted to a maximum length
+ * (which is inclusive)
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface MaxLength {
 
     /**
-     * Maximum allowed length
+     * Maximum allowed length (inclusive)
      * 
-     * @return Maximum length
+     * @return Maximum length (inclusive)
      */
     public int length() default Integer.MAX_VALUE;
 }

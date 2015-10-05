@@ -1,5 +1,12 @@
 # Airline - Change Log
 
+## 2.0.1
+
+- Bug Fixes
+    - Fix `@MinLength` being an exclusive restriction i.e. value had to be greater than given length when intention was that value should be at least the given length
+- Documentation
+    - Add missing Javadocs to new annotations
+
 ## 2.0.0
 
 2.0.0 represents substantial breaking changes over 1.x which were made to make the library more configurable and extensible.  We **strongly** recommend reading the included `Migrating.md` for notes on how to migrate existing Airline powered CLIs forward.

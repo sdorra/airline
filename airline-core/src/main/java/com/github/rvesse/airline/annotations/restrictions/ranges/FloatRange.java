@@ -28,11 +28,31 @@ import java.lang.annotation.Target;
 @Target({ FIELD })
 public @interface FloatRange {
 
+    /**
+     * Minimum value
+     * 
+     * @return Minimum value
+     */
     float min() default Float.MIN_VALUE;
-    
+
+    /**
+     * Maximum value
+     * 
+     * @return Maximum value
+     */
     float max() default Float.MAX_VALUE;
-    
+
+    /**
+     * Whether the minimum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean minInclusive() default true;
-    
+
+    /**
+     * Whether the maximum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean maxInclusive() default true;
 }

@@ -24,6 +24,14 @@ import java.lang.annotation.Target;
 /**
  * Annotation used to specify that a section that would otherwise be inherited
  * from a parent class should be hidden
+ * <p>
+ * Annotations for help sections are automatically inherited down the class
+ * hierarchy which allows for a parent class to define a common help section
+ * (e.g. {@link ExitCodes}). This can be overridden by specifying it again
+ * further down the class hierarchy but in some cases it may actually be
+ * desirable to hide an inherited section entirely in which case this annotation
+ * may be used.
+ * </p>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })

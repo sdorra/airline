@@ -28,11 +28,31 @@ import java.lang.annotation.Target;
 @Target({ FIELD })
 public @interface DoubleRange {
 
+    /**
+     * Minimum value
+     * 
+     * @return Minimum value
+     */
     double min() default Double.MIN_VALUE;
-    
+
+    /**
+     * Maximum value
+     * 
+     * @return Maximum value
+     */
     double max() default Double.MAX_VALUE;
-    
+
+    /**
+     * Whether the minimum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean minInclusive() default true;
-    
+
+    /**
+     * Whether the maximum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean maxInclusive() default true;
 }

@@ -30,12 +30,22 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Inherited
 @Documented
-public @interface Group
-{
-    public static final class NO_DEFAULT {}
-    
+public @interface Group {
+    public static final class NO_DEFAULT {
+    }
+
     /**
      * Name of the group.
+     * <p>
+     * If the name contains spaces then this is interpreted as a sub-group, for
+     * example {@code foo bar} would be interpreted as a group {@code foo} with
+     * a sub-group {@code bar}. All the other fields on this annotation are
+     * interpreted as applying to the sub-group being specified.
+     * <p>
+     * If you also wished to place commands into the {@code foo} group you would
+     * need to specify a separate {@link Group} annotation with {@code foo} as
+     * the name.
+     * </p>
      */
     String name();
 
@@ -47,13 +57,13 @@ public @interface Group
     /**
      * Default command class for the group (optional)
      */
-    Class<?> defaultCommand() default NO_DEFAULT.class;
+    Class<?>defaultCommand() default NO_DEFAULT.class;
 
     /**
      * command classes to add to the group (optional)
      */
-    Class<?>[] commands() default {};
-    
+    Class<?>[]commands() default {};
+
     /**
      * Whether the group should be hidden
      */

@@ -23,6 +23,11 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
+/**
+ * A restriction that requires string values
+ * @author rvesse
+ *
+ */
 public class LengthRestriction extends AbstractStringRestriction implements HelpHint {
 
     private final boolean maximum;
@@ -38,7 +43,7 @@ public class LengthRestriction extends AbstractStringRestriction implements Help
         if (maximum) {
             return value.length() <= this.length;
         } else {
-            return value.length() > this.length;
+            return value.length() >= this.length;
         }
     }
 

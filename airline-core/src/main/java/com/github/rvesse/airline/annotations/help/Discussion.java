@@ -20,6 +20,12 @@ import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that provides a discussion section for a commands help
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
 public @interface Discussion {
@@ -33,5 +39,5 @@ public @interface Discussion {
      * 
      * @return Command discussion
      */
-    public String[] paragraphs() default {};
+    public String[]paragraphs() default {};
 }

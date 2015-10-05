@@ -20,6 +20,11 @@ import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that provides an examples section for a commands help
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
 public @interface Examples {

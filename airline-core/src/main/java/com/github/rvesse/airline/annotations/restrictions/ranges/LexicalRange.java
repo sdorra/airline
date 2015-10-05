@@ -44,14 +44,14 @@ public @interface LexicalRange {
     /**
      * Whether the minimum is inclusive
      * 
-     * @return True if inclusive, false otherwise
+     * @return True if inclusive, false if exclusive
      */
     boolean minInclusive() default true;
 
     /**
      * Whether the maximum is inclusive
      * 
-     * @return True if inclusive, false otherwise
+     * @return True if inclusive, false if exclusive
      */
     boolean maxInclusive() default true;
 

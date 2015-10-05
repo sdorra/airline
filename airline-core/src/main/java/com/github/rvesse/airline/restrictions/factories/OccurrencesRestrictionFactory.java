@@ -20,10 +20,23 @@ import java.lang.annotation.Annotation;
 import com.github.rvesse.airline.annotations.restrictions.MaxOccurrences;
 import com.github.rvesse.airline.annotations.restrictions.MinOccurrences;
 import com.github.rvesse.airline.annotations.restrictions.Once;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.common.OccurrencesRestriction;
 
+/**
+ * An annotation used to mark that an option must occur at most once
+ * 
+ * <p>
+ * To more finely control the number of occurrences of an option use
+ * {@link MinOccurrences} and {@link MaxOccurrences}. If you simply wish to
+ * state that an option must occur then use {@link Required}.
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 public class OccurrencesRestrictionFactory implements OptionRestrictionFactory, ArgumentsRestrictionFactory {
 
     @Override
@@ -35,7 +48,7 @@ public class OccurrencesRestrictionFactory implements OptionRestrictionFactory, 
     public OptionRestriction createOptionRestriction(Annotation annotation) {
         return createCommon(annotation);
     }
-    
+
     protected OccurrencesRestriction createCommon(Annotation annotation) {
         if (annotation instanceof MaxOccurrences) {
             MaxOccurrences max = (MaxOccurrences) annotation;

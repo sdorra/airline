@@ -23,6 +23,11 @@ import java.lang.annotation.Target;
 
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 
+/**
+ * Class annotation used to declaratively specify a CLI
+ * @author rvesse
+ *
+ */
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Cli {

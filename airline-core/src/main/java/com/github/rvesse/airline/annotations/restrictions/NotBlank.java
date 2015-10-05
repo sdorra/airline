@@ -20,6 +20,17 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation that marks that an options values must not be blank i.e. empty
+ * or all whitespace
+ * <p>
+ * If you just wish to require that the value be non-empty use {@link NotEmpty}
+ * instead.
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface NotBlank {

@@ -24,10 +24,28 @@ import java.lang.annotation.Target;
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.DefaultTypeConverter;
+import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.options.OptionParser;
 
+/**
+ * Class annotation used to declaratively specify a parser configuration
+ * <p>
+ * When applied to a class that is also annotated with the {@link Command}
+ * annotation then if that class is used with
+ * {@link SingleCommand#singleCommand(Class)} the parser configuration will
+ * automatically be detected from this annotation.
+ * </p>
+ * <p>
+ * When specifying a CLI via the {@link Cli} annotation then this annotation may
+ * be included as an argument to the {@link Cli#parserConfiguration()} field to
+ * provide a parser configuration for the CLI.
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Parser {

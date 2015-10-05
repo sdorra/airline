@@ -53,8 +53,14 @@ public @interface Command {
     /**
      * The group(s) this command should belong to. if left empty the command
      * will belong to the default command group
+     * <p>
+     * If a group name contains spaces then this is interpreted as referring to
+     * a sub-group, for example {@code foo bar} would place this command into
+     * the {@code bar} group which would be placed as a sub-group of the
+     * {@code foo} group.
+     * </p>
      * 
      * @return Command groups
      */
-    String[] groupNames() default {};
+    String[]groupNames() default {};
 }

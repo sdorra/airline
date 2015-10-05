@@ -20,6 +20,17 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation that marks an options value must not be empty
+ * <p>
+ * If you also need the value to be non-blank i.e. not all whitespace then use
+ * {@link NotBlank}. If you need to enforce a minimum length then use
+ * {@link MinLength}.
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface NotEmpty {

@@ -28,11 +28,31 @@ import java.lang.annotation.Target;
 @Target({ FIELD })
 public @interface ByteRange {
 
+    /**
+     * Minimum value
+     * 
+     * @return Minimum value
+     */
     byte min() default Byte.MIN_VALUE;
-    
+
+    /**
+     * Maximum value
+     * 
+     * @return Maximum value
+     */
     byte max() default Byte.MAX_VALUE;
-    
+
+    /**
+     * Whether the minimum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean minInclusive() default true;
-    
+
+    /**
+     * Whether the maximum value is inclusive
+     * 
+     * @return True if inclusive, false if exclusive
+     */
     boolean maxInclusive() default true;
 }

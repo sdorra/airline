@@ -21,6 +21,12 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 
+/**
+ * Abstract restrictions on string values for options and arguments
+ * 
+ * @author rvesse
+ *
+ */
 public abstract class AbstractStringRestriction extends AbstractCommonRestriction {
 
     @Override
@@ -35,11 +41,45 @@ public abstract class AbstractStringRestriction extends AbstractCommonRestrictio
             throw violated(state, arguments, value);
     }
 
+    /**
+     * Method that derived classes must implement to check whether a value is
+     * valid
+     * 
+     * @param value
+     *            Value
+     * @return True if valid, false if valid
+     */
     protected abstract boolean isValid(String value);
 
+    /**
+     * Method that derived classes must implement to provide an exception for
+     * the case of an invalid option value, this will be called if
+     * {@link #isValid(String)} returns {@code false}
+     * 
+     * @param state
+     *            Parser state
+     * @param option
+     *            Option metadata for the option whose value is being checked
+     * @param value
+     *            Value which has been deemed invalid
+     * @return Exception
+     */
     protected abstract <T> ParseRestrictionViolatedException violated(ParseState<T> state, OptionMetadata option,
             String value);
 
+    /**
+     * Method that derived classes must implement to provide an exception for
+     * the case of an invalid argument value, this will be called if
+     * {@link #isValid(String)} returns {@code false}
+     * 
+     * @param state
+     *            Parser state
+     * @param arguments
+     *            Arguments metadata
+     * @param value
+     *            Value which has been deemed invalid
+     * @return Exception
+     */
     protected abstract <T> ParseRestrictionViolatedException violated(ParseState<T> state, ArgumentsMetadata arguments,
             String value);
 }
