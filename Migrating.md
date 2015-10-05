@@ -133,6 +133,10 @@ Similar to `@Option` the `@Arguments` annotation has changed to have the `requir
 
 Arguments now allows for applying many different restrictions such as `@AllowedRawValues` to arguments.
 
+## Exception Changes
+
+All exceptions are now located in the `com.github.rvesse.airline.parser.errors` package of sub-packages there-of.
+
 ## Metadata Changes
 
 ### GlobalMetadata
@@ -177,6 +181,8 @@ A few examples are given in the following table, there are many more new restric
 Option and argument restrictions are automatically discovered by examining the annotations present on fields marked with `@Option` and `@Arguments`.  The `RestrictionRegistry` is used to map annotations into instances of `OptionRestriction` or `ArgumentsRestriction` as appropriate.
 
 Global restrictions are defined when you create a `Cli` or `SingleCommand` instance, if you don't define any the default set which provides backwards compatibility with the global restrictions that applied in Airline 1 are used.
+
+The `ParseRestrictionViolatedException` serves as the parent exception type for all exceptions pertaining to restriction violations.
 
 ### Custom Restrictions
 
