@@ -13,33 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help.ronn;
+package com.github.rvesse.airline.help.man;
 
+/**
+ * Standard man page section numbers
+ */
 public class ManSections {
-    
-    // From http://stackoverflow.com/a/62972/107591
-    // 1 - General commands
-    // 2 - System calls
-    // 3 - C library functions
-    // 4 - Special files (usually devices, those found in /dev) and drivers
-    // 5 - File formats and conventions
-    // 6 - Games and screensavers
-    // 7 - Miscellanea
-    // 8 - System administration commands and daemons
 
+    // From http://stackoverflow.com/a/62972/107591
+
+    /**
+     * General Commands
+     */
     public static final int GENERAL_COMMANDS = 1;
-    
+
+    /**
+     * System Calls
+     */
     public static final int SYSTEM_CALLS = 2;
-    
+
+    /**
+     * C Library Functions
+     */
     public static final int C_LIBRARY_FUNCTIONS = 3;
-    
+
+    /**
+     * Special files
+     */
     public static final int SPECIAL_FILES = 4;
-    
+
+    /**
+     * File formats
+     */
     public static final int FILE_FORMATS = 5;
-    
+
+    /**
+     * Games and Screensavers
+     */
     public static final int GAMES_AND_SCREENSAVERS = 6;
-    
-    public static final int MISCELLANEA = 7;
-    
+
+    /**
+     * Miscellaneous
+     */
+    public static final int MISCELLANEOUS = 7;
+
+    /**
+     * System administration and daemons
+     */
     public static final int SYSTEM_ADMIN_AND_DAEMONS = 8;
 }

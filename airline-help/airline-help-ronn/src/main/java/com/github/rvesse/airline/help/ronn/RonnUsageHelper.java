@@ -38,6 +38,13 @@ import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 
+/**
+ * @deprecated The RONN format has some know bugs and it is recommended to use
+ *             classes from the airline-help-man module instead of classes from
+ *             this module
+ *
+ */
+@Deprecated
 public class RonnUsageHelper extends AbstractUsageGenerator {
 
     /**

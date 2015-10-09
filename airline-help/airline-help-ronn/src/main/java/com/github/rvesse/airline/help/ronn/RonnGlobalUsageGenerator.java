@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractGlobalUsageGenerator;
+import com.github.rvesse.airline.help.man.ManSections;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
@@ -36,8 +37,8 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * <p>
- * A global usage generator which generates help in <a
- * href="http://rtomayko.github.io/ronn/">Ronn format</a> which can then be
+ * A global usage generator which generates help in
+ * <a href="http://rtomayko.github.io/ronn/">Ronn format</a> which can then be
  * transformed into man pages or HTML pages as desired using the Ronn tooling.
  * </p>
  * <p>
@@ -45,6 +46,12 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * protected method so this class can be used as a base and extended if you wish
  * to customise how sections are output
  * </p>
+ * 
+ * @author rvesse
+ * @deprecated The RONN format has some know bugs and it is recommended to use
+ *             classes from the airline-help-man module instead of classes from
+ *             this module
+ *
  */
 public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> {
 
@@ -53,8 +60,8 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
     protected final RonnUsageHelper helper;
 
     public RonnGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, false, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false,
-                false));
+        this(ManSections.GENERAL_COMMANDS, false,
+                new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, false));
     }
 
     public RonnGlobalUsageGenerator(int manSection) {
@@ -146,7 +153,8 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
         outputGroupCommandsList(writer, global, global.getCommandGroups(), 0);
     }
 
-    protected void outputGroupCommandsList(Writer writer, GlobalMetadata<T> global, List<CommandGroupMetadata> groups, int indent) throws IOException {
+    protected void outputGroupCommandsList(Writer writer, GlobalMetadata<T> global, List<CommandGroupMetadata> groups,
+            int indent) throws IOException {
         if (groups.size() == 0)
             return;
 
@@ -168,10 +176,10 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
                         .append(getCommandName(global, new String[] { group.getName() }, command)).append("`:\n");
                 writer.append("  ").append(command.getDescription());
             }
-            
+
             outputGroupCommandsList(writer, global, group.getSubGroups(), indent + 4);
         }
-        
+
     }
 
     /**
@@ -253,7 +261,8 @@ public class RonnGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T>
      * 
      * @throws IOException
      */
-    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global) throws IOException {
+    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global)
+            throws IOException {
         writer.append(RonnUsageHelper.NEW_PARA).append(RonnUsageHelper.HORIZONTAL_RULE)
                 .append(RonnUsageHelper.NEW_PARA);
 

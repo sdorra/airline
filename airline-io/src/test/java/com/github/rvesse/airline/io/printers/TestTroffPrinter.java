@@ -30,6 +30,7 @@ public class TestTroffPrinter {
     private static final String TABLE_START = ".TS";
     private static final String END_LIST = ".IP \"\" 0";
     private static final String BULLET = ".IP \"\\(bu\" 4";
+    private static final String PLAIN = ".IP \"\" 4";
     private static final String TITLED_BULLET = ".TP";
     private static final String BREAK = ".br";
     
@@ -121,6 +122,35 @@ public class TestTroffPrinter {
     }
     
     @Test
+    public void plain_list() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startPlainList();
+        printer.println("A");
+        printer.nextPlainListItem();
+        printer.println("B");
+        printer.nextPlainListItem();
+        printer.println("C");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] { 
+                PLAIN,
+                "A", 
+                PLAIN, 
+                "B", 
+                PLAIN,
+                "C",
+                END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
     public void nested_list_01() {
         StringWriter strWriter = new StringWriter();
         TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
@@ -186,6 +216,42 @@ public class TestTroffPrinter {
                 ""
             }, '\n');
         //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void nested_list_03() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startBulletedList();
+        printer.println("A");
+        printer.startPlainList();
+        printer.println("B");
+        printer.endList();
+        printer.nextBulletedListItem();
+        printer.println("C");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        // - A
+        //   B
+        // - C
+        String expected = StringUtils.join(new String[] { 
+                BULLET,
+                "A", 
+                ".RS",
+                PLAIN, 
+                "B", 
+                ".RE",
+                BULLET,
+                "C",
+                END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        System.out.println(strWriter.toString());
         Assert.assertEquals(strWriter.toString(), expected);
     }
     

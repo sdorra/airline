@@ -48,9 +48,9 @@ public class TroffPrinter {
     private static final String REQUEST_BREAK = ".br";
 
     private enum ListType {
-        BULLET, TITLED
+        BULLET, TITLED, PLAIN
     }
-    
+
     private static final int DEFAULT_INDENTATION = 4;
 
     private static final String BULLET = "\"\\(bu\"";
@@ -117,6 +117,13 @@ public class TroffPrinter {
         }
     }
 
+    public void println() {
+        if (newline)
+            return;
+        writer.println();
+        newline = true;
+    }
+
     public void lineBreak() {
         if (!newline)
             writer.println();
@@ -163,6 +170,20 @@ public class TroffPrinter {
         newline = false;
     }
 
+    public void startPlainList() {
+        if (!newline)
+            writer.println();
+
+        if (level > 0) {
+            writer.println(REQUEST_MOVE_LEFT_MARGIN);
+        }
+        lists.push(ListType.PLAIN);
+        printPlainBullet();
+
+        level++;
+        newline = false;
+    }
+
     /**
      * Starts a titled list, the next line of text printed will form the title
      */
@@ -201,8 +222,23 @@ public class TroffPrinter {
         if (level > 0) {
             if (lists.peek() != ListType.BULLET)
                 throw new IllegalStateException(
-                        "Cannot move to next bulleted list item when currently in a titled list");
+                        "Cannot move to next bulleted list item when currently in another list type");
             printBullet();
+            newline = false;
+        } else {
+            throw new IllegalStateException("Cannot start a new list item when not currently in a list");
+        }
+    }
+
+    public void nextPlainListItem() {
+        if (!newline)
+            writer.println();
+
+        if (level > 0) {
+            if (lists.peek() != ListType.PLAIN)
+                throw new IllegalStateException(
+                        "Cannot move to next plain list item when currently in another list type");
+            printPlainBullet();
             newline = false;
         } else {
             throw new IllegalStateException("Cannot start a new list item when not currently in a list");
@@ -220,7 +256,7 @@ public class TroffPrinter {
         if (level > 0) {
             if (lists.peek() != ListType.TITLED)
                 throw new IllegalStateException(
-                        "Cannot move to next titled list item when currently in a bulleted list");
+                        "Cannot move to next titled list item when currently in another list type");
             printTitledBullet();
             newline = false;
         } else {
@@ -288,8 +324,8 @@ public class TroffPrinter {
         // Output row data
         for (int r = 0; r < rows.size(); r++) {
             List<String> row = rows.get(r);
-            
-            if (r == 1 && hasHeader)  {
+
+            if (r == 1 && hasHeader) {
                 // Add divider between header and data
                 for (int c = 0; c < maxColumns; c++) {
                     writer.print("_");
@@ -298,7 +334,7 @@ public class TroffPrinter {
                 }
                 writer.println();
             }
-            
+
             for (int c = 0; c < maxColumns; c++) {
                 if (c >= row.size())
                     break;
@@ -333,6 +369,10 @@ public class TroffPrinter {
         writer.println(String.format(REQUEST_PARAGRAPH_TITLED));
     }
 
+    protected void printPlainBullet() {
+        writer.println(String.format(".IP \"\" %d", this.indentation));
+    }
+
     private String asArg(String arg) {
         return String.format("\"%s\"", escapeArg(arg));
     }
@@ -359,6 +399,10 @@ public class TroffPrinter {
         line = line.replace("\t", "\\t");
 
         return line;
+    }
+
+    public void flush() {
+        writer.flush();
     }
 
     public void finish() {

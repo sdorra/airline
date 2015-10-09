@@ -26,6 +26,7 @@ import java.util.List;
 
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.man.ManSections;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
@@ -43,12 +44,17 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * </p>
  * 
  * @author rvesse
- * 
+ * @deprecated The RONN format has some know bugs and it is recommended to use
+ *             classes from the airline-help-man module instead of classes from
+ *             this module
+ *
  */
+@Deprecated
 public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerator<T> {
 
     public RonnMultiPageGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, false, new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, true));
+        this(ManSections.GENERAL_COMMANDS, false,
+                new RonnCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, true));
     }
 
     public RonnMultiPageGlobalUsageGenerator(int manSection) {
@@ -59,7 +65,8 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
         this(manSection, includeHidden, new RonnCommandUsageGenerator(manSection, includeHidden, true));
     }
 
-    protected RonnMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden, CommandUsageGenerator commandUsageGenerator) {
+    protected RonnMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden,
+            CommandUsageGenerator commandUsageGenerator) {
         super(manSection, includeHidden, commandUsageGenerator);
     }
 
@@ -81,7 +88,8 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
     }
 
     @Override
-    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global) throws IOException {
+    protected void outputCommandUsages(OutputStream output, Writer writer, GlobalMetadata<T> global)
+            throws IOException {
         // Default group usages
         outputDefaultGroupCommandUsages(output, writer, global);
 
@@ -89,7 +97,7 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
-            
+
             List<CommandGroupMetadata> groupPath = new ArrayList<CommandGroupMetadata>();
             groupPath.add(group);
             outputGroupCommandUsages(output, writer, global, groupPath);
@@ -109,7 +117,8 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
             output = createCommandFile(global, UsageHelper.toGroupNames(groups), command);
             writer = new OutputStreamWriter(output);
 
-            commandUsageGenerator.usage(global.getName(), UsageHelper.toGroupNames(groups), command.getName(), command, output);
+            commandUsageGenerator.usage(global.getName(), UsageHelper.toGroupNames(groups), command.getName(), command,
+                    output);
 
             // Write a reference back to the suite man page
             outputReferenceToSuite(global, writer);
@@ -120,7 +129,7 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
             writer.close();
             output.close();
         }
-        
+
         // Sub-groups
         for (CommandGroupMetadata subGroup : sortCommandGroups(group.getSubGroups())) {
             if (subGroup.isHidden() && !this.includeHidden())
@@ -133,15 +142,16 @@ public class RonnMultiPageGlobalUsageGenerator<T> extends RonnGlobalUsageGenerat
     }
 
     protected void outputReferenceToSuite(GlobalMetadata<T> global, Writer writer) throws IOException {
-        writer.append(RonnUsageHelper.NEW_PARA).append("## ").append(global.getName().toUpperCase()).append(RonnUsageHelper.NEW_PARA);
+        writer.append(RonnUsageHelper.NEW_PARA).append("## ").append(global.getName().toUpperCase())
+                .append(RonnUsageHelper.NEW_PARA);
         writer.append("Part of the `").append(global.getName()).append("(").append(Integer.toString(this.manSection))
                 .append(")` suite");
     }
 
     protected FileOutputStream createCommandFile(GlobalMetadata<T> global, String[] groupNames, CommandMetadata command)
             throws FileNotFoundException {
-        return new FileOutputStream(getCommandName(global, groupNames, command).replace(
-                String.format("(%d)", this.manSection), String.format(".%d.ronn", this.manSection)));
+        return new FileOutputStream(getCommandName(global, groupNames, command)
+                .replace(String.format("(%d)", this.manSection), String.format(".%d.ronn", this.manSection)));
     }
 
     @Override

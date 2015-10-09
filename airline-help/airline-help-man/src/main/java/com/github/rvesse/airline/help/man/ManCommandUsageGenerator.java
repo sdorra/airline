@@ -13,77 +13,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help.ronn;
+package com.github.rvesse.airline.help.man;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.io.printers.TroffPrinter;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 
 /**
- * A command usage generator which generates help in <a
- * href="http://rtomayko.github.io/ronn/">Ronn format</a> which can then be
- * transformed into man pages or HTML pages as desired using the Ronn tooling
- * 
+ * A command usage generator which generates help in man page (Troff) format
  */
-public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
+public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
     private final int manSection;
     private final boolean standalone;
-    private final RonnUsageHelper helper;
+    private final ManUsageHelper helper;
 
-    public RonnCommandUsageGenerator() {
+    public ManCommandUsageGenerator() {
         this(ManSections.GENERAL_COMMANDS, false, true);
     }
 
     /**
-     * Creates a new RONN usage generator
+     * Creates a new man page usage generator
      * 
      * @param manSection
      *            Man section to which this command belongs, use constants from
      *            {@link ManSections}
      * @param standalone
-     *            Whether this is a stand-alone RONN file, this controls the
+     *            Whether this is a stand-alone man-page file, this controls the
      *            formatting of the title which is significant when using this
      *            in conjunction with things like the
-     *            {@link RonnGlobalUsageGenerator} where the output from this is
-     *            output a fragment of a larger document and RONN will not
-     *            render the titles if stand-alone is enabled
+     *            {@link ManGlobalUsageGenerator} where the output from this is
+     *            output a fragment of a larger document and the titles should
+     *            be presented differently if stand-alone is disabled
      */
-    public RonnCommandUsageGenerator(int manSection, boolean includeHidden, boolean standalone) {
+    public ManCommandUsageGenerator(int manSection, boolean includeHidden, boolean standalone) {
         super(includeHidden);
         this.manSection = manSection;
         this.standalone = standalone;
         this.helper = createHelper(includeHidden);
     }
 
-    protected RonnUsageHelper createHelper(boolean includeHidden) {
-        return new RonnUsageHelper(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden);
+    protected ManUsageHelper createHelper(boolean includeHidden) {
+        return new ManUsageHelper(UsageHelper.DEFAULT_OPTION_COMPARATOR, includeHidden);
     }
 
     @Override
     public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             OutputStream output) throws IOException {
-        String sectionHeader = "## ";
 
         // Fall back to metadata declared name if necessary
         if (commandName == null)
             commandName = command.getName();
 
-        Writer writer = new OutputStreamWriter(output);
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(output));
 
-        sectionHeader = outputTitle(writer, programName, groupNames, commandName, command, sectionHeader);
+        outputTitle(printer, programName, groupNames, commandName, command);
 
         // Find the help sections
         List<HelpSection> preSections = new ArrayList<HelpSection>();
@@ -92,52 +90,60 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         // Output pre help sections
         for (HelpSection section : preSections) {
-            helper.outputHelpSection(writer, section, sectionHeader);
+            helper.outputHelpSection(printer, section);
         }
 
-        List<OptionMetadata> options = outputSynopsis(writer, programName, groupNames, commandName, command,
-                sectionHeader);
+        List<OptionMetadata> options = outputSynopsis(printer, programName, groupNames, commandName, command);
 
         if (options.size() > 0 || command.getArguments() != null) {
-            outputOptions(writer, command, options, sectionHeader);
+            outputOptions(printer, command, options);
         }
 
         // Output post help sections
         for (HelpSection section : postSections) {
-            helper.outputHelpSection(writer, section, sectionHeader);
+            helper.outputHelpSection(printer, section);
         }
 
         // Flush the output
-        writer.flush();
+        printer.flush();
         output.flush();
     }
 
     /**
      * Outputs a documentation section detailing the options and their usages
      * 
-     * @param writer
-     *            Writer
+     * @param printer
+     *            Troff Printer
      * @param command
      *            Command
      * @param options
      *            Option meta-data
-     * @param sectionHeader
-     *            Section header
      * 
      * @throws IOException
      */
-    protected void outputOptions(Writer writer, CommandMetadata command, List<OptionMetadata> options,
-            String sectionHeader) throws IOException {
-        helper.outputOptions(writer, options, sectionHeader);
-        helper.outputArguments(writer, command);
+    protected void outputOptions(TroffPrinter printer, CommandMetadata command, List<OptionMetadata> options)
+            throws IOException {
+        // Options
+        // Can end the list if there are no arguments
+        helper.outputOptions(printer, options, command.getArguments() == null);
+
+        // Arguments
+        // Must start the list if there are no visible options
+        helper.outputArguments(printer, command.getArguments(), options.size() > 0
+                && (this.includeHidden() || CollectionUtils.exists(options, new Predicate<OptionMetadata>() {
+                    @Override
+                    public boolean evaluate(OptionMetadata option) {
+                        return !option.isHidden();
+                    }
+                })));
     }
 
     /**
      * Outputs a synopsis section for the documentation showing how to use a
      * command
      * 
-     * @param writer
-     *            Writer
+     * @param printer
+     *            Troff printer
      * @param programName
      *            Program name
      * @param groupNames
@@ -146,47 +152,51 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Command name
      * @param command
      *            Command
-     * @param sectionHeader
-     *            Section header
      * @return List of all the available options (global, group and command)
      * @throws IOException
      */
-    protected List<OptionMetadata> outputSynopsis(Writer writer, String programName, String[] groupNames,
-            String commandName, CommandMetadata command, String sectionHeader) throws IOException {
-        writer.append(RonnUsageHelper.NEW_PARA).append(sectionHeader).append("SYNOPSIS")
-                .append(RonnUsageHelper.NEW_PARA);
+    protected List<OptionMetadata> outputSynopsis(TroffPrinter printer, String programName, String[] groupNames,
+            String commandName, CommandMetadata command) throws IOException {
+        printer.nextSection("SYNOPSIS");
+
         List<OptionMetadata> options = new ArrayList<>();
         List<OptionMetadata> aOptions;
         if (programName != null) {
-            writer.append("`").append(programName).append("`");
+            printer.printBold(programName);
             aOptions = command.getGlobalOptions();
             if (aOptions != null && aOptions.size() > 0) {
-                writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
+                printer.print(" ");
+                printer.print(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
                 options.addAll(aOptions);
             }
         }
         if (groupNames != null) {
             for (int i = 0; i < groupNames.length; i++) {
-                writer.append(" `").append(groupNames[i]).append("`");
+                printer.print(" ");
+                printer.printBold(" " + groupNames[i]);
             }
             aOptions = command.getGroupOptions();
             if (aOptions != null && aOptions.size() > 0) {
-                writer.append(" ").append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
+                printer.print(" ");
+                printer.print(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
                 options.addAll(aOptions);
             }
         }
         aOptions = command.getCommandOptions();
-        writer.append(" `").append(commandName).append("` ")
-                .append(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
+        printer.printBold(commandName);
+        printer.print(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
         options.addAll(aOptions);
 
         // command arguments (optional)
         if (command.getArguments() != null) {
-            writer.append(" [--] ").append(toUsage(command.getArguments()));
+            printer.print(" [--] ");
+            printer.print(toUsage(command.getArguments()));
         }
 
+        printer.println();
+
         if (!this.standalone) {
-            writer.append(RonnUsageHelper.NEW_PARA).append(command.getDescription());
+            printer.println(command.getDescription());
         }
         return options;
     }
@@ -204,28 +214,23 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Command name
      * @param command
      *            Command meta-data
-     * @param sectionHeader
-     *            Section header
-     * @return Section header
      * @throws IOException
      */
-    protected String outputTitle(Writer writer, String programName, String[] groupNames, String commandName,
-            CommandMetadata command, String sectionHeader) throws IOException {
-        if (!this.standalone) {
-            writer.append(sectionHeader);
-            sectionHeader = "#" + sectionHeader;
+    protected void outputTitle(TroffPrinter printer, String programName, String[] groupNames, String commandName,
+            CommandMetadata command) throws IOException {
+        String fullName = getFullCommandName(programName, groupNames, commandName);
+        printer.start(fullName, manSection);
+
+        printer.nextSection("NAME");
+        printer.printBold(fullName);
+        if (!StringUtils.isEmpty(command.getDescription())) {
+            printer.print(String.format(" - %s", command.getDescription()));
         }
-        writeFullCommandName(programName, groupNames, commandName, writer);
-        if (this.standalone) {
-            writer.append(" -- ");
-            writer.append(command.getDescription()).append("\n");
-            writer.append("==========");
-        }
-        return sectionHeader;
+        printer.println();
     }
 
     /**
-     * Writes the full command name in man page syntax
+     * Gets the full command name in man page syntax
      * 
      * @param programName
      *            Program name
@@ -237,17 +242,19 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Writer
      * @throws IOException
      */
-    protected void writeFullCommandName(String programName, String[] groupNames, String commandName, Writer writer)
+    protected String getFullCommandName(String programName, String[] groupNames, String commandName)
             throws IOException {
+        StringBuilder builder = new StringBuilder();
         if (programName != null) {
-            writer.append(programName).append("-");
+            builder.append(programName).append("-");
         }
         if (groupNames != null) {
             for (int i = 0; i < groupNames.length; i++) {
-                writer.append(groupNames[i]).append("-");
+                builder.append(groupNames[i]).append("-");
             }
         }
-        writer.append(commandName).append("(").append(Integer.toString(this.manSection)).append(")");
+        builder.append(commandName);
+        return builder.toString();
     }
 
     @Override
