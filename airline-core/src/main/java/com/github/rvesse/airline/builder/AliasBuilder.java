@@ -26,7 +26,7 @@ public class AliasBuilder<C> {
     private final String name;
     private final List<String> arguments = new ArrayList<String>();
 
-    AliasBuilder(String name) {
+    public AliasBuilder(String name) {
         if (StringUtils.isBlank(name))
             throw new IllegalArgumentException("Alias name cannot be null/empty/whitespace");
         this.name = name;

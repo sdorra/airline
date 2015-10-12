@@ -23,11 +23,12 @@ import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.DefaultTypeConverter;
+import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
- * Represents metadata about the parser configuration
+ * Represents meta-data about the parser configuration
  */
 public class ParserMetadata<T> {
 
@@ -39,14 +40,15 @@ public class ParserMetadata<T> {
     private final boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     private final List<OptionParser<T>> optionParsers;
     private final List<AliasMetadata> aliases;
+    private final UserAliasesSource<T> userAliases;
     private final TypeConverter typeConverter;
     private final CommandFactory<T> commandFactory;
     private final String argsSeparator;
 
     public ParserMetadata(CommandFactory<T> commandFactory, List<OptionParser<T>> optionParsers,
             TypeConverter typeConverter, boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions,
-            List<AliasMetadata> aliases, boolean aliasesOverrideBuiltIns, boolean aliasesMayChain,
-            String argumentsSeparator) {
+            List<AliasMetadata> aliases, UserAliasesSource<T> userAliases, boolean aliasesOverrideBuiltIns,
+            boolean aliasesMayChain, String argumentsSeparator) {
         if (optionParsers == null)
             throw new NullPointerException("optionParsers cannot be null");
         if (aliases == null)
@@ -63,6 +65,7 @@ public class ParserMetadata<T> {
 
         // Aliases
         this.aliases = AirlineUtils.unmodifiableListCopy(aliases);
+        this.userAliases = userAliases;
         this.aliasesOverrideBuiltIns = aliasesOverrideBuiltIns;
         this.aliasesMayChain = aliasesMayChain;
 
@@ -101,6 +104,15 @@ public class ParserMetadata<T> {
      */
     public List<AliasMetadata> getAliases() {
         return aliases;
+    }
+
+    /**
+     * Gets the user aliases source (if any)
+     * 
+     * @return User aliases source
+     */
+    public UserAliasesSource<T> getUserAliasesSource() {
+        return userAliases;
     }
 
     /**

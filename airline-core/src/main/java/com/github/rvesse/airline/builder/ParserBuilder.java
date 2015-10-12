@@ -15,26 +15,18 @@
  */
 package com.github.rvesse.airline.builder;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.parser.aliases.AliasArgumentsParser;
+import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
@@ -54,6 +46,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
     protected String argsSeparator;
+    protected UserAliasesSource<C> userAliases;
 
     public static <T> ParserMetadata<T> defaultConfiguration() {
         return new ParserBuilder<T>().build();
@@ -109,7 +102,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * @return Builder
      * @throws IOException
      */
-    public ParserBuilder<C> withUserAliases(String programName) throws IOException {
+    public ParserBuilder<C> withUserAliases(String programName) {
         // Use default filename and search location
         return withUserAliases(programName + ".config", null,
                 System.getProperty("user.home") + "/." + programName + "/");
@@ -134,7 +127,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * @return Builder
      * @throws IOException
      */
-    public ParserBuilder<C> withUserAliases(String programName, String searchLocation) throws IOException {
+    public ParserBuilder<C> withUserAliases(String programName, String searchLocation) {
         // Use default filename
         return withUserAliases(programName + ".config", null, searchLocation);
     }
@@ -177,8 +170,10 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * </p>
      * <h3>Notes</h3>
      * <ul>
-     * <li>Recursive aliases are not supported and will result in errors when
-     * used</li>
+     * <li>Recursive aliases are only supported if
+     * {@link #withAliasesChaining()}} is specified and will result in errors
+     * when used otherwise. Even when recursive aliases are enabled aliases
+     * cannot use circular references.</li>
      * <li>Aliases cannot override built-ins unless you have called
      * {@link #withAliasesOverridingBuiltIns()} on your builder</li>
      * </ul>
@@ -186,78 +181,9 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * @return
      * @throws IOException
      */
-    public ParserBuilder<C> withUserAliases(final String filename, final String prefix, final String... searchLocations)
-            throws IOException {
-        Properties properties = new Properties();
-
-        // Find the home directory since we will use this
-        File homeDir = null;
-        if (!StringUtils.isEmpty(System.getProperty("user.home"))) {
-            homeDir = new File(System.getProperty("user.home"));
-        }
-
-        // Search locations in reverse order overwriting previously found values
-        // each time. Thus the first location in the list has highest precedence
-        Set<String> loaded = new HashSet<>();
-        for (int i = searchLocations.length - 1; i >= 0; i--) {
-            // Check an actual location
-            String loc = searchLocations[i];
-            if (StringUtils.isBlank(loc))
-                continue;
-
-            // Allow use of ~/ or ~\ as reference to user home directory
-            if (loc.startsWith("~" + File.separator)) {
-                if (homeDir == null)
-                    continue;
-                loc = homeDir.getAbsolutePath()
-                        + loc.substring(homeDir.getAbsolutePath().endsWith(File.separator) ? 2 : 1);
-            }
-
-            // Don't read property files multiple times
-            if (loaded.contains(loc))
-                continue;
-
-            File f = new File(loc);
-            f = new File(f, filename);
-            if (f.exists() && f.isFile() && f.canRead()) {
-                try (FileInputStream input = new FileInputStream(f)) {
-                    properties.load(input);
-                } finally {
-                    // Remember we've tried to read this file so we don't try
-                    // and read it multiple times
-                    loaded.add(loc);
-                }
-            }
-        }
-
-        // Strip any irrelevant properties
-        if (StringUtils.isNotEmpty(prefix)) {
-            List<Object> keysToRemove = new ArrayList<Object>();
-            for (Object key : properties.keySet()) {
-                if (!key.toString().startsWith(prefix))
-                    keysToRemove.add(key);
-            }
-            for (Object key : keysToRemove) {
-                properties.remove(key);
-            }
-        }
-
-        // Generate the aliases
-        for (Object key : properties.keySet()) {
-            String name = key.toString();
-            if (!StringUtils.isBlank(prefix))
-                name = name.substring(prefix.length());
-            AliasBuilder<C> alias = this.withAlias(name);
-
-            String value = properties.getProperty(key.toString());
-            if (StringUtils.isEmpty(value))
-                continue;
-
-            // Process property value into arguments
-            List<String> args = AliasArgumentsParser.parse(value);
-            alias.withArguments(args.toArray(new String[args.size()]));
-        }
-
+    public ParserBuilder<C> withUserAliases(final String filename, final String prefix,
+            final String... searchLocations) {
+        this.userAliases = new UserAliasesSource<C>(filename, prefix, searchLocations);
         return this;
     }
 
@@ -394,6 +320,19 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
             this.withDefaultOptionParsers();
         }
 
+        // Load user aliases
+        // These may override explicitly defined aliases
+        if (this.userAliases != null) {
+            try {
+                for (AliasMetadata alias : this.userAliases.load()) {
+                    aliases.put(alias.getName(), new AliasBuilder<C>(alias.getName())
+                            .withArguments(alias.getArguments().toArray(new String[alias.getArguments().size()])));
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to load user aliases", e);
+            }
+        }
+
         // Build aliases
         List<AliasMetadata> aliasData;
         if (aliases != null) {
@@ -406,6 +345,6 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         }
 
         return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, allowAbbreviatedCommands,
-                allowAbbreviatedOptions, aliasData, aliasesOverrideBuiltIns, aliasesMayChain, argsSeparator);
+                allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns, aliasesMayChain, argsSeparator);
     }
 }

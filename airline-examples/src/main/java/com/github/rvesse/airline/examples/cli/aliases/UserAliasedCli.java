@@ -15,8 +15,6 @@
  */
 package com.github.rvesse.airline.examples.cli.aliases;
 
-import java.io.IOException;
-
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.examples.ExampleExecutor;
@@ -54,14 +52,10 @@ public class UserAliasedCli {
         // Read aliases from user configuration file
         // You can find this example configuration under
         // src/main/resources/aliases.config
-        try {
-            //@formatter:off
-            builder.withParser()
-                   .withUserAliases("aliases.config", null, "src/main/resources/");
-            //@formatter:on
-        } catch (IOException e) {
-            System.out.println("Failed to read in aliases.config");
-        }
+        //@formatter:off
+        builder.withParser()
+               .withUserAliases("aliases.config", null, "src/main/resources/");
+        //@formatter:on
 
         ExampleExecutor.executeCli(builder.build(), args);
     }

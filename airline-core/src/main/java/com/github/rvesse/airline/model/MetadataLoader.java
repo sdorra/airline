@@ -48,7 +48,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -105,16 +104,12 @@ public class MetadataLoader {
             builder.withAlias(alias.name()).withArguments(alias.arguments());
         }
         if (!StringUtils.isEmpty(parserConfig.userAliasesFile())) {
-            try {
-                if (parserConfig.userAliasesSearchLocation().length > 0) {
-                    builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
-                            parserConfig.userAliasesSearchLocation());
-                } else {
-                    builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
-                            new String[] { new File(".").getAbsolutePath() });
-                }
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Failed to load user aliases based upon Parser annotation", e);
+            if (parserConfig.userAliasesSearchLocation().length > 0) {
+                builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
+                        parserConfig.userAliasesSearchLocation());
+            } else {
+                builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
+                        new String[] { new File(".").getAbsolutePath() });
             }
         }
 
