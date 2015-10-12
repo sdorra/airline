@@ -1,5 +1,15 @@
 # Airline - Change Log
 
+## 2.1.0
+
+- Module Additions and Changes
+    - New `airline-help-man` module
+        - `ManSections` moved into this module (**Breaking**)
+    - RONN help generators moved to `airline-help-ronn` module (**Breaking**)
+- Help Improvements
+    - New direct man page generation via `ManCommandUsageGenerator`, `ManGlobalUsageGenerator` and `ManMultiPageGlobalUsageGenerator`
+        - These are intended to replace the existing RONN generators and as such the RONN generators are marked as deprecated
+
 ## 2.0.1
 
 - Bug Fixes
