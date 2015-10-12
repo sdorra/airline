@@ -44,7 +44,6 @@ public class TestTroffPrinter {
         
         //@formatter:off
         String expected = StringUtils.join(new String[] { 
-                ".",
                 ".TH \"Test\" \"1\" \"\" \"\" \"\"",
                 "" 
             }, '\n');
@@ -62,7 +61,6 @@ public class TestTroffPrinter {
         
         //@formatter:off
         String expected = StringUtils.join(new String[] { 
-                ".",
                 ".TH \"Test Quotes\" \"1\" \"\" \"\" \"\"",
                 "" 
             }, '\n');
