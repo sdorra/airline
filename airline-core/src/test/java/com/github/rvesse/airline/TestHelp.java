@@ -284,7 +284,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <patterns>\n" +
@@ -333,7 +333,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <name> <url>\n" +
@@ -392,7 +392,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
@@ -437,7 +437,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
@@ -499,7 +499,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <rest>\n" +
@@ -573,7 +573,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
@@ -605,7 +605,7 @@ public class TestHelp {
                 "OPTIONS\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +
@@ -924,7 +924,7 @@ public class TestHelp {
                 "\n" +
                 "        --\n" +
                 "            This option can be used to separate command-line options from the\n" +
-                "            list of argument, (useful when arguments might be mistaken for\n" +
+                "            list of argument (useful when arguments might be mistaken for\n" +
                 "            command-line options)\n" +
                 "\n" +
                 "        <parameters>\n" +

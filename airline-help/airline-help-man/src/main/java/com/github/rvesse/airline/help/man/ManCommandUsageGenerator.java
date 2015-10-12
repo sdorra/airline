@@ -39,11 +39,10 @@ import com.github.rvesse.airline.model.OptionMetadata;
 public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
     private final int manSection;
-    private final boolean standalone;
     private final ManUsageHelper helper;
 
     public ManCommandUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, false, true);
+        this(ManSections.GENERAL_COMMANDS, false);
     }
 
     /**
@@ -52,18 +51,10 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @param manSection
      *            Man section to which this command belongs, use constants from
      *            {@link ManSections}
-     * @param standalone
-     *            Whether this is a stand-alone man-page file, this controls the
-     *            formatting of the title which is significant when using this
-     *            in conjunction with things like the
-     *            {@link ManGlobalUsageGenerator} where the output from this is
-     *            output a fragment of a larger document and the titles should
-     *            be presented differently if stand-alone is disabled
      */
-    public ManCommandUsageGenerator(int manSection, boolean includeHidden, boolean standalone) {
+    public ManCommandUsageGenerator(int manSection, boolean includeHidden) {
         super(includeHidden);
         this.manSection = manSection;
-        this.standalone = standalone;
         this.helper = createHelper(includeHidden);
     }
 
@@ -164,7 +155,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
         if (programName != null) {
             // Program name
             printer.printBold(programName);
-            
+
             // Program Options
             aOptions = command.getGlobalOptions();
             if (aOptions != null && aOptions.size() > 0) {
@@ -191,7 +182,8 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
         }
         // Command Name
 
-        printer.print(" ");
+        if (programName != null || groupNames != null)
+            printer.print(" ");
         printer.printBold(commandName);
         printer.print(" ");
 
@@ -211,9 +203,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
 
         printer.println();
 
-        if (!this.standalone) {
-            printer.println(command.getDescription());
-        }
+        printer.println(command.getDescription());
         return options;
     }
 

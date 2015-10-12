@@ -49,15 +49,15 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
 
     public ManGlobalUsageGenerator() {
         this(ManSections.GENERAL_COMMANDS, false,
-                new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false, false));
+                new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));
     }
 
     public ManGlobalUsageGenerator(int manSection) {
-        this(manSection, false, new ManCommandUsageGenerator(manSection, false, false));
+        this(manSection, false, new ManCommandUsageGenerator(manSection, false));
     }
 
     public ManGlobalUsageGenerator(int manSection, boolean includeHidden) {
-        this(manSection, includeHidden, new ManCommandUsageGenerator(manSection, includeHidden, false));
+        this(manSection, includeHidden, new ManCommandUsageGenerator(manSection, includeHidden));
     }
 
     protected ManGlobalUsageGenerator(int manSection, boolean includeHidden,

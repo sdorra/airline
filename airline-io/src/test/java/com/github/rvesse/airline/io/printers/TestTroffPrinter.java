@@ -249,7 +249,6 @@ public class TestTroffPrinter {
                 ""
             }, '\n');
         //@formatter:on
-        System.out.println(strWriter.toString());
         Assert.assertEquals(strWriter.toString(), expected);
     }
     
