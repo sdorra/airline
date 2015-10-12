@@ -133,7 +133,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 && (this.includeHidden() || CollectionUtils.exists(options, new Predicate<OptionMetadata>() {
                     @Override
                     public boolean evaluate(OptionMetadata option) {
-                        return !option.isHidden();
+                        return option.isHidden();
                     }
                 })));
     }
@@ -162,35 +162,51 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
         List<OptionMetadata> options = new ArrayList<>();
         List<OptionMetadata> aOptions;
         if (programName != null) {
+            // Program name
             printer.printBold(programName);
+            
+            // Program Options
             aOptions = command.getGlobalOptions();
             if (aOptions != null && aOptions.size() > 0) {
                 printer.print(" ");
-                printer.print(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
+                aOptions = sortOptions(aOptions);
+                this.helper.outputOptionsSynopsis(printer, aOptions);
                 options.addAll(aOptions);
             }
         }
         if (groupNames != null) {
+            // Group Name(s)
             for (int i = 0; i < groupNames.length; i++) {
                 printer.print(" ");
-                printer.printBold(" " + groupNames[i]);
+                printer.printBold(groupNames[i]);
             }
+            // Group Options
             aOptions = command.getGroupOptions();
             if (aOptions != null && aOptions.size() > 0) {
                 printer.print(" ");
-                printer.print(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
+                aOptions = sortOptions(aOptions);
+                this.helper.outputOptionsSynopsis(printer, aOptions);
                 options.addAll(aOptions);
             }
         }
-        aOptions = command.getCommandOptions();
+        // Command Name
+
+        printer.print(" ");
         printer.printBold(commandName);
-        printer.print(StringUtils.join(toSynopsisUsage(sortOptions(aOptions)), ' '));
+        printer.print(" ");
+
+        // Command options
+        aOptions = command.getCommandOptions();
+        aOptions = sortOptions(aOptions);
+        this.helper.outputOptionsSynopsis(printer, aOptions);
         options.addAll(aOptions);
 
-        // command arguments (optional)
+        // Command arguments (optional)
         if (command.getArguments() != null) {
-            printer.print(" [--] ");
-            printer.print(toUsage(command.getArguments()));
+            printer.print(" [ ");
+            printer.printBold("--");
+            printer.print(" ] ");
+            this.helper.outputArgumentsSynopsis(printer, command.getArguments());
         }
 
         printer.println();

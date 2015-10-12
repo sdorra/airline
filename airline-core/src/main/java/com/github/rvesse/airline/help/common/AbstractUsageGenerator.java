@@ -149,10 +149,6 @@ public class AbstractUsageGenerator {
     }
 
     protected String toUsage(ArgumentsMetadata arguments) {
-        if (!arguments.getUsage().isEmpty()) {
-            return arguments.getUsage();
-        }
-
         boolean required = arguments.isRequired();
         StringBuilder stringBuilder = new StringBuilder();
         if (!required) {
@@ -221,9 +217,6 @@ public class AbstractUsageGenerator {
     }
 
     protected String toDescription(ArgumentsMetadata arguments) {
-        if (!arguments.getUsage().isEmpty()) {
-            return arguments.getUsage();
-        }
         List<String> descriptionTitles = arguments.getTitle();
         StringBuilder stringBuilder = new StringBuilder();
         for (String title : descriptionTitles) {
@@ -236,7 +229,6 @@ public class AbstractUsageGenerator {
         }
 
         return stringBuilder.toString();
-
     }
 
     protected String toDescription(OptionMetadata option) {

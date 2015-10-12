@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,10 +56,12 @@ public class ManUsageHelper extends AbstractUsageGenerator {
 
                 // Option names
                 if (first) {
-                    printer.startTitledList(toDescription(option));
+                    printer.startTitledList();
+                    this.outputOptionTitle(printer, option);
                     first = false;
                 } else {
-                    printer.nextTitledListItem(toDescription(option));
+                    printer.nextTitledListItem();
+                    this.outputOptionTitle(printer, option);
                 }
 
                 // Description
@@ -88,18 +91,22 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             // Arguments separator option
 
             if (startList) {
-                printer.startTitledList(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
+                printer.startTitledList();
             } else {
-                printer.nextTitledListItem(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
+                printer.nextTitledListItem();
             }
+            printer.printBold(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
+            printer.println();
 
             // Description
             printer.startPlainList();
-            printer.println("This option can be used to separate command-line options from the list of argument, (useful when arguments might be mistaken for command-line options)");
+            printer.println(
+                    "This option can be used to separate command-line options from the list of argument, (useful when arguments might be mistaken for command-line options)");
             printer.endList();
 
             // Arguments name(s)
-            printer.nextTitledListItem(toDescription(arguments));
+            printer.nextTitledListItem();
+            this.outputArgumentsTitle(printer, arguments);
 
             // Description
             printer.startPlainList();
@@ -256,5 +263,102 @@ public class ManUsageHelper extends AbstractUsageGenerator {
         }
 
         printer.flush();
+    }
+
+    public void outputOptionsSynopsis(TroffPrinter printer, List<OptionMetadata> options) {
+        boolean first = true;
+        for (int i = 0; i < options.size(); i++) {
+            OptionMetadata option = options.get(i);
+            if (option.isHidden() && !this.includeHidden())
+                continue;
+
+            if (first) {
+                first = false;
+            } else {
+                printer.print(" ");
+            }
+
+            this.outputOptionSynopsis(printer, option);
+        }
+    }
+
+    public void outputOptionSynopsis(TroffPrinter printer, OptionMetadata option) {
+        Set<String> options = option.getOptions();
+        boolean required = option.isRequired();
+        if (!required) {
+            printer.print("[ ");
+        }
+
+        if (options.size() > 1) {
+            printer.print("{");
+        }
+
+        boolean first = true;
+        for (String name : options) {
+            if (!first) {
+                printer.print(" | ");
+            } else {
+                first = false;
+            }
+            printer.printBold(name);
+        }
+
+        if (options.size() > 1) {
+            printer.print("}");
+        }
+
+        if (option.getArity() > 0) {
+            printer.print(" ");
+            printer.printItalic(option.getTitle());
+        }
+
+        if (option.isMultiValued()) {
+            printer.printItalic("...");
+        }
+
+        if (!required) {
+            printer.print(" ]");
+        }
+    }
+    
+    public void outputArgumentsSynopsis(TroffPrinter printer, ArgumentsMetadata arguments) {
+        if (!arguments.isRequired()) {
+            printer.print("[ ");
+        }
+        
+        for (String title : arguments.getTitle()) {
+            printer.printItalic(title);
+            printer.print(" ");
+        }
+        
+        if (!arguments.isRequired()) {
+            printer.print("]");
+        }
+    }
+
+    public void outputOptionTitle(TroffPrinter printer, OptionMetadata option) {
+        int i = 0;
+        for (String name : option.getOptions()) {
+            printer.printBold(name);
+            if (option.getArity() > 1) {
+                printer.print(" ");
+                printer.printItalic(option.getTitle());
+            }
+            if (i < option.getOptions().size() - 1)
+                printer.print(", ");
+            i++;
+        }
+        printer.println();
+    }
+    
+    public void outputArgumentsTitle(TroffPrinter printer, ArgumentsMetadata arguments) {
+        int i = 0;
+        for (String title : arguments.getTitle()) {
+            printer.printItalic(title);
+            if (i < arguments.getTitle().size() - 1)
+                printer.print(" ");
+            i++;
+        }
+        printer.println();
     }
 }

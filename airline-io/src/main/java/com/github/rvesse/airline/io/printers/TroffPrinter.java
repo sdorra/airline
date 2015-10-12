@@ -77,17 +77,22 @@ public class TroffPrinter {
     }
 
     public void start(String title, int manSection, String header, String footer, String footerExtra) {
-        if (newline)
-            prepareLine();
+        if (!newline) {
+            writer.println();
+            newline = true;
+        }
 
         writer.println(String.format(".TH %s %s %s %s %s", asArg(title), asArg(Integer.toString(manSection)),
                 asArg(footer), asArg(footerExtra), asArg(header)));
         newline = true;
+        inSection = false;
     }
 
     public void nextSection(String sectionTitle) {
-        if (newline)
-            prepareLine();
+        if (!newline) {
+            writer.println();
+            newline = true;
+        }
 
         writer.println(String.format(".SH %s", sectionTitle));
         newline = true;
@@ -95,8 +100,13 @@ public class TroffPrinter {
     }
 
     public void print(String value) {
+        if (StringUtils.isEmpty(value))
+            return;
+
         String[] lines = StringUtils.split(value, '\n');
-        if (lines.length == 0) {
+        if (lines.length == 0)
+            return;
+        if (lines.length == 1) {
             // Append some text value directly
             if (newline)
                 prepareLine();
@@ -160,7 +170,7 @@ public class TroffPrinter {
         if (!newline)
             writer.println();
 
-        if (level > 0) {
+        if (level > 0 || inSection) {
             writer.println(REQUEST_MOVE_LEFT_MARGIN);
         }
         lists.push(ListType.BULLET);
@@ -174,7 +184,7 @@ public class TroffPrinter {
         if (!newline)
             writer.println();
 
-        if (level > 0) {
+        if (level > 0 || inSection) {
             writer.println(REQUEST_MOVE_LEFT_MARGIN);
         }
         lists.push(ListType.PLAIN);
@@ -200,7 +210,7 @@ public class TroffPrinter {
         if (!newline)
             writer.println();
 
-        if (level > 0) {
+        if (level > 0 || inSection) {
             writer.println(REQUEST_MOVE_LEFT_MARGIN);
         }
         lists.push(ListType.TITLED);
@@ -245,6 +255,11 @@ public class TroffPrinter {
         }
     }
 
+    /**
+     * Moves to the next titled list item without providing a title. The next
+     * line of text written will therefore be treated as the title for this
+     * item.
+     */
     public void nextTitledListItem() {
         nextTitledListItem(null);
     }
@@ -263,7 +278,7 @@ public class TroffPrinter {
             throw new IllegalStateException("Cannot start a new titled list item when not currently in a list");
         }
 
-        if (title != null) {
+        if (!StringUtils.isEmpty(title)) {
             writer.println(escape(title));
             writer.println(REQUEST_BREAK);
         }

@@ -21,10 +21,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import com.github.rvesse.airline.Cli;
+import com.github.rvesse.airline.Git.Add;
+import com.github.rvesse.airline.Git.RemoteAdd;
+import com.github.rvesse.airline.Git.RemoteShow;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
+import com.github.rvesse.airline.builder.CliBuilder;
+import com.github.rvesse.airline.help.Help;
+
 import org.testng.annotations.Test;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
@@ -154,8 +162,6 @@ public class TestHelpMan {
 
 
     
-    //@formatter:off
-    /*
     @Test
     public void testMan() throws IOException {
         //@formatter:off
@@ -306,7 +312,9 @@ public class TestHelpMan {
                 "\n");
         //@formatter:on
     }
-
+    
+    //@formatter:off
+    /*
     @Test
     public void testManMultiPage() throws IOException {
         //@formatter:off

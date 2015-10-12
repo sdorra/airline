@@ -34,7 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ArgumentsMetadata {
     private final List<String> titles;
-    private final String description, usage, completionCommand;
+    private final String description, completionCommand;
     private final int completionBehaviour;
     private final Set<Accessor> accessors;
     private final List<ArgumentsRestriction> restrictions;
@@ -51,7 +51,6 @@ public class ArgumentsMetadata {
 
         this.titles = ListUtils.unmodifiableList(IteratorUtils.toList(titles.iterator()));
         this.description = description;
-        this.usage = usage;
         this.arity = arity <= 0 ? Integer.MIN_VALUE : arity;
         this.completionBehaviour = completionBehaviour;
         this.completionCommand = completionCommand;
@@ -69,7 +68,6 @@ public class ArgumentsMetadata {
 
         this.titles = first.titles;
         this.description = first.description;
-        this.usage = first.usage;
         this.arity = first.arity;
         this.completionBehaviour = first.completionBehaviour;
         this.completionCommand = first.completionCommand;
@@ -92,10 +90,6 @@ public class ArgumentsMetadata {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getUsage() {
-        return usage;
     }
 
     public boolean isRequired() {
@@ -147,9 +141,6 @@ public class ArgumentsMetadata {
         if (!titles.equals(that.titles)) {
             return false;
         }
-        if (usage != null ? !usage.equals(that.usage) : that.usage != null) {
-            return false;
-        }
 
         return true;
     }
@@ -158,7 +149,6 @@ public class ArgumentsMetadata {
     public int hashCode() {
         int result = titles.hashCode();
         result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (usage != null ? usage.hashCode() : 0);
         return result;
     }
 
@@ -168,7 +158,6 @@ public class ArgumentsMetadata {
         sb.append("ArgumentsMetadata");
         sb.append("{title='").append(StringUtils.join(titles, ',')).append('\'');
         sb.append(", description='").append(description).append('\'');
-        sb.append(", usage='").append(usage).append('\'');
         sb.append(", accessors=").append(accessors);
         sb.append('}');
         return sb.toString();
