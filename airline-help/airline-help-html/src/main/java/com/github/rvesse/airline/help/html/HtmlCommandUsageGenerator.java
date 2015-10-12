@@ -30,6 +30,7 @@ import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
@@ -44,7 +45,8 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      */
     public static final String DEFAULT_STYLESHEET = "css/bootstrap.min.css";
     /**
-     * Constant for a new line (using a {@code <br>})
+     * Constant for a new line (using a {@code <br>
+     * })
      */
     protected static final String NEWLINE = "<br/>\n";
 
@@ -78,8 +80,12 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
-            OutputStream output) throws IOException {
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, OutputStream output) throws IOException {
+
+        if (parserConfig == null) {
+            parserConfig = MetadataLoader.loadParser(command.getType());
+        }
 
         Writer writer = new OutputStreamWriter(output);
 
@@ -101,7 +107,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
         // Options
         if (options.size() > 0 || command.getArguments() != null) {
             options = sortOptions(options);
-            outputOptions(writer, options, command.getArguments());
+            outputOptions(writer, options, command.getArguments(), parserConfig);
         }
 
         // TODO Output post help sections
@@ -123,8 +129,8 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Option meta-data
      * @throws IOException
      */
-    protected void outputOptions(Writer writer, List<OptionMetadata> options, ArgumentsMetadata arguments)
-            throws IOException {
+    protected <T> void outputOptions(Writer writer, List<OptionMetadata> options, ArgumentsMetadata arguments,
+            ParserMetadata<T> parserConfig) throws IOException {
         writer.append(NEWLINE);
         writer.append("<h1 class=\"text-info\">OPTIONS</h1>\n").append(NEWLINE);
 
@@ -161,7 +167,7 @@ public class HtmlCommandUsageGenerator extends AbstractCommandUsageGenerator {
             writer.append("<div class=\"row\">\n");
             writer.append("<div class=\"span8 offset1\">\n");
 
-            writer.append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).append("\n");
+            writer.append(parserConfig.getArgumentsSeparator()).append("\n");
 
             writer.append("</div>\n");
             writer.append("</div>\n");

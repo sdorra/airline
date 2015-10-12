@@ -30,7 +30,9 @@ import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.help.man.ManSections;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 /**
  * A command usage generator which generates help in
@@ -79,9 +81,13 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
-            OutputStream output) throws IOException {
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, OutputStream output) throws IOException {
         String sectionHeader = "## ";
+        
+        if (parserConfig == null) {
+            parserConfig = MetadataLoader.loadParser(command.getType());
+        }
 
         // Fall back to metadata declared name if necessary
         if (commandName == null)
@@ -105,7 +111,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
                 sectionHeader);
 
         if (options.size() > 0 || command.getArguments() != null) {
-            outputOptions(writer, command, options, sectionHeader);
+            outputOptions(writer, command, options, sectionHeader, parserConfig);
         }
 
         // Output post help sections
@@ -132,10 +138,10 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputOptions(Writer writer, CommandMetadata command, List<OptionMetadata> options,
-            String sectionHeader) throws IOException {
+    protected <T> void outputOptions(Writer writer, CommandMetadata command, List<OptionMetadata> options,
+            String sectionHeader, ParserMetadata<T> parserConfig) throws IOException {
         helper.outputOptions(writer, options, sectionHeader);
-        helper.outputArguments(writer, command);
+        helper.outputArguments(writer, command, parserConfig);
     }
 
     /**

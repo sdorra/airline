@@ -114,7 +114,7 @@ public class Help<T> implements Runnable, Callable<Void> {
      * @throws IOException
      */
     public static void help(CommandMetadata command, boolean includeHidden, OutputStream out) throws IOException {
-        new CliCommandUsageGenerator(includeHidden).usage(null, null, command.getName(), command, out);
+        new CliCommandUsageGenerator(includeHidden).usage(null, null, command.getName(), command, null, out);
     }
 
     /**
@@ -252,15 +252,15 @@ public class Help<T> implements Runnable, Callable<Void> {
                 //@formatter:on
                 command = CollectionUtils.find(group.getCommands(), findCommandPredicate);
                 if (command != null) {
-                    new CliCommandUsageGenerator().usage(global.getName(), UsageHelper.toGroupNames(groupPath), command.getName(), command,
-                            out);
+                    new CliCommandUsageGenerator().usage(global.getName(), UsageHelper.toGroupNames(groupPath),
+                            command.getName(), command, global.getParserConfiguration(), out);
                     return;
                 }
 
                 // Didn't find an appropriate command
                 if (global.getParserConfiguration().allowsAbbreviatedCommands()) {
-                    System.out.println("Unknown command " + name + " " + commandOrSubGroupName
-                            + " or an ambiguous abbreviation");
+                    System.out.println(
+                            "Unknown command " + name + " " + commandOrSubGroupName + " or an ambiguous abbreviation");
                 } else {
                     System.out.println("Unknown command " + name + " " + commandOrSubGroupName);
                 }
@@ -276,7 +276,8 @@ public class Help<T> implements Runnable, Callable<Void> {
         command = CollectionUtils.find(global.getDefaultGroupCommands(), findCommandPredicate);
         if (command != null) {
             // Command in default group help
-            new CliCommandUsageGenerator(includeHidden).usage(global.getName(), null, command.getName(), command, out);
+            new CliCommandUsageGenerator(includeHidden).usage(global.getName(), null, command.getName(), command,
+                    global.getParserConfiguration(), out);
             return;
         }
 

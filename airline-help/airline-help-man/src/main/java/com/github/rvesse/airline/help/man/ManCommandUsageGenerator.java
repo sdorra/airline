@@ -31,7 +31,9 @@ import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.io.printers.TroffPrinter;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 /**
  * A command usage generator which generates help in man page (Troff) format
@@ -63,8 +65,13 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
     }
 
     @Override
-    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
-            OutputStream output) throws IOException {
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, OutputStream output) throws IOException {
+        
+        // Get the parser metadata
+        if (parserConfig == null) {
+            parserConfig = MetadataLoader.loadParser(command.getType());
+        }
 
         // Fall back to metadata declared name if necessary
         if (commandName == null)
@@ -87,7 +94,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
         List<OptionMetadata> options = outputSynopsis(printer, programName, groupNames, commandName, command);
 
         if (options.size() > 0 || command.getArguments() != null) {
-            outputOptions(printer, command, options);
+            outputOptions(printer, command, options, parserConfig);
         }
 
         // Output post help sections
@@ -112,7 +119,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * 
      * @throws IOException
      */
-    protected void outputOptions(TroffPrinter printer, CommandMetadata command, List<OptionMetadata> options)
+    protected <T> void outputOptions(TroffPrinter printer, CommandMetadata command, List<OptionMetadata> options, ParserMetadata<T> parserConfig)
             throws IOException {
         // Options
         // Can end the list if there are no arguments
@@ -126,7 +133,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
                     public boolean evaluate(OptionMetadata option) {
                         return option.isHidden();
                     }
-                })));
+                })), parserConfig);
     }
 
     /**

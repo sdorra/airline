@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.help.common;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +28,7 @@ import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.utils.comparators.HelpSectionComparator;
 
 /**
@@ -40,7 +42,7 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
     public AbstractCommandUsageGenerator() {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR);
     }
-    
+
     public AbstractCommandUsageGenerator(boolean includeHidden) {
         this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, includeHidden);
     }
@@ -48,7 +50,7 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
     public AbstractCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator) {
         this(optionComparator, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, false);
     }
-    
+
     public AbstractCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
         this(optionComparator, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, includeHidden);
     }
@@ -60,9 +62,31 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
     }
 
     @Override
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig) throws IOException {
+        usage(programName, groupNames, commandName, command, parserConfig, System.out);
+    }
+
+    /**
+     * @deprecated Please use the overload that explicitly takes a parser
+     *             configuration
+     */
+    @Override
+    @Deprecated
     public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command)
             throws IOException {
-        usage(programName, groupNames, commandName, command, System.out);
+        usage(programName, groupNames, commandName, command, null, System.out);
+    }
+
+    /**
+     * @deprecated Please use the overload that explicitly takes a parser
+     *             configuration
+     */
+    @Override
+    @Deprecated
+    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            OutputStream output) throws IOException {
+        usage(programName, groupNames, commandName, command, null, output);
     }
 
     /**
@@ -91,7 +115,8 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
      * @param postSections
      *            Sections that should be placed after base content
      */
-    protected void findHelpSections(CommandMetadata command, List<HelpSection> preSections, List<HelpSection> postSections) {
+    protected void findHelpSections(CommandMetadata command, List<HelpSection> preSections,
+            List<HelpSection> postSections) {
         for (HelpSection section : command.getHelpSections()) {
             if (section.suggestedOrder() < 0) {
                 preSections.add(section);

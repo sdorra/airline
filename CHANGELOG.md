@@ -9,6 +9,7 @@
 - Help Improvements
     - New direct man page generation via `ManCommandUsageGenerator`, `ManGlobalUsageGenerator` and `ManMultiPageGlobalUsageGenerator`
         - These are intended to replace the existing RONN generators and as such the RONN generators are marked as deprecated
+    - `CommandUsageGenerator` has new overloads that take a `ParserMetadata<T>` object, old overloads are deprecated in favour of these.  This allows generators to produce more accurate help in some circumstances.
 
 ## 2.0.1
 

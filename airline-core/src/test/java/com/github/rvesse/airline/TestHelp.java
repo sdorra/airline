@@ -452,7 +452,7 @@ public class TestHelp {
         SingleCommand<ArgsAllowedValues> command = singleCommand(ArgsAllowedValues.class);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new CliCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), out);
+        new CliCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), null, out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test ArgsAllowedValues - ArgsAllowedValues description\n" +
@@ -687,7 +687,7 @@ public class TestHelp {
         AbstractCommandUsageGenerator generator = new CliCommandUsageGenerator(true);
         CommandMetadata metadata = CollectionUtils.find(parser.getMetadata().getDefaultGroupCommands(), new CommandFinder("OptionsHidden"));
         Assert.assertNotNull(metadata);
-        generator.usage("test", null, "OptionsHidden", metadata, out);
+        generator.usage("test", null, "OptionsHidden", metadata, null, out);
         
         assertEquals(new String(out.toByteArray(), utf8), 
                 "NAME\n" +
@@ -887,7 +887,7 @@ public class TestHelp {
         SingleCommand<Args1> command = singleCommand(Args1.class);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
         assertEquals(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test - args1 description\n" +
@@ -939,7 +939,7 @@ public class TestHelp {
         SingleCommand<ArgsExitCodes> command = singleCommand(ArgsExitCodes.class);
     
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
         testStringAssert(new String(out.toByteArray(), utf8),
                 "NAME\n" +
                 "        test - ArgsExitCodes description\n" +

@@ -27,7 +27,9 @@ import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
 
@@ -60,8 +62,13 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     }
 
     @Override
-    protected void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
-            UsagePrinter out) throws IOException {
+    protected <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException {
+        
+        if (parserConfig == null) {
+            parserConfig = MetadataLoader.loadParser(command.getType());
+        }
+        
         // Name and description
         outputDescription(out, programName, groupNames, commandName, command);
 
@@ -81,7 +88,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
         // Options
         ArgumentsMetadata arguments = command.getArguments();
         if (options.size() > 0 || arguments != null) {
-            outputOptionsAndArguments(out, command, options, arguments);
+            outputOptionsAndArguments(out, command, options, arguments, parserConfig);
         }
 
         // Output post help sections
@@ -103,10 +110,10 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Arguments meta-data
      * @throws IOException
      */
-    protected void outputOptionsAndArguments(UsagePrinter out, CommandMetadata command, List<OptionMetadata> options,
-            ArgumentsMetadata arguments) throws IOException {
+    protected <T> void outputOptionsAndArguments(UsagePrinter out, CommandMetadata command, List<OptionMetadata> options,
+            ArgumentsMetadata arguments, ParserMetadata<T> parserConfig) throws IOException {
         helper.outputOptions(out, options);
-        helper.outputArguments(out, arguments);
+        helper.outputArguments(out, arguments, parserConfig);
     }
 
     /**

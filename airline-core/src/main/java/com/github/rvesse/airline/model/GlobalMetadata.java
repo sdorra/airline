@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
@@ -52,7 +53,7 @@ public class GlobalMetadata<T> {
         this.defaultGroupCommands = AirlineUtils.unmodifiableListCopy(defaultGroupCommands);
         this.commandGroups = AirlineUtils.unmodifiableListCopy(commandGroups);
         this.restrictions = AirlineUtils.unmodifiableListCopy(restrictions);
-        this.parserConfig = parserConfig;
+        this.parserConfig = parserConfig != null ? parserConfig : ParserBuilder.<T>defaultConfiguration();
     }
 
     public String getName() {

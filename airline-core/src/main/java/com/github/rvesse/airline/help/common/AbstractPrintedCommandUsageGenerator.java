@@ -22,7 +22,9 @@ import java.util.Comparator;
 
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 /**
  * Abstract command usage generator for generators that use a
@@ -55,8 +57,8 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
-            UsagePrinter out) throws IOException;
+    protected abstract <T> void usage(String programName, String[] groupNames, String commandName,
+            CommandMetadata command, ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException;
 
     /**
      * Creates a usage printer for the given stream
@@ -72,10 +74,13 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     }
 
     @Override
-    public void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
-            OutputStream out) throws IOException {
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, OutputStream out) throws IOException {
         UsagePrinter printer = createUsagePrinter(out);
-        usage(programName, groupNames, commandName, command, printer);
+        if (parserConfig == null) {
+            parserConfig = MetadataLoader.loadParser(command.getType());
+        }
+        usage(programName, groupNames, commandName, command, parserConfig, printer);
         printer.flush();
     }
 

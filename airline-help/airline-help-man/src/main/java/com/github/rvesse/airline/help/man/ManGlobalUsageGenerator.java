@@ -48,8 +48,7 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
     protected final ManUsageHelper helper;
 
     public ManGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, false,
-                new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));
+        this(ManSections.GENERAL_COMMANDS, false, new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));
     }
 
     public ManGlobalUsageGenerator(int manSection) {
@@ -135,7 +134,7 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             printer.print("Default (no ");
             printer.printItalic("group");
             printer.println(" specified)");
-            
+
             boolean first = true;
             for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
                 if (command.isHidden() && !this.includeHidden())
@@ -273,7 +272,7 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
         printer.print(" [ ");
         printer.printItalic("command-args");
         printer.print(" ]");
-        
+
         printer.println();
         printer.println(global.getDescription());
     }
@@ -367,7 +366,7 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             printer.flush();
             output.flush();
             commandUsageGenerator.usage(global.getName(), UsageHelper.toGroupNames(groups), command.getName(), command,
-                    output);
+                    global.getParserConfiguration(), output);
         }
 
         // Sub-groups
@@ -401,7 +400,8 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
 
             printer.flush();
             output.flush();
-            commandUsageGenerator.usage(global.getName(), null, command.getName(), command, output);
+            commandUsageGenerator.usage(global.getName(), null, command.getName(), command,
+                    global.getParserConfiguration(), output);
         }
     }
 

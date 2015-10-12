@@ -110,7 +110,7 @@ public class TestHelpMan {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ManCommandUsageGenerator generator = new ManCommandUsageGenerator();
-        generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(), out);
+        generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(), null, out);
         //@formatter:off
         testStringAssert(new String(out.toByteArray(), utf8), 
                 StringUtils.join(new String[] {
@@ -138,7 +138,7 @@ public class TestHelpMan {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ManCommandUsageGenerator generator = new ManCommandUsageGenerator();
-        generator.usage(null, null, "ArgsExamples", cmd.getCommandMetadata(), out);
+        generator.usage(null, null, "ArgsExamples", cmd.getCommandMetadata(), null, out);
         //@formatter:off
         testStringAssert(new String(out.toByteArray(), utf8), 
             StringUtils.join(new String[] {
@@ -393,10 +393,10 @@ public class TestHelpMan {
         Cli<Runnable> gitParser = builder.build();
         
         ManGlobalUsageGenerator<Runnable> generator = new ManMultiPageGlobalUsageGenerator<Runnable>();
-        FileOutputStream out = new FileOutputStream("git.1");
+        FileOutputStream out = new FileOutputStream("target/git.1");
         generator.usage(gitParser.getMetadata(), out);
         
-        File git = new File("git.1");
+        File git = new File("target/git.1");
         Assert.assertTrue(git.exists());
         String usage = readFile(git);
         assertEquals(usage,
@@ -628,7 +628,7 @@ public class TestHelpMan {
         SingleCommand<ArgsExitCodes> command = singleCommand(ArgsExitCodes.class);
     
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), out);
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
         assertEquals(new String(out.toByteArray(), utf8),
                 StringUtils.join(new String[] {
                         ".TH \"test\" \"1\" \"\" \"\" \"\"",

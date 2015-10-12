@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 /**
  * Interface implemented by classes that can generate usage documentation for a
@@ -38,7 +39,10 @@ public interface CommandUsageGenerator {
      * @param command
      *            Command Metadata
      * @throws IOException
+     * @deprecated Please use the overload that takes the parser configuration
+     *             explicitly
      */
+    @Deprecated
     public abstract void usage(String programName, String[] groupNames, String commandName, CommandMetadata command)
             throws IOException;
 
@@ -56,7 +60,52 @@ public interface CommandUsageGenerator {
      * @param out
      *            Stream to output to
      * @throws IOException
+     * @deprecated Please use the overload that takes the parser configuration
+     *             explicitly
      */
+    @Deprecated
     public abstract void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             OutputStream output) throws IOException;
+
+    /**
+     * Generate the help and output it on standard out
+     * 
+     * @param programName
+     *            Program Name
+     * @param groupNames
+     *            Group Name(s)
+     * @param commandName
+     *            Command Name
+     * @param command
+     *            Command Metadata
+     * @param parserConfig
+     *            Parser configuration, if {@code null} is passed then the
+     *            parser configuration is automatically determined based on the
+     *            command class for which we are producing help
+     * @throws IOException
+     */
+    public abstract <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig) throws IOException;
+
+    /**
+     * Generate the help and output it to the stream
+     * 
+     * @param programName
+     *            Program Name
+     * @param groupNames
+     *            Group Name(s)
+     * @param commandName
+     *            Command Name
+     * @param command
+     *            Command Metadata
+     * @param parserConfig
+     *            Parser Configuration, if {@code null} is passed then the
+     *            parser configuration is automatically determined based on the
+     *            command class for which we are producing help
+     * @param out
+     *            Stream to output to
+     * @throws IOException
+     */
+    public abstract <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, OutputStream output) throws IOException;
 }

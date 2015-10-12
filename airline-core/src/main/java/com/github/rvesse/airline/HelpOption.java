@@ -93,12 +93,12 @@ public class HelpOption<C> {
         try {
             generator.usage(globalMetadata != null ? globalMetadata.getName() : null,
                     groupMetadata != null ? toGroupNames(groupMetadata) : null, commandMetadata.getName(),
-                    commandMetadata);
+                    commandMetadata, globalMetadata != null ? globalMetadata.getParserConfiguration() : null);
         } catch (IOException e) {
             throw new RuntimeException("Error generating usage documentation", e);
         }
     }
-    
+
     private static String[] toGroupNames(CommandGroupMetadata group) {
         List<CommandGroupMetadata> groupPath = new ArrayList<CommandGroupMetadata>();
         groupPath.add(group);

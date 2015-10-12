@@ -60,11 +60,12 @@ public class RonnUsageHelper extends AbstractUsageGenerator {
         super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
     }
 
-    public void outputArguments(Writer writer, CommandMetadata command) throws IOException {
+    public <T> void outputArguments(Writer writer, CommandMetadata command, ParserMetadata<T> parserConfig)
+            throws IOException {
         ArgumentsMetadata arguments = command.getArguments();
         if (arguments != null) {
             // Arguments separator
-            writer.append(NEW_PARA).append("* `").append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).append("`:\n");
+            writer.append(NEW_PARA).append("* `").append(parserConfig.getArgumentsSeparator()).append("`:\n");
 
             // description
             writer.append("This option can be used to separate command-line options from the "

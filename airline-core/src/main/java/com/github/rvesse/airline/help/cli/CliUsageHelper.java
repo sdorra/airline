@@ -180,11 +180,11 @@ public class CliUsageHelper extends AbstractUsageGenerator {
         return maxRows;
     }
 
-    public void outputArguments(UsagePrinter out, ArgumentsMetadata arguments) throws IOException {
+    public <T> void outputArguments(UsagePrinter out, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig) throws IOException {
         if (arguments != null) {
             // Arguments separator option
             UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR).newline();
+            optionPrinter.append(parserConfig.getArgumentsSeparator()).newline();
             optionPrinter.flush();
 
             // Description

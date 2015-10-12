@@ -33,10 +33,9 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class ManMultiPageGlobalUsageGenerator<T> extends ManGlobalUsageGenerator<T> {
-    
+
     public ManMultiPageGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, false,
-                new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));
+        this(ManSections.GENERAL_COMMANDS, false, new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));
     }
 
     public ManMultiPageGlobalUsageGenerator(int manSection) {
@@ -82,7 +81,7 @@ public class ManMultiPageGlobalUsageGenerator<T> extends ManGlobalUsageGenerator
             output = createCommandFile(global, UsageHelper.toGroupNames(groups), command);
 
             commandUsageGenerator.usage(global.getName(), UsageHelper.toGroupNames(groups), command.getName(), command,
-                    output);
+                    global.getParserConfiguration(), output);
 
             // Write a reference back to the suite man page
             outputReferenceToSuite(new TroffPrinter(new PrintWriter(output)), global);
@@ -140,7 +139,8 @@ public class ManMultiPageGlobalUsageGenerator<T> extends ManGlobalUsageGenerator
             // Create new separate output stream and writer for each command
             output = createCommandFile(global, null, command);
 
-            commandUsageGenerator.usage(global.getName(), null, command.getName(), command, output);
+            commandUsageGenerator.usage(global.getName(), null, command.getName(), command,
+                    global.getParserConfiguration(), output);
 
             // Write a reference back to the suite man page
             outputReferenceToSuite(new TroffPrinter(new PrintWriter(output)), global);

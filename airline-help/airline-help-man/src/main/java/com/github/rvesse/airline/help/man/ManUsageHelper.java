@@ -85,7 +85,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
         }
     }
 
-    public void outputArguments(TroffPrinter printer, ArgumentsMetadata arguments, boolean startList)
+    public <T> void outputArguments(TroffPrinter printer, ArgumentsMetadata arguments, boolean startList, ParserMetadata<T> parserConfig)
             throws IOException {
         if (arguments != null) {
             // Arguments separator option
@@ -95,7 +95,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             } else {
                 printer.nextTitledListItem();
             }
-            printer.printBold(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
+            printer.printBold(parserConfig.getArgumentsSeparator());
             printer.println();
 
             // Description

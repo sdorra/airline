@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 
@@ -42,7 +43,8 @@ public class CommandSuggester
 
         if (command.getArguments() != null) {
             // Include arguments separator
-            suggestions.add(ParserMetadata.DEFAULT_ARGUMENTS_SEPARATOR);
+            ParserMetadata<?> parserConfig = MetadataLoader.loadParser(command.getType());
+            suggestions.add(parserConfig.getArgumentsSeparator());
         }
 
         return ListUtils.unmodifiableList(suggestions);
