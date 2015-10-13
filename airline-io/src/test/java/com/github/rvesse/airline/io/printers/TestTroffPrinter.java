@@ -29,7 +29,7 @@ public class TestTroffPrinter {
     private static final String TABLE_END = ".TE";
     private static final String TABLE_START = ".TS";
     private static final String END_LIST = ".IP \"\" 0";
-    private static final String BULLET = ".IP \"\\(em\" 4";
+    private static final String BULLET = ".IP \"-\" 4";
     private static final String PLAIN = ".IP \"\" 4";
     private static final String NUMBER_REG = ".nr list1 1 1";
     private static final String NUMBER_REG_CLEAR = ".rr list1";

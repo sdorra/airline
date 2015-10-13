@@ -56,10 +56,20 @@ public class TroffPrinter {
     }
 
     private static final String BULLET_STYLE_BULLET = "\"\\(bu\"";
-    private static final String BULLET_STYLE_DASH = "\"\\(em\"";
+    private static final String BULLET_STYLE_DASH = "\"-\"";
+    private static final String BULLET_STYLE_EM_DASH = "\"\\(em\"";
 
+    /**
+     * Supported bullet style
+     * @author rvesse
+     *
+     */
     public enum BulletStyle {
-        BULLET(BULLET_STYLE_BULLET), DASH(BULLET_STYLE_DASH);
+        //@formatter:off
+        BULLET(BULLET_STYLE_BULLET), 
+        DASH(BULLET_STYLE_DASH),
+        EM_DASH(BULLET_STYLE_EM_DASH);
+        //@formatter:on
 
         private final String glyph;
 
