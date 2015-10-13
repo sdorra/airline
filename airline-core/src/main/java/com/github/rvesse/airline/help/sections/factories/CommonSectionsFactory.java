@@ -17,13 +17,16 @@ package com.github.rvesse.airline.help.sections.factories;
 
 import java.lang.annotation.Annotation;
 
+import com.github.rvesse.airline.annotations.help.Copyright;
 import com.github.rvesse.airline.annotations.help.Discussion;
 import com.github.rvesse.airline.annotations.help.Examples;
 import com.github.rvesse.airline.annotations.help.HideSection;
+import com.github.rvesse.airline.annotations.help.ProseSection;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.common.BasicSection;
+import com.github.rvesse.airline.help.sections.common.CommonSections;
 import com.github.rvesse.airline.help.sections.common.DiscussionSection;
 import com.github.rvesse.airline.help.sections.common.ExamplesSection;
 import com.github.rvesse.airline.help.sections.common.ExitCodesSection;
@@ -46,6 +49,16 @@ public class CommonSectionsFactory implements HelpSectionFactory {
         } else if (annotation instanceof HideSection) {
             HideSection hide = (HideSection) annotation;
             return new BasicSection(hide.title(), 0, null, null, HelpFormat.NONE_PRINTABLE, new String[0]);
+        } else if (annotation instanceof ProseSection) {
+            ProseSection prose = (ProseSection) annotation;
+            return new BasicSection(prose.title(), prose.suggestedOrder(), null, null, HelpFormat.PROSE,
+                    prose.paragraphs());
+        } else if (annotation instanceof Copyright) {
+            Copyright copyright = (Copyright) annotation;
+            String line = String.format("Copyright (c) %s %s%s", copyright.holder(), copyright.startYear(),
+                    copyright.endYear() > copyright.startYear() ? String.format("-%s", copyright.endYear()) : "");
+            return new BasicSection(CommonSections.TITLE_COPYRIGHT, CommonSections.ORDER_COPYRIGHT, null, null,
+                    HelpFormat.PROSE, new String[] { line });
         }
         return null;
     }

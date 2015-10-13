@@ -20,10 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.rvesse.airline.annotations.help.Copyright;
 import com.github.rvesse.airline.annotations.help.Discussion;
 import com.github.rvesse.airline.annotations.help.Examples;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
 import com.github.rvesse.airline.annotations.help.HideSection;
+import com.github.rvesse.airline.annotations.help.ProseSection;
 import com.github.rvesse.airline.help.sections.factories.CommonSectionsFactory;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionFactory;
 
@@ -48,6 +50,8 @@ public class HelpSectionRegistry {
         FACTORIES.put(Examples.class, commonFactory);
         FACTORIES.put(ExitCodes.class, commonFactory);
         FACTORIES.put(HideSection.class, commonFactory);
+        FACTORIES.put(Copyright.class, commonFactory);
+        FACTORIES.put(ProseSection.class, commonFactory);
 
         init = true;
     }
