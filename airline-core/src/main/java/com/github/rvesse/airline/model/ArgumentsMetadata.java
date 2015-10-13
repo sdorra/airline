@@ -34,14 +34,19 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ArgumentsMetadata {
     private final List<String> titles;
-    private final String description, completionCommand;
-    private final int completionBehaviour;
+    private final String description;
     private final Set<Accessor> accessors;
     private final List<ArgumentsRestriction> restrictions;
     private final int arity;
 
-    public ArgumentsMetadata(Iterable<String> titles, String description, String usage, int arity,
-            int completionBehaviour, String completionCommand, Iterable<ArgumentsRestriction> restrictions, Iterable<Field> path) {
+    //@formatter:off
+    public ArgumentsMetadata(Iterable<String> titles, 
+                             String description, 
+                             String usage, 
+                             int arity,
+                             Iterable<ArgumentsRestriction> restrictions, 
+                             Iterable<Field> path) {
+    //@formatter:on
         if (titles == null)
             throw new NullPointerException("title cannot be null");
         if (path == null)
@@ -52,9 +57,8 @@ public class ArgumentsMetadata {
         this.titles = ListUtils.unmodifiableList(IteratorUtils.toList(titles.iterator()));
         this.description = description;
         this.arity = arity <= 0 ? Integer.MIN_VALUE : arity;
-        this.completionBehaviour = completionBehaviour;
-        this.completionCommand = completionCommand;
-        this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions) : Collections.<ArgumentsRestriction>emptyList();
+        this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions)
+                : Collections.<ArgumentsRestriction> emptyList();
         this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
     }
 
@@ -69,15 +73,13 @@ public class ArgumentsMetadata {
         this.titles = first.titles;
         this.description = first.description;
         this.arity = first.arity;
-        this.completionBehaviour = first.completionBehaviour;
-        this.completionCommand = first.completionCommand;
         this.restrictions = first.restrictions;
 
         Set<Accessor> accessors = new HashSet<>();
         for (ArgumentsMetadata other : arguments) {
             if (!first.equals(other))
-                throw new IllegalArgumentException(String.format("Conflicting arguments definitions: %s, %s", first,
-                        other));
+                throw new IllegalArgumentException(
+                        String.format("Conflicting arguments definitions: %s, %s", first, other));
 
             accessors.addAll(other.getAccessors());
         }
@@ -100,14 +102,6 @@ public class ArgumentsMetadata {
         return arity;
     }
 
-    public int getCompletionBehaviours() {
-        return completionBehaviour;
-    }
-
-    public String getCompletionCommand() {
-        return completionCommand;
-    }
-
     public Set<Accessor> getAccessors() {
         return accessors;
     }
@@ -119,7 +113,7 @@ public class ArgumentsMetadata {
     public Class<?> getJavaType() {
         return accessors.iterator().next().getJavaType();
     }
-    
+
     public List<ArgumentsRestriction> getRestrictions() {
         return this.restrictions;
     }

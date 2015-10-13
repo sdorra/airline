@@ -21,11 +21,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import com.github.rvesse.airline.CompletionBehaviour;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.help.BashCompletion;
 import com.github.rvesse.airline.examples.ExampleRunnable;
+import com.github.rvesse.airline.help.cli.bash.CompletionBehaviour;
 import com.github.rvesse.airline.model.GlobalMetadata;
 
 @Command(name = "help", description = "A command that provides help on other commands")
@@ -34,7 +35,8 @@ public class Help implements ExampleRunnable {
     @Inject
     private GlobalMetadata<ExampleRunnable> global;
 
-    @Arguments(description = "Provides the name of the commands you want to provide help for", completionBehaviour = CompletionBehaviour.CLI_COMMANDS)
+    @Arguments(description = "Provides the name of the commands you want to provide help for")
+    @BashCompletion(behaviour = CompletionBehaviour.CLI_COMMANDS)
     private List<String> commandNames = new ArrayList<String>();
     
     @Option(name = "--include-hidden", description = "When set hidden commands and options are shown in help", hidden = true)

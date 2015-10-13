@@ -553,9 +553,7 @@ public class MetadataLoader {
                                                                        arity,
                                                                        hidden, 
                                                                        override, 
-                                                                       sealed, 
-                                                                       optionAnnotation.completionBehaviour(),
-                                                                       optionAnnotation.completionCommand(),
+                                                                       sealed,
                                                                        restrictions,
                                                                        path);
                     //@formatter:on
@@ -643,8 +641,6 @@ public class MetadataLoader {
                                                                           description, 
                                                                           usage,
                                                                           arity,
-                                                                          argumentsAnnotation.completionBehaviour(), 
-                                                                          argumentsAnnotation.completionCommand(),
                                                                           restrictions,
                                                                           path));
                     //@formatter:on

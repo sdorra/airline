@@ -13,6 +13,7 @@
     <module>airline-help-man</module>
     <module>airline-help-ronn</module>
     <module>airline-help-html</module>
+    <module>airline-help-bash</module>
   </modules>
 
   <properties>

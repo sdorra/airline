@@ -15,7 +15,6 @@
  */
 package com.github.rvesse.airline.annotations;
 
-import com.github.rvesse.airline.CompletionBehaviour;
 import com.github.rvesse.airline.model.OptionMetadata;
 
 import java.lang.annotation.Retention;
@@ -89,31 +88,4 @@ public @interface Option {
      * @return True if sealed, false otherwise
      */
     boolean sealed() default false;
-
-    /**
-     * Sets the desired completion behaviour
-     * <p>
-     * This is used by usage generators that are capable of generating
-     * completion scripts. It indicates any additional completion behaviour that
-     * should apply in addition to completions generated from the
-     * {@link #allowedValues()} and/or {@link #completionCommand()}. You should
-     * use the constants from {@link CompletionBehaviour} as values to this.
-     * </p>
-     * 
-     * @return Completion Behaviours
-     */
-    int completionBehaviour() default CompletionBehaviour.NONE;
-
-    /**
-     * Provides a command used to generate the completion words for this option
-     * <p>
-     * This is used by usage generators that are capable of generating
-     * completion scripts. If you instead want to limit the completions to a
-     * fixed set of strings then you should simply set the
-     * {@link #allowedValues()} property appropriately.
-     * </p>
-     * 
-     * @return Completion command
-     */
-    String completionCommand() default "";
 }

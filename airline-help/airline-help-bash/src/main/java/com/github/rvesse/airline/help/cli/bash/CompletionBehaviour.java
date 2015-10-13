@@ -13,38 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.help.cli.bash;
 
 /**
  * Possible completion behaviour for options/arguments 
  */
-public class CompletionBehaviour {
+public enum CompletionBehaviour {
     /**
      * None, either this is a flag option (i.e. arity zero) or you want to limit
-     * completions to those specified by the option metadata
+     * completions to those specified by the option meta-data
      */
-    public static final int NONE = 0;
+    NONE,
     /**
      * Filenames, use standard filename completion if no other completions apply
      */
-    public static final int FILENAMES = 1;
+    FILENAMES,
     /**
      * Directories, use standard directory name completion if no other
      * completions apply
      */
-    public static final int DIRECTORIES = 2;
+    DIRECTORIES,
     /**
-     * Use the completions from the option metadata (if any) but treat them as
+     * Use the completions from the option meta-data (if any) but treat them as
      * if they were filenames for additional completion
      */
-    public static final int AS_FILENAMES = 3;
+    AS_FILENAMES,
     /**
-     * Use the completions from the option metadata (if any) but treat them as
+     * Use the completions from the option meta-data (if any) but treat them as
      * if they were directory names for additional completion
      */
-    public static final int AS_DIRECTORIES = 4;
+    AS_DIRECTORIES,
             
-    public static final int CLI_COMMANDS = 5;
+    /**
+     * Commands from the CLI for which we are provided completions
+     */
+    CLI_COMMANDS,
     
-    public static final int SYSTEM_COMMANDS = 6;;
+    /**
+     * OS System commands
+     */
+    SYSTEM_COMMANDS
 }

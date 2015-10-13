@@ -33,8 +33,8 @@ import org.apache.commons.collections4.SetUtils;
 public class OptionMetadata {
     private final OptionType optionType;
     private final Set<String> options;
-    private final String title, description, completionCommand;
-    private final int arity, completionBehaviour;
+    private final String title, description;
+    private final int arity;
     private final boolean hidden, overrides, sealed;
     private final List<OptionRestriction> restrictions;
     private Set<Accessor> accessors;
@@ -48,8 +48,6 @@ public class OptionMetadata {
                           boolean hidden, 
                           boolean overrides, 
                           boolean sealed,
-                          int completionBehaviours,
-                          String completionCommand,
                           Iterable<OptionRestriction> restrictions,
                           Iterable<Field> path) {
     //@formatter:on
@@ -70,8 +68,6 @@ public class OptionMetadata {
         this.hidden = hidden;
         this.overrides = overrides;
         this.sealed = sealed;
-        this.completionBehaviour = completionBehaviours;
-        this.completionCommand = completionCommand;
         this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions) : Collections.<OptionRestriction>emptyList();
 
         if (path != null) {
@@ -95,8 +91,6 @@ public class OptionMetadata {
         this.hidden = option.hidden;
         this.overrides = option.overrides;
         this.sealed = option.sealed;
-        this.completionBehaviour = option.completionBehaviour;
-        this.completionCommand = option.completionCommand;
         this.restrictions = option.restrictions;
 
         Set<Accessor> accessors = new LinkedHashSet<Accessor>();
@@ -144,14 +138,6 @@ public class OptionMetadata {
 
     public boolean isSealed() {
         return sealed;
-    }
-
-    public int getCompletionBehaviours() {
-        return completionBehaviour;
-    }
-
-    public String getCompletionCommand() {
-        return completionCommand;
     }
 
     public boolean isMultiValued() {
@@ -323,8 +309,6 @@ public class OptionMetadata {
                                     child.hidden, 
                                     child.overrides,
                                     child.sealed,
-                                    child.completionBehaviour,
-                                    child.completionCommand,
                                     child.restrictions.size() > 0 ? child.restrictions : parent.restrictions,
                                     null);
         //@formatter:on

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -26,8 +27,10 @@ import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.CompletionBehaviour;
+import com.github.rvesse.airline.Accessor;
+import com.github.rvesse.airline.annotations.help.BashCompletion;
 import com.github.rvesse.airline.help.common.AbstractGlobalUsageGenerator;
+import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
@@ -104,7 +107,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             for (CommandGroupMetadata group : global.getCommandGroups()) {
                 if (group.isHidden() && !this.includeHidden())
                     continue;
-                
+
                 commandNames.add(group.getName());
             }
         }
@@ -127,10 +130,9 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
         indent(writer, 4);
         writer.append("COMPREPLY=()").append(NEWLINE);
         if (global.getDefaultCommand() != null) {
-            writeCompletionGeneration(writer, 4, false, CompletionBehaviour.NONE, "COMMANDS",
-                    "DEFAULT_COMMAND_COMPLETIONS");
+            writeCompletionGeneration(writer, 4, false, null, "COMMANDS", "DEFAULT_COMMAND_COMPLETIONS");
         } else {
-            writeCompletionGeneration(writer, 4, false, CompletionBehaviour.NONE, "COMMANDS");
+            writeCompletionGeneration(writer, 4, false, null, "COMMANDS");
         }
         indent(writer, 2);
         writer.append("fi").append(DOUBLE_NEWLINE);
@@ -145,7 +147,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             for (CommandGroupMetadata group : global.getCommandGroups()) {
                 if (group.isHidden() && !this.includeHidden())
                     continue;
-                
+
                 // Add case for the group
                 writeGroupCase(writer, global, group, 4);
 
@@ -158,7 +160,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             for (CommandMetadata command : global.getDefaultGroupCommands()) {
                 if (groups.contains(command.getName()))
                     continue;
-                
+
                 groups.add(command.getName());
 
                 if (command.isHidden() && !this.includeHidden())
@@ -214,7 +216,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
         for (CommandGroupMetadata group : global.getCommandGroups()) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
-            
+
             // Generate the group completion function
             generateGroupCompletionFunction(writer, global, group);
 
@@ -341,10 +343,9 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             writer.append("DEFAULT_GROUP_COMMAND_COMPLETIONS=(${COMPREPLY[@]})").append(NEWLINE);
         }
         if (global.getDefaultCommand() != null) {
-            writeCompletionGeneration(writer, 4, true, CompletionBehaviour.NONE, "COMMANDS",
-                    "DEFAULT_GROUP_COMMAND_COMPLETIONS");
+            writeCompletionGeneration(writer, 4, true, null, "COMMANDS", "DEFAULT_GROUP_COMMAND_COMPLETIONS");
         } else {
-            writeCompletionGeneration(writer, 4, true, CompletionBehaviour.NONE, "COMMANDS");
+            writeCompletionGeneration(writer, 4, true, null, "COMMANDS");
         }
         writer.append("  fi").append(DOUBLE_NEWLINE);
 
@@ -419,16 +420,17 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
                 writer.append(")\n");
 
                 // Then generate the completions for the option
-                if (StringUtils.isNotEmpty(option.getCompletionCommand())) {
+                BashCompletion completion = getCompletionData(option);
+                if (completion != null && StringUtils.isNotEmpty(completion.command())) {
                     indent(writer, 8);
-                    writer.append("ARG_GENERATED_VALUES=$( ").append(option.getCompletionCommand()).append(" )")
-                            .append(NEWLINE);
+                    writer.append("ARG_GENERATED_VALUES=$( ").append(completion.command()).append(" )").append(NEWLINE);
                 }
-                AbstractAllowedValuesRestriction allowedValues = (AbstractAllowedValuesRestriction) CollectionUtils.find(option.getRestrictions(), new AllowedValuesOptionFinder());
+                AbstractAllowedValuesRestriction allowedValues = (AbstractAllowedValuesRestriction) CollectionUtils
+                        .find(option.getRestrictions(), new AllowedValuesOptionFinder());
                 if (allowedValues != null && allowedValues.getAllowedValues().size() > 0) {
                     writeWordListVariable(writer, 8, "ARG_VALUES", allowedValues.getAllowedValues().iterator());
                 }
-                writeCompletionGeneration(writer, 8, true, option.getCompletionBehaviours(), "ARG_VALUES",
+                writeCompletionGeneration(writer, 8, true, getCompletionData(option), "ARG_VALUES",
                         "ARG_GENERATED_VALUES");
                 indent(writer, 8);
                 writer.append(";;").append(NEWLINE);
@@ -439,19 +441,18 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
 
         // If we previously saw a flag we could see another option or an
         // argument if supported
-        int behaviour = CompletionBehaviour.NONE;
+        BashCompletion completion = null;
         if (command.getArguments() != null) {
-            if (StringUtils.isNotEmpty(command.getArguments().getCompletionCommand())) {
-                writer.append("  ARGUMENTS=$( ").append(command.getArguments().getCompletionCommand()).append(" )")
-                        .append(NEWLINE);
+            completion = getCompletionData(command.getArguments());
+            if (completion != null && StringUtils.isNotEmpty(completion.command())) {
+                writer.append("  ARGUMENTS=$( ").append(completion.command()).append(" )").append(NEWLINE);
             } else {
                 writer.append("  ARGUMENTS=").append(NEWLINE);
             }
-            behaviour = command.getArguments().getCompletionBehaviours();
         } else {
             writer.append("  ARGUMENTS=").append(NEWLINE);
         }
-        writeCompletionGeneration(writer, 2, true, behaviour, "FLAG_OPTS", "ARG_OPTS", "ARGUMENTS");
+        writeCompletionGeneration(writer, 2, true, completion, "FLAG_OPTS", "ARG_OPTS", "ARGUMENTS");
 
         // End Function
         writer.append('}').append(DOUBLE_NEWLINE);
@@ -534,28 +535,33 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
         }
     }
 
-    private void writeCompletionGeneration(Writer writer, int indent, boolean isNestedFunction, int behaviour,
-            String... varNames) throws IOException {
+    private void writeCompletionGeneration(Writer writer, int indent, boolean isNestedFunction,
+            BashCompletion completion, String... varNames) throws IOException {
         indent(writer, indent);
         writer.append("COMPREPLY=( $(compgen ");
 
-        // Add -o flag as appropriate
-        switch (behaviour) {
-        case CompletionBehaviour.FILENAMES:
-            writer.append("-o default ");
-            break;
-        case CompletionBehaviour.DIRECTORIES:
-            writer.append("-o dirnames ");
-            break;
-        case CompletionBehaviour.AS_FILENAMES:
-            writer.append("-o filenames ");
-            break;
-        case CompletionBehaviour.AS_DIRECTORIES:
-            writer.append("-o plusdirs ");
-            break;
-        case CompletionBehaviour.SYSTEM_COMMANDS:
-            writer.append("-c ");
-            break;
+        if (completion != null) {
+            // Add -o flag as appropriate
+            switch (completion.behaviour()) {
+            case FILENAMES:
+                writer.append("-o default ");
+                break;
+            case DIRECTORIES:
+                writer.append("-o dirnames ");
+                break;
+            case AS_FILENAMES:
+                writer.append("-o filenames ");
+                break;
+            case AS_DIRECTORIES:
+                writer.append("-o plusdirs ");
+                break;
+            case SYSTEM_COMMANDS:
+                writer.append("-c ");
+                break;
+            default:
+                // No completion behaviour
+                break;
+            }
         }
 
         // Build a word list from available variables
@@ -565,7 +571,7 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             if (i < varNames.length - 1)
                 writer.append(' ');
         }
-        if (behaviour == CompletionBehaviour.CLI_COMMANDS) {
+        if (completion != null && completion.behaviour() == CompletionBehaviour.CLI_COMMANDS) {
             writer.append(" ${COMMANDS}");
         }
         writer.append("\" -- ${CURR_WORD}) )").append(NEWLINE);
@@ -587,6 +593,38 @@ public class BashCompletionGenerator<T> extends AbstractGlobalUsageGenerator<T> 
             }
         }
         return builder.toString();
+    }
+
+    /**
+     * Gets the completion info for an option
+     * 
+     * @param option
+     *            Option
+     * @return Completion data, {@code null} if none specified
+     */
+    protected BashCompletion getCompletionData(OptionMetadata option) {
+        return getCompletionData(option.getAccessors());
+    }
+
+    /**
+     * Gets the completion info for arguments
+     * 
+     * @param arguments
+     *            Arguments
+     * @return Completion data, {@code null} if none specified
+     */
+    protected BashCompletion getCompletionData(ArgumentsMetadata arguments) {
+        return getCompletionData(arguments.getAccessors());
+    }
+
+    protected BashCompletion getCompletionData(Collection<Accessor> accessors) {
+        BashCompletion info = null;
+        for (Accessor accessor : accessors) {
+            info = accessor.getAnnotation(BashCompletion.class);
+            if (info != null)
+                break;
+        }
+        return info;
     }
 
 }

@@ -19,6 +19,7 @@ import com.github.rvesse.airline.parser.ParserUtil;
 import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -113,6 +114,11 @@ public class Accessor
             }
         }
         return instance;
+    }
+    
+    public <T extends Annotation> T getAnnotation(Class<T> annotationCls) {
+        Field lastField = path.get(path.size() - 1);
+        return lastField.getAnnotation(annotationCls);
     }
 
     public void addValues(Object commandInstance, Iterable<?> values)

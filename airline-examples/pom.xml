@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.github.rvesse</groupId>
@@ -8,7 +9,7 @@
   <artifactId>airline-examples</artifactId>
   <name>Airline - Examples</name>
   <description>Provides a variety of examples of using Airline</description>
-  
+
   <properties>
     <license.header.path>${project.parent.basedir}</license.header.path>
   </properties>
@@ -22,6 +23,11 @@
     <dependency>
       <groupId>com.github.rvesse</groupId>
       <artifactId>airline-io</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-help-bash</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
