@@ -6,12 +6,18 @@
     - New `airline-help-man` module
         - `ManSections` moved into this module (**Breaking**)
     - RONN help generators moved to `airline-help-ronn` module (**Breaking**)
+    - HTML help generators moved to `airline-help-html` module (**Breaking**)
+    - Bash help generators moved to `airline-help-bash` module (**Breaking**)
+        - `CompletionBehaviour` moved into this module (**Breaking**)
 - Help Improvements
-    - New direct man page generation via `ManCommandUsageGenerator`, `ManGlobalUsageGenerator` and `ManMultiPageGlobalUsageGenerator`
+    - New direct man page generation via `ManCommandUsageGenerator`, `ManGlobalUsageGenerator` and `ManMultiPageGlobalUsageGenerator` provided in the `airline-help-man`
         - These are intended to replace the existing RONN generators and as such the RONN generators are marked as deprecated
     - `CommandUsageGenerator` has new overloads that take a `ParserMetadata<T>` object, old overloads are deprecated in favour of these.  This allows generators to produce more accurate help in some circumstances
+    - New `@Copyright` and `@License` annotations for adding copyright and license statements to help
+    - New `@ProseSection` annotation for adding a custom prose section to help
  - Metadata Changes
      - User alias configuration are now preserved on a `UserAliasesSource<T>` class which is accessible via `ParserMetadata<T>.getUserAliasesSource()`
+     - `completionBehaviour` and `completionCommand` are no longer fields on the `@Option` and `@Arguments` annotation.  Instead use the `@BashCompletion` annotation from the `airline-help-bash` module
 
 ## 2.0.1
 

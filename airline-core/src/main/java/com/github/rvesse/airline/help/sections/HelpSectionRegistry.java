@@ -25,6 +25,7 @@ import com.github.rvesse.airline.annotations.help.Discussion;
 import com.github.rvesse.airline.annotations.help.Examples;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
 import com.github.rvesse.airline.annotations.help.HideSection;
+import com.github.rvesse.airline.annotations.help.License;
 import com.github.rvesse.airline.annotations.help.ProseSection;
 import com.github.rvesse.airline.help.sections.factories.CommonSectionsFactory;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionFactory;
@@ -51,6 +52,7 @@ public class HelpSectionRegistry {
         FACTORIES.put(ExitCodes.class, commonFactory);
         FACTORIES.put(HideSection.class, commonFactory);
         FACTORIES.put(Copyright.class, commonFactory);
+        FACTORIES.put(License.class, commonFactory);
         FACTORIES.put(ProseSection.class, commonFactory);
 
         init = true;

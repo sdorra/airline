@@ -16,11 +16,15 @@
 package com.github.rvesse.airline.help.sections.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.annotations.help.Copyright;
 import com.github.rvesse.airline.annotations.help.Discussion;
 import com.github.rvesse.airline.annotations.help.Examples;
 import com.github.rvesse.airline.annotations.help.HideSection;
+import com.github.rvesse.airline.annotations.help.License;
 import com.github.rvesse.airline.annotations.help.ProseSection;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
 import com.github.rvesse.airline.help.sections.HelpFormat;
@@ -39,26 +43,43 @@ public class CommonSectionsFactory implements HelpSectionFactory {
     @Override
     public HelpSection createSection(Annotation annotation) {
         if (annotation instanceof Examples) {
+            // Examples
             Examples ex = (Examples) annotation;
             return new ExamplesSection(ex.examples(), ex.descriptions());
         } else if (annotation instanceof Discussion) {
+            // Discussion
             return new DiscussionSection(((Discussion) annotation).paragraphs());
         } else if (annotation instanceof ExitCodes) {
+            // Exit Codes
             ExitCodes exits = (ExitCodes) annotation;
             return new ExitCodesSection(exits.codes(), exits.descriptions());
         } else if (annotation instanceof HideSection) {
+            // Hide Section
+            // Used to hide inherited section
             HideSection hide = (HideSection) annotation;
             return new BasicSection(hide.title(), 0, null, null, HelpFormat.NONE_PRINTABLE, new String[0]);
         } else if (annotation instanceof ProseSection) {
+            // Prose Section
             ProseSection prose = (ProseSection) annotation;
-            return new BasicSection(prose.title(), prose.suggestedOrder(), null, null, HelpFormat.PROSE,
-                    prose.paragraphs());
+            return new com.github.rvesse.airline.help.sections.common.ProseSection(prose.title(),
+                    prose.suggestedOrder(), prose.paragraphs());
         } else if (annotation instanceof Copyright) {
+            // Copyright Section
             Copyright copyright = (Copyright) annotation;
             String line = String.format("Copyright (c) %s %s%s", copyright.holder(), copyright.startYear(),
                     copyright.endYear() > copyright.startYear() ? String.format("-%s", copyright.endYear()) : "");
-            return new BasicSection(CommonSections.TITLE_COPYRIGHT, CommonSections.ORDER_COPYRIGHT, null, null,
-                    HelpFormat.PROSE, new String[] { line });
+            return new com.github.rvesse.airline.help.sections.common.ProseSection(CommonSections.TITLE_COPYRIGHT,
+                    CommonSections.ORDER_COPYRIGHT, new String[] { line });
+        } else if (annotation instanceof License) {
+            // License section
+            License license = (License) annotation;
+            String[] data = Arrays.copyOf(license.paragraphs(), StringUtils.isNotBlank(license.url())
+                    ? license.paragraphs().length + 1 : license.paragraphs().length);
+            if (StringUtils.isNotBlank(license.url())) {
+                data[data.length - 1] = String.format("Please see %s for more information", license.url());
+            }
+            return new com.github.rvesse.airline.help.sections.common.ProseSection(CommonSections.TITLE_LICENSE,
+                    CommonSections.ORDER_LICENSE, data);
         }
         return null;
     }

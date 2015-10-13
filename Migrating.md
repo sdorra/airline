@@ -1,4 +1,42 @@
-# Migrating to Airline 2
+# Migrating to Airline 2.1 from Airline 2
+
+Airline 2.1 includes a number of breaking changes which are part of improvements and restructuring of the help systems.
+
+## Help Modules
+
+Previously all help generators were included in the main `airline` module.  With Airline 2.1 only the CLI help is included in that module, all other help generators are provided by separate modules which can be pulled in as desired.
+
+Help Generators | New Module
+---------------------- | -----------------
+RONN | `airline-help-ronn`
+HTML | `airline-help-html`
+Bash Completion | `airline-help-bash`
+Man (**Added in 2.1**) | `airline-help-man`
+
+If you were using any of these then you may need to tweak your dependencies appropriately.
+
+## Generating Man pages
+
+Previously we provided RONN format help generators which generated RONN output (an extended dialect of Markdown) that could then be converted into `man` pages with the `ronn` tool.  However we found that RONN had a number of bugs that could cause the generated man pages to have strange formatting in some cases.
+
+To address this new Man format help generators are introduced which are capable of generating man pages directly without needing an intermediate format or third party tool.  As a result the existing RONN generators are deprecated and should be avoided in favour of the new help generators.
+
+## Bash Completion
+
+Previously information for Bash completion was provided by the `completionBehaviour` and `completionCommand` fields of the `@Option` and `@Arguments` annotations.  In 2.1 these are now moved into their own `@BashCompletion` annotation which is part of the `airline-help-bash` module.
+
+For example in Airline 2:
+
+    @Option(name = { "--example" }, arity = 1, completionBehaviour = CompletionBehaviour.FILES)
+    private String example;
+    
+Would change to the following in Airline 2.1:
+
+    @Option(name = { "--examples" }, arity = 1)
+    @BashCompletion(behaviour = CompletionBehaviour.FILES)
+    private String example;
+
+# Migrating to Airline 2 from Airline 1
 
 Airline 2 is a significant rewrite of Airline and as such there are lots of breaking changes to be aware of.  This document aims to guide you through the user facing changes.
 

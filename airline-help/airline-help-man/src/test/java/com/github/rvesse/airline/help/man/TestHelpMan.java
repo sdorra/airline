@@ -28,6 +28,7 @@ import com.github.rvesse.airline.Git.Add;
 import com.github.rvesse.airline.Git.RemoteAdd;
 import com.github.rvesse.airline.Git.RemoteShow;
 import com.github.rvesse.airline.SingleCommand;
+import com.github.rvesse.airline.args.ArgsCopyrightAndLicense;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
@@ -165,6 +166,36 @@ public class TestHelpMan {
                 ""
             }, '\n')
         );
+        //@formatter:on
+    }
+    
+    public void testCopyrightLicenseMan() throws IOException {
+        SingleCommand<ArgsCopyrightAndLicense> cmd = singleCommand(ArgsCopyrightAndLicense.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ManCommandUsageGenerator generator = new ManCommandUsageGenerator();
+        generator.usage(null, null, "ArgsCopyrightAndLicense", cmd.getCommandMetadata(), null, out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                StringUtils.join(new String[] 
+                {
+                    ".TH \"ArgsCopyrightAndLicense\" \"1\" \"\" \"\" \"\"",
+                    ".SH NAME",
+                    ".IP \"\" 0",
+                    "\\fBArgsCopyrightAndLicense\\fR",
+                    ".SH SYNOPSIS",
+                    ".IP \"\" 0",
+                    "\\fBArgsCopyrightAndLicense\\fR ",
+                    ".SH COPYRIGHT",
+                    ".IP \"\" 0",
+                    "Copyright (c) Acme Inc 2015\\-2016",
+                    ".SH LICENSE",
+                    ".IP \"\" 0",
+                    "This software is open source under the Apache License 2.0",
+                    ".IP \"\" 0",
+                    "Please see http://apache.org/licenses/LICENSE\\-2.0 for more information",
+                    ""
+                }, '\n'));
         //@formatter:on
     }
 

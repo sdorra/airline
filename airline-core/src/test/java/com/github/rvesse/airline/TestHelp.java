@@ -33,6 +33,7 @@ import com.github.rvesse.airline.args.Args2;
 import com.github.rvesse.airline.args.ArgsAllowedValues;
 import com.github.rvesse.airline.args.ArgsArityString;
 import com.github.rvesse.airline.args.ArgsBooleanArity;
+import com.github.rvesse.airline.args.ArgsCopyrightAndLicense;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsHiddenDiscussion;
@@ -238,6 +239,30 @@ public class TestHelp {
         //@formatter:on
     }
 
+    public void testCopyrightLicense() throws IOException {
+        SingleCommand<ArgsCopyrightAndLicense> cmd = singleCommand(ArgsCopyrightAndLicense.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Help.help(cmd.getCommandMetadata(), out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                "NAME\n" +
+                "        ArgsCopyrightAndLicense -\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        ArgsCopyrightAndLicense\n" +
+                "\n" +
+                "COPYRIGHT\n" +
+                "        Copyright (c) Acme Inc 2015-2016\n" +
+                "\n" +
+                "LICENSE\n" +
+                "        This software is open source under the Apache License 2.0\n" +
+                "\n" +
+                "        Please see http://apache.org/licenses/LICENSE-2.0 for more information\n" +
+                "\n");
+        //@formatter:on
+    }
+    
     public void testGit() throws IOException {
         //@formatter:off
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")

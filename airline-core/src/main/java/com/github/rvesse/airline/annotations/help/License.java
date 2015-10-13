@@ -21,34 +21,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that provides a copyright statement in a commands help
+ * Annotation that provides a license statement in a commands help
  *
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
-public @interface Copyright {
+public @interface License {
 
     /**
-     * Gets/Sets the start year
+     * Gets/Sets text describing the license that applies
      * 
-     * @return Start year
+     * @return License description
      */
-    public int startYear();
+    public String[] paragraphs() default {};
 
     /**
-     * Gets/Sets the end year
-     * <p>
-     * If less than the start year this is ignored
-     * </p>
+     * Gets/Sets a URL for the license
      * 
-     * @return End year
+     * @return License URL
      */
-    public int endYear() default -1;
-
-    /**
-     * Gets/Sets the copyright holder
-     * 
-     * @return Copyright holder
-     */
-    public String holder();
+    public String url() default "";
 }
