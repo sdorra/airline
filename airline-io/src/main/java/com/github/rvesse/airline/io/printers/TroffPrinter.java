@@ -21,6 +21,10 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Printer class for generating Troff output
+ *
+ */
 public class TroffPrinter {
 
     private static final String REQUEST_TABLE_END = ".TE";
@@ -48,28 +52,41 @@ public class TroffPrinter {
     private static final String REQUEST_BREAK = ".br";
 
     private enum ListType {
-        BULLET, TITLED, PLAIN
+        BULLET, TITLED, PLAIN, NUMBERED
+    }
+
+    private static final String BULLET_STYLE_BULLET = "\"\\(bu\"";
+    private static final String BULLET_STYLE_DASH = "\"\\(em\"";
+
+    public enum BulletStyle {
+        BULLET(BULLET_STYLE_BULLET), DASH(BULLET_STYLE_DASH);
+
+        private final String glyph;
+
+        BulletStyle(String glyph) {
+            this.glyph = glyph;
+        }
     }
 
     private static final int DEFAULT_INDENTATION = 4;
-
-    private static final String BULLET = "\"\\(bu\"";
 
     private final PrintWriter writer;
     private int level = 0;
     private boolean newline = true;
     private boolean inSection = false;
-    private int indentation = DEFAULT_INDENTATION;
+    private final int indentation = DEFAULT_INDENTATION;
     private Stack<ListType> lists = new Stack<ListType>();
+    private final String listGlyph;
 
     public TroffPrinter(PrintWriter writer) {
-        this(writer, DEFAULT_INDENTATION);
+        this(writer, DEFAULT_INDENTATION, BulletStyle.DASH);
     }
 
-    public TroffPrinter(PrintWriter writer, int indentation) {
+    public TroffPrinter(PrintWriter writer, int indentation, BulletStyle style) {
         if (writer == null)
             throw new NullPointerException("writer cannot be null");
         this.writer = writer;
+        this.listGlyph = style.glyph;
     }
 
     public void start(String title, int manSection) {
@@ -194,6 +211,20 @@ public class TroffPrinter {
         newline = false;
     }
 
+    public void startNumberedList() {
+        if (!newline)
+            writer.println();
+
+        if (level > 0 || inSection) {
+            writer.println(REQUEST_MOVE_LEFT_MARGIN);
+        }
+        lists.push(ListType.NUMBERED);
+        level++;
+        printNumberedBullet(true);
+
+        newline = false;
+    }
+
     /**
      * Starts a titled list, the next line of text printed will form the title
      */
@@ -236,7 +267,7 @@ public class TroffPrinter {
             printBullet();
             newline = false;
         } else {
-            throw new IllegalStateException("Cannot start a new list item when not currently in a list");
+            notInList();
         }
     }
 
@@ -251,7 +282,26 @@ public class TroffPrinter {
             printPlainBullet();
             newline = false;
         } else {
-            throw new IllegalStateException("Cannot start a new list item when not currently in a list");
+            notInList();
+        }
+    }
+
+    protected void notInList() {
+        throw new IllegalStateException("Cannot start a new list item when not currently in a list");
+    }
+
+    public void nextNumberedListItem() {
+        if (!newline)
+            writer.println();
+
+        if (level > 0) {
+            if (lists.peek() != ListType.NUMBERED)
+                throw new IllegalStateException(
+                        "Cannot move to next numbered list item when currently in another list type");
+            printNumberedBullet(false);
+            newline = false;
+        } else {
+            notInList();
         }
     }
 
@@ -298,7 +348,11 @@ public class TroffPrinter {
             throw new IllegalStateException("Cannot end a list when not currently in a list");
         }
 
-        lists.pop();
+        ListType type = lists.pop();
+        if (type == ListType.NUMBERED) {
+            // Clear the register
+            writer.println(String.format(".rr list%d", this.level));
+        }
         level--;
         newline = true;
     }
@@ -377,7 +431,7 @@ public class TroffPrinter {
     }
 
     protected void printBullet() {
-        writer.println(String.format(".IP %s %d", BULLET, this.indentation));
+        writer.println(String.format(".IP %s %d", this.listGlyph, this.indentation));
     }
 
     protected void printTitledBullet() {
@@ -386,6 +440,16 @@ public class TroffPrinter {
 
     protected void printPlainBullet() {
         writer.println(String.format(".IP \"\" %d", this.indentation));
+    }
+
+    protected void printNumberedBullet(boolean first) {
+        if (first) {
+            // Create the register
+            writer.println(String.format(".nr list%d 1 1", this.level));
+            writer.println(String.format(".IP \\n[list%d]. %d", this.level, this.indentation));
+        } else {
+            writer.println(String.format(".IP \\n+[list%d]. %d", this.level, this.indentation));
+        }
     }
 
     private String asArg(String arg) {

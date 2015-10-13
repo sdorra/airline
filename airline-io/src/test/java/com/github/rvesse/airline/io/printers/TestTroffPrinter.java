@@ -29,8 +29,12 @@ public class TestTroffPrinter {
     private static final String TABLE_END = ".TE";
     private static final String TABLE_START = ".TS";
     private static final String END_LIST = ".IP \"\" 0";
-    private static final String BULLET = ".IP \"\\(bu\" 4";
+    private static final String BULLET = ".IP \"\\(em\" 4";
     private static final String PLAIN = ".IP \"\" 4";
+    private static final String NUMBER_REG = ".nr list1 1 1";
+    private static final String NUMBER_REG_CLEAR = ".rr list1";
+    private static final String NUMBER_BULLET_FIRST = ".IP \\n[list1]. 4";
+    private static final String NUMBER_BULLET_REST = ".IP \\n+[list1]. 4";
     private static final String TITLED_BULLET = ".TP";
     private static final String BREAK = ".br";
     
@@ -149,6 +153,37 @@ public class TestTroffPrinter {
     }
     
     @Test
+    public void numbered_list() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startNumberedList();
+        printer.println("A");
+        printer.nextNumberedListItem();
+        printer.println("B");
+        printer.nextNumberedListItem();
+        printer.println("C");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        String expected = StringUtils.join(new String[] { 
+                NUMBER_REG,
+                NUMBER_BULLET_FIRST,
+                "A", 
+                NUMBER_BULLET_REST, 
+                "B", 
+                NUMBER_BULLET_REST,
+                "C",
+                END_LIST,
+                NUMBER_REG_CLEAR,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
     public void nested_list_01() {
         StringWriter strWriter = new StringWriter();
         TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
@@ -246,6 +281,45 @@ public class TestTroffPrinter {
                 BULLET,
                 "C",
                 END_LIST,
+                ""
+            }, '\n');
+        //@formatter:on
+        Assert.assertEquals(strWriter.toString(), expected);
+    }
+    
+    @Test
+    public void nested_list_04() {
+        StringWriter strWriter = new StringWriter();
+        TroffPrinter printer = new TroffPrinter(new PrintWriter(strWriter));
+        
+        printer.startNumberedList();
+        printer.println("A");
+        printer.startNumberedList();
+        printer.println("B");
+        printer.endList();
+        printer.nextNumberedListItem();
+        printer.println("C");
+        printer.endList();
+        printer.finish();
+        
+        //@formatter:off
+        // 1. A
+        //   1. B
+        // 2. C
+        String expected = StringUtils.join(new String[] {
+                NUMBER_REG,
+                NUMBER_BULLET_FIRST,
+                "A", 
+                ".RS",
+                NUMBER_REG.replace("list1", "list2"),
+                NUMBER_BULLET_FIRST.replace("list1", "list2"),
+                "B", 
+                ".RE",
+                NUMBER_REG_CLEAR.replace("list1", "list2"),
+                NUMBER_BULLET_REST,
+                "C",
+                END_LIST,
+                NUMBER_REG_CLEAR,
                 ""
             }, '\n');
         //@formatter:on
