@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -31,15 +32,62 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.builder.AliasBuilder;
 import com.github.rvesse.airline.model.AliasMetadata;
 
+/**
+ * Represents the source of user defined aliases
+ * 
+ * @author rvesse
+ *
+ * @param <C>
+ */
 public class UserAliasesSource<C> {
 
-    private final String[] searchLocations;
+    private final List<String> searchLocations;
     private final String filename, prefix;
 
     public UserAliasesSource(String filename, String prefix, String... searchLocations) {
         this.filename = filename;
         this.prefix = prefix;
-        this.searchLocations = Arrays.copyOf(searchLocations, searchLocations.length);
+        this.searchLocations = Collections.unmodifiableList(Arrays.asList(searchLocations));
+
+        if (StringUtils.isBlank(this.filename)) {
+            throw new IllegalArgumentException("Filename cannot be null/empty/blank");
+        }
+        if (this.searchLocations.size() == 0) {
+            throw new IllegalArgumentException("At least one search location must be specified");
+        }
+    }
+
+    /**
+     * Gets the filename of the configuration file that will be scanned for
+     * alias definitions
+     * 
+     * @return Configuration file name
+     */
+    public String getFilename() {
+        return this.filename;
+    }
+
+    /**
+     * Gets the search locations where the configuration file may be located in
+     * order of preference
+     * 
+     * @return Search locations in order of preference
+     */
+    public List<String> getSearchLocations() {
+        return this.searchLocations;
+    }
+
+    /**
+     * Gets the prefix that is used to distinguish alias definitions from other
+     * property definitions in the configuration file
+     * <p>
+     * If this is null/empty/blank then no prefix is in effect
+     * </p>
+     * 
+     * @return Prefix
+     */
+    public String getPrefix() {
+        return this.prefix;
     }
 
     public List<AliasMetadata> load() throws FileNotFoundException, IOException {
@@ -54,9 +102,9 @@ public class UserAliasesSource<C> {
         // Search locations in reverse order overwriting previously found values
         // each time. Thus the first location in the list has highest precedence
         Set<String> loaded = new HashSet<>();
-        for (int i = searchLocations.length - 1; i >= 0; i--) {
+        for (int i = searchLocations.size() - 1; i >= 0; i--) {
             // Check an actual location
-            String loc = searchLocations[i];
+            String loc = searchLocations.get(i);
             if (StringUtils.isBlank(loc))
                 continue;
 
@@ -86,7 +134,7 @@ public class UserAliasesSource<C> {
         }
 
         // Strip any irrelevant properties
-        if (StringUtils.isNotEmpty(prefix)) {
+        if (StringUtils.isNotBlank(prefix)) {
             List<Object> keysToRemove = new ArrayList<Object>();
             for (Object key : properties.keySet()) {
                 if (!key.toString().startsWith(prefix))

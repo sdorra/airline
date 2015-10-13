@@ -103,7 +103,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
      * @param parserConfig
      *            Parser Configuration
      * @param command
-     *            Command metadata
+     *            Command meta-data
      * @param args
      *            Arguments
      * @return Parser State

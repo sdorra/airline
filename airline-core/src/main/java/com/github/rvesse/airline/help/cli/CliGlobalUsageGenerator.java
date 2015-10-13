@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
@@ -26,11 +28,12 @@ import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
 public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
-    
+
     private final CliUsageHelper helper;
 
     public CliGlobalUsageGenerator() {
@@ -60,8 +63,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
         helper = createHelper(optionComparator, includeHidden);
     }
 
-    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
-            boolean includeHidden) {
+    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
         return new CliUsageHelper(optionComparator, includeHidden);
     }
 
@@ -81,6 +83,11 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
 
         // Command list
         outputCommandList(out, global);
+
+        // Aliases
+        if (global.getParserConfiguration().getUserAliasesSource() != null) {
+            outputUserAliases(out, global, global.getParserConfiguration().getUserAliasesSource());
+        }
     }
 
     /**
@@ -99,13 +106,15 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             outputCommandDescription(commandPrinter, null, command);
         }
-        
+
         outputGroupCommandsList(commandPrinter, global, global.getCommandGroups());
     }
-    
-    protected void outputGroupCommandsList(UsagePrinter out, GlobalMetadata<T> global, List<CommandGroupMetadata> groups) throws IOException {
-        if (groups.size() == 0) return;
-        
+
+    protected void outputGroupCommandsList(UsagePrinter out, GlobalMetadata<T> global,
+            List<CommandGroupMetadata> groups) throws IOException {
+        if (groups.size() == 0)
+            return;
+
         for (CommandGroupMetadata group : sortCommandGroups(groups)) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
@@ -113,7 +122,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
             for (CommandMetadata command : sortCommands(group.getCommands())) {
                 outputCommandDescription(out, group, command);
             }
-            
+
             if (group.getSubGroups().size() > 0) {
                 UsagePrinter subGroupPrinter = out.newIndentedPrinter(4);
                 outputGroupCommandsList(subGroupPrinter, global, group.getSubGroups());
@@ -176,5 +185,69 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
             }
             out.newline();
         }
+    }
+
+    protected void outputUserAliases(UsagePrinter out, GlobalMetadata<T> global, UserAliasesSource<T> userAliases)
+            throws IOException {
+        if (userAliases == null)
+            return;
+
+        out.append("USER DEFINED ALIASES").newline();
+
+        UsagePrinter aliasPrinter = out.newIndentedPrinter(8);
+        aliasPrinter
+                .append(String.format(
+                        "This CLI supports user defined aliases which may be placed in a %s file located in %s the following location(s):",
+                        userAliases.getFilename(), userAliases.getSearchLocations().size() > 1 ? "one/more of" : ""))
+                .newline().newline();
+
+        UsagePrinter locationPrinter = aliasPrinter.newIndentedPrinter(4);
+        int i = 1;
+        for (String location : userAliases.getSearchLocations()) {
+            locationPrinter.append(String.format("%d) %s", i, location)).newline();
+            i++;
+        }
+        locationPrinter.flush();
+
+        aliasPrinter.newline();
+        if (userAliases.getSearchLocations().size() > 1) {
+            aliasPrinter
+                    .append("Where the file exists in multiple locations then the files are merged together with the earlier locations taking precedence.")
+                    .newline().newline();
+        }
+        aliasPrinter.append("This file contains aliases defined in Java properties file style e.g.").newline()
+                .newline();
+
+        UsagePrinter examplePrinter = aliasPrinter.newIndentedPrinter(4);
+        examplePrinter
+                .append(String.format("%sfoo=bar --flag",
+                        StringUtils.isNotBlank(userAliases.getPrefix()) ? userAliases.getPrefix() : ""))
+                .newline().newline();
+        examplePrinter.flush();
+
+        aliasPrinter.append("Here an alias foo is defined which causes the bar command to be invoked with the --flag option passed to it.");
+        if (StringUtils.isNotBlank(userAliases.getPrefix())) {
+            aliasPrinter.append("Aliases are distinguished from other properties in the file by the prefix '"
+                    + userAliases.getPrefix() + "' as seen in the example.").newline();
+        }
+        aliasPrinter.newline();
+        aliasPrinter.append("Alias definitions are subject to the following conditions:").newline().newline();
+
+        UsagePrinter restrictionsPrinter = aliasPrinter.newIndentedPrinter(4);
+        if (global.getParserConfiguration().aliasesOverrideBuiltIns()) {
+            restrictionsPrinter.append("- Aliases may override existing commands");
+        } else {
+            restrictionsPrinter.append("- Aliases cannot override existing commands");
+        }
+        restrictionsPrinter.newline();
+        if (global.getParserConfiguration().aliasesMayChain()) {
+            restrictionsPrinter.append(
+                    "- Aliases may be defined in terms of other aliases provided circular references are not created");
+        } else {
+            restrictionsPrinter.append("- Aliases cannot be defined in terms of other aliases");
+        }
+        restrictionsPrinter.newline();
+        restrictionsPrinter.flush();
+
     }
 }

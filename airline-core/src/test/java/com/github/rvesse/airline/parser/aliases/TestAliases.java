@@ -15,11 +15,14 @@
  */
 package com.github.rvesse.airline.parser.aliases;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -28,6 +31,7 @@ import org.testng.annotations.Test;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
+import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
@@ -35,11 +39,11 @@ public class TestAliases {
 
     private static final File f = new File("target/test.config");
     private static String homeDir;
-    
+
     @BeforeClass
     public static void setup() {
         homeDir = System.getProperty("user.home");
-        
+
         // Change home directory for purposes of these tests
         System.setProperty("user.home", new File("target/").getAbsolutePath());
     }
@@ -164,7 +168,7 @@ public class TestAliases {
         Assert.assertEquals(cmd.parameters.size(), 1);
         Assert.assertEquals(cmd.parameters.get(0), "faz");
     }
-    
+
     @Test
     public void user_aliases_home_dir_01() throws IOException {
         prepareConfig(f, "foo=Args1 bar");
@@ -413,4 +417,56 @@ public class TestAliases {
         // Check parsing
         cli.parse();
     }
+
+    @Test
+    public void user_aliases_help_01() throws IOException {
+        prepareConfig(f, "a.foo=Args1 bar", "b.foo=Args1 faz");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), "b.", "target/");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Alias Help
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        new CliGlobalUsageGenerator<Args1>().usage(cli.getMetadata(), output);
+        //@formatter:off
+        Assert.assertEquals(new String(output.toByteArray(), StandardCharsets.UTF_8),
+                StringUtils.join(new String[] {
+                "NAME",
+                "        test -",
+                "",
+                "SYNOPSIS",
+                "        test <command> [ <args> ]",
+                "",
+                "COMMANDS",
+                "        Args1",
+                "            args1 description",
+                "",
+                "USER DEFINED ALIASES",
+                "        This CLI supports user defined aliases which may be placed in a",
+                "        test.config file located in the following location(s):",
+                "",
+                "            1) target/",
+                "",
+                "        This file contains aliases defined in Java properties file style e.g.",
+                "",
+                "            b.foo=bar --flag",
+                "",
+                "        Here an alias foo is defined which causes the bar command to be invoked",
+                "        with the --flag option passed to it. Aliases are distinguished from",
+                "        other properties in the file by the prefix 'b.' as seen in the example.",
+                "",
+                "        Alias definitions are subject to the following conditions:",
+                "",
+                "            - Aliases cannot override existing commands",
+                "            - Aliases cannot be defined in terms of other aliases",
+                ""
+                }, '\n'));
+        //@formatter:on
+    }
+
 }
