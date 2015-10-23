@@ -14,6 +14,7 @@
     <module>airline-help-ronn</module>
     <module>airline-help-html</module>
     <module>airline-help-bash</module>
+    <module>airline-help-markdown</module>
   </modules>
 
   <properties>
