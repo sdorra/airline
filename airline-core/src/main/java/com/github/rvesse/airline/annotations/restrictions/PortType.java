@@ -16,12 +16,18 @@
 package com.github.rvesse.airline.annotations.restrictions;
 
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Port types
  */
-public enum PortType {
+public enum PortType implements Comparable<PortType> {
 
+    /**
+     * Any port
+     */
+    ANY(0, 65535),
     /**
      * Port {@code 0} i.e. the special port that has the OS allocate an
      * available port
@@ -41,11 +47,7 @@ public enum PortType {
      * The dynamic ports (aka private or ephemeral ports), these are ports
      * {@code 49152} to {@code 65535} which are never assigned by the IANA
      */
-    DYNAMIC(49152, 65535),
-    /**
-     * Any port
-     */
-    ANY(0, 65535);
+    DYNAMIC(49152, 65535);
 
     private final int min, max;
 
@@ -83,6 +85,22 @@ public enum PortType {
         return port >= min && port <= max;
     }
 
+    /**
+     * Gets whether the port type contains another port type i.e. does this
+     * cover at least the same range of ports as the other
+     * 
+     * @param other
+     *            Other port type
+     * @return True if this covers at least the same range of ports as the
+     *         other, false otherwise
+     */
+    public boolean contains(PortType other) {
+        if (this == other)
+            return true;
+
+        return this.getMinimumPort() <= other.getMinimumPort() && this.getMaximumPort() >= other.getMaximumPort();
+    }
+
     @Override
     public String toString() {
         if (min != max) {
@@ -102,11 +120,31 @@ public enum PortType {
     public static String toRangesString(Iterable<PortType> portTypes) {
         StringBuilder builder = new StringBuilder();
         Iterator<PortType> iter = portTypes.iterator();
+        Set<PortType> types = new TreeSet<>();
+        while (iter.hasNext()) {
+            PortType range = iter.next();
+
+            // Check that the port range is not contained in another port range
+            // we've already seen
+            boolean add = true;
+            for (PortType other : types) {
+                if (other.contains(range)) {
+                    add = false;
+                    break;
+                }
+            }
+            if (add)
+                types.add(range);
+        }
+
+        // Build the string
+        iter = types.iterator();
         while (iter.hasNext()) {
             builder.append(iter.next().toString());
             if (iter.hasNext())
                 builder.append(", ");
         }
+
         return builder.toString();
     }
 }
