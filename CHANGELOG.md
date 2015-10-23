@@ -15,6 +15,9 @@
     - `CommandUsageGenerator` has new overloads that take a `ParserMetadata<T>` object, old overloads are deprecated in favour of these.  This allows generators to produce more accurate help in some circumstances
     - New `@Copyright` and `@License` annotations for adding copyright and license statements to help
     - New `@ProseSection` annotation for adding a custom prose section to help
+    - Improved presentation of help hint for options/arguments annotated with `@Port`
+    - Numeric ranges no longer explicitly set min/max if those are set to the min/max of their respective numeric types.
+    - Improved presentation of help hint for single value ranges
  - Metadata Changes
      - User alias configuration are now preserved on a `UserAliasesSource<T>` class which is accessible via `ParserMetadata<T>.getUserAliasesSource()`
      - `completionBehaviour` and `completionCommand` are no longer fields on the `@Option` and `@Arguments` annotation.  Instead use the `@BashCompletion` annotation from the `airline-help-bash` module

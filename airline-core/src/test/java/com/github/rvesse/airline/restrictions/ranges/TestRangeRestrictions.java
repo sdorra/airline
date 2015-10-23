@@ -174,6 +174,30 @@ public class TestRangeRestrictions {
         
         checkHelp(parser, new String[] { "value == 0" }, new String[0]);
     }
+    
+    @Test
+    public void integer_range_complete() throws IOException {
+        SingleCommand<? extends OptionRangeBase> parser = TestingUtil
+                .singleCommandParser(OptionIntegerRangeComplete.class);
+        hasRangeRestriction(parser.getCommandMetadata());
+
+        OptionRangeBase cmd = parser.parse("-i", Long.toString(Long.MAX_VALUE));
+        Assert.assertEquals(cmd.i, Long.MAX_VALUE);
+        
+        checkHelp(parser, new String[0], new String[] { String.format("%s <= value <= %s", Long.MIN_VALUE, Long.MAX_VALUE) });
+    }
+    
+    @Test
+    public void integer_range_complete_exclusive() throws IOException {
+        SingleCommand<? extends OptionRangeBase> parser = TestingUtil
+                .singleCommandParser(OptionIntegerRangeCompleteExclusive.class);
+        hasRangeRestriction(parser.getCommandMetadata());
+
+        OptionRangeBase cmd = parser.parse("-i", Long.toString(Long.MAX_VALUE - 1));
+        Assert.assertEquals(cmd.i, Long.MAX_VALUE - 1);
+        
+        checkHelp(parser, new String[] { String.format("%s < value < %s", Long.MIN_VALUE, Long.MAX_VALUE) }, new String[0]);
+    }
 
     @Test(expectedExceptions = ParseInvalidRestrictionException.class)
     public void integer_range_invalid_01() {
