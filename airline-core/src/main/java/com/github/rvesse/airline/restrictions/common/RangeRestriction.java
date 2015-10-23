@@ -39,7 +39,7 @@ import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 public class RangeRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final Object min, max;
-    private final boolean minInclusive, maxInclusive;
+    private final boolean minInclusive, maxInclusive, singleValue;
     private final Comparator<Object> comparator;
 
     public RangeRestriction(Object min, boolean minInclusive, Object max, boolean maxInclusive,
@@ -55,13 +55,16 @@ public class RangeRestriction extends AbstractCommonRestriction implements HelpH
         // Validate the range
         if (min != null && max != null) {
             int rangeComparison = this.comparator.compare(min, max);
+            this.singleValue = rangeComparison == 0;
             if (rangeComparison > 0)
                 throw new ParseInvalidRestrictionException("min (%s) is greater than max (%s)", min, max);
             if (rangeComparison == 0 && (!minInclusive || !maxInclusive))
                 throw new ParseInvalidRestrictionException(
-                        "min (%s) and max (%s) compare as equal but either minInclusive or maxInclusive was false",
-                        min, max);
+                        "min (%s) and max (%s) compare as equal but either minInclusive or maxInclusive was false", min,
+                        max);
 
+        } else {
+            this.singleValue = false;
         }
     }
 
@@ -121,8 +124,12 @@ public class RangeRestriction extends AbstractCommonRestriction implements HelpH
     public String[] getContentBlock(int blockNumber) {
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
-        return new String[] { String.format("This options value must fall in the following range: %s",
-                AirlineUtils.toRangeString(this.min, this.minInclusive, this.max, this.maxInclusive)) };
+        if (this.singleValue) {
+            return new String[] { String.format("This options value must meet the restriction value == %s", this.min) };
+        } else {
+            return new String[] { String.format("This options value must fall in the following range: %s",
+                    AirlineUtils.toRangeString(this.min, this.minInclusive, this.max, this.maxInclusive)) };
+        }
     }
 
 }

@@ -107,19 +107,21 @@ public class RangeRestrictionFactory implements OptionRestrictionFactory, Argume
     protected RangeRestriction createLexicalRange(Annotation annotation) {
         LexicalRange lRange = (LexicalRange) annotation;
         return new RangeRestriction(StringUtils.isEmpty(lRange.min()) ? null : lRange.min(), lRange.minInclusive(),
-                StringUtils.isEmpty(lRange.max()) ? null : lRange.max(), lRange.maxInclusive(), new LexicalComparator(
-                        Locale.forLanguageTag(lRange.locale())));
+                StringUtils.isEmpty(lRange.max()) ? null : lRange.max(), lRange.maxInclusive(),
+                new LexicalComparator(Locale.forLanguageTag(lRange.locale())));
     }
 
     protected RangeRestriction createFloatRange(Annotation annotation) {
         FloatRange sRange = (FloatRange) annotation;
-        return new RangeRestriction(Float.valueOf(sRange.min()), sRange.minInclusive(), Float.valueOf(sRange.max()),
+        return new RangeRestriction(sRange.min() != Float.MIN_VALUE ? Float.valueOf(sRange.min()) : null,
+                sRange.minInclusive(), sRange.max() != Float.MAX_VALUE ? Float.valueOf(sRange.max()) : null,
                 sRange.maxInclusive(), FLOAT_COMPARATOR);
     }
 
     protected RangeRestriction createDoubleRange(Annotation annotation) {
         DoubleRange sRange = (DoubleRange) annotation;
-        return new RangeRestriction(Double.valueOf(sRange.min()), sRange.minInclusive(), Double.valueOf(sRange.max()),
+        return new RangeRestriction(sRange.min() != Double.MIN_VALUE ? Double.valueOf(sRange.min()) : null,
+                sRange.minInclusive(), sRange.max() != Double.MAX_VALUE ? Double.valueOf(sRange.max()) : null,
                 sRange.maxInclusive(), DOUBLE_COMPARATOR);
     }
 
@@ -131,19 +133,23 @@ public class RangeRestrictionFactory implements OptionRestrictionFactory, Argume
 
     protected RangeRestriction createShortRange(Annotation annotation) {
         ShortRange sRange = (ShortRange) annotation;
-        return new RangeRestriction(Short.valueOf(sRange.min()), sRange.minInclusive(), Short.valueOf(sRange.max()),
+        return new RangeRestriction(sRange.min() != Short.MIN_VALUE ? Short.valueOf(sRange.min()) : null,
+                sRange.minInclusive(), sRange.max() != Short.MAX_VALUE ? Short.valueOf(sRange.max()) : null,
                 sRange.maxInclusive(), SHORT_COMPARATOR);
     }
 
     protected RangeRestriction createIntegerRange(Annotation annotation) {
         IntegerRange iRange = (IntegerRange) annotation;
-        return new RangeRestriction(Integer.valueOf(iRange.min()), iRange.minInclusive(),
-                Integer.valueOf(iRange.max()), iRange.maxInclusive(), INTEGER_COMPARATOR);
+        return new RangeRestriction(
+                iRange.min() != Integer.MIN_VALUE ? Integer.valueOf(iRange.min()) : Integer.MIN_VALUE,
+                iRange.minInclusive(), iRange.max() != Integer.MAX_VALUE ? Integer.valueOf(iRange.max()) : null,
+                iRange.maxInclusive(), INTEGER_COMPARATOR);
     }
 
     protected RangeRestriction createLongRange(Annotation annotation) {
         LongRange iRange = (LongRange) annotation;
-        return new RangeRestriction(Long.valueOf(iRange.min()), iRange.minInclusive(), Long.valueOf(iRange.max()),
+        return new RangeRestriction(iRange.min() != Long.MIN_VALUE ? Long.valueOf(iRange.min()) : null,
+                iRange.minInclusive(), iRange.max() != Long.MAX_VALUE ? Long.valueOf(iRange.max()) : null,
                 iRange.maxInclusive(), LONG_COMPARATOR);
     }
 
