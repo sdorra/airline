@@ -28,6 +28,7 @@ import com.github.rvesse.airline.annotations.restrictions.MinOccurrences;
 import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import com.github.rvesse.airline.annotations.restrictions.NotEmpty;
 import com.github.rvesse.airline.annotations.restrictions.Once;
+import com.github.rvesse.airline.annotations.restrictions.Path;
 import com.github.rvesse.airline.annotations.restrictions.Pattern;
 import com.github.rvesse.airline.annotations.restrictions.Port;
 import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
@@ -121,6 +122,7 @@ public class RestrictionRegistry {
 
         // Specialized restrictions
         registerCommon(Port.class, new PortRestrictionFactory());
+        registerCommon(Path.class, new PathRestrictionFactory());
 
         init = true;
     }
