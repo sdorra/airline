@@ -20,14 +20,15 @@ import java.lang.annotation.Annotation;
 import com.github.rvesse.airline.annotations.restrictions.Path;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.restrictions.common.FileRestriction;
+import com.github.rvesse.airline.restrictions.common.PathRestriction;
 
 public class PathRestrictionFactory implements OptionRestrictionFactory, ArgumentsRestrictionFactory {
-    
-    protected final FileRestriction createCommon(Annotation annotation) {
+
+    protected final PathRestriction createCommon(Annotation annotation) {
         if (annotation instanceof Path) {
             Path path = (Path) annotation;
-            return new FileRestriction(path.mustExist(), path.readable(), path.writeable(), path.executable(), path.kind());
+            return new PathRestriction(path.mustExist(), path.readable(), path.writable(), path.executable(),
+                    path.kind());
         }
         return null;
     }

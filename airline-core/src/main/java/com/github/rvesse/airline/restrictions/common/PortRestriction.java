@@ -76,8 +76,9 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
         invalidPort(String.format("Option '%s'", option.getTitle()), value);
     }
 
-    protected void invalidArgumentsPort(ArgumentsMetadata arguments, Object value) {
-        invalidPort(String.format("Argument '%s'", arguments.getTitle().get(0)), value);
+    protected void invalidArgumentsPort(ArgumentsMetadata arguments, int argIndex, Object value) {
+        invalidPort(String.format("Argument '%s'", AbstractCommonRestriction.getArgumentTitle(arguments, argIndex)),
+                value);
     }
 
     protected void invalidPort(String title, Object value) {
@@ -95,19 +96,22 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
             return;
 
         List<Object> values = state.getParsedArguments();
+        int i = 0;
         for (Object value : values) {
             if (value instanceof Long) {
                 if (!isValid(((Long) value).longValue()))
-                    invalidArgumentsPort(arguments, value);
+                    invalidArgumentsPort(arguments, i, value);
             } else if (value instanceof Integer) {
                 if (!isValid(((Integer) value).intValue()))
-                    invalidArgumentsPort(arguments, value);
+                    invalidArgumentsPort(arguments, i, value);
             } else if (value instanceof Short) {
                 if (!isValid(((Short) value).shortValue()))
-                    invalidArgumentsPort(arguments, value);
+                    invalidArgumentsPort(arguments, i, value);
+            } else {
+                throw new ParseInvalidRestrictionException("Cannot apply a @Port restriction to an option of type %s",
+                        arguments.getJavaType());
             }
-            throw new ParseInvalidRestrictionException("Cannot apply a @Port restriction to an option of type %s",
-                    arguments.getJavaType());
+            i++;
         }
     }
 
@@ -167,8 +171,9 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
         if (this.acceptablePorts.contains(PortType.ANY)) {
-            return new String[] { String.format(
-                    "This options value represents a port and must fall in the port range %s", PortType.ANY.toString()) };
+            return new String[] {
+                    String.format("This options value represents a port and must fall in the port range %s",
+                            PortType.ANY.toString()) };
         } else {
             return new String[] { String.format(
                     "This options value represents a port and must fall in one of the following port ranges: %s",

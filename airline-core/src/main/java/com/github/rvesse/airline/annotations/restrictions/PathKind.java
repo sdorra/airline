@@ -16,9 +16,9 @@
 package com.github.rvesse.airline.annotations.restrictions;
 
 /**
- * Enumeration of file kinds
+ * Enumeration of path kinds
  */
-public enum FileKind {
+public enum PathKind {
     /**
      * File
      */
@@ -28,7 +28,7 @@ public enum FileKind {
      */
     DIRECTORY,
     /**
-     * File or Directory
+     * Any path
      */
-    FILE_OR_DIRECTORY
+    ANY
 }

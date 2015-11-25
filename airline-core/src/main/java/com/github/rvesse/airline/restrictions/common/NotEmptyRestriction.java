@@ -23,7 +23,7 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
-import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 
 public class NotEmptyRestriction extends AbstractStringRestriction implements HelpHint {
 
@@ -41,7 +41,7 @@ public class NotEmptyRestriction extends AbstractStringRestriction implements He
     protected <T> ParseRestrictionViolatedException violated(ParseState<T> state, ArgumentsMetadata arguments,
             String value) {
         return new ParseRestrictionViolatedException("Arguments '%s' requires a non-empty value",
-                AirlineUtils.first(arguments.getTitle()));
+                AbstractCommonRestriction.getArgumentTitle(state, arguments));
     }
 
     @Override

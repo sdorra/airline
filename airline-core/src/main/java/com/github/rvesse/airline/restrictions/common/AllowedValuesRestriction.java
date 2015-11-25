@@ -31,6 +31,7 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
@@ -88,9 +89,12 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
             return;
 
         Set<Object> allowedValues = createAllowedValues(state, arguments.getTitle().get(0), arguments.getJavaType());
+        int i = 0;
         for (Object parsedArg : parsedArguments) {
             if (!allowedValues.contains(parsedArg))
-                throw new ParseArgumentsIllegalValueException(arguments.getTitle().get(0), parsedArg, allowedValues);
+                throw new ParseArgumentsIllegalValueException(AbstractCommonRestriction.getArgumentTitle(arguments, i),
+                        parsedArg, allowedValues);
+            i++;
         }
     }
 

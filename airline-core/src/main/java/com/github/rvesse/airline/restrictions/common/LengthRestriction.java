@@ -21,10 +21,12 @@ import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
+import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * A restriction that requires string values
+ * 
  * @author rvesse
  *
  */
@@ -66,12 +68,12 @@ public class LengthRestriction extends AbstractStringRestriction implements Help
         if (maximum) {
             return new ParseRestrictionViolatedException(
                     "Argument '%s' was given value '%s' that has length %d which exceeds the maximum permitted length of %d",
-                    AirlineUtils.first(arguments.getTitle()), value, value.length(), this.length);
+                    AbstractCommonRestriction.getArgumentTitle(state, arguments), value, value.length(), this.length);
 
         } else {
             return new ParseRestrictionViolatedException(
                     "Argument '%s' was given value '%s' that has length %d which is below the minimum required length of %d",
-                    AirlineUtils.first(arguments.getTitle()), value, value.length(), this.length);
+                    AbstractCommonRestriction.getArgumentTitle(state, arguments), value, value.length(), this.length);
         }
     }
 
@@ -94,11 +96,13 @@ public class LengthRestriction extends AbstractStringRestriction implements Help
     public String[] getContentBlock(int blockNumber) {
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
-        
+
         if (maximum) {
-            return new String[] { String.format("This options value has a maximum length of %d characters", this.length) };
+            return new String[] {
+                    String.format("This options value has a maximum length of %d characters", this.length) };
         } else {
-            return new String[] { String.format("This options value has a minimum length of %d characters", this.length) };
+            return new String[] {
+                    String.format("This options value has a minimum length of %d characters", this.length) };
         }
     }
 

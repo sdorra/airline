@@ -21,6 +21,13 @@
  - Metadata Changes
      - User alias configuration are now preserved on a `UserAliasesSource<T>` class which is accessible via `ParserMetadata<T>.getUserAliasesSource()`
      - `completionBehaviour` and `completionCommand` are no longer fields on the `@Option` and `@Arguments` annotation.  Instead use the `@BashCompletion` annotation from the `airline-help-bash` module
+- Restriction Improvements
+    - Better help hints for range based restrictions when the range includes the lower/upper limit of the data type as the lower/upper bound
+    - Better help hints for `@Port` restriction
+    - New `@Path` restriction for specifying that an arguments value is a path to a file/directory and applying restrictions on the path/file that should be enforced e.g. must exist, readable etc.
+- Bug Fixes
+    - `@Port` restriction would incorrectly reject valid values when applies to `@Arguments` annotated fields
+    - Restrictions could report incorrect argument title when applied to arguments with multiple titles
 
 ## 2.0.1
 

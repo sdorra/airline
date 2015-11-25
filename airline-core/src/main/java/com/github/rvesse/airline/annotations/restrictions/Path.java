@@ -36,11 +36,11 @@ public @interface Path {
     public boolean mustExist() default false;
 
     /**
-     * Gets/Sets whether the given file must be write-able
+     * Gets/Sets whether the given file must be writable
      * 
-     * @return True if must be write-able, false otherwise
+     * @return True if must be writable, false otherwise
      */
-    public boolean writeable() default true;
+    public boolean writable() default true;
 
     /**
      * Gets/Sets whether the given file must be readable
@@ -61,5 +61,5 @@ public @interface Path {
      * 
      * @return Expected file kind
      */
-    public FileKind kind() default FileKind.FILE_OR_DIRECTORY;
+    public PathKind kind() default PathKind.ANY;
 }

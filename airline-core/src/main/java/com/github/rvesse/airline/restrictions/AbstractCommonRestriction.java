@@ -25,7 +25,7 @@ public abstract class AbstractCommonRestriction implements OptionRestriction, Ar
     public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
         // Does no validation
     }
-    
+
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
         // Does no validation
@@ -39,5 +39,34 @@ public abstract class AbstractCommonRestriction implements OptionRestriction, Ar
     @Override
     public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
         // Does no validation
+    }
+
+    public static <T> String getArgumentTitle(ParseState<T> state, ArgumentsMetadata arguments) {
+        // Use empty string if no appropriate meta-data available
+        if (arguments == null || arguments.getTitle().size() == 0 || state == null)
+            return "";
+
+        // If number of arguments parsed so far is less than the number of
+        // titles available grab the next title
+        if (state.getParsedArguments().size() < arguments.getTitle().size())
+            return arguments.getTitle().get(state.getParsedArguments().size());
+
+        // If number of arguments passed so far is greater than the number of
+        // titles available just use the last title
+        return arguments.getTitle().get(arguments.getTitle().size() - 1);
+    }
+
+    public static <T> String getArgumentTitle(ArgumentsMetadata arguments, int argIndex) {
+        // Use empty string if no appropriate meta-data available
+        if (arguments == null || arguments.getTitle().size() == 0)
+            return "";
+
+        // If index has a title available grab it
+        if (argIndex < arguments.getTitle().size())
+            return arguments.getTitle().get(argIndex);
+
+        // If index is greater than available titles just use the last title
+        return arguments.getTitle().get(arguments.getTitle().size() - 1);
+
     }
 }

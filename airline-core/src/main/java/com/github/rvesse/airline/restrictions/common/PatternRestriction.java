@@ -51,7 +51,7 @@ public class PatternRestriction extends AbstractCommonRestriction implements Hel
         if (!this.pattern.matcher(value).find())
             throw new ParseRestrictionViolatedException(
                     "Argument '%s' was given value '%s' which does not match the regular expression '%s'",
-                    AirlineUtils.first(arguments.getTitle()), value, this.pattern.toString());
+                    AbstractCommonRestriction.getArgumentTitle(state, arguments), value, this.pattern.toString());
     }
 
     @Override
@@ -74,8 +74,8 @@ public class PatternRestriction extends AbstractCommonRestriction implements Hel
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
 
-        return new String[] { String.format("This options value must match the regular expression '%s'",
-                this.pattern.toString()) };
+        return new String[] {
+                String.format("This options value must match the regular expression '%s'", this.pattern.toString()) };
     }
 
 }
