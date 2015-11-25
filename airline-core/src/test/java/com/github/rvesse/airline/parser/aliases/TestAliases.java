@@ -56,7 +56,7 @@ public class TestAliases {
         System.setProperty("user.home", homeDir);
     }
 
-    private static void prepareConfig(File f, String... lines) throws IOException {
+    public static void prepareConfig(File f, String... lines) throws IOException {
         FileWriter writer = new FileWriter(f);
         for (String line : lines) {
             writer.append(line);

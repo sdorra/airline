@@ -388,7 +388,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
         int i = 0;
         for (String name : option.getOptions()) {
             printer.append(String.format("`%s`", name));
-            if (option.getArity() > 1) {
+            if (option.getArity() > 0) {
                 printer.append(String.format("*%s*", option.getTitle()));
             }
             if (i < option.getOptions().size() - 1)

@@ -85,8 +85,8 @@ public class ManUsageHelper extends AbstractUsageGenerator {
         }
     }
 
-    public <T> void outputArguments(TroffPrinter printer, ArgumentsMetadata arguments, boolean startList, ParserMetadata<T> parserConfig)
-            throws IOException {
+    public <T> void outputArguments(TroffPrinter printer, ArgumentsMetadata arguments, boolean startList,
+            ParserMetadata<T> parserConfig) throws IOException {
         if (arguments != null) {
             // Arguments separator option
 
@@ -320,17 +320,17 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             printer.print(" ]");
         }
     }
-    
+
     public void outputArgumentsSynopsis(TroffPrinter printer, ArgumentsMetadata arguments) {
         if (!arguments.isRequired()) {
             printer.print("[ ");
         }
-        
+
         for (String title : arguments.getTitle()) {
             printer.printItalic(title);
             printer.print(" ");
         }
-        
+
         if (!arguments.isRequired()) {
             printer.print("]");
         }
@@ -340,7 +340,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
         int i = 0;
         for (String name : option.getOptions()) {
             printer.printBold(name);
-            if (option.getArity() > 1) {
+            if (option.getArity() > 0) {
                 printer.print(" ");
                 printer.printItalic(option.getTitle());
             }
@@ -350,7 +350,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
         }
         printer.println();
     }
-    
+
     public void outputArgumentsTitle(TroffPrinter printer, ArgumentsMetadata arguments) {
         int i = 0;
         for (String title : arguments.getTitle()) {

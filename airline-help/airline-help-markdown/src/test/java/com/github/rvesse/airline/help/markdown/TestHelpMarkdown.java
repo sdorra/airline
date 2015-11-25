@@ -21,19 +21,26 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.Git.Add;
 import com.github.rvesse.airline.Git.RemoteAdd;
 import com.github.rvesse.airline.Git.RemoteShow;
+import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
 import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.help.markdown.MarkdownCommandUsageGenerator;
 import com.github.rvesse.airline.help.markdown.MarkdownGlobalUsageGenerator;
+import com.github.rvesse.airline.parser.aliases.TestAliases;
 
+import org.apache.commons.lang3.StringUtils;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
@@ -43,6 +50,14 @@ import static org.testng.Assert.assertEquals;
 @Test//(enabled = false)
 public class TestHelpMarkdown {
     private final Charset utf8 = Charset.forName("utf-8");
+    private static final File f = new File("target/test.config");
+    
+    @AfterClass
+    public static void cleanup() {
+        if (f.exists()) {
+            f.delete();
+        }
+    }
 
     /**
      * Helper method for if you're trying to determine the differences between
@@ -352,6 +367,118 @@ public class TestHelpMarkdown {
                 "| 1 | |\n" +
                 "| 2 | Error 2 |\n" +
                 "\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void user_aliases_help_markdown() throws IOException {
+        TestAliases.prepareConfig(f, "a.foo=Args1 bar", "b.foo=Args1 faz");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), "b.", "target/");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Alias Help
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        new MarkdownGlobalUsageGenerator<Args1>().usage(cli.getMetadata(), output);
+        //@formatter:off
+        Assert.assertEquals(new String(output.toByteArray(), StandardCharsets.UTF_8),
+                StringUtils.join(new String[] {
+                        "# NAME",
+                        "",
+                        "`test` -",
+                        "",
+                        "# SYNOPSIS",
+                        "",
+                        "`test` *command* [ *command-args* ]",
+                        "",
+                        "# COMMANDS",
+                        "",
+                        "- `Args1`",
+                        "",
+                        "  args1 description",
+                        "",
+                        "---",
+                        "",
+                        "# NAME",
+                        "",
+                        "`test` `Args1` - args1 description",
+                        "",
+                        "# SYNOPSIS",
+                        "",
+                        "`test` `Args1` [ `-groups` *groups* ] [ `-long` *l* ] [ `-debug` ] [",
+                        "`-bigdecimal` *bigd* ] [ { `-log` | `-verbose` } *verbose* ] [ `-date` *date* ]",
+                        "[ `-double` *doub* ] [ `-float` *floa* ] [ `--` ] [ *parameters* ]",
+                        "",
+                        "# OPTIONS",
+                        "",
+                        "- `-bigdecimal` *bigd*",
+                        "",
+                        "  A BigDecimal number",
+                        "",
+                        "- `-date` *date*",
+                        "",
+                        "  An ISO 8601 formatted date.",
+                        "",
+                        "- `-debug`",
+                        "",
+                        "  Debug mode",
+                        "",
+                        "- `-double` *doub*",
+                        "",
+                        "  A double number",
+                        "",
+                        "- `-float` *floa*",
+                        "",
+                        "  A float number",
+                        "",
+                        "- `-groups` *groups*",
+                        "",
+                        "  Comma-separated list of group names to be run",
+                        "",
+                        "- `-log` *verbose* , `-verbose` *verbose*",
+                        "",
+                        "  Level of verbosity",
+                        "",
+                        "- `-long` *l*",
+                        "",
+                        "  A long number",
+                        "",
+                        "- `--`",
+                        "",
+                        "  This option can be used to separate command-line options from the list of",
+                        "  arguments (useful when arguments might be mistaken for command-line options)",
+                        "",
+                        "- *parameters*",
+                        "",
+                        "",
+                        "",
+                        "# USER DEFINED ALIASES",
+                        "",
+                        "This CLI supports user defined aliases which may be placed in a test.config file",
+                        "located in the following location(s):",
+                        "",
+                        "1. `target/`",
+                        "",
+                        "",
+                        "This file contains aliases defined in Java properties file style e.g.",
+                        "",
+                        "    b.foo=bar --flag",
+                        "",
+                        "Here an alias foo is defined which causes the bar command to be invoked with the",
+                        "`--flag` option passed to it. Aliases are distinguished from other properties in",
+                        "the file by the prefix `b.` as seen in the example.",
+                        "",
+                        "Alias definitions are subject to the following conditions:",
+                        "",
+                        "  - Aliases cannot override existing commands",
+                        "  - Aliases cannot be defined in terms of other aliases",
+                        ""
+                }, '\n'));
         //@formatter:on
     }
 }

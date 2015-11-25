@@ -221,49 +221,43 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
         if (userAliases == null)
             return;
 
-        out.append("# USER DEFINED ALIASES").newline();
+        out.append("# USER DEFINED ALIASES").newline().newline();
 
-        UsagePrinter aliasPrinter = out.newIndentedPrinter(8);
-        aliasPrinter
-                .append(String.format(
-                        "This CLI supports user defined aliases which may be placed in a %s file located in %s the following location(s):",
-                        userAliases.getFilename(), userAliases.getSearchLocations().size() > 1 ? "one/more of" : ""))
-                .newline().newline();
-
-        UsagePrinter locationPrinter = aliasPrinter.newIndentedPrinter(4);
-        int i = 1;
-        for (String location : userAliases.getSearchLocations()) {
-            locationPrinter.append(String.format("%d) %s", i, location)).newline();
-            i++;
-        }
-        locationPrinter.flush();
-
-        aliasPrinter.newline();
-        if (userAliases.getSearchLocations().size() > 1) {
-            aliasPrinter
-                    .append("Where the file exists in multiple locations then the files are merged together with the earlier locations taking precedence.")
-                    .newline().newline();
-        }
-        aliasPrinter.append("This file contains aliases defined in Java properties file style e.g.").newline()
+        out.append(String.format(
+                "This CLI supports user defined aliases which may be placed in a %s file located in %s the following location(s):",
+                userAliases.getFilename(), userAliases.getSearchLocations().size() > 1 ? "one/more of" : "")).newline()
                 .newline();
 
-        UsagePrinter examplePrinter = aliasPrinter.newIndentedPrinter(4);
+        for (String location : userAliases.getSearchLocations()) {
+            out.appendOnOneLine(String.format("1. `%s`", location)).newline();
+        }
+        out.newline();
+
+        out.newline();
+        if (userAliases.getSearchLocations().size() > 1) {
+            out.append(
+                    "Where the file exists in multiple locations then the files are merged together with the earlier locations taking precedence.")
+                    .newline().newline();
+        }
+        out.append("This file contains aliases defined in Java properties file style e.g.").newline().newline();
+
+        UsagePrinter examplePrinter = out.newIndentedPrinter(4);
         examplePrinter
                 .append(String.format("%sfoo=bar --flag",
                         StringUtils.isNotBlank(userAliases.getPrefix()) ? userAliases.getPrefix() : ""))
                 .newline().newline();
         examplePrinter.flush();
 
-        aliasPrinter.append(
-                "Here an alias foo is defined which causes the bar command to be invoked with the --flag option passed to it.");
+        out.append(
+                "Here an alias foo is defined which causes the bar command to be invoked with the `--flag` option passed to it.");
         if (StringUtils.isNotBlank(userAliases.getPrefix())) {
-            aliasPrinter.append("Aliases are distinguished from other properties in the file by the prefix '"
-                    + userAliases.getPrefix() + "' as seen in the example.").newline();
+            out.append("Aliases are distinguished from other properties in the file by the prefix `"
+                    + userAliases.getPrefix() + "` as seen in the example.").newline();
         }
-        aliasPrinter.newline();
-        aliasPrinter.append("Alias definitions are subject to the following conditions:").newline().newline();
+        out.newline();
+        out.append("Alias definitions are subject to the following conditions:").newline().newline();
 
-        UsagePrinter restrictionsPrinter = aliasPrinter.newIndentedPrinter(2);
+        UsagePrinter restrictionsPrinter = out.newIndentedPrinter(2);
         if (global.getParserConfiguration().aliasesOverrideBuiltIns()) {
             restrictionsPrinter.append("- Aliases may override existing commands");
         } else {
