@@ -40,7 +40,7 @@ import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static org.testng.Assert.assertEquals;
 
 // Disable while #30 is in progress
-@Test(enabled = false)
+@Test//(enabled = false)
 public class TestHelpMarkdown {
     private final Charset utf8 = Charset.forName("utf-8");
 
@@ -112,21 +112,22 @@ public class TestHelpMarkdown {
         MarkdownCommandUsageGenerator generator = new MarkdownCommandUsageGenerator();
         generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(), cmd.getParserConfiguration(), out);
         //@formatter:off
-        testStringAssert(new String(out.toByteArray(), utf8), 
-                "ArgsMultiParagraphDiscussion(1) -- null\n" +
-                "==========\n" +
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "# NAME\n" +
                 "\n" +
-                "## SYNOPSIS\n" +
+                "`ArgsMultiParagraphDiscussion` -\n" +
                 "\n" +
-                " `ArgsMultiParagraphDiscussion` \n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "## DISCUSSION\n" +
+                "`ArgsMultiParagraphDiscussion`\n" +
+                "\n" +
+                "# DISCUSSION\n" +
                 "\n" +
                 "First paragraph\n" +
                 "\n" +
                 "Middle paragraph\n" +
                 "\n" +
-                "Final paragraph\n" + 
+                "Final paragraph\n" +
                 "\n");
         //@formatter:on
     }
@@ -141,21 +142,22 @@ public class TestHelpMarkdown {
         generator.usage(null, null, "ArgsExamples", cmd.getCommandMetadata(), cmd.getParserConfiguration(), out);
         //@formatter:off
         testStringAssert(new String(out.toByteArray(), utf8), 
-                "ArgsExamples(1) -- null\n" +
-                "==========\n" +
+                "# NAME\n" +
                 "\n" +
-                "## SYNOPSIS\n" +
+                "`ArgsExamples` -\n" +
                 "\n" +
-                " `ArgsExamples` \n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "## EXAMPLES\n" +
+                "`ArgsExamples`\n" +
+                "\n" +
+                "# EXAMPLES\n" +
                 "\n" +
                 "    ArgsExample\n" +
                 "\n" +
                 "Does nothing\n" +
                 "\n" +
                 "    ArgsExample foo bar\n" +
-                "\n" + 
+                "\n" +
                 "Foos a bar\n" +
                 "\n");
         //@formatter:on
@@ -182,131 +184,145 @@ public class TestHelpMarkdown {
         generator.usage(gitParser.getMetadata(), out);
         String usage = new String(out.toByteArray(), utf8);
         assertEquals(usage,
-                "git(1) -- the stupid content tracker\n" +
-                "==========\n" +
+                "# NAME\n" +
                 "\n" +
-                "## SYNOPSIS\n" +
+                "`git` - the stupid content tracker\n" +
                 "\n" +
-                "`git` [ -v ] [<group>] <command> [command-args]\n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "## OPTIONS\n" +
+                "`git` [ `-v` ] [ *group* ] *command* [ *command-args* ]\n" +
                 "\n" +
-                "* `-v`:\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `-v`\n" +
+                "\n" +
                 "  Verbose mode\n" +
                 "\n" +
-                "## COMMAND GROUPS\n" +
+                "# COMMANDS\n" +
                 "\n" +
-                "Commands are grouped as follows:\n" +
+                "- `add`\n" +
                 "\n" +
-                "* Default (no <group> specified)\n" +
-                "\n" +
-                "  * `add`:\n" +
                 "  Add file contents to the index\n" +
                 "\n" +
-                "  * `help`:\n" +
+                "- `help`\n" +
+                "\n" +
                 "  Display help information\n" +
                 "\n" +
-                "* **remote**\n" +
+                "- `remote add`\n" +
                 "\n" +
-                "  Manage set of tracked repositories\n" +
-                "\n" +
-                "  * `add`:\n" +
                 "  Adds a remote\n" +
                 "\n" +
-                "  * `show`:\n" +
+                "- `remote show`\n" +
+                "\n" +
                 "  Gives some information about the remote <name>\n" +
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git-add(1)\n" +
+                "# NAME\n" +
                 "\n" +
-                "### SYNOPSIS\n" +
+                "`git` `add` - Add file contents to the index\n" +
                 "\n" +
-                "`git` [ -v ] `add` [ -i ] [--] [ <patterns>... ]\n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "Add file contents to the index\n" +
+                "`git` [ `-v` ] `add` [ `-i` ] [ `--` ] [ *patterns* ]\n" +
                 "\n" +
-                "### OPTIONS\n" +
+                "# OPTIONS\n" +
                 "\n" +
-                "* `-i`:\n" +
+                "- `-i`\n" +
+                "\n" +
                 "  Add modified contents interactively.\n" +
                 "\n" +
-                "* `-v`:\n" +
+                "- `-v`\n" +
+                "\n" +
                 "  Verbose mode\n" +
                 "\n" +
-                "* `--`:\n" +
-                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "- `--`\n" +
                 "\n" +
-                "* <patterns>:\n" +
-                "Patterns of files to be added\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
                 "\n" +
-                "---\n" +
+                "- *patterns*\n" +
                 "\n" +
-                "## git-help(1)\n" +
-                "\n" +
-                "### SYNOPSIS\n" +
-                "\n" +
-                "`git` `help`  [--] [ <command>... ]\n" +
-                "\n" +
-                "Display help information\n" +
-                "\n" +
-                "### OPTIONS\n" +
-                "\n" +
-                "* `--`:\n" +
-                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
-                "\n" +
-                "* <command>:\n" +
-                "\n" +
+                "  Patterns of files to be added\n" +
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git-remote-add(1)\n" +
+                "# NAME\n" +
                 "\n" +
-                "### SYNOPSIS\n" +
+                "`git` `help` - Display help information\n" +
                 "\n" +
-                "`git` [ -v ] `remote` `add` [ -t <branch> ] [--] [ <name> <url>... ]\n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "Adds a remote\n" +
+                "`git` `help` [ `--` ] [ *command* ]\n" +
                 "\n" +
-                "### OPTIONS\n" +
+                "# OPTIONS\n" +
                 "\n" +
-                "* `-t` <branch>:\n" +
+                "- `--`\n" +
+                "\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
+                "\n" +
+                "- *command*\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "# NAME\n" +
+                "\n" +
+                "`git` `remote` `add` - Adds a remote\n" +
+                "\n" +
+                "# SYNOPSIS\n" +
+                "\n" +
+                "`git` [ `-v` ] `remote` `add` [ `-t` *branch* ] [ `--` ] [ *name* *url* ]\n" +
+                "\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `-t`\n" +
+                "\n" +
                 "  Track only a specific branch\n" +
                 "\n" +
-                "* `-v`:\n" +
+                "- `-v`\n" +
+                "\n" +
                 "  Verbose mode\n" +
                 "\n" +
-                "* `--`:\n" +
-                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "- `--`\n" +
                 "\n" +
-                "* <name> <url>:\n" +
-                "Name and URL of remote repository to add\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
+                "\n" +
+                "- *name* *url*\n" +
+                "\n" +
+                "  Name and URL of remote repository to add\n" +
                 "\n" +
                 "---\n" +
                 "\n" +
-                "## git-remote-show(1)\n" +
+                "# NAME\n" +
                 "\n" +
-                "### SYNOPSIS\n" +
+                "`git` `remote` `show` - Gives some information about the remote <name>\n" +
                 "\n" +
-                "`git` [ -v ] `remote` `show` [ -n ] [--] [ <remote> ]\n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "Gives some information about the remote <name>\n" +
+                "`git` [ `-v` ] `remote` `show` [ `-n` ] [ `--` ] [ *remote* ]\n" +
                 "\n" +
-                "### OPTIONS\n" +
+                "# OPTIONS\n" +
                 "\n" +
-                "* `-n`:\n" +
+                "- `-n`\n" +
+                "\n" +
                 "  Do not query remote heads\n" +
                 "\n" +
-                "* `-v`:\n" +
+                "- `-v`\n" +
+                "\n" +
                 "  Verbose mode\n" +
                 "\n" +
-                "* `--`:\n" +
-                "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options).\n" +
+                "- `--`\n" +
                 "\n" +
-                "* <remote>:\n" +
-                "Remote to show\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
                 "\n" +
-                "---\n" +
+                "- *remote*\n" +
+                "\n" +
+                "  Remote to show\n" +
                 "\n");
         //@formatter:on
     }
@@ -318,20 +334,24 @@ public class TestHelpMarkdown {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new MarkdownCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), command.getParserConfiguration(), out);
         assertEquals(new String(out.toByteArray(), utf8),
-                "test(1) -- ArgsExitCodes description\n" +
-                "==========\n" +
+                "# NAME\n" +
                 "\n" +
-                "## SYNOPSIS\n" +
+                "`test` - ArgsExitCodes description\n" +
                 "\n" +
-                " `test` \n" +
+                "# SYNOPSIS\n" +
                 "\n" +
-                "## EXIT CODES\n" +
+                "`test`\n" +
+                "\n" +
+                "# EXIT CODES\n" +
                 "\n" +
                 "This command returns one of the following exit codes:\n" +
                 "\n" +
-                "* ** 0 ** - Success\n" +
-                "* ** 1 **\n" +
-                "* ** 2 ** - Error 2\n");
+                "| | |\n" +
+                "| ---- | ---- |\n" +
+                "| 0 | Success |\n" +
+                "| 1 | |\n" +
+                "| 2 | Error 2 |\n" +
+                "\n");
         //@formatter:on
     }
 }

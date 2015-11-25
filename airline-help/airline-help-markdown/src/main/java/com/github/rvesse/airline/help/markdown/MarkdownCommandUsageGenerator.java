@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.github.rvesse.airline.help.cli.CliUsageHelper;
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
@@ -34,8 +35,7 @@ import com.github.rvesse.airline.model.ParserMetadata;
 
 public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGenerator {
 
-    private static final String BOLD = "**";
-    private final CliUsageHelper helper;
+    private final MarkdownUsageHelper helper;
 
     public MarkdownCommandUsageGenerator() {
         this(DEFAULT_COLUMNS, DEFAULT_OPTION_COMPARATOR, false);
@@ -59,12 +59,13 @@ public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGe
         helper = createHelper(optionComparator, includeHidden);
     }
 
-    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
-        return new CliUsageHelper(optionComparator, includeHidden);
+    protected MarkdownUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
+            boolean includeHidden) {
+        return new MarkdownUsageHelper(optionComparator, includeHidden);
     }
 
     @Override
-    protected <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException {
 
         if (parserConfig == null) {
@@ -138,23 +139,28 @@ public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGe
     protected List<OptionMetadata> outputSynopsis(UsagePrinter out, String programName, String[] groupNames,
             String commandName, CommandMetadata command) throws IOException {
         out.append("# SYNOPSIS").newline().newline();
-        
+
         List<OptionMetadata> options = new ArrayList<>();
         if (programName != null) {
-            out.append(programName).appendWords(toSynopsisUsage(sortOptions(command.getGlobalOptions())));
+            out.append(String.format("`%s`", programName));
+            helper.outputOptionsSynopsis(out, command.getGlobalOptions());
             options.addAll(command.getGlobalOptions());
         }
         if (groupNames != null) {
-            out.appendWords(groupNames);
-            out.appendWords(toSynopsisUsage(sortOptions(command.getGroupOptions())));
+            for (String group : groupNames) {
+                out.append(String.format("`%s`", group));
+            }
+            helper.outputOptionsSynopsis(out, command.getGroupOptions());
             options.addAll(command.getGroupOptions());
         }
-        out.append(commandName).appendWords(toSynopsisUsage(sortOptions(command.getCommandOptions())));
+        out.append(String.format("`%s`", commandName));
+        helper.outputOptionsSynopsis(out, command.getCommandOptions());
         options.addAll(command.getCommandOptions());
 
         // command arguments (optional)
         if (command.getArguments() != null) {
-            out.append("[--]").append(toUsage(command.getArguments()));
+            out.append("[ `--` ]");
+            helper.outputArgumentsSynopsis(out, command.getArguments());
         }
         out.newline();
         out.newline();
@@ -180,11 +186,15 @@ public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGe
             CommandMetadata command) throws IOException {
         out.append("# NAME").newline().newline();
 
-        out = out.append(programName);
-        if (groupNames != null) {
-            out.appendWords(groupNames);
+        if (StringUtils.isNotEmpty(programName)) {
+            out = out.append(String.format("`%s`", programName));
         }
-        out.append(String.format("%s%s%s", BOLD, commandName, BOLD));
+        if (groupNames != null) {
+            for (String group : groupNames) {
+                out.append(String.format("`%s`", group));
+            }
+        }
+        out.append(String.format("`%s`", commandName));
         out.append("-").append(command.getDescription()).newline().newline();
     }
 

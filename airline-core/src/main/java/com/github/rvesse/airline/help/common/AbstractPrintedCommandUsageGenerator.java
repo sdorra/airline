@@ -43,7 +43,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
     }
 
     /**
-     * Generate the help and output is using the provided {@link UsagePrinter}
+     * Generate the help and output it using the provided {@link UsagePrinter}
      * 
      * @param programName
      *            Program Name
@@ -57,7 +57,7 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Usage printer to output with
      * @throws IOException
      */
-    protected abstract <T> void usage(String programName, String[] groupNames, String commandName,
+    public abstract <T> void usage(String programName, String[] groupNames, String commandName,
             CommandMetadata command, ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException;
 
     /**

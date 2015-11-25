@@ -101,7 +101,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             // Description
             printer.startPlainList();
             printer.println(
-                    "This option can be used to separate command-line options from the list of argument (useful when arguments might be mistaken for command-line options)");
+                    "This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options)");
             printer.endList();
 
             // Arguments name(s)

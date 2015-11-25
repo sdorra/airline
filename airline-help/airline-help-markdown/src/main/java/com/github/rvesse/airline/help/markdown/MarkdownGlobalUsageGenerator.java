@@ -16,13 +16,14 @@
 package com.github.rvesse.airline.help.markdown;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
-import com.github.rvesse.airline.help.cli.CliUsageHelper;
+import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
 import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
@@ -30,42 +31,49 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
 
 public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
 
-    private final CliUsageHelper helper;
+    private final MarkdownUsageHelper helper;
+    private final AbstractPrintedCommandUsageGenerator commandUsageGenerator;
 
     public MarkdownGlobalUsageGenerator() {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false, new MarkdownCommandUsageGenerator(false));
     }
 
     public MarkdownGlobalUsageGenerator(boolean includeHidden) {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
+                new MarkdownCommandUsageGenerator(includeHidden));
     }
 
     public MarkdownGlobalUsageGenerator(int columns) {
         this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false, new MarkdownCommandUsageGenerator(columns));
     }
 
     public MarkdownGlobalUsageGenerator(int columns, boolean includeHidden) {
         this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
+                new MarkdownCommandUsageGenerator(columns, includeHidden));
     }
 
     public MarkdownGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
             Comparator<? super CommandMetadata> commandComparator,
-            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
+            Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden,
+            AbstractPrintedCommandUsageGenerator commandUsageGenerator) {
         super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
         helper = createHelper(optionComparator, includeHidden);
+        this.commandUsageGenerator = commandUsageGenerator;
     }
 
-    protected CliUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
-        return new CliUsageHelper(optionComparator, includeHidden);
+    protected MarkdownUsageHelper createHelper(Comparator<? super OptionMetadata> optionComparator,
+            boolean includeHidden) {
+        return new MarkdownUsageHelper(optionComparator, includeHidden);
     }
 
     @Override
@@ -82,8 +90,10 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
             helper.outputOptions(out, options);
         }
 
-        // Command list
+        // Commands and Command Groups
+        out.append("# COMMANDS").newline().newline();
         outputCommandList(out, global);
+        outputCommandUsages(out, global);
 
         // Aliases
         if (global.getParserConfiguration().getUserAliasesSource() != null) {
@@ -101,14 +111,11 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      * @throws IOException
      */
     protected void outputCommandList(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
-        out.append("COMMANDS").newline();
-        UsagePrinter commandPrinter = out.newIndentedPrinter(8);
-
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
-            outputCommandDescription(commandPrinter, null, command);
+            outputCommandDescription(out, null, command);
         }
 
-        outputGroupCommandsList(commandPrinter, global, global.getCommandGroups());
+        outputGroupCommandsList(out, global, global.getCommandGroups());
     }
 
     protected void outputGroupCommandsList(UsagePrinter out, GlobalMetadata<T> global,
@@ -142,9 +149,20 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      * @throws IOException
      */
     protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
-        out.append("SYNOPSIS").newline();
-        out.newIndentedPrinter(8).newPrinterWithHangingIndent(8).append(global.getName())
-                .appendWords(toSynopsisUsage(global.getOptions())).append("<command> [ <args> ]").newline().newline();
+        out.append("# SYNOPSIS").newline().newline();
+
+        out.append(String.format("`%s`", global.getName()));
+        helper.outputOptionsSynopsis(out, global.getOptions());
+
+        if (global.getCommandGroups().size() > 0) {
+            if (global.getDefaultGroupCommands().size() > 0)
+                out.append("[");
+            out.append("*group*");
+            if (global.getDefaultGroupCommands().size() > 0)
+                out.append("]");
+        }
+
+        out.append("*command* [ *command-args* ]").newline().newline();
     }
 
     /**
@@ -157,9 +175,9 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      * @throws IOException
      */
     protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
-        out.append("NAME").newline();
+        out.append("# NAME").newline().newline();
 
-        out.newIndentedPrinter(8).append(global.getName()).append("-").append(global.getDescription()).newline()
+        out.append(String.format("`%s`", global.getName())).append(" -").append(global.getDescription()).newline()
                 .newline();
     }
 
@@ -177,12 +195,22 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
     protected void outputCommandDescription(UsagePrinter out, CommandGroupMetadata group, CommandMetadata command)
             throws IOException {
         if (!command.isHidden() || this.includeHidden()) {
+            // New bullet point
+            out.append(" - ");
+            out = out.newIndentedPrinter(2);
+
+            // Build name and wrap in backticks
+            StringBuilder name = new StringBuilder();
+            name.append('`');
             if (group != null) {
-                out.append(group.getName());
+                name.append(group.getName()).append(' ');
             }
-            out.append(command.getName()).newline();
+            name.append(command.getName());
+            name.append('`');
+            out.append(name.toString()).newline();
+
             if (command.getDescription() != null) {
-                out.newIndentedPrinter(4).append(command.getDescription()).newline();
+                out.newline().append(command.getDescription()).newline();
             }
             out.newline();
         }
@@ -193,7 +221,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
         if (userAliases == null)
             return;
 
-        out.append("USER DEFINED ALIASES").newline();
+        out.append("# USER DEFINED ALIASES").newline();
 
         UsagePrinter aliasPrinter = out.newIndentedPrinter(8);
         aliasPrinter
@@ -226,7 +254,8 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
                 .newline().newline();
         examplePrinter.flush();
 
-        aliasPrinter.append("Here an alias foo is defined which causes the bar command to be invoked with the --flag option passed to it.");
+        aliasPrinter.append(
+                "Here an alias foo is defined which causes the bar command to be invoked with the --flag option passed to it.");
         if (StringUtils.isNotBlank(userAliases.getPrefix())) {
             aliasPrinter.append("Aliases are distinguished from other properties in the file by the prefix '"
                     + userAliases.getPrefix() + "' as seen in the example.").newline();
@@ -234,7 +263,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
         aliasPrinter.newline();
         aliasPrinter.append("Alias definitions are subject to the following conditions:").newline().newline();
 
-        UsagePrinter restrictionsPrinter = aliasPrinter.newIndentedPrinter(4);
+        UsagePrinter restrictionsPrinter = aliasPrinter.newIndentedPrinter(2);
         if (global.getParserConfiguration().aliasesOverrideBuiltIns()) {
             restrictionsPrinter.append("- Aliases may override existing commands");
         } else {
@@ -249,6 +278,94 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
         }
         restrictionsPrinter.newline();
         restrictionsPrinter.flush();
+    }
 
+    /**
+     * Outputs the command usages for all groups
+     * 
+     * @param printer
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputCommandUsages(UsagePrinter printer, GlobalMetadata<T> global) throws IOException {
+        // Default group usages
+        outputDefaultGroupCommandUsages(printer, global);
+
+        // Other group usages
+        for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
+            if (group.isHidden() && !this.includeHidden())
+                continue;
+
+            List<CommandGroupMetadata> groupPath = new ArrayList<CommandGroupMetadata>();
+            groupPath.add(group);
+            outputGroupCommandUsages(printer, global, groupPath);
+        }
+    }
+
+    /**
+     * Outputs the command usages for the commands in the default group
+     * 
+     * @param printer
+     *            Usage printer
+     * @param global
+     *            Global meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputDefaultGroupCommandUsages(UsagePrinter printer, GlobalMetadata<T> global) throws IOException {
+        for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
+            if (command.isHidden() && !this.includeHidden())
+                continue;
+
+            // Horizontal rule
+            printer.append("---").newline().newline();
+
+            printer.flush();
+            commandUsageGenerator.usage(global.getName(), (String[]) null, command.getName(), command,
+                    global.getParserConfiguration(), printer);
+        }
+    }
+
+    /**
+     * Outputs the command usages for the commands in the given group
+     * 
+     * @param printer
+     *            Usage printer
+     * @param global
+     *            Global Meta-data
+     * @param group
+     *            Group Meta-data
+     * 
+     * @throws IOException
+     */
+    protected void outputGroupCommandUsages(UsagePrinter printer, GlobalMetadata<T> global,
+            List<CommandGroupMetadata> groups) throws IOException {
+        CommandGroupMetadata group = groups.get(groups.size() - 1);
+
+        // Commands in the group
+        for (CommandMetadata command : sortCommands(group.getCommands())) {
+            if (command.isHidden() && !this.includeHidden())
+                continue;
+
+            // Horizontal rule
+            printer.append("---").newline().newline();
+
+            printer.flush();
+            commandUsageGenerator.usage(global.getName(), UsageHelper.toGroupNames(groups), command.getName(), command,
+                    global.getParserConfiguration(), printer);
+        }
+
+        // Sub-groups
+        for (CommandGroupMetadata subGroup : sortCommandGroups(group.getSubGroups())) {
+            if (subGroup.isHidden() && !this.includeHidden())
+                continue;
+
+            List<CommandGroupMetadata> subGroupPath = AirlineUtils.listCopy(groups);
+            subGroupPath.add(subGroup);
+            outputGroupCommandUsages(printer, global, subGroupPath);
+        }
     }
 }

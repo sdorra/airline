@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,7 +42,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
     }
 
     public void outputOptions(UsagePrinter out, List<OptionMetadata> options) throws IOException {
-        out.append("# OPTIONS").newline();
+        out.append("# OPTIONS").newline().newline();
 
         options = sortOptions(options);
         for (OptionMetadata option : options) {
@@ -51,23 +52,23 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
             }
 
             // Option names
-            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append(toDescription(option)).newline();
-            optionPrinter.flush();
+            out.append(" -");
+            UsagePrinter optionPrinter = out.newIndentedPrinter(2);
+            this.outputOptionTitle(optionPrinter, option);
+            optionPrinter.newline();
 
             // Description
-            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-            descriptionPrinter.append(option.getDescription()).newline();
+            optionPrinter.append(option.getDescription()).newline();
 
             // Restrictions
             for (OptionRestriction restriction : option.getRestrictions()) {
                 if (restriction instanceof HelpHint) {
-                    outputOptionRestriction(descriptionPrinter, option, restriction, (HelpHint) restriction);
+                    outputOptionRestriction(optionPrinter, option, restriction, (HelpHint) restriction);
                 }
             }
 
-            descriptionPrinter.newline();
-            descriptionPrinter.flush();
+            optionPrinter.newline();
+            optionPrinter.flush();
         }
     }
 
@@ -94,7 +95,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
         // Ignore non-printable help
         if (hint.getFormat() == HelpFormat.NONE_PRINTABLE)
             return;
-        
+
         // Print preamble if present
         if (!StringUtils.isBlank(hint.getPreamble())) {
             out.append(hint.getPreamble());
@@ -113,20 +114,21 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
                 // Print as text with indents
                 for (int e = 0; e < hint.getContentBlock(0).length; e++) {
                     // Example will be in first content block
-                    out.appendOnOneLine(hint.getContentBlock(0)[e]);
-                    out.newline().newline();
-                    out.flush();
+                    UsagePrinter examplePrinter = out.newIndentedPrinter(4);
+                    examplePrinter.appendOnOneLine(hint.getContentBlock(0)[e]);
+                    examplePrinter.newline().newline();
+                    examplePrinter.flush();
 
                     // Print example description with additional indent
-                    UsagePrinter examplePrinter = out.newIndentedPrinter(4);
+
                     for (int d = 1; d < hint.numContentBlocks(); d++) {
                         String[] descriptions = hint.getContentBlock(d);
                         if (e >= descriptions.length)
                             continue;
-                        examplePrinter.append(descriptions[e]);
-                        examplePrinter.newline().newline();
+                        out.append(descriptions[e]);
+                        out.newline().newline();
                     }
-                    examplePrinter.flush();
+                    out.flush();
                 }
                 break;
             case TABLE:
@@ -145,18 +147,69 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
                     rows.add(rowData);
                 }
 
-                // Print out table
-                UsagePrinter tablePrinter = out.newIndentedPrinter(4);
-                tablePrinter.appendTable(rows, 0);
-                tablePrinter.newline();
-                tablePrinter.flush();
+                // Print out table header
+                StringBuilder headerLine = new StringBuilder();
+                headerLine.append("| ");
+                if (hint.getFormat() != HelpFormat.TABLE_WITH_HEADERS) {
+                    // Create empty header row
+                    for (int col = 0; col < hint.numContentBlocks(); col++) {
+                        headerLine.append(" | ");
+                    }
+                } else {
+                    // Create header row
+                    for (String col : rows.get(0)) {
+                        headerLine.append(col);
+                        headerLine.append(" | ");
+                    }
+                }
+                out.appendOnOneLine(headerLine.toString());
+                out.newline();
+
+                // Print the header/content divider
+                StringBuilder dividerLine = new StringBuilder();
+                char[] headerChars = headerLine.toString().toCharArray();
+                int lastPipePos = 0;
+                for (int i = 0; i < headerChars.length; i++) {
+                    char c = headerChars[i];
+                    if (c == '|') {
+                        if (i > 0 && i - lastPipePos <= 3) {
+                            dividerLine.append("--- ");
+                        }
+                        lastPipePos = i;
+                        dividerLine.append(c);
+                        dividerLine.append(' ');
+                        i++;
+                    } else {
+                        dividerLine.append('-');
+                    }
+                }
+                out.appendOnOneLine(dividerLine.toString());
+                out.newline();
+
+                // Print out the rows
+                int firstRow = hint.getFormat() == HelpFormat.TABLE_WITH_HEADERS ? 1 : 0;
+                for (int row = firstRow; row < rows.size(); row++) {
+                    StringBuilder contentLine = new StringBuilder();
+                    contentLine.append("| ");
+
+                    List<String> rowData = rows.get(row);
+                    for (int col = 0; col < rowData.size(); col++) {
+                        contentLine.append(rowData.get(col));
+                        contentLine.append(" | ");
+                    }
+                    out.appendOnOneLine(contentLine.toString());
+                    out.newline();
+                }
+                out.newline();
+
                 break;
             case LIST:
                 // Print first content block as an indented list list
-                UsagePrinter listPrinter = out.newIndentedPrinter(4);
+                UsagePrinter listPrinter = out.newPrinterWithHangingIndent(2);
                 for (String item : hint.getContentBlock(0)) {
-                    listPrinter.append(item).newline();
+                    listPrinter.append(" -").append(item).newline();
                 }
+                listPrinter.newline();
                 listPrinter.flush();
                 break;
             default:
@@ -180,35 +233,40 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
         return maxRows;
     }
 
-    public <T> void outputArguments(UsagePrinter out, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig) throws IOException {
+    public <T> void outputArguments(UsagePrinter out, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig)
+            throws IOException {
         if (arguments != null) {
             // Arguments separator option
-            UsagePrinter optionPrinter = out.newIndentedPrinter(8);
-            optionPrinter.append(parserConfig.getArgumentsSeparator()).newline();
+            out.append(" -");
+            UsagePrinter optionPrinter = out.newIndentedPrinter(2);
+            optionPrinter.append(String.format("`%s`", parserConfig.getArgumentsSeparator())).newline().newline();
             optionPrinter.flush();
 
             // Description
-            UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
-            descriptionPrinter
-                    .append("This option can be used to separate command-line options from the list of argument (useful when arguments might be mistaken for command-line options)")
+            optionPrinter
+                    .append("This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options)")
                     .newline();
-            descriptionPrinter.newline();
+            optionPrinter.newline();
+            optionPrinter.flush();
 
             // Arguments name(s)
-            optionPrinter.append(toDescription(arguments)).newline();
+            out.append(" -");
+            optionPrinter = out.newIndentedPrinter(2);
+            this.outputArgumentsTitle(optionPrinter, arguments);
+            optionPrinter.newline();
 
             // Description
-            descriptionPrinter.append(arguments.getDescription()).newline();
+            optionPrinter.append(arguments.getDescription()).newline();
 
             // Restrictions
             for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
                 if (restriction instanceof HelpHint) {
-                    outputArgumentsRestriction(descriptionPrinter, arguments, restriction, (HelpHint) restriction);
+                    outputArgumentsRestriction(optionPrinter, arguments, restriction, (HelpHint) restriction);
                 }
             }
 
-            descriptionPrinter.newline();
-            descriptionPrinter.flush();
+            optionPrinter.newline();
+            optionPrinter.flush();
         }
     }
 
@@ -246,22 +304,104 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
 
         // Section title
         if (!StringUtils.isBlank(section.getTitle())) {
+            out.append("#");
             out.append(section.getTitle().toUpperCase());
-            out.newline();
+            out.newline().newline();
         }
 
-        UsagePrinter sectionPrinter = out.newIndentedPrinter(8);
-
         // Content
-        outputHint(sectionPrinter, section, true);
+        outputHint(out, section, true);
 
         // Post-amble
         if (!StringUtils.isBlank(section.getPostamble())) {
-            sectionPrinter.append(section.getPostamble());
-            sectionPrinter.newline();
+            out.append(section.getPostamble());
+            out.newline().newline();
         }
 
-        sectionPrinter.flush();
         out.flush();
+        out.flush();
+    }
+
+    public void outputOptionsSynopsis(UsagePrinter printer, List<OptionMetadata> options) {
+        for (int i = 0; i < options.size(); i++) {
+            OptionMetadata option = options.get(i);
+            if (option.isHidden() && !this.includeHidden())
+                continue;
+
+            this.outputOptionSynopsis(printer, option);
+        }
+    }
+
+    public void outputOptionSynopsis(UsagePrinter printer, OptionMetadata option) {
+        Set<String> options = option.getOptions();
+        boolean required = option.isRequired();
+        if (!required) {
+            printer.append("[ ");
+        }
+
+        if (options.size() > 1) {
+            printer.append("{");
+        }
+
+        boolean first = true;
+        for (String name : options) {
+            if (!first) {
+                printer.append("|");
+            } else {
+                first = false;
+            }
+            printer.append(String.format("`%s`", name));
+        }
+
+        if (options.size() > 1) {
+            printer.append("}");
+        }
+
+        if (option.getArity() > 0) {
+            printer.append(String.format("*%s*", option.getTitle()));
+        }
+
+        if (option.isMultiValued()) {
+            printer.append("*...*");
+        }
+
+        if (!required) {
+            printer.append("]");
+        }
+    }
+
+    public void outputArgumentsSynopsis(UsagePrinter printer, ArgumentsMetadata arguments) {
+        if (!arguments.isRequired()) {
+            printer.append("[");
+        }
+
+        for (String title : arguments.getTitle()) {
+            printer.append(String.format("*%s*", title));
+        }
+
+        if (!arguments.isRequired()) {
+            printer.append("]");
+        }
+    }
+
+    public void outputOptionTitle(UsagePrinter printer, OptionMetadata option) {
+        int i = 0;
+        for (String name : option.getOptions()) {
+            printer.append(String.format("`%s`", name));
+            if (option.getArity() > 1) {
+                printer.append(String.format("*%s*", option.getTitle()));
+            }
+            if (i < option.getOptions().size() - 1)
+                printer.append(",");
+            i++;
+        }
+        printer.newline();
+    }
+
+    public void outputArgumentsTitle(UsagePrinter printer, ArgumentsMetadata arguments) {
+        for (String title : arguments.getTitle()) {
+            printer.append(String.format("*%s*", title));
+        }
+        printer.newline();
     }
 }

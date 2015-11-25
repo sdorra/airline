@@ -62,7 +62,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     }
 
     @Override
-    protected <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+    public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException {
         
         if (parserConfig == null) {

@@ -190,7 +190,7 @@ public class CliUsageHelper extends AbstractUsageGenerator {
             // Description
             UsagePrinter descriptionPrinter = optionPrinter.newIndentedPrinter(4);
             descriptionPrinter
-                    .append("This option can be used to separate command-line options from the list of argument (useful when arguments might be mistaken for command-line options)")
+                    .append("This option can be used to separate command-line options from the list of arguments (useful when arguments might be mistaken for command-line options)")
                     .newline();
             descriptionPrinter.newline();
 
