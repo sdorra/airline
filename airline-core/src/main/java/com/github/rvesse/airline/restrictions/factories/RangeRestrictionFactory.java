@@ -16,7 +16,9 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
@@ -160,6 +162,28 @@ public class RangeRestrictionFactory implements OptionRestrictionFactory, Argume
                 iRange.minInclusive(),
                 iRange.max() != Long.MAX_VALUE || !iRange.maxInclusive() ? Long.valueOf(iRange.max()) : null,
                 iRange.maxInclusive(), LONG_COMPARATOR);
+    }
+    
+    protected List<Class<? extends Annotation>> supportedAnnotations() {
+        List<Class<? extends Annotation>> supported = new ArrayList<>();
+        supported.add(LongRange.class);
+        supported.add(IntegerRange.class);
+        supported.add(ShortRange.class);
+        supported.add(ByteRange.class);
+        supported.add(DoubleRange.class);
+        supported.add(FloatRange.class);
+        supported.add(LexicalRange.class);
+        return supported;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedArgumentsAnnotations() {
+        return supportedAnnotations();
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        return supportedAnnotations();
     }
 
 }

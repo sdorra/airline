@@ -1,0 +1,9 @@
+com.github.rvesse.airline.restrictions.factories.AllowedValuesRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.OccurrencesRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.PathRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.PortRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.RangeRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.RequiredOnlyIfRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.RequireFromRestrictionFactory
+com.github.rvesse.airline.restrictions.factories.SimpleRestrictionsFactory
+com.github.rvesse.airline.restrictions.factories.StringRestrictionFactory

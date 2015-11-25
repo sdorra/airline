@@ -25,6 +25,10 @@
     - Better help hints for range based restrictions when the range includes the lower/upper limit of the data type as the lower/upper bound
     - Better help hints for `@Port` restriction
     - New `@Path` restriction for specifying that an arguments value is a path to a file/directory and applying restrictions on the path/file that should be enforced e.g. must exist, readable etc.
+    - Switched to using `ServiceLoader` to discover available restriction factories avoiding the need to explicitly register these with the `RestrictionRegistry`
+        - Factories are now required to implement a method indicating what annotations they can translate into restrictions (**Breaking**)
+        - Provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.OptionRestrictionFactory` file to specify option restriction factories
+        - Provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.ArgumentsRestrictionFactory` file to specify argument restriction factories
 - Bug Fixes
     - `@Port` restriction would incorrectly reject valid values when applies to `@Arguments` annotated fields
     - Restrictions could report incorrect argument title when applied to arguments with multiple titles

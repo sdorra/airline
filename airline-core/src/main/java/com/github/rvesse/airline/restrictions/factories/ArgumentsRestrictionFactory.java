@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 
@@ -33,5 +34,13 @@ public interface ArgumentsRestrictionFactory {
      *         create a restriction from the given annotation
      */
     public abstract ArgumentsRestriction createArgumentsRestriction(Annotation annotation);
+    
+    /**
+     * Gets a list of annotations that this factory can convert into arguments
+     * restrictions
+     * 
+     * @return List of supported annotations
+     */
+    public List<Class<? extends Annotation>> supportedArgumentsAnnotations();
 
 }

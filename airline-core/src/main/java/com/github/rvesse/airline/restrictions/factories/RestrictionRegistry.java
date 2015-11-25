@@ -18,35 +18,11 @@ package com.github.rvesse.airline.restrictions.factories;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
-import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
-import com.github.rvesse.airline.annotations.restrictions.MaxLength;
-import com.github.rvesse.airline.annotations.restrictions.MaxOccurrences;
-import com.github.rvesse.airline.annotations.restrictions.MinLength;
-import com.github.rvesse.airline.annotations.restrictions.MinOccurrences;
-import com.github.rvesse.airline.annotations.restrictions.NotBlank;
-import com.github.rvesse.airline.annotations.restrictions.NotEmpty;
-import com.github.rvesse.airline.annotations.restrictions.Once;
-import com.github.rvesse.airline.annotations.restrictions.Path;
-import com.github.rvesse.airline.annotations.restrictions.Pattern;
-import com.github.rvesse.airline.annotations.restrictions.Port;
-import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
-import com.github.rvesse.airline.annotations.restrictions.RequireSome;
-import com.github.rvesse.airline.annotations.restrictions.Required;
-import com.github.rvesse.airline.annotations.restrictions.RequiredOnlyIf;
-import com.github.rvesse.airline.annotations.restrictions.Unrestricted;
-import com.github.rvesse.airline.annotations.restrictions.ranges.ByteRange;
-import com.github.rvesse.airline.annotations.restrictions.ranges.DoubleRange;
-import com.github.rvesse.airline.annotations.restrictions.ranges.FloatRange;
-import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
-import com.github.rvesse.airline.annotations.restrictions.ranges.LexicalRange;
-import com.github.rvesse.airline.annotations.restrictions.ranges.LongRange;
-import com.github.rvesse.airline.annotations.restrictions.ranges.ShortRange;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
-import com.github.rvesse.airline.restrictions.None;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.restrictions.common.IsRequiredRestriction;
 
 /**
  * Central registry for restrictions
@@ -62,17 +38,6 @@ public class RestrictionRegistry {
         init();
     }
 
-    private static <T extends OptionRestrictionFactory & ArgumentsRestrictionFactory> void registerCommon(
-            Class<? extends Annotation> cls, T factory) {
-        registerCommon(cls, factory, factory);
-    }
-
-    private static void registerCommon(Class<? extends Annotation> cls, OptionRestrictionFactory opFactory,
-            ArgumentsRestrictionFactory argFactory) {
-        OPTION_RESTRICTION_FACTORIES.put(cls, opFactory);
-        ARGUMENT_RESTRICTION_FACTORIES.put(cls, argFactory);
-    }
-
     /**
      * Initializes the default set of restrictions
      */
@@ -80,49 +45,21 @@ public class RestrictionRegistry {
         if (init)
             return;
 
-        // Basic restrictions
-        registerCommon(Required.class, new SimpleOptionRestrictionFactory(IsRequiredRestriction.class),
-                new SimpleArgumentsRestrictionFactory(IsRequiredRestriction.class));
-        registerCommon(Unrestricted.class, new SimpleOptionRestrictionFactory(None.class),
-                new SimpleArgumentsRestrictionFactory(None.class));
-
-        // Allowed values restrictions
-        AllowedValuesRestrictionFactory allowedFactory = new AllowedValuesRestrictionFactory();
-        registerCommon(AllowedRawValues.class, allowedFactory, allowedFactory);
-
-        // Range restrictions
-        RangeRestrictionFactory rangeFactory = new RangeRestrictionFactory();
-        registerCommon(LongRange.class, rangeFactory);
-        registerCommon(IntegerRange.class, rangeFactory);
-        registerCommon(ShortRange.class, rangeFactory);
-        registerCommon(ByteRange.class, rangeFactory);
-        registerCommon(DoubleRange.class, rangeFactory);
-        registerCommon(FloatRange.class, rangeFactory);
-        registerCommon(LexicalRange.class, rangeFactory);
-
-        // Advanced requirement restrictions
-        RequireFromRestrictionFactory requireFactory = new RequireFromRestrictionFactory();
-        OPTION_RESTRICTION_FACTORIES.put(RequireOnlyOne.class, requireFactory);
-        OPTION_RESTRICTION_FACTORIES.put(RequireSome.class, requireFactory);
-        OPTION_RESTRICTION_FACTORIES.put(RequiredOnlyIf.class, new RequiredOnlyIfRestrictionFactory());
-
-        // Occurrences restrictions
-        OccurrencesRestrictionFactory occurrenceFactory = new OccurrencesRestrictionFactory();
-        registerCommon(Once.class, occurrenceFactory);
-        registerCommon(MaxOccurrences.class, occurrenceFactory);
-        registerCommon(MinOccurrences.class, occurrenceFactory);
-
-        // String restrictions
-        StringRestrictionFactory stringFactory = new StringRestrictionFactory();
-        registerCommon(Pattern.class, stringFactory);
-        registerCommon(MaxLength.class, stringFactory);
-        registerCommon(MinLength.class, stringFactory);
-        registerCommon(NotEmpty.class, stringFactory);
-        registerCommon(NotBlank.class, stringFactory);
-
-        // Specialized restrictions
-        registerCommon(Port.class, new PortRestrictionFactory());
-        registerCommon(Path.class, new PathRestrictionFactory());
+        // Use ServerLoader to obtain restrictions
+        ServiceLoader<OptionRestrictionFactory> optionRestrictionFactories = ServiceLoader
+                .load(OptionRestrictionFactory.class);
+        for (OptionRestrictionFactory factory : optionRestrictionFactories) {
+            for (Class<? extends Annotation> cls : factory.supportedOptionAnnotations()) {
+                OPTION_RESTRICTION_FACTORIES.put(cls, factory);
+            }
+        }
+        ServiceLoader<ArgumentsRestrictionFactory> argumentsRestrictionFactories = ServiceLoader
+                .load(ArgumentsRestrictionFactory.class);
+        for (ArgumentsRestrictionFactory factory : argumentsRestrictionFactories) {
+            for (Class<? extends Annotation> cls : factory.supportedArgumentsAnnotations()) {
+                ARGUMENT_RESTRICTION_FACTORIES.put(cls, factory);
+            }
+        }
 
         init = true;
     }

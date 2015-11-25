@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
 import com.github.rvesse.airline.annotations.restrictions.RequireSome;
@@ -34,6 +36,14 @@ public class RequireFromRestrictionFactory implements OptionRestrictionFactory {
             return new RequireFromRestriction(one.tag(), true);
         }
         return null;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        List<Class<? extends Annotation>> supported = new ArrayList<>();
+        supported.add(RequireSome.class);
+        supported.add(RequireOnlyOne.class);
+        return supported;
     }
 
 }

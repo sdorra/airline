@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 
 import com.github.rvesse.airline.annotations.restrictions.Path;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
@@ -41,6 +43,20 @@ public class PathRestrictionFactory implements OptionRestrictionFactory, Argumen
     @Override
     public OptionRestriction createOptionRestriction(Annotation annotation) {
         return createCommon(annotation);
+    }
+    
+    protected List<Class<? extends Annotation>> supportedAnnotations() {
+        return Collections.<Class<? extends Annotation>>singletonList(Path.class);
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedArgumentsAnnotations() {
+        return supportedAnnotations();
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        return supportedAnnotations();
     }
 
 }

@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.rvesse.airline.annotations.restrictions.MaxLength;
 import com.github.rvesse.airline.annotations.restrictions.MinLength;
@@ -58,5 +60,25 @@ public class StringRestrictionFactory implements ArgumentsRestrictionFactory, Op
             return new NotEmptyRestriction();
         }
         return null;
+    }
+    
+    protected List<Class<? extends Annotation>> supportedAnnotations() {
+        List<Class<? extends Annotation>> supported = new ArrayList<>();
+        supported.add(Pattern.class);
+        supported.add(MaxLength.class);
+        supported.add(MinLength.class);
+        supported.add(NotBlank.class);
+        supported.add(NotEmpty.class);
+        return supported;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        return supportedAnnotations();
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedArgumentsAnnotations() {
+        return supportedAnnotations();
     }
 }

@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 
 import com.github.rvesse.airline.annotations.restrictions.RequiredOnlyIf;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
@@ -30,6 +32,11 @@ public class RequiredOnlyIfRestrictionFactory implements OptionRestrictionFactor
             return new RequiredOnlyIfRestriction(onlyIf.names());
         }
         return null;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        return Collections.<Class<? extends Annotation>>singletonList(RequiredOnlyIf.class);
     }
 
 }

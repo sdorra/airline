@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
@@ -48,5 +50,22 @@ public class AllowedValuesRestrictionFactory implements OptionRestrictionFactory
     @Override
     public ArgumentsRestriction createArgumentsRestriction(Annotation annotation) {
         return (ArgumentsRestriction) createCommon(annotation);
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        return supportedAnnotations();
+    }
+
+    protected List<Class<? extends Annotation>> supportedAnnotations() {
+        List<Class<? extends Annotation>> supported = new ArrayList<>();
+        supported.add(AllowedRawValues.class);
+        supported.add(AllowedValues.class);
+        return supported;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedArgumentsAnnotations() {
+        return supportedAnnotations();
     }
 }

@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.github.rvesse.airline.annotations.restrictions.MaxOccurrences;
 import com.github.rvesse.airline.annotations.restrictions.MinOccurrences;
@@ -60,6 +62,24 @@ public class OccurrencesRestrictionFactory implements OptionRestrictionFactory, 
             return new OccurrencesRestriction(1, true);
         }
         return null;
+    }
+    
+    protected List<Class<? extends Annotation>> supportedAnnotations() {
+        List<Class<? extends Annotation>> supported = new ArrayList<>();
+        supported.add(MaxOccurrences.class);
+        supported.add(MinOccurrences.class);
+        supported.add(Once.class);
+        return supported;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedArgumentsAnnotations() {
+        return supportedAnnotations();
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedOptionAnnotations() {
+        return supportedAnnotations();
     }
 
 }

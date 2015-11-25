@@ -35,6 +35,15 @@ Would change to the following in Airline 2.1:
     @Option(name = { "--examples" }, arity = 1)
     @BashCompletion(behaviour = CompletionBehaviour.FILES)
     private String example;
+    
+## Restriction factories
+
+In Airline 2.0 restriction factories had to be explicitly registered with the `RestrictionRegistry`, Airline 2.1 moves to using `ServiceLoader` for discovery of restriction factories.  While factories may still be explicitly registered they can now also be specified in the following files:
+
+- `META-INF/services/com.github.rvesse.airline.restrictions.factories.OptionRestrictionFactory` 
+- `META-INF/services/com.github.rvesse.airline.restrictions.factories.ArgumentsRestrictionFactory`
+
+Note that if you want to use this mechanism and intend to use the Maven shade plugin or similar to build a single JAR you must ensure that you preserve the built-in services files from the `airline` module as otherwise the built-in restriction annotations will not be honoured.
 
 # Migrating to Airline 2 from Airline 1
 
