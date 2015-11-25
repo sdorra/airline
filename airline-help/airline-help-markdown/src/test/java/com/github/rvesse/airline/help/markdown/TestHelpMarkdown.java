@@ -30,6 +30,8 @@ import com.github.rvesse.airline.Git.Add;
 import com.github.rvesse.airline.Git.RemoteAdd;
 import com.github.rvesse.airline.Git.RemoteShow;
 import com.github.rvesse.airline.args.Args1;
+import com.github.rvesse.airline.args.ArgsAllowedValues;
+import com.github.rvesse.airline.args.ArgsCopyrightAndLicense;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
@@ -293,7 +295,7 @@ public class TestHelpMarkdown {
                 "\n" +
                 "# OPTIONS\n" +
                 "\n" +
-                "- `-t`\n" +
+                "- `-t` *branch*\n" +
                 "\n" +
                 "  Track only a specific branch\n" +
                 "\n" +
@@ -477,6 +479,71 @@ public class TestHelpMarkdown {
                         "",
                         "  - Aliases cannot override existing commands",
                         "  - Aliases cannot be defined in terms of other aliases",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testArgsAllowedValuesMarkdown() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsAllowedValues> command = singleCommand(ArgsAllowedValues.class);
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new MarkdownCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), null, out);
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        "# NAME",
+                        "",
+                        "`test` `ArgsAllowedValues` - ArgsAllowedValues description",
+                        "",
+                        "# SYNOPSIS",
+                        "",
+                        "`test` `ArgsAllowedValues` [ `-mode` *mode* ]",
+                        "",
+                        "# OPTIONS",
+                        "",
+                        "- `-mode` *mode*",
+                        "",
+                        "  A string from a restricted set of values",
+                        "",
+                        "  This options value is restricted to the following set of values:",
+                        "  - a",
+                        "  - b",
+                        "  - c",
+                        "",
+                        "",
+                        ""
+                }, '\n'));
+        
+        //@formatter:on
+    }
+    
+    public void testCopyrightLicenseMarkdown() throws IOException {
+        SingleCommand<ArgsCopyrightAndLicense> cmd = singleCommand(ArgsCopyrightAndLicense.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new MarkdownCommandUsageGenerator().usage(null, null, cmd.getCommandMetadata().getName(), cmd.getCommandMetadata(), null, out);
+        //@formatter:off
+        testStringAssert(new String(out.toByteArray(), utf8), 
+                StringUtils.join(new String[] {
+                        "# NAME",
+                        "",
+                        "`ArgsCopyrightAndLicense` -",
+                        "",
+                        "# SYNOPSIS",
+                        "",
+                        "`ArgsCopyrightAndLicense`",
+                        "",
+                        "# COPYRIGHT",
+                        "",
+                        "Copyright (c) Acme Inc 2015-2016",
+                        "",
+                        "# LICENSE",
+                        "",
+                        "This software is open source under the Apache License 2.0",
+                        "",
+                        "Please see http://apache.org/licenses/LICENSE-2.0 for more information",
+                        "",
                         ""
                 }, '\n'));
         //@formatter:on
