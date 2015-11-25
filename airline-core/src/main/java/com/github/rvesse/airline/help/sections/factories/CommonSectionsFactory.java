@@ -16,7 +16,9 @@
 package com.github.rvesse.airline.help.sections.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -82,6 +84,19 @@ public class CommonSectionsFactory implements HelpSectionFactory {
                     CommonSections.ORDER_LICENSE, data);
         }
         return null;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> supportedAnnotations() {
+        List<Class<? extends Annotation>> supported = new ArrayList<>();
+        supported.add(Examples.class);
+        supported.add(Discussion.class);
+        supported.add(ExitCodes.class);
+        supported.add(HideSection.class);
+        supported.add(ProseSection.class);
+        supported.add(Copyright.class);
+        supported.add(License.class);
+        return supported;
     }
 
 }

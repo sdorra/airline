@@ -13,17 +13,19 @@
     - New direct man page generation via `ManCommandUsageGenerator`, `ManGlobalUsageGenerator` and `ManMultiPageGlobalUsageGenerator` provided in the `airline-help-man`
         - These are intended to replace the existing RONN generators and as such the RONN generators are marked as deprecated
     - `CommandUsageGenerator` has new overloads that take a `ParserMetadata<T>` object, old overloads are deprecated in favour of these.  This allows generators to produce more accurate help in some circumstances
+    - Switched to using `ServiceLoader` to discover available help section factories avoiding the need to explicitly register these with `HelpSectionRegistry`
+        - Provide a `META-INF/services/com.github.rvesse.airline.help.sections.factories.HelpSectionFactory` file to specify help section factories
+        - `HelpSectionRegistry` moved to package `com.github.rvesse.airline.help.sections.factories` (**Breaking**)
+        - `HelpSectionFactory` now required to implement a `supportedAnnotations()` method to declare the annotations it can turn into `HelpSection` instances (**Breaking**)
     - New `@Copyright` and `@License` annotations for adding copyright and license statements to help
     - New `@ProseSection` annotation for adding a custom prose section to help
     - Improved presentation of help hint for options/arguments annotated with `@Port`
-    - Numeric ranges no longer explicitly set min/max if those are set to the min/max of their respective numeric types.
+    - Improved presentation of help hints for numeric ranges, they no longer show min/max if those are set to the min/max of their respective numeric types and the range is inclusive
     - Improved presentation of help hint for single value ranges
  - Metadata Changes
      - User alias configuration are now preserved on a `UserAliasesSource<T>` class which is accessible via `ParserMetadata<T>.getUserAliasesSource()`
      - `completionBehaviour` and `completionCommand` are no longer fields on the `@Option` and `@Arguments` annotation.  Instead use the `@BashCompletion` annotation from the `airline-help-bash` module
 - Restriction Improvements
-    - Better help hints for range based restrictions when the range includes the lower/upper limit of the data type as the lower/upper bound
-    - Better help hints for `@Port` restriction
     - New `@Path` restriction for specifying that an arguments value is a path to a file/directory and applying restrictions on the path/file that should be enforced e.g. must exist, readable etc.
     - Switched to using `ServiceLoader` to discover available restriction factories avoiding the need to explicitly register these with the `RestrictionRegistry`
         - Factories are now required to implement a method indicating what annotations they can translate into restrictions (**Breaking**)

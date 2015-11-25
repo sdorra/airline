@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.help.sections;
+package com.github.rvesse.airline.help.sections.factories;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
-import com.github.rvesse.airline.annotations.help.Copyright;
-import com.github.rvesse.airline.annotations.help.Discussion;
-import com.github.rvesse.airline.annotations.help.Examples;
-import com.github.rvesse.airline.annotations.help.ExitCodes;
-import com.github.rvesse.airline.annotations.help.HideSection;
-import com.github.rvesse.airline.annotations.help.License;
-import com.github.rvesse.airline.annotations.help.ProseSection;
-import com.github.rvesse.airline.help.sections.factories.CommonSectionsFactory;
-import com.github.rvesse.airline.help.sections.factories.HelpSectionFactory;
+import com.github.rvesse.airline.help.sections.HelpSection;
 
 /**
  * Registry which maps annotations to help sections
@@ -46,14 +39,12 @@ public class HelpSectionRegistry {
         if (init)
             return;
 
-        CommonSectionsFactory commonFactory = new CommonSectionsFactory();
-        FACTORIES.put(Discussion.class, commonFactory);
-        FACTORIES.put(Examples.class, commonFactory);
-        FACTORIES.put(ExitCodes.class, commonFactory);
-        FACTORIES.put(HideSection.class, commonFactory);
-        FACTORIES.put(Copyright.class, commonFactory);
-        FACTORIES.put(License.class, commonFactory);
-        FACTORIES.put(ProseSection.class, commonFactory);
+        ServiceLoader<HelpSectionFactory> helpSectionFactories = ServiceLoader.load(HelpSectionFactory.class);
+        for (HelpSectionFactory factory : helpSectionFactories) {
+            for (Class<? extends Annotation> cls : factory.supportedAnnotations()) {
+                FACTORIES.put(cls, factory);
+            }
+        }
 
         init = true;
     }

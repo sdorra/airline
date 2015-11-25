@@ -16,10 +16,30 @@
 package com.github.rvesse.airline.help.sections.factories;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 
 import com.github.rvesse.airline.help.sections.HelpSection;
 
+/**
+ * Interface for factories that convert annotations into {@link HelpSection}
+ * instances
+ *
+ */
 public interface HelpSectionFactory {
 
+    /**
+     * Tries to create a section from the given annotation
+     * 
+     * @param annotation
+     *            Annotation
+     * @return Help section or {@code null} if the annotation is not supported
+     */
     public abstract HelpSection createSection(Annotation annotation);
+
+    /**
+     * Gets a list of the supported annotations
+     * 
+     * @return Supported annotations
+     */
+    public abstract List<Class<? extends Annotation>> supportedAnnotations();
 }

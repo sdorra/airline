@@ -27,7 +27,7 @@ import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.Parser;
 import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.help.sections.HelpSection;
-import com.github.rvesse.airline.help.sections.HelpSectionRegistry;
+import com.github.rvesse.airline.help.sections.factories.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.parser.ParserUtil;
 import com.github.rvesse.airline.parser.options.OptionParser;

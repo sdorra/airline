@@ -17,7 +17,6 @@ package com.github.rvesse.airline.restrictions.factories;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.github.rvesse.airline.annotations.restrictions.Required;

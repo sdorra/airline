@@ -8,7 +8,7 @@ Previously all help generators were included in the main `airline` module.  With
 
 Help Generators | New Module
 ---------------------- | -----------------
-RONN | `airline-help-ronn`
+RONN (**Deprecated in 2.1**) | `airline-help-ronn`
 HTML | `airline-help-html`
 Bash Completion | `airline-help-bash`
 Man (**Added in 2.1**) | `airline-help-man`
@@ -36,7 +36,7 @@ Would change to the following in Airline 2.1:
     @BashCompletion(behaviour = CompletionBehaviour.FILES)
     private String example;
     
-## Restriction factories
+## Restriction Factories
 
 In Airline 2.0 restriction factories had to be explicitly registered with the `RestrictionRegistry`, Airline 2.1 moves to using `ServiceLoader` for discovery of restriction factories.  While factories may still be explicitly registered they can now also be specified in the following files:
 
@@ -44,6 +44,16 @@ In Airline 2.0 restriction factories had to be explicitly registered with the `R
 - `META-INF/services/com.github.rvesse.airline.restrictions.factories.ArgumentsRestrictionFactory`
 
 Note that if you want to use this mechanism and intend to use the Maven shade plugin or similar to build a single JAR you must ensure that you preserve the built-in services files from the `airline` module as otherwise the built-in restriction annotations will not be honoured.
+
+## Help Section Factories
+
+In Airline 2.0 help section factories had to be explicitly registered with the `HelpSectionFactory`, Airline 2.1 moves to using `ServiceLoader` for discovery of help section factories.  While factories may still be explicitly registered they can now also be specified in the following file:
+
+- `META-INF/services/com.github.rvesse.airline.help.sections.factories.HelpSectionFactory`
+
+Note that if you want to use this mechanism and intend to use the Maven shade plugin or similar to build a single JAR you must ensure that you preserve the built-in services files from the `airline` module as otherwise the built-in help section annotations will not be honoured.
+
+Additionally the `HelpSectionRegistry` was moved into the `com.github.rvesse.airline.help.sections.factories` package.
 
 # Migrating to Airline 2 from Airline 1
 
