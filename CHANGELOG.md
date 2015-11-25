@@ -6,13 +6,17 @@
     - New `airline-help-man` module
         - `ManSections` moved into this module (**Breaking**)
     - RONN help generators moved to `airline-help-ronn` module (**Breaking**)
+        - All RONN generators are marked as `@deprecated` since they are superseded by the Man and Markdown format generators
     - HTML help generators moved to `airline-help-html` module (**Breaking**)
     - Bash help generators moved to `airline-help-bash` module (**Breaking**)
         - `CompletionBehaviour` moved into this module (**Breaking**)
+     - New `airline-help-markdown` module for generating Markdown help
 - Help Improvements
     - New direct man page generation via `ManCommandUsageGenerator`, `ManGlobalUsageGenerator` and `ManMultiPageGlobalUsageGenerator` provided in the `airline-help-man`
-        - These are intended to replace the existing RONN generators and as such the RONN generators are marked as deprecated
-    - `CommandUsageGenerator` has new overloads that take a `ParserMetadata<T>` object, old overloads are deprecated in favour of these.  This allows generators to produce more accurate help in some circumstances
+        - These are intended to replace use of the existing RONN generators for generating Man pages
+   - New direct Markdown generation via `MarkdownCommandUsageGenerator`, `MarkdownGlobalUsageGenerator` and `MarkdownMultiPageGlobalUsageGenerator`
+        -  These are intended to replace use of the existing RONN generators for generating Markdown help
+    - `CommandUsageGenerator` has new overloads that take a `ParserMetadata<T>` object, old overloads are deprecated in favour of these.  This allows generators to produce more accurate help in some circumstances.
     - Switched to using `ServiceLoader` to discover available help section factories avoiding the need to explicitly register these with `HelpSectionRegistry`
         - Provide a `META-INF/services/com.github.rvesse.airline.help.sections.factories.HelpSectionFactory` file to specify help section factories
         - `HelpSectionRegistry` moved to package `com.github.rvesse.airline.help.sections.factories` (**Breaking**)

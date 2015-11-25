@@ -11,7 +11,8 @@ Help Generators | New Module
 RONN (**Deprecated in 2.1**) | `airline-help-ronn`
 HTML | `airline-help-html`
 Bash Completion | `airline-help-bash`
-Man (**Added in 2.1**) | `airline-help-man`
+Man (**New in 2.1**) | `airline-help-man`
+Markdown (**New in 2.1**) | `airline-help-markdown`
 
 If you were using any of these then you may need to tweak your dependencies appropriately.
 
@@ -21,9 +22,13 @@ Previously we provided RONN format help generators which generated RONN output (
 
 To address this new Man format help generators are introduced which are capable of generating man pages directly without needing an intermediate format or third party tool.  As a result the existing RONN generators are deprecated and should be avoided in favour of the new help generators.
 
+## Generating Markdown help
+
+Since RONN generators are now deprecated we have also added new Markdown format help generators which can be used to generate Markdown format help directly.  These don't use any of the extended RONN syntax though they do use GitHub Flaboured Markdown table syntax for tables.
+
 ## Bash Completion
 
-Previously information for Bash completion was provided by the `completionBehaviour` and `completionCommand` fields of the `@Option` and `@Arguments` annotations.  In 2.1 these are now moved into their own `@BashCompletion` annotation which is part of the `airline-help-bash` module.
+Previously information for Bash completion was provided by the `completionBehaviour` and `completionCommand` fields of the `@Option` and `@Arguments` annotations.  In 2.1 these are now moved into their own `@BashCompletion` annotation which is now found in the `airline-help-bash` module.
 
 For example in Airline 2:
 

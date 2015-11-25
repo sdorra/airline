@@ -8,7 +8,9 @@ This is a substantially rewritten fork of the original [airline library](https:/
 
 ## Breaking Changes versus 1.x
 
-Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward
+Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.
+
+Airline 2.1 (currently under development) contains some minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.  Some users may need to add additional dependencies if they were using help formats other than the basic CLI help.
 
 ## Usage
 
@@ -76,7 +78,7 @@ Use the following maven dependency declaration:
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `2.0.1-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
+Snapshot artifacts of the latest source are also available using the version `2.1.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
 ## Build Status
 
