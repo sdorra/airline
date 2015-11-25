@@ -18,6 +18,7 @@ package com.github.rvesse.airline.help.markdown;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -48,12 +49,11 @@ import org.testng.annotations.Test;
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static org.testng.Assert.assertEquals;
 
-// Disable while #30 is in progress
-@Test//(enabled = false)
+@Test
 public class TestHelpMarkdown {
     private final Charset utf8 = Charset.forName("utf-8");
     private static final File f = new File("target/test.config");
-    
+
     @AfterClass
     public static void cleanup() {
         if (f.exists()) {
@@ -121,13 +121,14 @@ public class TestHelpMarkdown {
         reader.close();
         return builder.toString();
     }
-    
+
     public void testMultiParagraphDiscussionMarkdown() throws IOException {
         SingleCommand<ArgsMultiParagraphDiscussion> cmd = singleCommand(ArgsMultiParagraphDiscussion.class);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         MarkdownCommandUsageGenerator generator = new MarkdownCommandUsageGenerator();
-        generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(), cmd.getParserConfiguration(), out);
+        generator.usage(null, null, "ArgsMultiParagraphDiscussion", cmd.getCommandMetadata(),
+                cmd.getParserConfiguration(), out);
         //@formatter:off
         testStringAssert(new String(out.toByteArray(), utf8),
                 "# NAME\n" +
@@ -148,9 +149,7 @@ public class TestHelpMarkdown {
                 "\n");
         //@formatter:on
     }
-    
-   
-    
+
     public void testExamplesMarkdown() throws IOException {
         SingleCommand<ArgsExamples> cmd = singleCommand(ArgsExamples.class);
 
@@ -344,6 +343,198 @@ public class TestHelpMarkdown {
         //@formatter:on
     }
 
+    public void testMarkdownMultiPage() throws IOException {
+        //@formatter:off
+        CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
+                .withDescription("the stupid content tracker")
+                .withDefaultCommand(Help.class)
+                .withCommand(Help.class)
+                .withCommand(Add.class);
+
+        builder.withGroup("remote")
+                .withDescription("Manage set of tracked repositories")
+                .withDefaultCommand(RemoteShow.class)
+                .withCommand(RemoteShow.class)
+                .withCommand(RemoteAdd.class);
+
+        Cli<Runnable> gitParser = builder.build();
+        
+        MarkdownMultiPageGlobalUsageGenerator<Runnable> generator = new MarkdownMultiPageGlobalUsageGenerator<Runnable>();
+        FileOutputStream out = new FileOutputStream("target/git.md");
+        generator.usage(gitParser.getMetadata(), out);
+        String usage = readFile(new File("target/git.md"));
+        //@formatter:off
+        assertEquals(usage,
+                "# NAME\n" +
+                "\n" +
+                "`git` - the stupid content tracker\n" +
+                "\n" +
+                "# SYNOPSIS\n" +
+                "\n" +
+                "`git` [ `-v` ] [ *group* ] *command* [ *command-args* ]\n" +
+                "\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `-v`\n" +
+                "\n" +
+                "  Verbose mode\n" +
+                "\n" +
+                "# COMMANDS\n" +
+                "\n" +
+                "- `add`\n" +
+                "\n" +
+                "  Add file contents to the index\n" +
+                "\n" +
+                "- `help`\n" +
+                "\n" +
+                "  Display help information\n" +
+                "\n" +
+                "- `remote add`\n" +
+                "\n" +
+                "  Adds a remote\n" +
+                "\n" +
+                "- `remote show`\n" +
+                "\n" +
+                "  Gives some information about the remote <name>\n" +
+                "\n");
+        //@formatter:on
+        
+        File gitHelp = new File("git-help.md");
+        Assert.assertTrue(gitHelp.exists());
+        usage = readFile(gitHelp);
+        
+        //@formatter:off
+        assertEquals(usage,
+                "# NAME\n" +
+                "\n" +
+                "`git` `help` - Display help information\n" +
+                "\n" +
+                "# SYNOPSIS\n" +
+                "\n" +
+                "`git` `help` [ `--` ] [ *command* ]\n" +
+                "\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `--`\n" +
+                "\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
+                "\n" +
+                "- *command*\n" +
+                "\n" +
+                "\n" +
+                "\n");
+        //@formatter:on
+        gitHelp.delete();
+        
+        File gitAdd = new File("git-add.md");
+        Assert.assertTrue(gitAdd.exists());
+        usage = readFile(gitAdd);
+        
+        //@formatter:off
+        assertEquals(usage,
+                "# NAME\n" +
+                "\n" +
+                "`git` `add` - Add file contents to the index\n" +
+                "\n" +
+                "# SYNOPSIS\n" +
+                "\n" +
+                "`git` [ `-v` ] `add` [ `-i` ] [ `--` ] [ *patterns* ]\n" +
+                "\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `-i`\n" +
+                "\n" +
+                "  Add modified contents interactively.\n" +
+                "\n" +
+                "- `-v`\n" +
+                "\n" +
+                "  Verbose mode\n" +
+                "\n" +
+                "- `--`\n" +
+                "\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
+                "\n" +
+                "- *patterns*\n" +
+                "\n" +
+                "  Patterns of files to be added\n" +
+                "\n");
+        gitAdd.delete();
+        
+        File gitRemoteAdd = new File("git-remote-add.md");
+        Assert.assertTrue(gitRemoteAdd.exists());
+        usage = readFile(gitRemoteAdd);
+        
+        //@formatter:off
+        assertEquals(usage,
+                "# NAME\n" +
+                "\n" +
+                "`git` `remote` `add` - Adds a remote\n" +
+                "\n" +
+                "# SYNOPSIS\n" +
+                "\n" +
+                "`git` [ `-v` ] `remote` `add` [ `-t` *branch* ] [ `--` ] [ *name* *url* ]\n" +
+                "\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `-t` *branch*\n" +
+                "\n" +
+                "  Track only a specific branch\n" +
+                "\n" +
+                "- `-v`\n" +
+                "\n" +
+                "  Verbose mode\n" +
+                "\n" +
+                "- `--`\n" +
+                "\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
+                "\n" +
+                "- *name* *url*\n" +
+                "\n" +
+                "  Name and URL of remote repository to add\n" +
+                "\n");
+        gitRemoteAdd.delete();
+        
+        File gitRemoteShow = new File("git-remote-show.md");
+        Assert.assertTrue(gitRemoteShow.exists());
+        usage = readFile(gitRemoteShow);
+        
+        //@formatter:off
+        assertEquals(usage,
+                "# NAME\n" +
+                "\n" +
+                "`git` `remote` `show` - Gives some information about the remote <name>\n" +
+                "\n" +
+                "# SYNOPSIS\n" +
+                "\n" +
+                "`git` [ `-v` ] `remote` `show` [ `-n` ] [ `--` ] [ *remote* ]\n" +
+                "\n" +
+                "# OPTIONS\n" +
+                "\n" +
+                "- `-n`\n" +
+                "\n" +
+                "  Do not query remote heads\n" +
+                "\n" +
+                "- `-v`\n" +
+                "\n" +
+                "  Verbose mode\n" +
+                "\n" +
+                "- `--`\n" +
+                "\n" +
+                "  This option can be used to separate command-line options from the list of\n" +
+                "  arguments (useful when arguments might be mistaken for command-line options)\n" +
+                "\n" +
+                "- *remote*\n" +
+                "\n" +
+                "  Remote to show\n" +
+                "\n");
+        //@formatter:on
+        gitRemoteShow.delete();
+         
+    }
+
     public void testExitCodesMarkdown() throws IOException {
         //@formatter:off
         SingleCommand<ArgsExitCodes> command = singleCommand(ArgsExitCodes.class);
@@ -371,7 +562,7 @@ public class TestHelpMarkdown {
                 "\n");
         //@formatter:on
     }
-    
+
     @Test
     public void user_aliases_help_markdown() throws IOException {
         TestAliases.prepareConfig(f, "a.foo=Args1 bar", "b.foo=Args1 faz");
@@ -483,7 +674,7 @@ public class TestHelpMarkdown {
                 }, '\n'));
         //@formatter:on
     }
-    
+
     public void testArgsAllowedValuesMarkdown() throws IOException {
         //@formatter:off
         SingleCommand<ArgsAllowedValues> command = singleCommand(ArgsAllowedValues.class);
@@ -517,12 +708,13 @@ public class TestHelpMarkdown {
         
         //@formatter:on
     }
-    
+
     public void testCopyrightLicenseMarkdown() throws IOException {
         SingleCommand<ArgsCopyrightAndLicense> cmd = singleCommand(ArgsCopyrightAndLicense.class);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new MarkdownCommandUsageGenerator().usage(null, null, cmd.getCommandMetadata().getName(), cmd.getCommandMetadata(), null, out);
+        new MarkdownCommandUsageGenerator().usage(null, null, cmd.getCommandMetadata().getName(),
+                cmd.getCommandMetadata(), null, out);
         //@formatter:off
         testStringAssert(new String(out.toByteArray(), utf8), 
                 StringUtils.join(new String[] {

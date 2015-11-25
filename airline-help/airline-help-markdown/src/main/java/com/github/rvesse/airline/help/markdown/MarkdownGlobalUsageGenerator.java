@@ -38,7 +38,7 @@ import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARAT
 public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
 
     private final MarkdownUsageHelper helper;
-    private final AbstractPrintedCommandUsageGenerator commandUsageGenerator;
+    protected final AbstractPrintedCommandUsageGenerator commandUsageGenerator;
 
     public MarkdownGlobalUsageGenerator() {
         this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,

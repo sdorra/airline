@@ -41,8 +41,8 @@ import com.github.rvesse.airline.model.ParserMetadata;
  * 
  * @author rvesse
  * @deprecated The RONN format has some know bugs and it is recommended to use
- *             classes from the airline-help-man module instead of classes from
- *             this module
+ *             classes from the airline-help-man or airline-help-markdown
+ *             modules instead of classes from this module
  *
  */
 public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
@@ -84,7 +84,7 @@ public class RonnCommandUsageGenerator extends AbstractCommandUsageGenerator {
     public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig, OutputStream output) throws IOException {
         String sectionHeader = "## ";
-        
+
         if (parserConfig == null) {
             parserConfig = MetadataLoader.loadParser(command.getType());
         }

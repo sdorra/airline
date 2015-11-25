@@ -40,8 +40,8 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 
 /**
  * @deprecated The RONN format has some know bugs and it is recommended to use
- *             classes from the airline-help-man module instead of classes from
- *             this module
+ *             classes from the airline-help-man or airline-help-markdown
+ *             modules instead of classes from this module
  *
  */
 @Deprecated
