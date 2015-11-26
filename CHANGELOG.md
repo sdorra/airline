@@ -2,6 +2,9 @@
 
 ## 2.1.1
 
+- Bug Fixes
+    - `ManCommandUsageGenerator` could incorrectly indent the arguments portion of the options list if both visible and hidden options are present
+
 ## 2.1.0
 
 - Module Additions and Changes

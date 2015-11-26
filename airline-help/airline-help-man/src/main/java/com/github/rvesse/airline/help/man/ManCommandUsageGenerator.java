@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
@@ -123,17 +121,11 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
             throws IOException {
         // Options
         // Can end the list if there are no arguments
-        helper.outputOptions(printer, options, command.getArguments() == null);
+        int optionsOutput = helper.outputOptions(printer, options, command.getArguments() == null);
 
         // Arguments
         // Must start the list if there are no visible options
-        helper.outputArguments(printer, command.getArguments(), options.size() > 0
-                && (this.includeHidden() || CollectionUtils.exists(options, new Predicate<OptionMetadata>() {
-                    @Override
-                    public boolean evaluate(OptionMetadata option) {
-                        return option.isHidden();
-                    }
-                })), parserConfig);
+        helper.outputArguments(printer, command.getArguments(), optionsOutput == 0, parserConfig);
     }
 
     /**

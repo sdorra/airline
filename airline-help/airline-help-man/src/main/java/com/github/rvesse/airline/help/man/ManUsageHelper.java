@@ -42,9 +42,10 @@ public class ManUsageHelper extends AbstractUsageGenerator {
         super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
     }
 
-    public void outputOptions(TroffPrinter printer, List<OptionMetadata> options, boolean endList) throws IOException {
+    public int outputOptions(TroffPrinter printer, List<OptionMetadata> options, boolean endList) throws IOException {
         printer.nextSection("OPTIONS");
 
+        int output = 0;
         options = sortOptions(options);
         if (!options.isEmpty()) {
             boolean first = true;
@@ -77,12 +78,14 @@ public class ManUsageHelper extends AbstractUsageGenerator {
 
                 printer.endList();
                 printer.flush();
+                output++;
             }
 
-            if (endList) {
+            if (endList && !first) {
                 printer.endList();
             }
         }
+        return output;
     }
 
     public <T> void outputArguments(TroffPrinter printer, ArgumentsMetadata arguments, boolean startList,

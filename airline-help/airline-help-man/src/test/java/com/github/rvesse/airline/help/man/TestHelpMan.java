@@ -685,4 +685,226 @@ public class TestHelpMan {
                 }, '\n'));
         //@formatter:on
     }
+    
+    public void testManOptionsAndArgsIndentation_01() throws IOException {
+        SingleCommand<ArgsManMixed> command = singleCommand(ArgsManMixed.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR [ \\fB\\-\\-flag\\fR ] [ \\fB\\-\\-\\fR ] [ \\fIarguments\\fR ]",
+                        ".SH OPTIONS",
+                        ".RS",
+                        ".TP",
+                        "\\fB\\-\\-flag\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".TP",
+                        "\\fB\\-\\-\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "This option can be used to separate command\\-line options from the list of arguments (useful when arguments might be mistaken for command\\-line options)",
+                        ".RE",
+                        ".TP",
+                        "\\fIarguments\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".IP \"\" 0",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testManOptionsAndArgsIndentation_02() throws IOException {
+        SingleCommand<ArgsManMixed2> command = singleCommand(ArgsManMixed2.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR  [ \\fB\\-\\-\\fR ] [ \\fIarguments\\fR ]",
+                        ".SH OPTIONS",
+                        ".RS",
+                        ".TP",
+                        "\\fB\\-\\-\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "This option can be used to separate command\\-line options from the list of arguments (useful when arguments might be mistaken for command\\-line options)",
+                        ".RE",
+                        ".TP",
+                        "\\fIarguments\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".IP \"\" 0",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testManOptionsAndArgsIndentation_03() throws IOException {
+        SingleCommand<ArgsManMixed3> command = singleCommand(ArgsManMixed3.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR [ \\fB\\-\\-flag\\fR ] [ \\fB\\-\\-\\fR ] [ \\fIarguments\\fR ]",
+                        ".SH OPTIONS",
+                        ".RS",
+                        ".TP",
+                        "\\fB\\-\\-flag\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".TP",
+                        "\\fB\\-\\-\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "This option can be used to separate command\\-line options from the list of arguments (useful when arguments might be mistaken for command\\-line options)",
+                        ".RE",
+                        ".TP",
+                        "\\fIarguments\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".IP \"\" 0",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testManOptionsOnly_01() throws IOException {
+        SingleCommand<ArgsManOption> command = singleCommand(ArgsManOption.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR [ \\fB\\-\\-flag\\fR ]",
+                        ".SH OPTIONS",
+                        ".RS",
+                        ".TP",
+                        "\\fB\\-\\-flag\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".IP \"\" 0",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testManOptionsOnly_02() throws IOException {
+        SingleCommand<ArgsManOption2> command = singleCommand(ArgsManOption2.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR ",
+                        ".SH OPTIONS",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testManArgsOnly_01() throws IOException {
+        SingleCommand<ArgsManArgs> command = singleCommand(ArgsManArgs.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR  [ \\fB\\-\\-\\fR ] [ \\fIarguments\\fR ]",
+                        ".SH OPTIONS",
+                        ".RS",
+                        ".TP",
+                        "\\fB\\-\\-\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "This option can be used to separate command\\-line options from the list of arguments (useful when arguments might be mistaken for command\\-line options)",
+                        ".RE",
+                        ".TP",
+                        "\\fIarguments\\fR",
+                        ".RS",
+                        ".IP \"\" 4",
+                        "",
+                        ".RE",
+                        ".IP \"\" 0",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    public void testManNone_01() throws IOException {
+        SingleCommand<ArgsManNone> command = singleCommand(ArgsManNone.class);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        
+        //@formatter:off
+        assertEquals(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR ",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
 }
