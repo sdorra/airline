@@ -10,7 +10,7 @@ This is a substantially rewritten fork of the original [airline library](https:/
 
 Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.
 
-Airline 2.1 (currently under development) contains some minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.  Some users may need to add additional dependencies if they were using help formats other than the basic CLI help.
+Airline 2.1 contains some further minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.  Some users may need to add additional Maven dependencies if they were using help formats other than the basic CLI help.
 
 ## Usage
 
@@ -66,7 +66,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.0.0`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.1.0`
 
 Use the following maven dependency declaration:
 
@@ -74,11 +74,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `2.1.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
+Snapshot artifacts of the latest source are also available using the version `2.1.1-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
 ## Build Status
 

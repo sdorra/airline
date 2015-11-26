@@ -3,6 +3,8 @@ target/
 pom.xml.versionsBackup
 test-output/
 dependency-reduced-pom.xml
+release.properties
+*.xml.releaseBackup
 
 # OS X Artifacts
 .DS_Store
