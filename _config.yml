@@ -13,8 +13,8 @@ title: Airline
 email: rvesse@dotnetrdf.org
 description: > 
   Annotation-driven Java framework for building powerful Git style CLIs in Java
-baseurl: "/airline/" # the subpath of your site, e.g. /blog/
-url: "http://rvesse.github.io" # the base hostname & protocol for your site
+baseurl: "/airline" 
+url: "http://rvesse.github.io"
 twitter_username: RobVesse
 github_username:  rvesse
 
