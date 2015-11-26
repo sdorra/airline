@@ -22,3 +22,4 @@ release.properties
 
 # Bundle/Jekyll Artifacts
 Gemfile.lock
+_site/
