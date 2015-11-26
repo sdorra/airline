@@ -19,3 +19,7 @@ release.properties
 *.iml
 *.iws
 *.ipr
+
+# Jekyll and Bundle Artifacts
+Gemfile.lock
+_site/
