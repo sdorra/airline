@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Command Annotation
-order: 2
+order: 10
 ---
 
 {% include toc.html %}
