@@ -1,0 +1,23 @@
+{% capture html %}
+  {% capture contextSlug    %}{{ include.context | split: "/"   | last }}{% endcapture %}
+  {% capture contextSearch %}{{ include.context | remove: contextSlug }}{% endcapture %}     <a class="sidebar-nav-item{% if page.url == "{{ site.baseurl }}/" %}active{% endif %}" href="{{ site.baseurl }}/">Home</a>
+        
+    {% assign entries = site.pages | sort: "order" %}
+    {% for entry in entries %}
+
+        {% if entry.layout == "page" %}
+          {% capture slug    %}{{ entry.url | split: "/"   | last }}{% endcapture %}
+          {% capture current %}{{ entry.url | remove: slug }}{% endcapture %}
+
+          {% if current == "/" %}
+        	        
+          {% elsif current == contextSearch %}
+               <a class="sidebar-nav-item{% if page.url contains entry.url %}active{% endif %}" href="{{ site.baseurl }}/{{ entry.url }}">{{ entry.title }}</a>
+          {% elsif slug == "index.html" %}
+               <a class="sidebar-nav-item{% if page.url contains entry.url %}active{% endif %}" href="{{ site.baseurl }}/{{ entry.url }}">{{ entry.title }}</a>           
+          {% endif %}
+        {% endif %}
+
+    {% endfor %}
+
+{% endcapture %}{{ html | strip_newlines | replace:'    ','' | replace:'    ','' | replace:'  ',' ' }}

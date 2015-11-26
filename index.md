@@ -30,6 +30,8 @@ Where `X.Y.Z` is your desired version, the current stable release is `{{ site.ve
 
 Airline is open source software licensed under the [Apache License 2.0](http://apache.org/licenses/LICENSE-2.0)
 
+Please see `license.txt` in this repository for further details
+
 ## Acknowledgements
 
 This project was forked from [http://github.com/airlift/airline](http://github.com/airlift/airline) and would not exist at all were it not for that library.

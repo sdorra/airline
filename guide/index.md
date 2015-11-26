@@ -1,6 +1,7 @@
 ---
 layout: page
 title: User Guide
+order: 1
 ---
 
 {% include toc.html %}
@@ -9,7 +10,7 @@ title: User Guide
 
 Welcome to the Airline Users Guide, this guide is intended to show you how to use every aspect of Airline.
 
-All the examples contained in this user guide may be found in the repository at {{ github.repo }}
+All the examples contained in this user guide may be found in the repository on <a href="{{ site.github.repo }}/tree/master/airline-examples/src/main/java/com/github/rvesse/airline/examples/userguide">GitHub</a>
 
 ## Getting Started
 
@@ -27,11 +28,11 @@ At a bare minimum you will need to add a dependency on the `airline` library to 
 
 Where `X.Y.Z` is your desired version, the current stable release is `{{ site.version }}`
 
-### Simple Command Example
+### Your First Command
 
-At its most basic defining a command in Airline means adding the `@Command` annotation to a class.
+At its most basic defining a command in Airline means adding some annotation to a class.
 
-Let's take a look at `GettingStarted.java`
+Let's take a look at `GettingStarted.java`:
 
 ```java
 package com.github.rvesse.airline.examples.userguide;
@@ -67,4 +68,12 @@ public class GettingStarted {
     }
 }
 ```
-So let's examine this in detail
+We'll talk about each of the things introduced in the subsequent sections and provide links to more in-depth pages where you can explore each introduced concept in detail.
+
+#### Defining the Command
+
+At a minimum we need to annotate our class with the `@Command` annotation.  This annotation tells Airline about the command, you must at a minimum specify the `name` field giving it the name of the command.  Names should ideally be short and memorable and they cannot contain whitespace.
+
+Here we've also defined the `description` field which gives a short description of the command.
+
+There are lots of other things that we can define on our command which are described in the [Command Annotation](command.html) documentation.
