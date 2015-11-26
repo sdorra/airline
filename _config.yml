@@ -1,12 +1,27 @@
+# Dependencies
+markdown:      kramdown
+highlighter:      pygments
+
+# Permalinks
+permalink:        pretty
+relative_permalinks: true
+
 # Site settings
 title: Airline
 email: rvesse@dotnetrdf.org
 description: > 
   Annotation-driven Java framework for building powerful Git style CLIs in Java
 baseurl: "/airline/" # the subpath of your site, e.g. /blog/
-url: "" # the base hostname & protocol for your site
+url: "http://rvesse.github.io" # the base hostname & protocol for your site
 twitter_username: RobVesse
 github_username:  rvesse
 
-# Build settings
-markdown: kramdown
+author:
+  name:           "Rob Vesse"
+  url:            https://twitter.com/RobVesse
+
+# Custom vars
+version:          2.1.0
+
+github:
+  repo:           https://github.com/rvesse/airline
