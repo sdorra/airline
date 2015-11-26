@@ -21,17 +21,17 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 
-public class RequiredTagParsedOptionFinder extends AbstractParsedOptionRestrictionBasedFinder implements Predicate<Pair<OptionMetadata, Object>> {
+public class MutuallyExclusiveWithTagParsedOptionFinder extends AbstractParsedOptionRestrictionBasedFinder implements Predicate<Pair<OptionMetadata, Object>> {
     
     private final String tag;
     
-    public RequiredTagParsedOptionFinder(String tag) {
+    public MutuallyExclusiveWithTagParsedOptionFinder(String tag) {
         this.tag = tag;
     }
 
     @Override
     protected Predicate<OptionRestriction> getRestrictionPredicate() {
-        return new RequiredFromFinder(tag);
+        return new MutuallyExclusiveWithFinder(tag);
     }
 
 }

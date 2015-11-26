@@ -125,8 +125,7 @@ public class PathRestriction extends AbstractCommonRestriction implements HelpHi
                     f = f.getParentFile();
                     if (f.exists()) {
                         // All conditions must be met by first part of the path
-                        // that
-                        // exists
+                        // that exists
                         if (this.readable && !f.canRead())
                             notReadable(title, path);
 
@@ -137,8 +136,7 @@ public class PathRestriction extends AbstractCommonRestriction implements HelpHi
                             notExecutable(title, path);
 
                         // All conditions satisfied so no need to continue going
-                        // up
-                        // the path
+                        // up the path
                         break;
                     }
                 }
@@ -190,6 +188,9 @@ public class PathRestriction extends AbstractCommonRestriction implements HelpHi
     @SuppressWarnings("incomplete-switch")
     @Override
     public String[] getContentBlock(int blockNumber) {
+        if (blockNumber != 0)
+            throw new IndexOutOfBoundsException();
+
         StringBuilder builder = new StringBuilder();
         switch (this.kind) {
         case FILE:
@@ -237,7 +238,7 @@ public class PathRestriction extends AbstractCommonRestriction implements HelpHi
         }
         if (this.readable || this.writable || this.executable)
             builder.append('.');
-        
+
         if (builder.length() == 0)
             builder.append("This options value must be a path.");
 

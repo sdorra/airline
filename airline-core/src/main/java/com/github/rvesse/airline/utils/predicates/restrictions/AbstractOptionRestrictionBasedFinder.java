@@ -15,23 +15,19 @@
  */
 package com.github.rvesse.airline.utils.predicates.restrictions;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 
-public class RequiredTagParsedOptionFinder extends AbstractParsedOptionRestrictionBasedFinder implements Predicate<Pair<OptionMetadata, Object>> {
-    
-    private final String tag;
-    
-    public RequiredTagParsedOptionFinder(String tag) {
-        this.tag = tag;
-    }
+public abstract class AbstractOptionRestrictionBasedFinder implements Predicate<OptionMetadata> {
+
+    protected abstract Predicate<OptionRestriction> getRestrictionPredicate();
 
     @Override
-    protected Predicate<OptionRestriction> getRestrictionPredicate() {
-        return new RequiredFromFinder(tag);
+    public final boolean evaluate(OptionMetadata arg0) {
+        return CollectionUtils.exists(arg0.getRestrictions(), getRestrictionPredicate());
     }
 
 }

@@ -19,9 +19,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.rvesse.airline.annotations.restrictions.MutuallyExclusiveWith;
 import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
 import com.github.rvesse.airline.annotations.restrictions.RequireSome;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.restrictions.options.MutuallyExclusiveRestriction;
 import com.github.rvesse.airline.restrictions.options.RequireFromRestriction;
 
 public class RequireFromRestrictionFactory implements OptionRestrictionFactory {
@@ -34,6 +36,9 @@ public class RequireFromRestrictionFactory implements OptionRestrictionFactory {
         } else if (annotation instanceof RequireOnlyOne) {
             RequireOnlyOne one = (RequireOnlyOne) annotation;
             return new RequireFromRestriction(one.tag(), true);
+        } else if (annotation instanceof MutuallyExclusiveWith) {
+            MutuallyExclusiveWith mutExcl = (MutuallyExclusiveWith) annotation;
+            return new MutuallyExclusiveRestriction(mutExcl.tag());
         }
         return null;
     }
@@ -43,6 +48,7 @@ public class RequireFromRestrictionFactory implements OptionRestrictionFactory {
         List<Class<? extends Annotation>> supported = new ArrayList<>();
         supported.add(RequireSome.class);
         supported.add(RequireOnlyOne.class);
+        supported.add(MutuallyExclusiveWith.class);
         return supported;
     }
 

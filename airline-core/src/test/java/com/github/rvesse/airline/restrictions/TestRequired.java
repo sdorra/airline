@@ -108,4 +108,39 @@ public class TestRequired {
         SingleCommand<If> parser = TestingUtil.singleCommandParser(If.class);
         parser.parse("-a", "test");
     }
+    
+    @Test
+    public void mutually_exclusive_with_good() {
+        SingleCommand<OptionallyOne> parser = TestingUtil.singleCommandParser(OptionallyOne.class);
+        parser.parse("-a", "test");
+        parser.parse("-b", "test");
+        parser.parse("-c", "test");
+        parser.parse("-a", "test", "-a", "test2");
+        parser.parse("-b", "test", "-b", "test2");
+        parser.parse("-c", "test", "-c", "test2", "-c", "test3", "-c", "test4", "-c", "test5");
+    }
+    
+    @Test
+    public void mutually_exclusive_with_none() {
+        SingleCommand<OptionallyOne> parser = TestingUtil.singleCommandParser(OptionallyOne.class);
+        parser.parse();
+    }
+    
+    @Test(expectedExceptions = ParseOptionGroupException.class)
+    public void mutually_exclusive_with_multiple_01() {
+        SingleCommand<OptionallyOne> parser = TestingUtil.singleCommandParser(OptionallyOne.class);
+        parser.parse("-a", "test", "-b", "test2");
+    }
+        
+    @Test(expectedExceptions = ParseOptionGroupException.class)
+    public void mutually_exclusive_with_multiple_02() {
+        SingleCommand<OptionallyOne> parser = TestingUtil.singleCommandParser(OptionallyOne.class);
+        parser.parse("-a", "test", "-c", "test2");
+    }
+        
+    @Test(expectedExceptions = ParseOptionGroupException.class)
+    public void mutually_exclusive_with_multiple_03() {
+        SingleCommand<OptionallyOne> parser = TestingUtil.singleCommandParser(OptionallyOne.class);
+        parser.parse("-b", "test", "-c", "test2");
+    }
 }

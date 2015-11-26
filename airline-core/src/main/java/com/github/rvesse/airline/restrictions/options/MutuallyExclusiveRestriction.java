@@ -30,49 +30,42 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
-import com.github.rvesse.airline.utils.predicates.restrictions.RequiredFromFinder;
+import com.github.rvesse.airline.utils.predicates.restrictions.MutuallyExclusiveWithFinder;
+import com.github.rvesse.airline.utils.predicates.restrictions.MutuallyExclusiveWithTagParsedOptionFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagOptionFinder;
-import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagParsedOptionFinder;
 
-public class RequireFromRestriction implements OptionRestriction, HelpHint {
+public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint {
 
     private final String tag;
-    private final boolean mutuallyExclusive;
 
-    public RequireFromRestriction(String tag, boolean mutuallyExclusive) {
+    public MutuallyExclusiveRestriction(String tag) {
         this.tag = tag;
-        this.mutuallyExclusive = mutuallyExclusive;
     }
 
     @Override
     public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
-
         Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
                 new ParsedOptionFinder(option));
 
         Collection<OptionRestriction> restrictions = CollectionUtils.select(option.getRestrictions(),
-                new RequiredFromFinder(this.tag));
+                new MutuallyExclusiveWithFinder(this.tag));
 
         for (@SuppressWarnings("unused")
         OptionRestriction restriction : restrictions) {
             // Find other parsed options which have the same tag
-            Collection<Pair<OptionMetadata, Object>> otherParsedOptions = CollectionUtils.select(
-                    state.getParsedOptions(), new RequiredTagParsedOptionFinder(this.tag));
+            Collection<Pair<OptionMetadata, Object>> otherParsedOptions = CollectionUtils
+                    .select(state.getParsedOptions(), new MutuallyExclusiveWithTagParsedOptionFinder(this.tag));
 
             // There are some parsed options but ONLY for this option
             if (otherParsedOptions.size() > 0 && otherParsedOptions.size() == parsedOptions.size())
                 continue;
 
             // Otherwise may need to error
-            if (mutuallyExclusive && parsedOptions.size() > 0 && otherParsedOptions.size() > parsedOptions.size()) {
+            if (parsedOptions.size() > 0 && otherParsedOptions.size() > parsedOptions.size()) {
                 Collection<OptionMetadata> taggedOptions = getTaggedOptions(state);
                 throw new ParseOptionGroupException(
                         "Only one of the following options may be specified but %d were found: %s", tag, taggedOptions,
                         otherParsedOptions.size(), toOptionsList(taggedOptions));
-            } else if (otherParsedOptions.size() == 0) {
-                Collection<OptionMetadata> taggedOptions = getTaggedOptions(state);
-                throw new ParseOptionGroupException("%s of the following options must be specified: %s", tag,
-                        taggedOptions, mutuallyExclusive ? "One" : "One/more", toOptionsList(taggedOptions));
             }
         }
     }
@@ -98,8 +91,8 @@ public class RequireFromRestriction implements OptionRestriction, HelpHint {
         if (options == null)
             options = state.getGroup() != null ? state.getGroup().getOptions() : null;
         if (options == null)
-            options = state.getGlobal() != null ? state.getGlobal().getOptions() : Collections
-                    .<OptionMetadata> emptyList();
+            options = state.getGlobal() != null ? state.getGlobal().getOptions()
+                    : Collections.<OptionMetadata> emptyList();
         return CollectionUtils.select(options, new RequiredTagOptionFinder(this.tag));
     }
 
@@ -126,17 +119,12 @@ public class RequireFromRestriction implements OptionRestriction, HelpHint {
     public String[] getContentBlock(int blockNumber) {
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
-        if (mutuallyExclusive) {
-            return new String[] { String.format(
-                    "This option is part of the group '%s' from which only one option may be specified", this.tag) };
-        } else {
-            return new String[] { String.format(
-                    "This option is part of the group '%s' from which at least one option must be specified", this.tag) };
-        }
+        return new String[] { String.format(
+                "This option is part of the group '%s' from which only one option may be specified", this.tag) };
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
-        // Nothing to do
+        // No pre-validation
     }
 }

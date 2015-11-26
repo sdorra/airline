@@ -31,6 +31,7 @@
      - `completionBehaviour` and `completionCommand` are no longer fields on the `@Option` and `@Arguments` annotation.  Instead use the `@BashCompletion` annotation from the `airline-help-bash` module
 - Restriction Improvements
     - New `@Path` restriction for specifying that an arguments value is a path to a file/directory and applying restrictions on the path/file that should be enforced e.g. must exist, readable etc.
+    - New `@MutuallyExclusiveWith` restriction for specifying that only one of some set of options may be specified but that those options are optional, this is thus a less restrictive version of `@RequireOnlyOne`
     - Switched to using `ServiceLoader` to discover available restriction factories avoiding the need to explicitly register these with the `RestrictionRegistry`
         - Factories are now required to implement a method indicating what annotations they can translate into restrictions (**Breaking**)
         - Provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.OptionRestrictionFactory` file to specify option restriction factories

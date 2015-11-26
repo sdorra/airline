@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.utils.predicates.restrictions;
+package com.github.rvesse.airline.restrictions;
 
-import org.apache.commons.collections4.Predicate;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.MutuallyExclusiveWith;
 
-import com.github.rvesse.airline.restrictions.OptionRestriction;
-
-public class RequiredTagOptionFinder extends AbstractOptionRestrictionBasedFinder {
-
-    private final String tag;
-
-    public RequiredTagOptionFinder(String tag) {
-        this.tag = tag;
-    }
-
-    @Override
-    protected Predicate<OptionRestriction> getRestrictionPredicate() {
-        return new RequiredFromFinder(tag);
-    }
-
+@Command(name = "optionally-one")
+public class OptionallyOne {
+    
+    @Option(name = "-a")
+    @MutuallyExclusiveWith(tag = "group")
+    public String a;
+    
+    @Option(name = "-b")
+    @MutuallyExclusiveWith(tag = "group")
+    public String b;
+    
+    @Option(name = "-c")
+    @MutuallyExclusiveWith(tag = "group")
+    public String c;
 }

@@ -21,17 +21,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * This annotation denotes that at least one of some set of options are
- * required, the set of options are identified by a user defined tag.
+ * Annotation that indicates that you optionally permit one option from some set
+ * of options to be present, the set of options are identified by a user defined
+ * tag.
  * <p>
  * By using the same tag across several annotated options you can state that you
- * require at least one of those options to be present. If you require only one
- * from some set of options you should instead use {@link RequireOnlyOne}.
+ * require only one of those options to be present. This is a less restrictive
+ * version of {@link RequireOnlyOne} that means that all the options in the set
+ * are optional but if any are present then only one from the set may be
+ * present.  If you require one/more from some set of options you should instead
+ * use the less restrictive {@link RequireSome}.
  * </p>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
-public @interface RequireSome {
+public @interface MutuallyExclusiveWith {
 
     /**
      * Provides a tag used to identify some set of options

@@ -28,7 +28,8 @@ import java.lang.annotation.Target;
  * By using the same tag across several annotated options you can state that you
  * require only one of those options to be present. If you require one/more from
  * some set of options you should instead use the less restrictive
- * {@link RequireSome}
+ * {@link RequireSome}. If you optionally require at most one from some set of
+ * options you can use {@link MutuallyExclusiveWith} instead.
  * </p>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)

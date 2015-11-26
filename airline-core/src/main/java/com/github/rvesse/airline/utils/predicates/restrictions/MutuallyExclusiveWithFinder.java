@@ -16,22 +16,31 @@
 package com.github.rvesse.airline.utils.predicates.restrictions;
 
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.restrictions.options.MutuallyExclusiveRestriction;
 
-public class RequiredTagParsedOptionFinder extends AbstractParsedOptionRestrictionBasedFinder implements Predicate<Pair<OptionMetadata, Object>> {
-    
+public class MutuallyExclusiveWithFinder implements Predicate<OptionRestriction> {
+
     private final String tag;
-    
-    public RequiredTagParsedOptionFinder(String tag) {
+
+    public MutuallyExclusiveWithFinder() {
+        this(null);
+    }
+
+    public MutuallyExclusiveWithFinder(String tag) {
         this.tag = tag;
     }
 
     @Override
-    protected Predicate<OptionRestriction> getRestrictionPredicate() {
-        return new RequiredFromFinder(tag);
+    public boolean evaluate(OptionRestriction restriction) {
+        if (restriction instanceof MutuallyExclusiveRestriction) {
+            if (tag == null)
+                return true;
+            return StringUtils.equals(tag, ((MutuallyExclusiveRestriction) restriction).getTag());
+        }
+        return false;
     }
 
 }
