@@ -16,13 +16,15 @@ Airline aims to reduce the boiler plate code typically associated with CLIs in J
 
 You can get Airline from Maven central by specifying the following Maven coordinates:
 
-    <dependency>
-      <groupId>com.github.rvesse</groupId>
-      <artifactId>airline</artifactId>
-      <version>X.Y.Z</version>
-    </dependency>
+```xml
+<dependency>
+  <groupId>com.github.rvesse</groupId>
+  <artifactId>airline</artifactId>
+  <version>X.Y.Z</version>
+</dependency>
+```
 
-Where `X.Y.Z` is your desired version, the current stable release is `2.1.0`
+Where `X.Y.Z` is your desired version, the current stable release is `{{ site.version }}`
 
 ## License
 
