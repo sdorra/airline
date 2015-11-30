@@ -1,7 +1,6 @@
 ---
 layout: page
 title: User Guide
-order: 1
 ---
 
 {% include toc.html %}
@@ -76,4 +75,4 @@ At a minimum we need to annotate our class with the `@Command` annotation.  This
 
 Here we've also defined the `description` field which gives a short description of the command.
 
-There are lots of other things that we can define on our command which are described in the [Command Annotation](command.html) documentation.
+There are lots of other things that we can define on our command which are described in the [Command Annotation](annotations/command.html) documentation.
