@@ -14,14 +14,23 @@ The annotation is actually very simple, at a minimum it looks like the following
 public class Tool {
 ```
 
-Where the `name` field states the name of the command, this name is the name by which users will refer to the command and that will be displayed in [Help](../help/) for the command.  Names are restricted to not contain whitespace but otherwise can contain whatever characters you want.
+Where the `name` field states the name of the command, this name is the name by which users will refer to the command and that will be displayed in [Help](../help/) for the command.
 
-More commonly you'll also want to add a `description` which gives users a brief overview of what your command does e.g.
+{% include alert.html %}
+Names are restricted to not contain whitespace but otherwise can contain whatever characters you want.
+	
+Remember that users need to be able to type the name at their command line terminal of choice so it is best to limit yourself to common characters i.e. alphanumerics and common punctuation marks.
+
+### Description
+
+Generally you'll also want to add a `description` which gives users a brief overview of what your command does e.g.
 
 ```java
 @Command(name = "tool", description = "This tool does something interesting")
 public class Tool {
 ```
+
+This is just a string that describes the functionality of your command, generally this should be kept relatively short.  If you want to include more detailed descriptions of functionality then you probably also want to use some of the [Help](../help/) annotations such as [`@Discussion`](discussion.html)
 
 ### Hiding Commands
 
