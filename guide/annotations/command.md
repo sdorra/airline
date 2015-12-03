@@ -11,7 +11,7 @@ The annotation is actually very simple, at a minimum it looks like the following
 
 ```java
 @Command(name = "tool")
-public class Tool {
+public class Tool { }
 ```
 
 Where the `name` field states the name of the command, this name is the name by which users will refer to the command and that will be displayed in [Help](../help/) for the command.
@@ -27,7 +27,7 @@ Generally you'll also want to add a `description` which gives users a brief over
 
 ```java
 @Command(name = "tool", description = "This tool does something interesting")
-public class Tool {
+public class Tool { }
 ```
 
 This is just a string that describes the functionality of your command, generally this should be kept relatively short.  If you want to include more detailed descriptions of functionality then you probably also want to use some of the [Help](../help/) annotations such as [`@Discussion`](discussion.html)
@@ -38,7 +38,7 @@ By default all commands in an Airline CLI are visible to users, however there ar
 
 ```java
 @Command(name = "tool", description = "This tool does something interesting", hidden = true)
-public class Tool {
+public class Tool { }
 ```
 
 When commands are hidden they will not be included in help (unless the help generator is explicitly specified to include them) so only users who are aware they are there can use them.
@@ -54,7 +54,7 @@ To specify which group(s) a command belongs to you use the `groupNames` fields l
 
 ```java
 @Command(name = "tool", description = "This tool does something interesting", hidden = true, groupNames = { "common", "foo bar"})
-public class Tool {
+public class Tool { }
 ```
 	
 Here we add our command to the `common` group, we also add it to the `bar` group which is a sub-group of the `foo` group.
