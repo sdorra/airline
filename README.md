@@ -12,6 +12,12 @@ Airline 2 contains significant breaking changes from Airline 1.x, please see [Mi
 
 Airline 2.1 contains some further minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.  Some users may need to add additional Maven dependencies if they were using help formats other than the basic CLI help.
 
+## User Guide
+
+We're currently working on our new website which will eventually include a comprehensive user guide though is currently a work in progress.
+
+You can find the website at [http://rvesse.github.io/airline/](http://rvesse.github.io/airline/)
+
 ## Usage
 
 To use airline you need to add a dependency to it to your own code, the Maven artifacts are described later in this file.

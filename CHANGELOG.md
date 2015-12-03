@@ -5,6 +5,9 @@
 - Bug Fixes
     - `ManCommandUsageGenerator` could incorrectly indent the arguments portion of the options list if both visible and hidden options are present
     - Man help output could fail in the options section if there were no visible options but some hidden options present
+- Annotation Changes
+   - Marked defunct fields of `@Arguments` annotation as deprecated
+   - Marked various annotations as `@Documented` so they are included in JavaDoc output
 
 ## 2.1.0
 
