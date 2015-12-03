@@ -25,7 +25,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 @Command(name = "getting-started", description = "We're just getting started")
-public class GettingStarted {
+public class GettingStarted implements Runnable {
 
     @Option(name = { "-f", "--flag" }, description = "An option that requires no values")
     private boolean flag = false;
@@ -39,7 +39,7 @@ public class GettingStarted {
         cmd.run();
     }
 
-    private void run() {
+    public void run() {
         System.out.println("Flag was " + (this.flag ? "set" : "not set"));
         if (args != null)
             System.out.println("Arguments were " + StringUtils.join(args, ","));

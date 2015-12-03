@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
  * The default type converter
  * <p>
  * This converter supports all the basic Java types plus types. Additionally it
- * supports any class that defines a static {@code fromString String} or
+ * supports any class that defines a static {@code fromString(String)} or
  * {@code valueOf(String)} method. Finally it supports any class that defines a
  * constructor that takes a string.
  * </p>

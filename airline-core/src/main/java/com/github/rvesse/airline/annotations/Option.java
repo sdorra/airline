@@ -22,12 +22,15 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 
+import java.lang.annotation.Documented;
+
 /**
  * Annotation to mark a field as an option
  *
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
+@Documented
 public @interface Option {
     /**
      * Is this a command, group or global option
@@ -35,14 +38,13 @@ public @interface Option {
     OptionType type() default OptionType.COMMAND;
 
     /**
-     * Name use to identify the option value in documentation and error
-     * messages.
+     * Name use to identify the option value in documentation and error messages
      */
     String title() default "";
 
     /**
-     * An array of allowed command line parameters (e.g. "-n", "--name",
-     * etc...).
+     * An array of allowed command line parameters e.g. {@code -n},
+     * {@code --name}, etc...
      */
     String[] name();
 
@@ -53,7 +55,7 @@ public @interface Option {
 
     /**
      * How many parameter values this option will consume. For example, an arity
-     * of 2 will allow "-pair value1 value2".
+     * of 2 will allow {@code -pair value1 value2}
      */
     int arity() default Integer.MIN_VALUE;
 

@@ -43,8 +43,9 @@ public @interface Group {
      * interpreted as applying to the sub-group being specified.
      * <p>
      * If you also wished to place commands into the {@code foo} group you would
-     * need to specify a separate {@link Group} annotation with {@code foo} as
-     * the name.
+     * need to specify this separately. Since only one instance of an annotation
+     * can appear on any given class you would need to use the {@link Groups}
+     * annotation to place multiple {@link Group} annotations on a class.
      * </p>
      */
     String name();
@@ -57,12 +58,12 @@ public @interface Group {
     /**
      * Default command class for the group (optional)
      */
-    Class<?>defaultCommand() default NO_DEFAULT.class;
+    Class<?> defaultCommand() default NO_DEFAULT.class;
 
     /**
      * command classes to add to the group (optional)
      */
-    Class<?>[]commands() default {};
+    Class<?>[] commands() default {};
 
     /**
      * Whether the group should be hidden

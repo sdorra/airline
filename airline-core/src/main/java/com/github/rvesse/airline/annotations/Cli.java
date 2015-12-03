@@ -18,6 +18,7 @@ package com.github.rvesse.airline.annotations;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -30,6 +31,7 @@ import com.github.rvesse.airline.restrictions.GlobalRestriction;
  */
 @Target(TYPE)
 @Retention(RUNTIME)
+@Documented
 public @interface Cli {
 
     public static final class NO_DEFAULT {
@@ -41,7 +43,7 @@ public @interface Cli {
      * 
      * @return Name
      */
-    String name() default "";
+    String name();
 
     /**
      * Sets the description of the CLI
