@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Airline"
+title: Airline
 permalink: index.html
 ---
 
@@ -10,7 +10,9 @@ Airline is an annotation-driven Java library for building Command Line Interface
 
 Airline aims to reduce the boiler plate code typically associated with CLIs in Java, many common behaviours can be achieved purely with annotations and zero user code.  Let's take a look at an ultra simple example:
 
-**TODO Example**
+## How to Use
+
+Please start reading the [User Guide](guide/) to learn how to use Airline for your applications.
 
 ## Get Airline
 
