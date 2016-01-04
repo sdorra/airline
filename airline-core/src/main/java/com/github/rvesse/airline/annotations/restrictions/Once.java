@@ -20,6 +20,16 @@ import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation that marks that an option may occur at most once
+ * <p>
+ * If you want to specify the minimum and maximum occurrences of an option you
+ * can use the {@link MinOccurrences} and {@link MaxOccurrences} annotations instead.
+ * </p>
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
 public @interface Once {

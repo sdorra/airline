@@ -21,7 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that marks that an options value must be a valid path to a file/directory
+ * Annotation that marks that an options value must be a valid path to a
+ * file/directory
  *
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)

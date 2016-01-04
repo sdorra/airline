@@ -39,7 +39,7 @@ public class TestOccurrences {
     @Test(expectedExceptions = ParseRestrictionViolatedException.class, expectedExceptionsMessageRegExp = ".*(maximum of 1).*(found 2).*")
     public void occurrences_bad_too_many_02() {
         SingleCommand<Occurrences> parser = TestingUtil.singleCommandParser(Occurrences.class);
-        parser.parse("-c", "c1", "-c", "c2");
+        parser.parse("-b", "b1", "-b", "b2", "-c", "c1", "-c", "c2");
     }
     
     @Test(expectedExceptions = ParseRestrictionViolatedException.class, expectedExceptionsMessageRegExp = ".*(at least 2).*(found 0).*")

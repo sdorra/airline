@@ -44,7 +44,9 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
     public void outputOptions(UsagePrinter out, List<OptionMetadata> options) throws IOException {
         out.append("# OPTIONS").newline().newline();
 
+        // Sort Options for consistent display across JVMs
         options = sortOptions(options);
+        
         for (OptionMetadata option : options) {
             // Skip hidden options
             if (option.isHidden() && !this.includeHidden()) {
@@ -323,6 +325,9 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
     }
 
     public void outputOptionsSynopsis(UsagePrinter printer, List<OptionMetadata> options) {
+        // Sort options for consistent display across different JVMs
+        options = sortOptions(options);
+        
         for (int i = 0; i < options.size(); i++) {
             OptionMetadata option = options.get(i);
             if (option.isHidden() && !this.includeHidden())

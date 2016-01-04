@@ -23,6 +23,10 @@ import java.lang.annotation.Target;
 /**
  * Annotation that marks an option as being restricted to occurring some maximum
  * number of times (inclusive)
+ * <p>
+ * If you want to specify that the option may only occur at most once then you
+ * can use the simpler {@link Once} annotation instead.
+ * </p>
  * 
  * @author rvesse
  *
