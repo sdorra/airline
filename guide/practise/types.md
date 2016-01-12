@@ -41,3 +41,7 @@ More generally Airline supports any Java class that meets one of the following c
 Airline also supports any type which is a `Collection` of another supported type.
 
 The advantage of using collection types e.g. `List<String>` is that your `@Option` or `@Arguments` annotated field stores all the values passed in.  If your field has a non-collection type then only the last use of that option/argument will be stored in the final class that Airline creates.
+
+## Custom Type Converters
+
+**TODO Document creating custom type converters**

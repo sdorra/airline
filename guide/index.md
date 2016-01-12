@@ -200,7 +200,8 @@ For a more complex CLI we need to use the [`@Cli`](annotations/cli.html) annotat
     commands = { GettingStarted.class, Tool.class })
 ```
 
-This states that our CLI has a `name` of `basic` and that it consists of two commands - `GettingStarted.class` and `Tool.class`.   Each command itself needs to be appropriately defined with at minimum an `@Command` annotation as shown in the earlier `GettingStarted.java` example.
+This states that our CLI has a `name` of `basic` and that it consists of two commands - `GettingStarted.class` and `Tool.class`.   Each command itself needs to be appropriately defined with at minimum a `@Command` annotation as shown in the earlier `GettingStarted.java` example.
 
 We also specify that `GettingStarted.class` will serve as our `defaultCommand`, this specifies what the behaviour of our CLI is if a user does not explicitly provide the name of the command to be run.
 
+**TODO Complete this example**

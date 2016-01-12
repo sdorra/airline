@@ -18,4 +18,4 @@ To add a discussion section simply add the `@Discussion` annotated to a class li
 	"We can have as many paragraphs as we feel are necessary"})
 public class MyClass { }```
 
-The annotation takes a single `paragraphs` field which takes a `String[]` array where each entry in the array is treated as a separate paragraph.
+The annotation takes a single `paragraphs` field which takes a `String[]` array where each entry in the array is treated as a separate paragraph of discussion in the help output.

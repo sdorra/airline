@@ -34,3 +34,5 @@ As with commands typically we also want to add a `description` that describes wh
     commands = { GettingStarted.class, Tool.class })
 public class BasicCli {
 ```
+
+**TODO Write up the rest of the @Cli annotation**

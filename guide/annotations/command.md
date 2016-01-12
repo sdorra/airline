@@ -61,3 +61,6 @@ Here we add our command to the `common` group, we also add it to the `bar` group
 
 Note that since command and group names cannot contain whitespace **any** whitespace in the specified group names is interpreted as a separator and thus treated as a path to the actual group you want to place your command in.
 
+{% include alert.html %}
+You can also specify groups by using the [`@Group`](group.html) annotation or as part of the [`@Cli`](cli.html) annotation.
+
