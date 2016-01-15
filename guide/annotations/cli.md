@@ -35,4 +35,16 @@ As with commands typically we also want to add a `description` that describes wh
 public class BasicCli {
 ```
 
+### Commands
+
+### Default Command
+
+### Groups
+
+### Global Restrictions
+
+### Parser Configuration
+
+Parser configuration for a CLI may be specified via the `parserConfiguration` field which takes a [`@Parser`](parser.html) annotation.  Please see the documentation for that annotation for notes on controlling the parser configuration.
+
 **TODO Write up the rest of the @Cli annotation**
