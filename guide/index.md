@@ -202,6 +202,45 @@ For a more complex CLI we need to use the [`@Cli`](annotations/cli.html) annotat
 
 This states that our CLI has a `name` of `basic` and that it consists of two commands - `GettingStarted.class` and `Tool.class`.   Each command itself needs to be appropriately defined with at minimum a `@Command` annotation as shown in the earlier `GettingStarted.java` example.
 
-We also specify that `GettingStarted.class` will serve as our `defaultCommand`, this specifies what the behaviour of our CLI is if a user does not explicitly provide the name of the command to be run.
+We also specify that `GettingStarted.class` will serve as our `defaultCommand`, this specifies what the behaviour of our CLI is if a user does not explicitly provide the name of the command to be run.  The `commands` field is used to provide an array of all the commands that make up the CLI.
 
-**TODO Complete this example**
+You can see the [`@Cli`](annotations/cli.html) documentation for many more advanced options that the annotation supports.
+
+### Parsing Phase
+
+For a CLI we can create a parser in a single line like so:
+
+```java
+Cli<Runnable> cli = new Cli<Runnable>(BasicCli.class);
+```
+
+This instructs Airline to extract the annotation meta-data from the given class - `BasicCli` in our example - and use it to prepare the necessary meta-data to parse user input.  Since this is a CLI this will also extract all the meta-data for all the `commands` that you specified as part of your CLI annotation.
+
+The type parameter given (`Runnable` in this example) specifies a common type for all the commands in the CLI and will be the resulting type from parsing.  `Object` can always be used but often it may be useful to have all your commands implement a common interface as in this example so that they have a standard method that your code can then invoke on the parsed command to have the actual command logic run.
+
+{% include alert.html %}
+Note that since `Cli` is a class and there is also a `@Cli` annotation if both are used in the same class then one will need to use the fully qualified package name to disambiguate.
+
+Once we have the `Cli` object we can parse a command like so:
+
+```java
+Runnable cmd = cli.parse(args);
+```
+
+### Interrogation Phase
+
+Finally you can now run the received command and interrogate the received options and act accordingly.  Since we defined our CLI to have all our commands implement `Runnable` then we can simply call the `run()` method:
+
+```java
+cmd.run();
+```
+
+As Airline has populated the fields of the parsed command appropriately it will have all the necessary information it needs to run its command logic.
+
+## What Next?
+
+You will probably want to read more about the various [annotations](annotations/) that Airline provides in order to learn how to annotate your commands and CLI with more advanced features.
+
+It is also worth taking a look at the [Airline in Practise](practise/) pages which detail various practicalities of using Airline in the real world.
+
+We'd also recommend learning about the [Help](help/) system which you can use to produce help for your commands and CLIs in a variety of common formats.
