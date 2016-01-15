@@ -82,3 +82,29 @@ public class ExtendedTypeConverter extends DefaultTypeConverter {
 ```
 
 Here we define our `ExtendedTypeConverter` which overrides the `convert()` method to add an attempt to convert the type by looking for a `parse(String)` method on the type.  `ConvertResult` is a helper class used in `DefaultTypeConverter` to pass around the results of an attempted conversion.
+
+### Using a Custom Type Converter
+
+In order to use a custom type converter you will need to register it with your parser.  To do this you can use the [`@Parser`](../annotations/parser.html) annotation e.g.
+
+```java
+@Parser(typeConverter = ExtendedTypeConverter.class)
+```
+
+If you are creating a single command i.e. a single `@Command` annotated class then simply add this annotation to your class.  If you are creating a CLI i.e. a `@Cli` annotation then you can use the `parser` field of the annotation like so:
+
+```java
+@Cli(name = "basic", 
+    description = "Provides a basic example CLI",
+    defaultCommand = GettingStarted.class, 
+    commands = { GettingStarted.class, Tool.class },
+    parser = @Parser(typeConverter = ExtendedTypeConverter.class))
+```
+
+Or if you are creating the `ParserMetadata<T>` using the fluent `ParserBuilder<T>` API you can add your custom type converter like so:
+
+```java
+ParserBuilder<Runnable> builder 
+  = new ParserBuilder<Runnable>()
+           .withTypeConverter(new ExtendedTypeConverter());
+```
