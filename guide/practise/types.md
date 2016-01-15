@@ -44,4 +44,41 @@ The advantage of using collection types e.g. `List<String>` is that your `@Optio
 
 ## Custom Type Converters
 
-**TODO Document creating custom type converters**
+To create a custom type converter that converts strings to Java objects in some other way(s) you will need to implement the `TypeConverter` interface.  This interface has a single method with the following signature:
+
+```java
+Object convert(String name, Class<?> type, String value);
+```
+
+Where `name` is the name of the option/argument we are trying to convert a value for, `type` is the target type to which we are trying to convert and `value` is the string value we are converting.
+
+Often it may be easier to simply extend the default behaviour described on this page by extending the `DefaultTypeConverter` e.g.
+
+```java
+package com.github.rvesse.airline.examples.userguide.practise;
+
+import com.github.rvesse.airline.DefaultTypeConverter;
+
+/**
+ * An example of an extended type converter that adds support for converting
+ * from types that provide an {@code parse(String)} method
+ *
+ */
+public class ExtendedTypeConverter extends DefaultTypeConverter {
+
+    @Override
+    public Object convert(String name, Class<?> type, String value) {
+        checkArguments(name, type, value);
+
+        // Try and convert from a parse(String) method
+        ConvertResult result = this.tryConvertStringMethod(type, value, "parse");
+        if (result.wasSuccessfull())
+            return result.getConvertedValue();
+
+        // Fall back to default behaviour otherwise
+        return super.convert(name, type, value);
+    }
+}
+```
+
+Here we define our `ExtendedTypeConverter` which overrides the `convert()` method to add an attempt to convert the type by looking for a `parse(String)` method on the type.  `ConvertResult` is a helper class used in `DefaultTypeConverter` to pass around the results of an attempted conversion.
