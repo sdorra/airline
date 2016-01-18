@@ -25,6 +25,9 @@ The following annotations are used to define various restrictions on options and
 
 **TODO** - List restriction annotations
 
+- Requirement related annotations:
+    - The [`@Required`](required.html) annotation indicates that an option/argument must be specified
+
 ## Help Annotations
 
 The following annotations are used to add additional help information to commands that may be consumed by the various help generators provided by Airline by producing additional help sections.
