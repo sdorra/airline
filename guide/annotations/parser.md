@@ -26,7 +26,8 @@ This has the same effect as not specifying any parser configuration since in tha
 Firstly there are the `useDefaultOptionParsers` and `defaultParsersFirst` fields, the former indicates that the default set of option parsers should be used and the latter indicates whether the defaults are configured before/after any other option parsers that you might configure.  Both of these default to `true` so there is no need to specify either unless you want to disable the default parsers or use alternative parsers in preference to the defaults e.g.
 
 ```java
-@Parser(useDefaultOptionParsers = true, defaultParsersFirst = false)
+@Parser(useDefaultOptionParsers = true, 
+        defaultParsersFirst = false)
 ```
 
 The `optionParsers` field is used to provide an array of classes that implement the `OptionParser` interface and thus can be used to customise the option parsers used or to change the order in which they are used.
@@ -34,7 +35,8 @@ The `optionParsers` field is used to provide an array of classes that implement 
 For example with the default parsers if we had an option that had arity 2 with the default parsers the user would be expected to specify it as `--option foo bar`.  However often in reality if we have an arity 2 argument we are expecting users to pass in a pair of values and it is quite common to do this as `--option foo=bar` which with the default configuration would be an error.  If we wanted to enable this style of parsing we could do so by enabling the built-in `MaybePairValueOptionParser` e.g.
 
 ```java
-@Parser(defaultParsersFirst = false, optionParsers = { MaybePairValueOptionParser.class })
+@Parser(defaultParsersFirst = false, 
+        optionParsers = { MaybePairValueOptionParser.class })
 ```
 
 ### Type Converter
@@ -93,4 +95,20 @@ To specify where to get user defined aliases from you use some combination of th
 
 Here we define that aliases will be defined in a file `example.config` which should be found under `~/example` (where `~` is treated as special value for users home directory)
 
-**TODO Write up remainder of notes on @Parser annotation**
+If you are using aliases then there are two remaining options that you may also be interested in.  The `aliasesMayChain` field which defaults to `false` controls whether user defined aliases are allowed to reference each other i.e. whether users can define aliases in terms or other aliases.  When set to `true` then aliases may be defined in terms of each other provided that a circular reference does not exist.
+
+```java
+@Parser(userAliasesFile = "example.config",
+        userAliasesSearchLocation = { "~/example/" },
+        userAliasesPrefix = "alias.",
+        aliasesMayChain = true)
+```
+
+Finally you can use `aliasesOverrideBuiltIns` to control whether user defined aliases are allowed to override built-in commands and this also defaults to false.  To understand this consider that you had defined a command `test` and then a user defines an alias `test` - which version should Airline use?  By default Airline will defer to the built-in command, however in some cases you may want to allow the users alias to take precedence in which case you can set this field to `true` e.g.
+
+```java
+@Parser(userAliasesFile = "example.config",
+        userAliasesSearchLocation = { "~/example/" },
+        userAliasesPrefix = "alias.",
+        aliasesOverrideBuiltIns = true)
+```

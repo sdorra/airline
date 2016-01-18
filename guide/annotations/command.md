@@ -26,7 +26,8 @@ Remember that users need to be able to type the name at their command line termi
 Generally you'll also want to add a `description` which gives users a brief overview of what your command does e.g.
 
 ```java
-@Command(name = "tool", description = "This tool does something interesting")
+@Command(name = "tool", 
+         description = "This tool does something interesting")
 public class Tool { }
 ```
 
@@ -37,7 +38,9 @@ This is just a string that describes the functionality of your command, generall
 By default all commands in an Airline CLI are visible to users, however there are various scenarios in which you might want to include advanced commands in your CLIs that aren't intended for use by ordinary users.  To do this you can make your command as hidden like so:
 
 ```java
-@Command(name = "tool", description = "This tool does something interesting", hidden = true)
+@Command(name = "tool", 
+         description = "This tool does something interesting", 
+         hidden = true)
 public class Tool { }
 ```
 
@@ -53,7 +56,10 @@ When incorporating a command into a CLI you may wish to place the command into o
 To specify which group(s) a command belongs to you use the `groupNames` fields like so:
 
 ```java
-@Command(name = "tool", description = "This tool does something interesting", hidden = true, groupNames = { "common", "foo bar"})
+@Command(name = "tool", 
+         description = "This tool does something interesting", 
+         hidden = true, 
+         groupNames = { "common", "foo bar"})
 public class Tool { }
 ```
 	
@@ -64,3 +70,6 @@ Note that since command and group names cannot contain whitespace **any** whites
 {% include alert.html %}
 You can also specify groups by using the [`@Group`](group.html) annotation or as part of the [`@Cli`](cli.html) annotation.
 
+## Parser Configuration
+
+If you are annotating a class which you intend to use as a single command i.e. via `SingleCommand.singleCommand()` and not as part of a larger CLI and you wish to change the parser configuration you can use the [`@Parser`](parser.html) annotation.

@@ -31,7 +31,8 @@ For help purposes you may also want to specify the `title` and the `description`
 The `title` specifies how the values (if any) that the option takes will be referred to in [Help](../help/), if you don't specify a `title` then the title is inferred from the name of the annotated field.
 
 ```java
-@Option(name = { "-a", "--alpha",  "--alphabet" }, title = "CharacterSet")
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+        title = "CharacterSet")
 private String alphabet;
 ```
 
@@ -40,7 +41,9 @@ So here we define that our option should have its value referred to as `Characte
 Similarly if we want to describe how an option is used we can add a `description` e.g.
 
 ```java
-@Option(name = { "-a", "--alpha",  "--alphabet" }, title = "CharacterSet", description = "Sets the character set to be used for output")
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+        title = "CharacterSet", 
+        description = "Sets the character set to be used for output")
 private String alphabet;
 ```
 
@@ -51,7 +54,10 @@ This provides users with some information about what an option actually does tha
 As with `@Command` annotations we can add a `hidden` field to specify that an option is hidden e.g.
 
 ```java
-@Option(name = { "-a", "--alpha",  "--alphabet" }, title = "CharacterSet", description = "Sets the character set to be used for output", hidden = true)
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+        title = "CharacterSet", 
+        description = "Sets the character set to be used for output", 
+        hidden = true)
 private String alphabet;
 ```
 
@@ -67,7 +73,8 @@ The `arity` of an option specifies how many values it expects to receive, by def
 In some cases we may actually want to take multiple values e.g.
 
 ```java
-@Option(name = { "-b", "--beta" }, arity = 2)
+@Option(name = { "-b", "--beta" }, 
+        arity = 2)
 private List<String> beta;
 ```
 	
@@ -99,7 +106,10 @@ When an option has `GROUP` or `GLOBAL` scope it may be specified earlier in the 
 So if our option was redefined like so:
 
 ```java
-@Option(name = { "-a", "--alpha",  "--alphabet" }, title = "CharacterSet", description = "Sets the character set to be used for output", type = OptionType.GROUP)
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+        title = "CharacterSet", 
+        description = "Sets the character set to be used for output",
+        type = OptionType.GROUP)
 private String alphabet;
 ```
 
@@ -110,7 +120,10 @@ Then we could instead invoke it like so:
 And similarly if our option was redefined like so:
 
 ```java
-@Option(name = { "-a", "--alpha",  "--alphabet" }, title = "CharacterSet", description = "Sets the character set to be used for output", type = OptionType.GLOBAL)
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+         title = "CharacterSet", 
+         description = "Sets the character set to be used for output", 
+         type = OptionType.GLOBAL)
 private String alphabet;
 ```
 
@@ -120,6 +133,35 @@ Then we could instead invoke it like so:
     
 #### Overrides and Sealed
 
-When you are using [Inheritance and Composition](../practise/oop.html) you may need to change the definition of an option further down your inheritance hierarchy.  In order to do this we simply need to define the option again and change the relevant parts of the definition.
+When you are using [Inheritance and Composition](../practise/oop.html) you may need/want to allow changing the definition of an option further down your inheritance hierarchy.
 
-For example if we wanted to make a 
+In order to do this we simply need to define the option again changing the relevant parts of the definition and adding the `overrides = true` field to indicate that we are changing a definition.
+
+{% include alert.html %}
+Airline does not allow changing an option definition unless you explicitly state `overrides = true`  
+Even then there are some things that **cannot** be overridden - namely the `name`, `type` and `arity` fields.  Also you can only change the Java type of the annotated field if the new type has a narrowing cast from the original type.
+
+For example lets change the `hidden` state of our option:
+
+```java
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+        title = "CharacterSet", 
+        description = "Sets the character set to be used for output", 
+        hidden = true, 
+        overrides = true)
+private String alphabet;
+```
+
+On the other hand sometimes if you are defining an option you may wish to prevent derived commands from changing the specification of that option in which case you can add `sealed = true` to the definition e.g.
+
+```java
+@Option(name = { "-a", "--alpha",  "--alphabet" }, 
+        title = "CharacterSet", 
+        description = "Sets the character set to be used for output", 
+        hidden = true, 
+        overrides = true,
+        sealed = true)
+private String alphabet;
+```
+
+Using this prevents the option from being redefined further down the inheritance hierarchy.

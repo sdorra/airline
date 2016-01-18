@@ -44,4 +44,4 @@ The `description` field may be used to describe how arguments are intended to be
 ```java
 @Arguments(description = "Provides the names of one/more files to process")
 private List<String> files;
-```
+```

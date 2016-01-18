@@ -27,8 +27,14 @@ The following annotations are used to define various restrictions on options and
 
 ## Help Annotations
 
-The following annotations are used to add additional help information to commands that may be consumed by the various help generators provided by Airline.
+The following annotations are used to add additional help information to commands that may be consumed by the various help generators provided by Airline by producing additional help sections.
 
-**TODO** - List help annotations
+All these annotations are added to an [`@Command`](command.html) annotated class or a parent class in the commands hierarchy.  They are automatically discovered from a command classes inheritance hierarchy, where an annotation occurs more than once the annotation specified furthest down the hierarchy is used.  This can be used to specify a default for some help annotation with the option of overriding it if necessary, the special [`@HideSection`](hide-section.html) annotation may be used to suppress an inherited help annotation.
 
-- The [`@Discussion`](discussion.html) annotation adds extended discussion to an [`@Command`](command.html) annotated class
+- The [`@Copyright`](copyright.html) annotation adds a copyright statement
+- The [`@Discussion`](discussion.html) annotation adds extended discussion 
+- The [`@ExitCodes`](exit-codes.html) annotation adds documentation on exit codes
+- The [`@Examples`](examples.html) annotation adds usage examples
+- The [`@HideSection`](hide-section.html) annotation is used to hide an inherited help section
+- The [`@License`](license.html) annotation adds a license statement
+- The [`@ProseSection`](prose-section.html) annotation adds an custom titled text section
