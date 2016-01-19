@@ -18,9 +18,10 @@ package com.github.rvesse.airline.args;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.help.HideSection;
+import com.github.rvesse.airline.help.sections.common.CommonSections;
 
 @Command(name="ArgsHiddenDiscussion")
-@HideSection(title = "Discussion")
+@HideSection(title = CommonSections.TITLE_DISCUSSION)
 public class ArgsHiddenDiscussion extends ArgsMultiParagraphDiscussion {
 
 }

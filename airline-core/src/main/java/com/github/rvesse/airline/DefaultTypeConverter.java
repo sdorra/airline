@@ -32,12 +32,7 @@ import java.lang.reflect.Method;
 public class DefaultTypeConverter implements TypeConverter {
     @Override
     public Object convert(String name, Class<?> type, String value) {
-        if (name == null)
-            throw new NullPointerException("name is null");
-        if (type == null)
-            throw new NullPointerException("type is null");
-        if (value == null)
-            throw new NullPointerException("value is null");
+        checkArguments(name, type, value);
 
         // Firstly try the standard Java types
         ConvertResult result = tryConvertBasicTypes(type, value);
@@ -61,6 +56,25 @@ public class DefaultTypeConverter implements TypeConverter {
             return result.getConvertedValue();
 
         throw new ParseOptionConversionException(name, value, type.getSimpleName());
+    }
+
+    /**
+     * Checks that the arguments are all non-null
+     * 
+     * @param name
+     *            Option/Argument name
+     * @param type
+     *            Target type
+     * @param value
+     *            String to convert
+     */
+    protected void checkArguments(String name, Class<?> type, String value) {
+        if (name == null)
+            throw new NullPointerException("name is null");
+        if (type == null)
+            throw new NullPointerException("type is null");
+        if (value == null)
+            throw new NullPointerException("value is null");
     }
 
     /**
@@ -164,30 +178,5 @@ public class DefaultTypeConverter implements TypeConverter {
         } catch (Exception ignored) {
         }
         return ConvertResult.FAILURE;
-    }
-
-    private static class ConvertResult {
-        private final Object value;
-        private final boolean success;
-
-        public static final ConvertResult FAILURE = new ConvertResult();
-
-        private ConvertResult() {
-            this.value = null;
-            this.success = false;
-        }
-
-        public ConvertResult(Object value) {
-            this.value = value;
-            this.success = true;
-        }
-
-        public boolean wasSuccessfull() {
-            return this.success;
-        }
-
-        public Object getConvertedValue() {
-            return this.value;
-        }
     }
 }
