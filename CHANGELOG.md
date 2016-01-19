@@ -8,6 +8,8 @@
 - Annotation Changes
    - Marked defunct fields of `@Arguments` annotation as deprecated
    - Marked various annotations as `@Documented` so they are included in JavaDoc output
+- Parser Changes
+    - Made internal helper class `ConvertResult` public to make it easier to extend the `DefaultTypeConverter`
 
 ## 2.1.0
 
