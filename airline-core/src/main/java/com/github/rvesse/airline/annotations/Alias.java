@@ -47,7 +47,7 @@ public @interface Alias {
      * 
      * @return Name
      */
-    String name() default "";
+    String name();
 
     /**
      * Arguments for the alias i.e. how the alias should be expanded
@@ -77,5 +77,5 @@ public @interface Alias {
      * 
      * @return
      */
-    String[]arguments() default {};
+    String[]arguments();
 }
