@@ -14,6 +14,11 @@ if [ -z "${VERSION}" ]; then
   echo "Must specify a version of the Javadocs to add"
   exit 1
 fi
+ALT_REPO=$2
+if [ -n "${ALT_REPO}" ]; then
+  RELEASE_REPO=$2
+  DEV_REPO=$2
+fi
 
 TARGET_DIR="${SCRIPT_DIR}/../javadoc/${VERSION}"
 if [ ! -d "${TARGET_DIR}" ]; then
