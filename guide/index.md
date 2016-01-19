@@ -1,6 +1,6 @@
 ---
 layout: page
-title: User Guide
+title: Introduction to Airline
 ---
 
 {% include toc.html %}
@@ -9,7 +9,7 @@ title: User Guide
 
 Welcome to the Airline Users Guide, this guide is intended to show you how to use every aspect of Airline.
 
-All the examples contained in this user guide may be found in compilable form in our Git repository at <a href="{{ site.github.repo }}/tree/master/airline-examples/src/main/java/com/github/rvesse/airline/examples/userguide">GitHub</a>
+Many of the examples contained in this user guide may be found in compilable form in our Git repository at <a href="{{ site.github.repo }}/tree/master/airline-examples/src/main/java/com/github/rvesse/airline/examples/userguide">GitHub</a>
 
 ## Definitions
 

@@ -34,7 +34,7 @@ The following annotations are used to specify that options/arguments (or combina
 - The [`@RequireOnlyOne`](require-only-one.html) annotation indicates that precisely one of some set of options must be specified
 - The [`@MutuallyExclusiveWith`](mutually-exclusive-with.html) annotation indicates that precisely one of some set of options may be specified
 
-### Occurence Restrictions
+### Occurrence Restrictions
 
 The following annotations are used to specify the number of times that options/arguments can be specified:
 

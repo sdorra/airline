@@ -18,6 +18,7 @@ private int number;
         arity = 1,
         title = "Name")
 @RequireOnlyOne(tag = "identifier")
+private string name;
 ```
 
 When fields are marked with `@RequireOnlyOne` if the user fails to supply exactly one of the options that have the same `tag` value then an error will be thrown during [parsing](../parser/).

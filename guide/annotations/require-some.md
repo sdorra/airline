@@ -18,6 +18,7 @@ private int number;
         arity = 1,
         title = "Name")
 @RequireSome(tag = "identifier")
+private String name;
 ```
 
 When fields are marked with `@RequireSome` if the user fails to supply at least one of the options that have the same `tag` value then an error will be thrown during [parsing](../parser/).

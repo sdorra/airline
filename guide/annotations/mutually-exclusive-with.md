@@ -18,6 +18,7 @@ private int number;
         arity = 1,
         title = "Name")
 @MutuallyExclusiveWith(tag = "identifier")
+private String name;
 ```
 
 When fields are marked with `@MutuallyExclusiveWith` if the user specifies more than one of the options that have the same `tag` value then an error will be thrown during [parsing](../parser/).
