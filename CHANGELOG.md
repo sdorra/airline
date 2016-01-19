@@ -8,8 +8,11 @@
 - Annotation Changes
    - Marked defunct fields of `@Arguments` annotation as deprecated
    - Marked various annotations as `@Documented` so they are included in JavaDoc output
+   - All fields of `@Alias` annotation are now required
 - Parser Changes
     - Made internal helper class `ConvertResult` public to make it easier to extend the `DefaultTypeConverter`
+- Documentation Improvements
+    - New website in progress at [http://rvesse.github.io/airline/](http://rvesse.github.io/airline/)
 
 ## 2.1.0
 
