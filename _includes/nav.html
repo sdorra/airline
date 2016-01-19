@@ -1,29 +1,51 @@
-<a class="sidebar-nav-item" href="{{ site.baseurl }}/">Home</a>
 <ul>
+  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/">Home</a></li>
   <li>
-  	<a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/">User Guide</a>
-  	<ol>
+  	<a href="#">User Guide</a>
+  	<ul>
+      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/">Introduction to Airline</a>
   	  <li>
-  	  	<a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/">Annotations</a>
-  	  	<ol>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/command.html">@Command</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/option.html">@Option</a></li>  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/arguments.html">@Arguments</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/cli.html">@Cli</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/parser.html">@Parser</a></li>
-               <hr />
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/copyright.html">@Copyright</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/discussion.html">@Discussion</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/examples.html">@Examples</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/exit-codes.html">@ExitCodes</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/hide-section.html">@HideSection</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/license.html">@License</a></li>
-  	  	  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/prose-section.html">@ProseSection</a></li>
-               <hr />
-               <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/required.html">@Required</a></li>
-               <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/require-some.html">@RequireSome</a></li>
-               <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/require-only-one.html">@RequireOnlyOne</a></li>
-               <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/mutually-exclusive-with.html">@MutuallyExclusiveWith</a></li>
-             </ol>
+  	  	<a href="#">Annotations</a>
+  	  	<ul>
+          <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/">Annotations Overview</a></li>
+          <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/unrestricted.html">@Unrestricted</a></li>
+          <li>
+            <a href="#">Meta-data Annotations</a>
+            <ul>
+    	  	    <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/command.html">@Command</a></li>
+            	<li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/option.html">@Option</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/arguments.html">@Arguments</a></li>
+   	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/cli.html">@Cli</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/parser.html">@Parser</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="#">Help Annotations</a>
+            <ul>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/copyright.html">@Copyright</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/discussion.html">@Discussion</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/examples.html">@Examples</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/exit-codes.html">@ExitCodes</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/hide-section.html">@HideSection</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/license.html">@License</a></li>
+  	  	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/prose-section.html">@ProseSection</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="#">Restriction Annotations</a>
+            <ul>
+              <li>
+              <a href="#">Requirement Annotations</a>
+                <ul>
+                  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/required.html">@Required</a></li>
+                  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/require-some.html">@RequireSome</a></li>
+                  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/require-only-one.html">@RequireOnlyOne</a></li>
+                  <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/mutually-exclusive-with.html">@MutuallyExclusiveWith</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
   	  </li>
   	  <li>
   	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/parser/">Parser</a> 
@@ -36,12 +58,14 @@
         </li>
         <li>
   	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/">Airline In Practise</a>
-  	    <ol>
+  	    <ul>
   	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/oop.html">Inheritance and Composition</a></li>
   	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/types.html">Supported Types</a></li>
             <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/aliases.html">User Defined Aliases</a></li>
-          </ol>
+          </ul>
         </li>
-      </ol>
+      </ul>
   </li>
+  <li><a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a></li>
+  <li><a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub project</a></li>
 </ul>

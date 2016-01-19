@@ -9,16 +9,17 @@
       <p class="lead">{{ site.description }}</p>
     </div>
 
-    <nav class="sidebar-nav" id="menu">
+    <div id="menu">
+      <nav class="sidebar-nav" id="mutlilevelpushmenu_wrapper">
+       {% include nav.html context=page.url %}
+      </nav>
+    </div>
 
-    {% include nav.html context=page.url %}
-      
-     <hr />
+    <hr />
 
-      <a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a>
-      <a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub project</a>
+    <div>
       <span class="sidebar-nav-item">Current Version: {{ site.version }}</span>
-    </nav>
+    </div>
     
     <p>All content on this site is open source under the <a href="http://apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
     
