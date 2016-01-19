@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline-help</artifactId>
-    <version>2.1.1</version>
+    <version>2.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>airline-help-ronn</artifactId>
   <name>Airline - Help - RONN</name>
