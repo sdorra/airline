@@ -60,40 +60,8 @@ At its most basic defining a command in Airline means adding some annotation to 
 
 Let's take a look at `GettingStarted.java`:
 
-```java
-package com.github.rvesse.airline.examples.userguide;
+{% include code/getting-started.md %}
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.github.rvesse.airline.SingleCommand;
-import com.github.rvesse.airline.annotations.Arguments;
-import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
-
-@Command(name = "getting-started", description = "We're just getting started")
-public class GettingStarted {
-
-    @Option(name = { "-f", "--flag" }, description = "An option that requires no values")
-    private boolean flag = false;
-
-    @Arguments(description = "Additional arguments")
-    private List<String> args;
-
-    public static void main(String[] args) {
-        SingleCommand<GettingStarted> parser = SingleCommand.singleCommand(GettingStarted.class);
-        GettingStarted cmd = parser.parse(args);
-        cmd.run();
-    }
-
-    private void run() {
-        System.out.println("Flag was " + (this.flag ? "set" : "not set"));
-        if (args != null)
-            System.out.println("Arguments were " + StringUtils.join(args, ","));
-    }
-}
-```
 We'll talk about each of the things introduced in the subsequent sections and provide links to more in-depth pages where you can explore each introduced concept in detail.
 
 ### Definition Phase
@@ -127,7 +95,7 @@ Here we define a `boolean` option which the user may invoke by passing `-f` or `
 
 There are lots of additional things we can define for our option if we want, please see the [`@Option` Annotation](annotations/option.html) documentation to learn more.
 
-You can have as many `@Option` definitions as you need provided that none of the definitions have overlapping `name` values.  Each `@Option` definition should be associated with a specific field.
+You can have as many `@Option` definitions as you need provided that none of the definitions have overlapping `name` values.  Each `@Option` definition **MUST** be associated with a specific field.
 
 #### Defining Arguments
 
@@ -169,7 +137,7 @@ private void run() {
 }
 ```
 
-Since we have an instance of the class we can access the fields as we would do normally.
+Since we have an instance of the class we can access the fields as we would do normally since Airline has populated them with the values passed in at the command line.
 
 ## Building a CLI
 
