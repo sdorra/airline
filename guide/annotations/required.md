@@ -16,3 +16,7 @@ private int number;
 ```
 
 When a field is marked with `@Required` if the user fails to supply that option/argument then an error will be thrown during [parsing](../parser/)
+
+### Related Annotations
+
+If you want to require one option from some set of options then you should use [`@RequireSome`](require-some.md)

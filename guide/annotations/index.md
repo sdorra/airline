@@ -23,10 +23,24 @@ The following annotations are used to define the high level aspects of your CLIs
 
 The following annotations are used to define various restrictions on options and arguments that cause Airline to automatically enforce restrictions on their usage e.g. requiring an option take a value from a restricted set of values.
 
-**TODO** - List restriction annotations
+All these annotations are applied to fields that are annotated with [`@Option`](option.html) or [`@Arguments`](arguments.html) and are automatically discovered during meta-data extraction.  If you are overriding the definition of an option then restrictions are automatically inherited unless you specify new restrictions further as part of your override.  In the case where you wish to remove inherited restrictions you can use the special [`@Unrestricted`](unrestricted.html) annotation to indicate that.
 
-- Requirement related annotations:
-    - The [`@Required`](required.html) annotation indicates that an option/argument must be specified
+### Requirement Restrictions
+
+The following annotations are used to specify that options/arguments (or combinations thereof) are required:
+
+- The [`@Required`](required.html) annotation indicates that an option/argument must be specified
+- The [`@RequireSome`](require-some.html) annotation indicates that one/more from some set of options must be specified
+- The [`@RequireOnlyOne`](require-only-one.html) annotation indicates that precisely one of some set of options must be specified
+- The [`@MutuallyExclusiveWith`](mutually-exclusive-with.html) annotation indicates that precisely one of some set of options may be specified
+
+### Occurence Restrictions
+
+The following annotations are used to specify the number of times that options/arguments can be specified:
+
+- The [`@Once`](once.html) annotation indicates that at option/argument may be specified only once
+- The [`@MinOccurrences`](min-occurrences.html) annotation indicates that an option/argument must be specified a minimum number of times
+- The [`@MaxOccurrences`](max-occurrences.html) annotation indicates that an option/argument may be specified a maximum number of times
 
 ## Help Annotations
 
