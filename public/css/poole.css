@@ -280,6 +280,9 @@ tbody tr:nth-child(odd) th {
   background-color: #ffff99;
 }
 
+p.message { 
+  min-height: 100px;
+}
 
 /*
  * Container

@@ -104,7 +104,7 @@ If you are using aliases then there are two remaining options that you may also 
         aliasesMayChain = true)
 ```
 
-Finally you can use `aliasesOverrideBuiltIns` to control whether user defined aliases are allowed to override built-in commands and this also defaults to false.  To understand this consider that you had defined a command `test` and then a user defines an alias `test` - which version should Airline use?  By default Airline will defer to the built-in command, however in some cases you may want to allow the users alias to take precedence in which case you can set this field to `true` e.g.
+You can use the `aliasesOverrideBuiltIns` field to control whether user defined aliases are allowed to override built-in commands and this also defaults to false.  To understand this consider that you had defined a command `test` and then a user defines an alias `test` - which version should Airline use?  By default Airline will defer to the built-in command, however in some cases you may want to allow the users alias to take precedence in which case you can set this field to `true` e.g.
 
 ```java
 @Parser(userAliasesFile = "example.config",
@@ -112,3 +112,14 @@ Finally you can use `aliasesOverrideBuiltIns` to control whether user defined al
         userAliasesPrefix = "alias.",
         aliasesOverrideBuiltIns = true)
 ```
+
+Finally if you want to provide some pre-defined aliases you can do so via the `aliases` property which takes an array of [`@Alias`](alias.html) annotations e.g.
+
+```java
+@Parser(aliases = {
+  @Alias(name = "rem", 
+         arguments = { "remove" })
+})
+```
+
+Here we define a single alias `rem` which invokes the `remove` command.

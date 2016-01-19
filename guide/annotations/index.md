@@ -15,8 +15,10 @@ The following annotations are used to define the high level aspects of your CLIs
 - The [`@Option`](option.html) annotation defines fields of a class as denoting options
 - The [`@Arguments`](arguments.html) annotation defines a field of a class as denoting arguments
 - The [`@Cli`](cli.html) annotation defines a class as being a CLI which consists of potentially many commands
-- The [`@Group`](group.html) annotation defines a command group within a CLI
+    - The [`@Group`](group.html) annotation defines a command group within a CLI
+    - The [`@Groups`](groups.html) annotation defines an `@Command` annotated class as belonging to some command groups within a CLI
 - The [`@Parser`](parser.html) annotation defines the parser behaviour
+    - The [`@Alias`](alias.html) annotation defines command aliases for a parser configuration
 - The [`@DefaultOption`](default-option.html) annotation defines an `@Option` annotated field as being able to also be populated as if it were `@Arguments` annotated
 
 ## Restriction Annotations
