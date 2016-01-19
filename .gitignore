@@ -23,3 +23,5 @@ release.properties
 # Bundle/Jekyll Artifacts
 Gemfile.lock
 _site/
+scripts/*.jar
+scripts/*.jar.md5
