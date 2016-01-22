@@ -1,3 +1,36 @@
+# Migration to Airline 2.2 from Airline 2.1
+
+Airline 2.2 has some minor breaking changes versus Airline 2.1
+
+## `@Arguments` arity
+
+Previously `@Arguments` had an `arity` field that was used to control the maximum arity of arguments.  In 2.2 this is removed and you should use the `@MaxOccurrences` restriction annotation to achieve the same effect e.g.
+
+```java
+@Arguments
+@MaxOccurrences(occurrences = 3)
+private List<String> args = new ArrayList<>();
+```
+
+## RONN Help Removed
+
+The `airline-help-ronn` module was removed in 2.2 as it was already deprecated.  For Markdown format help use the `airline-help-markdown` module and for Man pages uses the `airline-help-man` module.
+
+## Global Restriction Annotations
+
+Previously global restrictions for CLIs could only be specified via the `restrictions` field of the `@Cli` annotation.  As of Airline 2.2 the global restrictions can now be specified via annotations in the same way that option and argument restrictions are specified.
+
+Airline 2.2 supports the following global restriction annotations:
+
+- `@CommandRequired`
+- `@NoUnexpectedArguments`
+- `@NoMissingOptionValues`
+- `@None`
+
+Note that most users will not need to use these annotations as the `@Cli` annotation has the `includeDefaultRestrictions` field default to `true` which causes the default set of global restrictions to be included without any further user configuration.
+
+---
+
 # Migrating to Airline 2.1 from Airline 2
 
 Airline 2.1 includes a number of breaking changes which are part of improvements and restructuring of the help systems.
@@ -59,6 +92,8 @@ In Airline 2.0 help section factories had to be explicitly registered with the `
 Note that if you want to use this mechanism and intend to use the Maven shade plugin or similar to build a single JAR you must ensure that you preserve the built-in services files from the `airline` module as otherwise the built-in help section annotations will not be honoured.
 
 Additionally the `HelpSectionRegistry` was moved into the `com.github.rvesse.airline.help.sections.factories` package.
+
+---
 
 # Migrating to Airline 2 from Airline 1
 
