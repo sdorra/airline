@@ -68,6 +68,9 @@ public class CliParser<T> extends AbstractCommandParser<T> {
 
         bindings.put(ParserMetadata.class, state.getParserConfiguration());
 
+        if (command == null) 
+            return null;
+        
         //@formatter:off
         return createInstance(command.getType(), 
                               command.getAllOptions(), 
