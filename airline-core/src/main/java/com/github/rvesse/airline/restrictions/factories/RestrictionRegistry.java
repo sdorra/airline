@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 
 /**
@@ -31,6 +32,7 @@ public class RestrictionRegistry {
 
     private static final Map<Class<? extends Annotation>, OptionRestrictionFactory> OPTION_RESTRICTION_FACTORIES = new HashMap<>();
     private static final Map<Class<? extends Annotation>, ArgumentsRestrictionFactory> ARGUMENT_RESTRICTION_FACTORIES = new HashMap<>();
+    private static final Map<Class<? extends Annotation>, GlobalRestrictionFactory> GLOBAL_RESTRICTION_FACTORIES = new HashMap<>();
 
     private static volatile boolean init = false;
 
@@ -39,7 +41,8 @@ public class RestrictionRegistry {
     }
 
     /**
-     * Initializes the default set of restrictions
+     * Initializes the base set of restrictions using the {@link ServiceLoader}
+     * mechanism
      */
     static synchronized void init() {
         if (init)
@@ -60,6 +63,13 @@ public class RestrictionRegistry {
                 ARGUMENT_RESTRICTION_FACTORIES.put(cls, factory);
             }
         }
+        ServiceLoader<GlobalRestrictionFactory> globalRestrictionFactories = ServiceLoader
+                .load(GlobalRestrictionFactory.class);
+        for (GlobalRestrictionFactory factory : globalRestrictionFactories) {
+            for (Class<? extends Annotation> cls : factory.supportedGlobalAnnotations()) {
+                GLOBAL_RESTRICTION_FACTORIES.put(cls, factory);
+            }
+        }
 
         init = true;
     }
@@ -71,6 +81,7 @@ public class RestrictionRegistry {
         init = false;
         OPTION_RESTRICTION_FACTORIES.clear();
         ARGUMENT_RESTRICTION_FACTORIES.clear();
+        GLOBAL_RESTRICTION_FACTORIES.clear();
         init();
     }
 
@@ -107,6 +118,24 @@ public class RestrictionRegistry {
         ArgumentsRestrictionFactory factory = ARGUMENT_RESTRICTION_FACTORIES.get(cls);
         if (factory != null)
             return factory.createArgumentsRestriction(annotation);
+        return null;
+    }
+
+    public static Set<Class<? extends Annotation>> getGlobalRestrictionAnnotationClasses() {
+        return GLOBAL_RESTRICTION_FACTORIES.keySet();
+    }
+
+    public static void addGlobalRestriction(Class<? extends Annotation> cls, GlobalRestrictionFactory factory) {
+        if (cls == null)
+            throw new NullPointerException("cls cannot be null");
+        GLOBAL_RESTRICTION_FACTORIES.put(cls, factory);
+    }
+
+    public static <T extends Annotation> GlobalRestriction getGlobalRestriction(Class<? extends Annotation> cls,
+            T annotation) {
+        GlobalRestrictionFactory factory = GLOBAL_RESTRICTION_FACTORIES.get(cls);
+        if (factory != null)
+            return factory.createGlobalRestriction(annotation);
         return null;
     }
 }
