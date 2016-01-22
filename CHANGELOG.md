@@ -9,6 +9,7 @@
     - Removed the deprecated RONN help generators (use `airline-help-man` or `airline-help-markdown` instead).  This removes the `airline-help-ronn` module (**Breaking**)
 - Restriction Changes
     - New `GlobalRestrictionsFactory` interface and corresponding registry in `RestrictionsRegistry`
+        - Uses `ServiceLoader` for automatic discovery, provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.GlobalRestrictionFactory` file to specify global restriction factories
     - Global restrictions can now be specified by adding annotations to `@Cli` annotated classes
 
 ## 2.1.1
