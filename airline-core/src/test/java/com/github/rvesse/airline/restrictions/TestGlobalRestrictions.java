@@ -5,6 +5,9 @@ import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.restrictions.global.CommandRequired;
+import com.github.rvesse.airline.annotations.restrictions.global.NoMissingOptionValues;
+import com.github.rvesse.airline.annotations.restrictions.global.NoUnexpectedArguments;
 import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
@@ -54,6 +57,13 @@ public class TestGlobalRestrictions {
     private class CommandRequiredCli {
 
     }
+    
+    @Cli(name = "cli", description = "Test CLI", commands = { Args1.class,
+            EmptyCommand.class }, includeDefaultRestrictions = false)
+    @CommandRequired
+    private class CommandRequiredAnnotationCli {
+
+    }
 
     @Test(expectedExceptions = ParseCommandMissingException.class)
     public void global_restrictions_command_required_01() {
@@ -66,11 +76,30 @@ public class TestGlobalRestrictions {
         com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(CommandRequiredCli.class);
         parser.parse(new String[] { "foo" });
     }
+    
+    @Test(expectedExceptions = ParseCommandMissingException.class)
+    public void global_restrictions_command_required_annotation_01() {
+        com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(CommandRequiredAnnotationCli.class);
+        parser.parse(new String[0]);
+    }
+
+    @Test(expectedExceptions = ParseCommandUnrecognizedException.class)
+    public void global_restrictions_command_required_annotation_02() {
+        com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(CommandRequiredAnnotationCli.class);
+        parser.parse(new String[] { "foo" });
+    }
 
     @Cli(name = "cli", description = "Test CLI", commands = { Args1.class,
             EmptyCommand.class }, includeDefaultRestrictions = false, restrictions = {
                     NoUnexpectedArgumentsRestriction.class })
     private class NoUnexpectedArgumentsCli {
+
+    }
+    
+    @Cli(name = "cli", description = "Test CLI", commands = { Args1.class,
+            EmptyCommand.class }, includeDefaultRestrictions = false)
+    @NoUnexpectedArguments
+    private class NoUnexpectedArgumentsAnnotationCli {
 
     }
 
@@ -99,6 +128,32 @@ public class TestGlobalRestrictions {
                 NoUnexpectedArgumentsCli.class);
         parser.parse(new String[] { "empty", "test" });
     }
+    
+    @Test
+    public void global_restrictions_no_unexpected_args_annotation_01() {
+        com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(
+                NoUnexpectedArgumentsAnnotationCli.class);
+        Object cmd = parser.parse(new String[] { "empty" });
+        Assert.assertTrue(cmd instanceof EmptyCommand);
+    }
+
+    @Test
+    public void global_restrictions_no_unexpected_args_annotation_02() {
+        com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(
+                NoUnexpectedArgumentsAnnotationCli.class);
+        Object cmd = parser.parse(new String[] { "Args1", "test" });
+        Assert.assertTrue(cmd instanceof Args1);
+        Args1 args = (Args1) cmd;
+        Assert.assertEquals(args.parameters.size(), 1);
+        Assert.assertEquals(args.parameters.get(0), "test");
+    }
+
+    @Test(expectedExceptions = ParseArgumentsUnexpectedException.class)
+    public void global_restrictions_no_unexpected_args_annotation_03() {
+        com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(
+                NoUnexpectedArgumentsAnnotationCli.class);
+        parser.parse(new String[] { "empty", "test" });
+    }
 
     @Cli(name = "cli", description = "Test CLI", commands = { Args1.class,
             EmptyCommand.class }, includeDefaultRestrictions = false, restrictions = {
@@ -106,11 +161,25 @@ public class TestGlobalRestrictions {
     private class NoMissingOptionValuesCli {
 
     }
+    
+    @Cli(name = "cli", description = "Test CLI", commands = { Args1.class,
+            EmptyCommand.class }, includeDefaultRestrictions = false)
+    @NoMissingOptionValues
+    private class NoMissingOptionValuesAnnotationCli {
+
+    }
 
     @Test(expectedExceptions = ParseOptionMissingValueException.class)
     public void global_restrictions_missing_option_values_01() {
         com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(
                 NoMissingOptionValuesCli.class);
+        parser.parse(new String[] { "Args1", "-long" });
+    }
+    
+    @Test(expectedExceptions = ParseOptionMissingValueException.class)
+    public void global_restrictions_missing_option_values_02() {
+        com.github.rvesse.airline.Cli<Object> parser = new com.github.rvesse.airline.Cli<>(
+                NoMissingOptionValuesAnnotationCli.class);
         parser.parse(new String[] { "Args1", "-long" });
     }
 }

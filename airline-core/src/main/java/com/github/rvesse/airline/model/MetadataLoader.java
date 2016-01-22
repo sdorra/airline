@@ -152,7 +152,21 @@ public class MetadataLoader {
                 : MetadataLoader.<C> loadParser(cliClass);
 
         // Prepare restrictions
+        // We find restrictions in the following order:
+        // 1 - Those declared via annotations
+        // 2 - Those declared via the restrictions field of the @Cli annotation
+        // 3 - Standard restrictions if the includeDefaultRestrctions field of
+        // the @Cli annotation is true
         List<GlobalRestriction> restrictions = new ArrayList<GlobalRestriction>();
+        for (Class<? extends Annotation> annotationClass : RestrictionRegistry
+                .getGlobalRestrictionAnnotationClasses()) {
+            annotation = cliClass.getAnnotation(annotationClass);
+            if (annotation == null)
+                continue;
+            GlobalRestriction restriction = RestrictionRegistry.getGlobalRestriction(annotationClass, annotation);
+            if (restriction != null)
+                restrictions.add(restriction);
+        }
         for (Class<? extends GlobalRestriction> cls : cliConfig.restrictions()) {
             restrictions.add(ParserUtil.createInstance(cls));
         }

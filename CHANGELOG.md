@@ -4,8 +4,12 @@
 
 - Annotation Changes
     - Removed deprecated `arity` from `@Arguments` - the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
+    - Global restrictions can now be specified via annotations
 - Help Changes
     - Removed the deprecated RONN help generators (use `airline-help-man` or `airline-help-markdown` instead).  This removes the `airline-help-ronn` module (**Breaking**)
+- Restriction Changes
+    - New `GlobalRestrictionsFactory` interface and corresponding registry in `RestrictionsRegistry`
+    - Global restrictions can now be specified by adding annotations to `@Cli` annotated classes
 
 ## 2.1.1
 
