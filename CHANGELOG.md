@@ -2,6 +2,8 @@
 
 ## 2.2.0
 
+- Annotation Changes
+    - Removed deprecated `arity` from `@Arguments` - the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
 
 ## 2.1.1
 

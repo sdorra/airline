@@ -621,8 +621,6 @@ public class MetadataLoader {
                     }
 
                     String description = argumentsAnnotation.description();
-                    String usage = argumentsAnnotation.usage();
-                    int arity = argumentsAnnotation.arity() <= 0 ? Integer.MIN_VALUE : argumentsAnnotation.arity();
 
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();
                     for (Class<? extends Annotation> annotationClass : RestrictionRegistry
@@ -638,9 +636,7 @@ public class MetadataLoader {
 
                     //@formatter:off
                     injectionMetadata.arguments.add(new ArgumentsMetadata(titles, 
-                                                                          description, 
-                                                                          usage,
-                                                                          arity,
+                                                                          description,
                                                                           restrictions,
                                                                           path));
                     //@formatter:on

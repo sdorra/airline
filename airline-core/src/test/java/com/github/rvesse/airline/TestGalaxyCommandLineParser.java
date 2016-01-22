@@ -279,8 +279,7 @@ public class TestGalaxyCommandLineParser
         @Inject
         public final AgentFilter agentFilter = new AgentFilter();
 
-        @Arguments(usage = "<groupId:artifactId[:packaging[:classifier]]:version> @<component:pools:version>",
-                description = "The binary and @configuration to install.  The default packaging is tar.gz")
+        @Arguments(description = "The binary and @configuration to install.  The default packaging is tar.gz")
         public final List<String> assignment = new ArrayList<>();
 
         @Override
@@ -302,8 +301,7 @@ public class TestGalaxyCommandLineParser
         @Inject
         public final SlotFilter slotFilter = new SlotFilter();
 
-        @Arguments(usage = "[<binary-version>] [@<config-version>]",
-                description = "Version of the binary and/or @configuration")
+        @Arguments(description = "Version of the binary and/or @configuration")
         public final List<String> versions = new ArrayList<>();
 
         @Override
@@ -432,7 +430,7 @@ public class TestGalaxyCommandLineParser
         @Option(name = {"--availability-zone"}, description = "Availability zone to provision")
         public String availabilityZone;
 
-        @Arguments(usage = "[<instance-type>]", description = "Instance type to provision")
+        @Arguments(description = "Instance type to provision")
         public String instanceType;
 
         @Override

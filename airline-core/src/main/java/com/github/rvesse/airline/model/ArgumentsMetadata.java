@@ -37,13 +37,10 @@ public class ArgumentsMetadata {
     private final String description;
     private final Set<Accessor> accessors;
     private final List<ArgumentsRestriction> restrictions;
-    private final int arity;
 
     //@formatter:off
     public ArgumentsMetadata(Iterable<String> titles, 
                              String description, 
-                             String usage, 
-                             int arity,
                              Iterable<ArgumentsRestriction> restrictions, 
                              Iterable<Field> path) {
     //@formatter:on
@@ -56,7 +53,6 @@ public class ArgumentsMetadata {
 
         this.titles = ListUtils.unmodifiableList(IteratorUtils.toList(titles.iterator()));
         this.description = description;
-        this.arity = arity <= 0 ? Integer.MIN_VALUE : arity;
         this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions)
                 : Collections.<ArgumentsRestriction> emptyList();
         this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
@@ -72,7 +68,6 @@ public class ArgumentsMetadata {
 
         this.titles = first.titles;
         this.description = first.description;
-        this.arity = first.arity;
         this.restrictions = first.restrictions;
 
         Set<Accessor> accessors = new HashSet<>();
@@ -96,10 +91,6 @@ public class ArgumentsMetadata {
 
     public boolean isRequired() {
         return CollectionUtils.exists(this.restrictions, new IsRequiredArgumentFinder());
-    }
-
-    public int getArity() {
-        return arity;
     }
 
     public Set<Accessor> getAccessors() {

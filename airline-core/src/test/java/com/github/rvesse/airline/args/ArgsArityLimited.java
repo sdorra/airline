@@ -19,13 +19,14 @@ import java.util.List;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.restrictions.MaxOccurrences;
 
 /**
  * Test restricted argument arity.
  */
 @Command(name = "ArgsArityLimited")
-public class ArgsArityLimited
-{
-    @Arguments(description = "Args", arity = 3)
+public class ArgsArityLimited {
+    @Arguments(description = "Args")
+    @MaxOccurrences(occurrences = 3)
     public List<String> args;
 }

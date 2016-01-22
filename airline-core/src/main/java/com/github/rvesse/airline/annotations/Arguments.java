@@ -18,8 +18,6 @@ package com.github.rvesse.airline.annotations;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.github.rvesse.airline.annotations.restrictions.MaxOccurrences;
-
 import static java.lang.annotation.ElementType.FIELD;
 
 import java.lang.annotation.Documented;
@@ -37,23 +35,4 @@ public @interface Arguments {
      * A description of the arguments.
      */
     String description() default "";
-
-    /**
-     * Argument usage for help.
-     * 
-     * @deprecated Not currently honoured and will be removed from 2.2.0 onwards
-     */
-    @Deprecated
-    String usage() default "";
-
-    /**
-     * The arity of the arguments, a value of less than or equal to zero is
-     * treated as unlimited
-     * 
-     * @deprecated Use the {@link MaxOccurrences} annotation on your fields to
-     *             apply a constraint instead, will be removed from 2.2.0
-     *             onwards
-     */
-    @Deprecated
-    int arity() default Integer.MIN_VALUE;
 }

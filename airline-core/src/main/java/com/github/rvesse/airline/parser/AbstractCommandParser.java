@@ -23,7 +23,6 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.AliasResolver;
-import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.AbbreviatedCommandFinder;
@@ -267,13 +266,6 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
     private ParseState<T> parseArg(ParseState<T> state, PeekingIterator<String> tokens, ArgumentsMetadata arguments,
             OptionMetadata defaultOption) {
         if (arguments != null) {
-            // Enforce maximum arity on arguments
-            if (arguments.getArity() > 0 && state.getParsedArguments().size() == arguments.getArity()) {
-                throw new ParseTooManyArgumentsException(
-                        "Too many arguments, at most %d arguments are permitted but extra argument %s was encountered",
-                        arguments.getArity(), tokens.peek());
-            }
-
             // Argument
             checkValidValue(state, arguments, tokens.peek());
             state = state.withArgument(getTypeConverter(state).convert(arguments.getTitle().get(0),
