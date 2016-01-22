@@ -4,6 +4,8 @@
 
 - Annotation Changes
     - Removed deprecated `arity` from `@Arguments` - the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
+- Help Changes
+    - Removed the deprecated RONN help generators (use `airline-help-man` or `airline-help-markdown` instead).  This removes the `airline-help-ronn` module (**Breaking**)
 
 ## 2.1.1
 
