@@ -15,13 +15,8 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.annotations.restrictions.PortType;
 import com.github.rvesse.airline.help.sections.HelpFormat;
@@ -33,7 +28,6 @@ import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 public class PortRestriction extends AbstractCommonRestriction implements HelpHint {
     private static final int MIN_PORT = 0, MAX_PORT = 65535;
@@ -45,30 +39,22 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
         if (acceptablePorts.isEmpty())
             return;
 
-        Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
-                new ParsedOptionFinder(option));
-        if (parsedOptions.isEmpty())
-            return;
-
-        for (Pair<OptionMetadata, Object> parsedOption : parsedOptions) {
-            Object value = parsedOption.getRight();
-            if (value instanceof Long) {
-                if (!isValid(((Long) value).longValue()))
-                    invalidOptionPort(option, value);
-            } else if (value instanceof Integer) {
-                if (!isValid(((Integer) value).intValue()))
-                    invalidOptionPort(option, value);
-            } else if (value instanceof Short) {
-                if (!isValid(((Short) value).shortValue()))
-                    invalidOptionPort(option, value);
-            } else {
-                throw new ParseInvalidRestrictionException("Cannot apply a @Port restriction to an option of type %s",
-                        option.getJavaType());
-            }
+        if (value instanceof Long) {
+            if (!isValid(((Long) value).longValue()))
+                invalidOptionPort(option, value);
+        } else if (value instanceof Integer) {
+            if (!isValid(((Integer) value).intValue()))
+                invalidOptionPort(option, value);
+        } else if (value instanceof Short) {
+            if (!isValid(((Short) value).shortValue()))
+                invalidOptionPort(option, value);
+        } else {
+            throw new ParseInvalidRestrictionException("Cannot apply a @Port restriction to an option of type %s",
+                    option.getJavaType());
         }
     }
 
@@ -76,9 +62,8 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
         invalidPort(String.format("Option '%s'", option.getTitle()), value);
     }
 
-    protected void invalidArgumentsPort(ArgumentsMetadata arguments, int argIndex, Object value) {
-        invalidPort(String.format("Argument '%s'", AbstractCommonRestriction.getArgumentTitle(arguments, argIndex)),
-                value);
+    protected void invalidArgumentsPort(ArgumentsMetadata arguments, String title, Object value) {
+        invalidPort(String.format("Argument '%s'", title), value);
     }
 
     protected void invalidPort(String title, Object value) {
@@ -88,30 +73,23 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments, Object value) {
         if (acceptablePorts.isEmpty())
             return;
 
-        if (state.getParsedArguments().isEmpty())
-            return;
-
-        List<Object> values = state.getParsedArguments();
-        int i = 0;
-        for (Object value : values) {
-            if (value instanceof Long) {
-                if (!isValid(((Long) value).longValue()))
-                    invalidArgumentsPort(arguments, i, value);
-            } else if (value instanceof Integer) {
-                if (!isValid(((Integer) value).intValue()))
-                    invalidArgumentsPort(arguments, i, value);
-            } else if (value instanceof Short) {
-                if (!isValid(((Short) value).shortValue()))
-                    invalidArgumentsPort(arguments, i, value);
-            } else {
-                throw new ParseInvalidRestrictionException("Cannot apply a @Port restriction to an option of type %s",
-                        arguments.getJavaType());
-            }
-            i++;
+        String title = getArgumentTitle(state, arguments);
+        if (value instanceof Long) {
+            if (!isValid(((Long) value).longValue()))
+                invalidArgumentsPort(arguments, title, value);
+        } else if (value instanceof Integer) {
+            if (!isValid(((Integer) value).intValue()))
+                invalidArgumentsPort(arguments, title, value);
+        } else if (value instanceof Short) {
+            if (!isValid(((Short) value).shortValue()))
+                invalidArgumentsPort(arguments, title, value);
+        } else {
+            throw new ParseInvalidRestrictionException("Cannot apply a @Port restriction to an option of type %s",
+                    arguments.getJavaType());
         }
     }
 

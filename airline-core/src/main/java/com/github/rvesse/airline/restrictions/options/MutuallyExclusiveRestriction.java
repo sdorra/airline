@@ -43,7 +43,7 @@ public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void finalValidate(ParseState<T> state, OptionMetadata option) {
         Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
                 new ParsedOptionFinder(option));
 
@@ -126,5 +126,10 @@ public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
         // No pre-validation
+    }
+
+    @Override
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
+        // No post-validation
     }
 }

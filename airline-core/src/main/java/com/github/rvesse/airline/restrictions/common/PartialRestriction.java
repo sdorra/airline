@@ -53,49 +53,33 @@ public class PartialRestriction extends AbstractCommonRestriction {
         this.argumentsRestriction = argumentsRestriction;
     }
 
-    private <T> boolean isApplicableToOption(ParseState<T> state, OptionMetadata option, boolean pre) {
+    private <T> boolean isApplicableToOption(ParseState<T> state, OptionMetadata option) {
         int index = CollectionUtils.countMatches(state.getParsedOptions(), new ParsedOptionFinder(option));
-        if (!pre) {
-            // TODO Logic here is wrong, needs to see if we've seen enough items
-            // to require a post validate and if so return true
-            index++;
-        }
-
         return indices.contains(index);
-    }
-
-    @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
-        if (optionRestriction == null)
-            return;
-        if (!isApplicableToOption(state, option, false))
-            return;
-
-        this.optionRestriction.postValidate(state, option);
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
         if (optionRestriction == null)
             return;
-        if (!isApplicableToOption(state, option, true))
+        if (!isApplicableToOption(state, option))
             return;
 
         this.optionRestriction.preValidate(state, option, value);
     }
+    
+    @Override
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
+        if (optionRestriction == null)
+            return;
+        if (!isApplicableToOption(state, option))
+            return;
 
-    private <T> boolean isApplicableToArgument(ParseState<T> state, boolean pre) {
+        this.optionRestriction.postValidate(state, option, value);
+    }
+
+    private <T> boolean isApplicableToArgument(ParseState<T> state) {
         int index = state.getParsedArguments().size();
-        if (!pre) {
-            // If we are doing a post-validate then need to fire the restriction
-            // if we've seen enough arguments to need it
-            for (int i = 0; i < index; i++) {
-                if (indices.contains(i))
-                    return true;
-            }
-            return false;
-        }
-
         return indices.contains(index);
     }
 
@@ -103,20 +87,19 @@ public class PartialRestriction extends AbstractCommonRestriction {
     public <T> void preValidate(ParseState<T> state, ArgumentsMetadata arguments, String value) {
         if (argumentsRestriction == null)
             return;
-        if (!isApplicableToArgument(state, true))
+        if (!isApplicableToArgument(state))
             return;
 
         this.argumentsRestriction.preValidate(state, arguments, value);
     }
-
+    
     @Override
-    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments, Object value) {
         if (argumentsRestriction == null)
             return;
-        if (!isApplicableToArgument(state, false))
+        if (!isApplicableToArgument(state))
             return;
 
-        this.argumentsRestriction.postValidate(state, arguments);
+        this.argumentsRestriction.postValidate(state, arguments, value);
     }
-
 }

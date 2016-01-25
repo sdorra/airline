@@ -109,7 +109,7 @@ public class CliParser<T> extends AbstractCommandParser<T> {
                 for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
                     if (restriction == null)
                         continue;
-                    restriction.postValidate(state, arguments);
+                    restriction.finalValidate(state, arguments);
                 }
             }
 
@@ -120,7 +120,7 @@ public class CliParser<T> extends AbstractCommandParser<T> {
                 for (OptionRestriction restriction : option.getRestrictions()) {
                     if (restriction == null)
                         continue;
-                    restriction.postValidate(state, option);
+                    restriction.finalValidate(state, option);
                 }
             }
         }

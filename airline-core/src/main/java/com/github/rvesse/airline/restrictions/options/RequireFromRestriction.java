@@ -45,8 +45,7 @@ public class RequireFromRestriction implements OptionRestriction, HelpHint {
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
-
+    public <T> void finalValidate(ParseState<T> state, OptionMetadata option) {
         Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
                 new ParsedOptionFinder(option));
 
@@ -56,8 +55,8 @@ public class RequireFromRestriction implements OptionRestriction, HelpHint {
         for (@SuppressWarnings("unused")
         OptionRestriction restriction : restrictions) {
             // Find other parsed options which have the same tag
-            Collection<Pair<OptionMetadata, Object>> otherParsedOptions = CollectionUtils.select(
-                    state.getParsedOptions(), new RequiredTagParsedOptionFinder(this.tag));
+            Collection<Pair<OptionMetadata, Object>> otherParsedOptions = CollectionUtils
+                    .select(state.getParsedOptions(), new RequiredTagParsedOptionFinder(this.tag));
 
             // There are some parsed options but ONLY for this option
             if (otherParsedOptions.size() > 0 && otherParsedOptions.size() == parsedOptions.size())
@@ -98,8 +97,8 @@ public class RequireFromRestriction implements OptionRestriction, HelpHint {
         if (options == null)
             options = state.getGroup() != null ? state.getGroup().getOptions() : null;
         if (options == null)
-            options = state.getGlobal() != null ? state.getGlobal().getOptions() : Collections
-                    .<OptionMetadata> emptyList();
+            options = state.getGlobal() != null ? state.getGlobal().getOptions()
+                    : Collections.<OptionMetadata> emptyList();
         return CollectionUtils.select(options, new RequiredTagOptionFinder(this.tag));
     }
 
@@ -131,12 +130,18 @@ public class RequireFromRestriction implements OptionRestriction, HelpHint {
                     "This option is part of the group '%s' from which only one option may be specified", this.tag) };
         } else {
             return new String[] { String.format(
-                    "This option is part of the group '%s' from which at least one option must be specified", this.tag) };
+                    "This option is part of the group '%s' from which at least one option must be specified",
+                    this.tag) };
         }
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
-        // Nothing to do
+        // No pre-validation
+    }
+
+    @Override
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
+        // No post-validation
     }
 }

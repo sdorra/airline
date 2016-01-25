@@ -19,24 +19,39 @@ package com.github.rvesse.airline.annotations.restrictions;
 import static java.lang.annotation.ElementType.FIELD;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Option;
+
+/**
+ * Annotation which is used to indicate that a restriction annotation (whose
+ * type is denoted by the {@link #restriction()} field) does not apply to all
+ * values passed to an {@link Option} or {@link Arguments} annotated field but
+ * rather applies only to certain values
+ * 
+ * @author rvesse
+ *
+ */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ FIELD })
-public @interface PartialRestriction {
+@Documented
+public @interface Partial {
 
     /**
-     * Specifies the indices to which the restriction should actually apply
+     * Specifies the indices (zero-based) to which the restriction should
+     * actually apply
      * 
-     * @return
+     * @return Indices
      */
     int[] index();
 
     /**
      * Specifies the restriction type whose application should be partial
      * 
-     * @return
+     * @return Restriction type
      */
     Class<? extends Annotation> restriction();
 }

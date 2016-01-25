@@ -18,9 +18,51 @@ package com.github.rvesse.airline.restrictions;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 
+/**
+ * Represents restrictions on options
+ * 
+ * @author rvesse
+ *
+ */
 public interface OptionRestriction {
 
-    public abstract <T> void postValidate(ParseState<T> state, OptionMetadata option);
+    /**
+     * Method that is called after Airline has completed parsing
+     * <p>
+     * This can be used to implement restrictions that require the final parser
+     * state to process
+     * </p>
+     * 
+     * @param state
+     *            Parser state
+     * @param option
+     *            Option meta-data
+     */
+    public abstract <T> void finalValidate(ParseState<T> state, OptionMetadata option);
 
+    /**
+     * Method that is called after Airline has converted a string argument
+     * received into a strongly typed Java value
+     * 
+     * @param state
+     *            Parser state
+     * @param option
+     *            Option meta-data
+     * @param value
+     *            Strongly typed value
+     */
+    public abstract <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value);
+
+    /**
+     * Method that is called before Airline attempts to convert a string
+     * argument received into a strongly typed Java value
+     * 
+     * @param state
+     *            Parser state
+     * @param option
+     *            Option meta-data
+     * @param value
+     *            String value
+     */
     public abstract <T> void preValidate(ParseState<T> state, OptionMetadata option, String value);
 }

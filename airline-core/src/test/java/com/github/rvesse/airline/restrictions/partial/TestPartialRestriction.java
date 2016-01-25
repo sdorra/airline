@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.testng.annotations.Test;
 
@@ -28,8 +29,12 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
+import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.restrictions.common.AllowedValuesRestriction;
+import com.github.rvesse.airline.restrictions.common.IsRequiredRestriction;
 import com.github.rvesse.airline.restrictions.common.NotBlankRestriction;
 import com.github.rvesse.airline.restrictions.common.PartialRestriction;
 
@@ -45,8 +50,19 @@ public class TestPartialRestriction {
         public List<String> args = new ArrayList<>();
     }
 
+    private <T> void checkRestriction(ParseState<T> state, ArgumentsRestriction restriction,
+            ArgumentsMetadata arguments, String rawValue) {
+        checkRestriction(state, restriction, arguments, rawValue, rawValue);
+    }
+
+    private <T> void checkRestriction(ParseState<T> state, ArgumentsRestriction restriction,
+            ArgumentsMetadata arguments, String rawValue, Object objValue) {
+        restriction.preValidate(state, arguments, rawValue);
+        restriction.postValidate(state, arguments, objValue);
+    }
+
     @Test
-    public void partial_01() throws NoSuchFieldException, SecurityException {
+    public void partial_notblank_01() throws NoSuchFieldException, SecurityException {
         List<String> titles = new ArrayList<>();
         titles.add("not-blank");
         titles.add("blank");
@@ -59,19 +75,34 @@ public class TestPartialRestriction {
         ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
-        restriction.preValidate(state, arguments, "text");
+        checkRestriction(state, restriction, arguments, "text");
         state = state.withArgument("text");
-        restriction.preValidate(state, arguments, "");
+        checkRestriction(state, restriction, arguments, "");
         state = state.withArgument("");
 
-        restriction.postValidate(state, arguments);
+        restriction.finalValidate(state, arguments);
     }
 
-    // Currently does not work because postValidate() is too general and sees
-    // the final parser state not the intermediate parser state. Need to change
-    // method signatures so there is a postValidate() and a finalValidate()
-    @Test(enabled = false)
-    public void partial_02() throws NoSuchFieldException, SecurityException {
+    @Test(expectedExceptions = ParseRestrictionViolatedException.class, expectedExceptionsMessageRegExp = ".*'not-blank' requires a non-blank value.*")
+    public void partial_notblank_02() throws NoSuchFieldException, SecurityException {
+        List<String> titles = new ArrayList<>();
+        titles.add("not-blank");
+        titles.add("blank");
+        List<ArgumentsRestriction> restrictions = new ArrayList<>();
+        PartialRestriction restriction = new PartialRestriction(new int[] { 0 },
+                (ArgumentsRestriction) new NotBlankRestriction());
+        restrictions.add(restriction);
+        List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
+
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+
+        ParseState<Partial> state = ParseState.newInstance();
+        // Should fail restriction because first argument cannot be blank
+        checkRestriction(state, restriction, arguments, "");
+    }
+
+    @Test
+    public void partial_allowed_values_01() throws NoSuchFieldException, SecurityException {
         List<String> titles = new ArrayList<>();
         titles.add("set-values");
         titles.add("any");
@@ -84,11 +115,90 @@ public class TestPartialRestriction {
         ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
-        restriction.preValidate(state, arguments, "foo");
+        checkRestriction(state, restriction, arguments, "foo");
         state = state.withArgument("foo");
-        restriction.preValidate(state, arguments, "");
+        checkRestriction(state, restriction, arguments, "bar");
         state = state.withArgument("bar");
 
-        restriction.postValidate(state, arguments);
+        restriction.finalValidate(state, arguments);
+    }
+
+    @Test(expectedExceptions = ParseArgumentsIllegalValueException.class, expectedExceptionsMessageRegExp = ".*set-values' was given as 'bar' which is not in the list of allowed values: \\[foo\\]")
+    public void partial_allowed_values_02() throws NoSuchFieldException, SecurityException {
+        List<String> titles = new ArrayList<>();
+        titles.add("set-values");
+        titles.add("any");
+        List<ArgumentsRestriction> restrictions = new ArrayList<>();
+        PartialRestriction restriction = new PartialRestriction(new int[] { 0 },
+                (ArgumentsRestriction) new AllowedValuesRestriction("foo"));
+        restrictions.add(restriction);
+        List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
+
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+
+        ParseState<Partial> state = ParseState.newInstance();
+        // Should fail restriction because first argument is restricted to a set
+        // of values
+        checkRestriction(state, restriction, arguments, "bar");
+    }
+
+    @Test
+    public void partial_allowed_raw_values_01() throws NoSuchFieldException, SecurityException {
+        List<String> titles = new ArrayList<>();
+        titles.add("set-values");
+        titles.add("any");
+        List<ArgumentsRestriction> restrictions = new ArrayList<>();
+        PartialRestriction restriction = new PartialRestriction(new int[] { 0 },
+                (ArgumentsRestriction) new AllowedRawValuesRestriction(false, Locale.ENGLISH, "foo"));
+        restrictions.add(restriction);
+        List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
+
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+
+        ParseState<Partial> state = ParseState.newInstance();
+        checkRestriction(state, restriction, arguments, "foo");
+        state = state.withArgument("foo");
+        checkRestriction(state, restriction, arguments, "bar");
+        state = state.withArgument("bar");
+
+        restriction.finalValidate(state, arguments);
+    }
+
+    @Test(expectedExceptions = ParseArgumentsIllegalValueException.class, expectedExceptionsMessageRegExp = ".*set-values' was given as 'bar' which is not in the list of allowed values: \\[foo\\]")
+    public void partial_allowed_raw_values_02() throws NoSuchFieldException, SecurityException {
+        List<String> titles = new ArrayList<>();
+        titles.add("set-values");
+        titles.add("any");
+        List<ArgumentsRestriction> restrictions = new ArrayList<>();
+        PartialRestriction restriction = new PartialRestriction(new int[] { 0 },
+                (ArgumentsRestriction) new AllowedRawValuesRestriction(false, Locale.ENGLISH, "foo"));
+        restrictions.add(restriction);
+        List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
+
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+
+        ParseState<Partial> state = ParseState.newInstance();
+        // Should fail restriction because first argument is restricted to a set
+        // of values
+        checkRestriction(state, restriction, arguments, "bar");
+    }
+
+    @Test
+    public void partial_required_01() throws NoSuchFieldException, SecurityException {
+        List<String> titles = new ArrayList<>();
+        titles.add("not-blank");
+        titles.add("blank");
+        List<ArgumentsRestriction> restrictions = new ArrayList<>();
+        PartialRestriction restriction = new PartialRestriction(new int[] { 0 },
+                (ArgumentsRestriction) new IsRequiredRestriction());
+        restrictions.add(restriction);
+        List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
+
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+
+        // Should pass because finalValidate() restrictions are not respected by
+        // partial restrictions
+        ParseState<Partial> state = ParseState.newInstance();
+        restriction.finalValidate(state, arguments);
     }
 }

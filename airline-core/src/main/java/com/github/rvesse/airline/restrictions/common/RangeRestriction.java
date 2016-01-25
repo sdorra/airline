@@ -15,21 +15,17 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
-import java.util.Collection;
 import java.util.Comparator;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
+import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
 import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 /**
  * A restriction that requires the value (after type conversion) to be within a
@@ -69,22 +65,23 @@ public class RangeRestriction extends AbstractCommonRestriction implements HelpH
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
         // Not enforced if no range provided
         if (this.min == null && this.max == null)
             return;
-
-        Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
-                new ParsedOptionFinder(option));
-
-        if (parsedOptions.isEmpty())
+        
+        if (!inRange(value))
+            throw new ParseOptionOutOfRangeException(option.getTitle(), value, min, minInclusive, max, maxInclusive);
+    }
+    
+    @Override
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments, Object value) {
+        // Not enforced if no range provided
+        if (this.min == null && this.max == null)
             return;
-
-        for (Pair<OptionMetadata, Object> parsedOption : parsedOptions) {
-            if (!inRange(parsedOption.getRight()))
-                throw new ParseOptionOutOfRangeException(option.getTitle(), parsedOption.getRight(), min, minInclusive,
-                        max, maxInclusive);
-        }
+        
+        if (!inRange(value))
+            throw new ParseOptionOutOfRangeException(getArgumentTitle(state, arguments), value, min, minInclusive, max, maxInclusive);
     }
 
     protected boolean inRange(Object value) {

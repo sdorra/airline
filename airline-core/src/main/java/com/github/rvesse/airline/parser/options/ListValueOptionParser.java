@@ -115,8 +115,8 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
                         option.getTitle(), option.getOptions().iterator().next(), list, option.getArity());
             if (listValues.size() > option.getArity())
                 throw new ParseOptionUnexpectedException(
-                        "Too many option values received for option %s in list value '%s' (%d values expected)", option
-                                .getOptions().iterator().next(), list, option.getArity());
+                        "Too many option values received for option %s in list value '%s' (%d values expected)",
+                        option.getOptions().iterator().next(), list, option.getArity());
 
             // Parse individual values and assign to option
             if (option.getArity() == 1) {
@@ -124,6 +124,7 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
                 checkValidValue(state, option, listValues.get(0));
                 Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
                         listValues.get(0));
+                checkValidConvertedValue(state, option, value);
                 state = state.withOptionValue(option, value).popContext();
             } else {
                 // Arity > 1 option
@@ -131,7 +132,9 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
 
                 for (String value : listValues) {
                     checkValidValue(state, option, value);
-                    values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value));
+                    Object objValue = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value);
+                    checkValidConvertedValue(state, option, objValue);
+                    values.add(objValue);
                 }
 
                 state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();

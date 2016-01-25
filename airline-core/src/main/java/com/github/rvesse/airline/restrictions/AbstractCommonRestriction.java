@@ -22,9 +22,14 @@ import com.github.rvesse.airline.parser.ParseState;
 public abstract class AbstractCommonRestriction implements OptionRestriction, ArgumentsRestriction {
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void finalValidate(ParseState<T> state, OptionMetadata option) {
         // Does no validation
     }
+    
+    @Override
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
+        // Does no validation
+    }    
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
@@ -35,9 +40,14 @@ public abstract class AbstractCommonRestriction implements OptionRestriction, Ar
     public <T> void preValidate(ParseState<T> state, ArgumentsMetadata arguments, String value) {
         // Does no validation
     }
+    
+    @Override
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments, Object value) {
+        // Does no validation
+    }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
+    public <T> void finalValidate(ParseState<T> state, ArgumentsMetadata arguments) {
         // Does no validation
     }
 

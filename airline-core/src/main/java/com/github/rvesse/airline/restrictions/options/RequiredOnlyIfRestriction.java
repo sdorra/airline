@@ -41,7 +41,7 @@ public class RequiredOnlyIfRestriction implements OptionRestriction, HelpHint {
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void finalValidate(ParseState<T> state, OptionMetadata option) {
         if (this.names.isEmpty())
             return;
 
@@ -69,7 +69,7 @@ public class RequiredOnlyIfRestriction implements OptionRestriction, HelpHint {
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
-        // Does nothing
+        // No pre-validation
     }
 
     @Override
@@ -91,9 +91,13 @@ public class RequiredOnlyIfRestriction implements OptionRestriction, HelpHint {
     public String[] getContentBlock(int blockNumber) {
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
-        return new String[] { String.format(
-                "This option is required if any of the following options are specified: %s",
+        return new String[] { String.format("This option is required if any of the following options are specified: %s",
                 StringUtils.join(this.names, ", ")) };
+    }
+
+    @Override
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
+        // No post-validation
     }
 
 }

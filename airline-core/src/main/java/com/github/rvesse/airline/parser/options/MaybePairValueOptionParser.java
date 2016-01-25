@@ -127,7 +127,9 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
 
         for (String value : pairValues) {
             checkValidValue(state, option, value);
-            values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value));
+            Object objValue = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value);
+            checkValidConvertedValue(state, option, objValue);
+            values.add(objValue);
         }
 
         state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();

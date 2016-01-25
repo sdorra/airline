@@ -44,7 +44,7 @@ public class OccurrencesRestriction extends AbstractCommonRestriction implements
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void finalValidate(ParseState<T> state, OptionMetadata option) {
         if (occurrences <= 0)
             return;
 
@@ -63,7 +63,7 @@ public class OccurrencesRestriction extends AbstractCommonRestriction implements
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
+    public <T> void finalValidate(ParseState<T> state, ArgumentsMetadata arguments) {
         if (occurrences <= 0)
             return;
 

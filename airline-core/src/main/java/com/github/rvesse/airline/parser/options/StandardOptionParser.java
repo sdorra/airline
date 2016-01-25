@@ -51,6 +51,7 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
                 String tokenStr = tokens.next();
                 checkValidValue(state, option, tokenStr);
                 value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
+                checkValidConvertedValue(state, option, value);
                 state = state.withOptionValue(option, value).popContext();
             }
         } else {
@@ -70,7 +71,9 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
                     break;
                 String tokenStr = tokens.next();
                 checkValidValue(state, option, tokenStr);
-                values.add(getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr));
+                Object objValue = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
+                checkValidConvertedValue(state, option, objValue);
+                values.add(objValue);
                 ++count;
             }
 

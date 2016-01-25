@@ -15,13 +15,8 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.TypeConverter;
@@ -31,11 +26,12 @@ import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
-import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
-import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
 public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
+
+    private Object currentState = null;
+    private Set<Object> allowedValues = null;
 
     public AllowedValuesRestriction(String... rawValues) {
         super(false);
@@ -43,26 +39,24 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, OptionMetadata option) {
+    public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
         // Not enforced if no values specified
         if (this.rawValues.isEmpty())
             return;
 
-        Collection<Pair<OptionMetadata, Object>> parsedOptions = CollectionUtils.select(state.getParsedOptions(),
-                new ParsedOptionFinder(option));
-        if (parsedOptions.isEmpty())
-            return;
-
-        // Else need to convert the raw values to their actual values
         Set<Object> allowedValues = createAllowedValues(state, option.getTitle(), option.getJavaType());
-
-        for (Pair<OptionMetadata, Object> parsedOption : parsedOptions) {
-            if (!allowedValues.contains(parsedOption.getRight()))
-                throw new ParseOptionIllegalValueException(option.getTitle(), parsedOption.getRight(), allowedValues);
+        if (!allowedValues.contains(value)) {
+            throw new ParseOptionIllegalValueException(option.getTitle(), value, allowedValues);
         }
     }
 
-    protected <T> Set<Object> createAllowedValues(ParseState<T> state, String title, Class<?> type) {
+    protected synchronized <T> Set<Object> createAllowedValues(ParseState<T> state, String title, Class<?> type) {
+        // Re-use cached values if possible
+        if (currentState == state) {
+            return allowedValues;
+        }
+
+        // Convert values
         Set<Object> actualValues = new LinkedHashSet<Object>();
         TypeConverter converter = state.getParserConfiguration().getTypeConverter();
         if (converter == null)
@@ -75,26 +69,24 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
                         "Unable to parse raw value '%s' in order to apply allowed values restriction", rawValue);
             }
         }
+
+        // Cache for re-use
+        currentState = state;
+        this.allowedValues = actualValues;
+
         return actualValues;
     }
 
     @Override
-    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments) {
+    public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments, Object value) {
         // Not enforced if no values specified
         if (this.rawValues.isEmpty())
             return;
 
-        List<Object> parsedArguments = state.getParsedArguments();
-        if (parsedArguments.isEmpty())
-            return;
-
-        Set<Object> allowedValues = createAllowedValues(state, arguments.getTitle().get(0), arguments.getJavaType());
-        int i = 0;
-        for (Object parsedArg : parsedArguments) {
-            if (!allowedValues.contains(parsedArg))
-                throw new ParseArgumentsIllegalValueException(AbstractCommonRestriction.getArgumentTitle(arguments, i),
-                        parsedArg, allowedValues);
-            i++;
+        String title = getArgumentTitle(state, arguments);
+        Set<Object> allowedValues = createAllowedValues(state, title, arguments.getJavaType());
+        if (!allowedValues.contains(value)) {
+            throw new ParseArgumentsIllegalValueException(title, value, allowedValues);
         }
     }
 

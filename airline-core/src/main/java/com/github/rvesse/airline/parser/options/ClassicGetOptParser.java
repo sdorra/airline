@@ -82,11 +82,13 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
                     checkValidValue(state, option, remainingToken);
                     Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
                             remainingToken);
+                    checkValidConvertedValue(state, option, value);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 } else if (tokens.hasNext()) {
                     String tokenStr = tokens.next();
                     checkValidValue(state, option, tokenStr);
                     Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
+                    checkValidConvertedValue(state, option, value);
                     nextState = nextState.withOptionValue(option, value).popContext();
                 }
 
