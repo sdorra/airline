@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.command;
 
+package com.github.rvesse.airline.restrictions.partial;
+
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 
-@Command(name = "cmd", description = "A command with an option that has a high arity option")
-public class CommandHighArityOption {
-	@Inject
-	public CommandMain commandMain;
-	
-	@Option(name = "--option", description = "An option with high arity", arity = 4)
-	public List<String> option;
-	
-	@Option(name = "--option2", description = "Just another option")
-	public String option2;
-	
-	@Arguments(description = "The rest of arguments")
-	public List<String> args;
+@Command(name = "partial")
+public class PartialAnnotated {
+
+    @Option(name = "--kvp", arity = 2)
+    @com.github.rvesse.airline.annotations.restrictions.Partial(appliesTo = { 0 }, restriction = NotBlank.class)
+    @NotBlank
+    public List<String> kvps = new ArrayList<>();
+
+    @Arguments
+    public List<String> args = new ArrayList<>();
 }

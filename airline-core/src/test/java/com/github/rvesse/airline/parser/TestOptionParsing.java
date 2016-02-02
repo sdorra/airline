@@ -28,7 +28,7 @@ import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
 import com.github.rvesse.airline.parser.errors.ParseOptionUnexpectedException;
-import com.github.rvesse.airline.parser.options.AbstractKeyValueOptionParser;
+import com.github.rvesse.airline.parser.options.AbstractNameValueOptionParser;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.ListValueOptionParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
@@ -252,7 +252,7 @@ public class TestOptionParsing {
         return builder.build();
     }
 
-    public static class KeyValueOptionParser<T> extends AbstractKeyValueOptionParser<T> {
+    public static class KeyValueOptionParser<T> extends AbstractNameValueOptionParser<T> {
 
         public KeyValueOptionParser(char separator) {
             super(separator);

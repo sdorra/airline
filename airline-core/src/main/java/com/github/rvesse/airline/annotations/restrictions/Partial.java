@@ -27,10 +27,10 @@ import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * Annotation which is used to indicate that a restriction annotation (whose
- * type is denoted by the {@link #restriction()} field) does not apply to all
- * values passed to an {@link Option} or {@link Arguments} annotated field but
- * rather applies only to certain values
+ * Annotation which is used as a modifier to indicate that a restriction
+ * annotation (whose type is denoted by the {@link #restriction()} field) does
+ * not apply to all values passed to an {@link Option} or {@link Arguments}
+ * annotated field but rather applies only to certain values
  * 
  * @author rvesse
  *
@@ -44,9 +44,9 @@ public @interface Partial {
      * Specifies the indices (zero-based) to which the restriction should
      * actually apply
      * 
-     * @return Indices
+     * @return Indices to which the restriction applies
      */
-    int[] index();
+    int[] appliesTo();
 
     /**
      * Specifies the restriction type whose application should be partial

@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.parser.options;
 
-/**
- * An options parser that supports the GNU Get Opt long style i.e.
- * {@code --name=value}
- */
-public class LongGetOptParser<T> extends AbstractNameValueOptionParser<T> {
+package com.github.rvesse.airline.restrictions.partial;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
+
+@Command(name = "partial")
+public class Partial {
+
+    @Option(name = "--kvp", arity = 2)
+    public List<String> kvps = new ArrayList<>();
+
+    @Arguments
+    public List<String> args = new ArrayList<>();
 }

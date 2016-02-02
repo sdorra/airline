@@ -16,6 +16,7 @@
 
 package com.github.rvesse.airline.restrictions.common;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,26 +36,44 @@ public class PartialRestriction extends AbstractCommonRestriction {
     private final OptionRestriction optionRestriction;
     private final ArgumentsRestriction argumentsRestriction;
 
-    public PartialRestriction(int[] indices, OptionRestriction optionRestriction) {
-        for (int i : indices) {
-            this.indices.add(i);
-        }
+    private PartialRestriction(OptionRestriction optionRestriction) {
         this.optionRestriction = optionRestriction;
         this.argumentsRestriction = optionRestriction instanceof ArgumentsRestriction
                 ? (ArgumentsRestriction) optionRestriction : null;
     }
 
-    public PartialRestriction(int[] indices, ArgumentsRestriction argumentsRestriction) {
-        for (int i : indices) {
-            this.indices.add(i);
-        }
+    private PartialRestriction(ArgumentsRestriction argumentsRestriction) {
         this.optionRestriction = argumentsRestriction instanceof OptionRestriction
                 ? (OptionRestriction) argumentsRestriction : null;
         this.argumentsRestriction = argumentsRestriction;
     }
 
+    public PartialRestriction(int[] indices, OptionRestriction optionRestriction) {
+        this(optionRestriction);
+        for (int i : indices) {
+            this.indices.add(i);
+        }
+    }
+
+    public PartialRestriction(int[] indices, ArgumentsRestriction argumentsRestriction) {
+        this(argumentsRestriction);
+        for (int i : indices) {
+            this.indices.add(i);
+        }
+    }
+    
+    public PartialRestriction(Collection<Integer> indices, OptionRestriction optionRestriction) {
+        this(optionRestriction);
+        this.indices.addAll(indices);
+    }
+
+    public PartialRestriction(Collection<Integer> indices, ArgumentsRestriction argumentsRestriction) {
+        this(argumentsRestriction);
+        this.indices.addAll(indices);
+    }
+
     private <T> boolean isApplicableToOption(ParseState<T> state, OptionMetadata option) {
-        int index = CollectionUtils.countMatches(state.getParsedOptions(), new ParsedOptionFinder(option));
+        int index = CollectionUtils.countMatches(state.getParsedOptions(), new ParsedOptionFinder(option)) % option.getArity();
         return indices.contains(index);
     }
 
@@ -67,7 +86,7 @@ public class PartialRestriction extends AbstractCommonRestriction {
 
         this.optionRestriction.preValidate(state, option, value);
     }
-    
+
     @Override
     public <T> void postValidate(ParseState<T> state, OptionMetadata option, Object value) {
         if (optionRestriction == null)
@@ -92,7 +111,7 @@ public class PartialRestriction extends AbstractCommonRestriction {
 
         this.argumentsRestriction.preValidate(state, arguments, value);
     }
-    
+
     @Override
     public <T> void postValidate(ParseState<T> state, ArgumentsMetadata arguments, Object value) {
         if (argumentsRestriction == null)

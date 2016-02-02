@@ -17,11 +17,14 @@ package com.github.rvesse.airline.parser;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.builder.ParserBuilder;
+import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.ArrayList;
@@ -63,7 +66,8 @@ public class ParseState<T> {
 
     public static <T> ParseState<T> newInstance() {
         return new ParseState<T>(null, null, null, null, new ArrayList<Pair<OptionMetadata, Object>>(),
-                Collections.<Context>emptyList(), Collections.<Object>emptyList(), null, Collections.<String>emptyList());
+                Collections.<Context> emptyList(), Collections.<Object> emptyList(), null,
+                Collections.<String> emptyList());
     }
 
     public ParseState<T> pushContext(Context location) {
@@ -75,13 +79,26 @@ public class ParseState<T> {
     }
 
     public ParseState<T> popContext() {
-        List<Context> locationStack = AirlineUtils.unmodifiableListCopy(this.locationStack.subList(0,
-                this.locationStack.size() - 1));
+        List<Context> locationStack = AirlineUtils
+                .unmodifiableListCopy(this.locationStack.subList(0, this.locationStack.size() - 1));
         return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, parsedArguments,
                 currentOption, unparsedInput);
     }
 
-    public ParseState<T> withOptionValue(OptionMetadata option, Object value) {
+    public ParseState<T> withOptionValue(OptionMetadata option, String rawValue) {
+        // Pre-validate
+        for (OptionRestriction restriction : option.getRestrictions()) {
+            restriction.preValidate(this, option, rawValue);
+        }
+
+        // Convert value
+        Object value = this.parserConfig.getTypeConverter().convert(option.getTitle(), option.getJavaType(), rawValue);
+
+        // Post-validate
+        for (OptionRestriction restriction : option.getRestrictions()) {
+            restriction.postValidate(this, option, value);
+        }
+
         List<Pair<OptionMetadata, Object>> newOptions = AirlineUtils.listCopy(parsedOptions);
         newOptions.add(Pair.of(option, value));
 
@@ -114,9 +131,23 @@ public class ParseState<T> {
                 option, unparsedInput);
     }
 
-    public ParseState<T> withArgument(Object argument) {
+    public ParseState<T> withArgument(ArgumentsMetadata arguments, String rawValue) {
+        // Pre-validate
+        for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
+            restriction.preValidate(this, arguments, rawValue);
+        }
+
+        // Convert value
+        Object value = this.parserConfig.getTypeConverter().convert(arguments.getTitle().get(0),
+                arguments.getJavaType(), rawValue);
+
+        // Post-validate
+        for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
+            restriction.postValidate(this, arguments, value);
+        }
+
         List<Object> newArguments = AirlineUtils.listCopy(parsedArguments);
-        newArguments.add(argument);
+        newArguments.add(value);
 
         return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, newArguments,
                 currentOption, unparsedInput);

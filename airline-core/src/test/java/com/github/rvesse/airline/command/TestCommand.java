@@ -185,7 +185,7 @@ public class TestCommand {
         //@formatter:on
 
         // it should be able to stop parsing option values for --option if it
-        // finds another valid option (--option2)
+        // finds the right number of values
         Object command = parser.parse("-v", "cmd", "--option", "val1", "val2", "val3", "val4", "--option2", "val5",
                 "arg1", "arg2", "arg3");
         assertNotNull(command, "command is null");

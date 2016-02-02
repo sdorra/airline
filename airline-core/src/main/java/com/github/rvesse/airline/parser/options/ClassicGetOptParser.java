@@ -66,7 +66,7 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
             // for no argument options, process the option and remove the
             // character from the token
             if (option.getArity() == 0) {
-                nextState = nextState.withOptionValue(option, Boolean.TRUE).popContext();
+                nextState = nextState.withOptionValue(option, Boolean.TRUE.toString()).popContext();
                 first = false;
                 continue;
             }
@@ -79,17 +79,9 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
                 // if current token has more characters, this is the value;
                 // otherwise it is the next token
                 if (!remainingToken.isEmpty()) {
-                    checkValidValue(state, option, remainingToken);
-                    Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
-                            remainingToken);
-                    checkValidConvertedValue(state, option, value);
-                    nextState = nextState.withOptionValue(option, value).popContext();
+                    nextState = nextState.withOptionValue(option, remainingToken).popContext();
                 } else if (tokens.hasNext()) {
-                    String tokenStr = tokens.next();
-                    checkValidValue(state, option, tokenStr);
-                    Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
-                    checkValidConvertedValue(state, option, value);
-                    nextState = nextState.withOptionValue(option, value).popContext();
+                    nextState = nextState.withOptionValue(option, tokens.next()).popContext();
                 }
 
                 return nextState;

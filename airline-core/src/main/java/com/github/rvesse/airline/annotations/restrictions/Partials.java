@@ -13,27 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.command;
 
-import java.util.List;
+package com.github.rvesse.airline.annotations.restrictions;
 
-import javax.inject.Inject;
+import static java.lang.annotation.ElementType.FIELD;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import com.github.rvesse.airline.annotations.Arguments;
-import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
-@Command(name = "cmd", description = "A command with an option that has a high arity option")
-public class CommandHighArityOption {
-	@Inject
-	public CommandMain commandMain;
-	
-	@Option(name = "--option", description = "An option with high arity", arity = 4)
-	public List<String> option;
-	
-	@Option(name = "--option2", description = "Just another option")
-	public String option2;
-	
-	@Arguments(description = "The rest of arguments")
-	public List<String> args;
+/**
+ * Annotation which is used to provide multiple {@link Partial} annotations to a
+ * {@link Option} or {@link Arguments} annotated field
+ * 
+ * @author rvesse
+ *
+ */
+@Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+@Target({ FIELD })
+@Documented
+public @interface Partials {
+
+    /**
+     * Specifies the partial modifiers for restrictions
+     * 
+     * @return Partial modifiers
+     */
+    Partial[] value();
 }

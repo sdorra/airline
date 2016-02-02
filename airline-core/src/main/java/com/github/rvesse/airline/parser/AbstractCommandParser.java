@@ -267,17 +267,11 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
             OptionMetadata defaultOption) {
         if (arguments != null) {
             // Argument
-            checkValidValue(state, arguments, tokens.peek());
-            state = state.withArgument(getTypeConverter(state).convert(arguments.getTitle().get(0),
-                    arguments.getJavaType(), tokens.next()));
+            state = state.withArgument(arguments, tokens.next());
         } else if (defaultOption != null) {
             // Default Option
             state = state.pushContext(Context.OPTION).withOption(defaultOption);
-            String tokenStr = tokens.next();
-            checkValidValue(state, defaultOption, tokenStr);
-            Object value = getTypeConverter(state).convert(defaultOption.getTitle(), defaultOption.getJavaType(),
-                    tokenStr);
-            state = state.withOptionValue(defaultOption, value).popContext();
+            state = state.withOptionValue(defaultOption, tokens.next()).popContext();
         } else {
             // Unparsed input
             state = state.withUnparsedInput(tokens.next());

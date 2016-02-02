@@ -62,14 +62,6 @@ public class ParserUtil {
                 if (option.equals(parsedOption.getLeft()))
                     values.add(parsedOption.getRight());
             }
-            if (option.getArity() > 1 && !values.isEmpty()) {
-                // hack: flatten the collections
-                List<Object> flattenedValues = new ArrayList<Object>();
-                for (Object value : values) {
-                    flattenedValues.addAll(IteratorUtils.<Object>toList(((Iterable<Object>) value).iterator()));
-                }
-                values = flattenedValues;
-            }
             if (values != null && !values.isEmpty()) {
                 for (Accessor accessor : option.getAccessors()) {
                     accessor.addValues(commandInstance, values);

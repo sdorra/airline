@@ -15,7 +15,6 @@
  */
 package com.github.rvesse.airline.parser.options;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.iterators.PeekingIterator;
@@ -23,7 +22,7 @@ import org.apache.commons.collections4.iterators.PeekingIterator;
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
-import com.github.rvesse.airline.utils.AirlineUtils;
+import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
 
 /**
  * An options parser that expects the name and value(s) to be white space
@@ -43,20 +42,13 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
         tokens.next();
         state = state.pushContext(Context.OPTION).withOption(option);
 
-        Object value;
         if (option.getArity() == 0) {
-            state = state.withOptionValue(option, Boolean.TRUE).popContext();
+            state = state.withOptionValue(option, Boolean.TRUE.toString()).popContext();
         } else if (option.getArity() == 1) {
             if (tokens.hasNext()) {
-                String tokenStr = tokens.next();
-                checkValidValue(state, option, tokenStr);
-                value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
-                checkValidConvertedValue(state, option, value);
-                state = state.withOptionValue(option, value).popContext();
+                state = state.withOptionValue(option, tokens.next()).popContext();
             }
         } else {
-            List<Object> values = new ArrayList<Object>();
-
             int count = 0;
 
             boolean hasSeparator = false;
@@ -69,17 +61,16 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
 
                 if (hasSeparator || foundNextOption)
                     break;
-                String tokenStr = tokens.next();
-                checkValidValue(state, option, tokenStr);
-                Object objValue = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), tokenStr);
-                checkValidConvertedValue(state, option, objValue);
-                values.add(objValue);
+                state = state.withOptionValue(option, tokens.next());
                 ++count;
             }
 
-            if (count == option.getArity() || hasSeparator || foundNextOption) {
-                state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();
+            if (count != option.getArity()) {
+                throw new ParseOptionMissingValueException(
+                        "Too few option values received for option %s (%d values expected but only found %d)",
+                        option.getTitle(), option.getOptions().iterator().next(), option.getArity(), count);
             }
+            state = state.popContext();
         }
         return state;
     }

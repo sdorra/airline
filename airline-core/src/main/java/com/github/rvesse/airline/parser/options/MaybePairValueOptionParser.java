@@ -15,7 +15,6 @@
  */
 package com.github.rvesse.airline.parser.options;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.iterators.PeekingIterator;
@@ -123,16 +122,11 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
         }
 
         // Parse the values and assign to option
-        List<Object> values = new ArrayList<Object>();
-
         for (String value : pairValues) {
-            checkValidValue(state, option, value);
-            Object objValue = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value);
-            checkValidConvertedValue(state, option, objValue);
-            values.add(objValue);
+            state = state.withOptionValue(option, value);
         }
 
-        state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();
+        state = state.popContext();
 
         return state;
     }

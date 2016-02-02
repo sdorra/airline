@@ -33,16 +33,16 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * @author rvesse
  *
  */
-public abstract class AbstractKeyValueOptionParser<T> extends AbstractOptionParser<T> {
+public abstract class AbstractNameValueOptionParser<T> extends AbstractOptionParser<T> {
 
     private static final char DEFAULT_SEPARATOR = '=';
     private final char separator;
 
-    public AbstractKeyValueOptionParser() {
+    public AbstractNameValueOptionParser() {
         this(DEFAULT_SEPARATOR);
     }
 
-    public AbstractKeyValueOptionParser(char sep) {
+    public AbstractNameValueOptionParser(char sep) {
         this.separator = sep;
     }
 
@@ -64,10 +64,7 @@ public abstract class AbstractKeyValueOptionParser<T> extends AbstractOptionPars
 
         // update state
         state = state.pushContext(Context.OPTION).withOption(option);
-        checkValidValue(state, option, parts.get(1));
-        Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), parts.get(1));
-        checkValidConvertedValue(state, option, value);
-        state = state.withOption(option).withOptionValue(option, value).popContext();
+        state = state.withOptionValue(option, parts.get(1)).popContext();
 
         return state;
     }

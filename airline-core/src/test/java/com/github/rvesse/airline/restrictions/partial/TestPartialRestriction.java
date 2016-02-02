@@ -22,16 +22,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.rvesse.airline.annotations.Arguments;
-import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.SingleCommand;
+import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
+import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.common.AllowedRawValuesRestriction;
 import com.github.rvesse.airline.restrictions.common.AllowedValuesRestriction;
 import com.github.rvesse.airline.restrictions.common.IsRequiredRestriction;
@@ -39,27 +41,6 @@ import com.github.rvesse.airline.restrictions.common.NotBlankRestriction;
 import com.github.rvesse.airline.restrictions.common.PartialRestriction;
 
 public class TestPartialRestriction {
-
-    @Command(name = "partial")
-    public class Partial {
-
-        @Option(name = "--kvp", arity = 2)
-        public List<String> kvps = new ArrayList<>();
-
-        @Arguments
-        public List<String> args = new ArrayList<>();
-    }
-
-    private <T> void checkRestriction(ParseState<T> state, ArgumentsRestriction restriction,
-            ArgumentsMetadata arguments, String rawValue) {
-        checkRestriction(state, restriction, arguments, rawValue, rawValue);
-    }
-
-    private <T> void checkRestriction(ParseState<T> state, ArgumentsRestriction restriction,
-            ArgumentsMetadata arguments, String rawValue, Object objValue) {
-        restriction.preValidate(state, arguments, rawValue);
-        restriction.postValidate(state, arguments, objValue);
-    }
 
     @Test
     public void partial_notblank_01() throws NoSuchFieldException, SecurityException {
@@ -75,10 +56,8 @@ public class TestPartialRestriction {
         ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
-        checkRestriction(state, restriction, arguments, "text");
-        state = state.withArgument("text");
-        checkRestriction(state, restriction, arguments, "");
-        state = state.withArgument("");
+        state = state.withArgument(arguments, "text");
+        state = state.withArgument(arguments, "");
 
         restriction.finalValidate(state, arguments);
     }
@@ -98,7 +77,7 @@ public class TestPartialRestriction {
 
         ParseState<Partial> state = ParseState.newInstance();
         // Should fail restriction because first argument cannot be blank
-        checkRestriction(state, restriction, arguments, "");
+        state = state.withArgument(arguments, "");
     }
 
     @Test
@@ -115,10 +94,8 @@ public class TestPartialRestriction {
         ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
-        checkRestriction(state, restriction, arguments, "foo");
-        state = state.withArgument("foo");
-        checkRestriction(state, restriction, arguments, "bar");
-        state = state.withArgument("bar");
+        state = state.withArgument(arguments, "foo");
+        state = state.withArgument(arguments, "bar");
 
         restriction.finalValidate(state, arguments);
     }
@@ -139,7 +116,7 @@ public class TestPartialRestriction {
         ParseState<Partial> state = ParseState.newInstance();
         // Should fail restriction because first argument is restricted to a set
         // of values
-        checkRestriction(state, restriction, arguments, "bar");
+        state.withArgument(arguments, "bar");
     }
 
     @Test
@@ -156,10 +133,8 @@ public class TestPartialRestriction {
         ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
-        checkRestriction(state, restriction, arguments, "foo");
-        state = state.withArgument("foo");
-        checkRestriction(state, restriction, arguments, "bar");
-        state = state.withArgument("bar");
+        state = state.withArgument(arguments, "foo");
+        state = state.withArgument(arguments, "bar");
 
         restriction.finalValidate(state, arguments);
     }
@@ -180,7 +155,27 @@ public class TestPartialRestriction {
         ParseState<Partial> state = ParseState.newInstance();
         // Should fail restriction because first argument is restricted to a set
         // of values
-        checkRestriction(state, restriction, arguments, "bar");
+        state.withArgument(arguments, "bar");
+    }
+
+    @Test
+    public void partial_allowed_raw_values_03() throws NoSuchFieldException, SecurityException {
+        List<String> names = new ArrayList<>();
+        names.add("--kvp");
+        List<OptionRestriction> restrictions = new ArrayList<>();
+        PartialRestriction restriction = new PartialRestriction(new int[] { 0 },
+                (OptionRestriction) new AllowedRawValuesRestriction(false, Locale.ENGLISH, "a", "b", "c"));
+        restrictions.add(restriction);
+        List<Field> fields = Collections.singletonList(Partial.class.getField("kvps"));
+
+        OptionMetadata option = new OptionMetadata(OptionType.COMMAND, names, "Key Value", "", 2, false, false, false,
+                restrictions, fields);
+
+        ParseState<Partial> state = ParseState.newInstance();
+        state = state.withOptionValue(option, "a");
+        state = state.withOptionValue(option, "value");
+
+        restriction.finalValidate(state, option);
     }
 
     @Test
@@ -200,5 +195,21 @@ public class TestPartialRestriction {
         // partial restrictions
         ParseState<Partial> state = ParseState.newInstance();
         restriction.finalValidate(state, arguments);
+    }
+
+    @Test
+    public void partial_annotated_notblank_01() throws NoSuchFieldException, SecurityException {
+        SingleCommand<PartialAnnotated> parser = SingleCommand.singleCommand(PartialAnnotated.class);
+        PartialAnnotated cmd = parser.parse(new String[] { "--kvp", "text", "" });
+        
+        Assert.assertEquals(cmd.kvps.size(), 2);
+        Assert.assertEquals(cmd.kvps.get(0), "text");
+        Assert.assertEquals(cmd.kvps.get(1), "");
+    }
+
+    @Test(expectedExceptions = ParseRestrictionViolatedException.class, expectedExceptionsMessageRegExp = ".*'kvps' requires a non-blank value.*")
+    public void partial_annotated_notblank_02() throws NoSuchFieldException, SecurityException {
+        SingleCommand<PartialAnnotated> parser = SingleCommand.singleCommand(PartialAnnotated.class);
+        parser.parse(new String[] { "--kvp", "", "text" });
     }
 }

@@ -25,6 +25,8 @@ import com.github.rvesse.airline.annotations.Groups;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.annotations.Parser;
+import com.github.rvesse.airline.annotations.restrictions.Partial;
+import com.github.rvesse.airline.annotations.restrictions.Partials;
 import com.github.rvesse.airline.builder.ParserBuilder;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionRegistry;
@@ -34,6 +36,7 @@ import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.restrictions.common.PartialRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.comparators.StringHierarchyComparator;
@@ -45,6 +48,7 @@ import javax.inject.Inject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -547,6 +551,7 @@ public class MetadataLoader {
                     boolean sealed = optionAnnotation.sealed();
 
                     // Find and create restrictions
+                    Map<Class<? extends Annotation>, Set<Integer>> partials = loadPartials(field);
                     List<OptionRestriction> restrictions = new ArrayList<OptionRestriction>();
                     for (Class<? extends Annotation> annotationClass : RestrictionRegistry
                             .getOptionRestrictionAnnotationClasses()) {
@@ -555,8 +560,13 @@ public class MetadataLoader {
                             continue;
                         OptionRestriction restriction = RestrictionRegistry.getOptionRestriction(annotationClass,
                                 annotation);
-                        if (restriction != null)
+                        if (restriction != null) {
+                            // Adjust for partial if necessary
+                            if (partials.containsKey(annotationClass))
+                                restriction = new PartialRestriction(partials.get(annotationClass), restriction);
+
                             restrictions.add(restriction);
+                        }
                     }
 
                     //@formatter:off
@@ -636,6 +646,7 @@ public class MetadataLoader {
 
                     String description = argumentsAnnotation.description();
 
+                    Map<Class<? extends Annotation>, Set<Integer>> partials = loadPartials(field);
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();
                     for (Class<? extends Annotation> annotationClass : RestrictionRegistry
                             .getArgumentsRestrictionAnnotationClasses()) {
@@ -644,8 +655,13 @@ public class MetadataLoader {
                             continue;
                         ArgumentsRestriction restriction = RestrictionRegistry.getArgumentsRestriction(annotationClass,
                                 annotation);
-                        if (restriction != null)
+                        if (restriction != null) {
+                            // Adjust for partial if necessary
+                            if (partials.containsKey(annotationClass))
+                                restriction = new PartialRestriction(partials.get(annotationClass), restriction);
+
                             restrictions.add(restriction);
+                        }
                     }
 
                     //@formatter:off
@@ -657,6 +673,32 @@ public class MetadataLoader {
                 }
             }
         }
+    }
+
+    private static Map<Class<? extends Annotation>, Set<Integer>> loadPartials(Field field) {
+        Map<Class<? extends Annotation>, Set<Integer>> partials = new HashMap<>();
+
+        Annotation partialsAnnotation = field.getAnnotation(Partials.class);
+        if (partialsAnnotation != null) {
+            for (Partial partial : ((Partials) partialsAnnotation).value()) {
+                collectPartial(partials, partial);
+            }
+        }
+        Annotation partialAnnotation = field.getAnnotation(Partial.class);
+        if (partialAnnotation != null) {
+            collectPartial(partials, (Partial) partialAnnotation);
+        }
+
+        return partials;
+    }
+
+    private static void collectPartial(Map<Class<? extends Annotation>, Set<Integer>> partials, Partial partial) {
+        Set<Integer> indices = partials.get(partial.restriction());
+        if (indices == null) {
+            indices = new HashSet<>();
+            partials.put(partial.restriction(), indices);
+        }
+        indices.addAll(AirlineUtils.arrayToList(ArrayUtils.toObject(partial.appliesTo())));
     }
 
     private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options) {

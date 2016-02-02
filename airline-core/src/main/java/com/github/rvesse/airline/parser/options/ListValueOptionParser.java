@@ -15,7 +15,6 @@
  */
 package com.github.rvesse.airline.parser.options;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang3.StringUtils;
@@ -95,7 +94,7 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
         String list = noSep ? name.substring(2) : null;
         if (option.getArity() == 0) {
             // Zero arity option, consume token and continue
-            state = state.withOptionValue(option, Boolean.TRUE).popContext();
+            state = state.withOptionValue(option, Boolean.TRUE.toString()).popContext();
         } else {
             if (list == null) {
                 // Can't parse list value if there are no further tokens
@@ -111,34 +110,21 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
             List<String> listValues = getValues(list);
             if (listValues.size() < option.getArity())
                 throw new ParseOptionMissingValueException(
-                        "Too few option values received for option %s in list value '%s' (%d values expected)",
-                        option.getTitle(), option.getOptions().iterator().next(), list, option.getArity());
+                        "Too few option values received for option %s in list value '%s' (%d values expected but only found %d)",
+                        option.getTitle(), option.getOptions().iterator().next(), list, option.getArity(),
+                        listValues.size());
             if (listValues.size() > option.getArity())
                 throw new ParseOptionUnexpectedException(
-                        "Too many option values received for option %s in list value '%s' (%d values expected)",
-                        option.getOptions().iterator().next(), list, option.getArity());
+                        "Too many option values received for option %s in list value '%s' (%d values expected but found %d)",
+                        option.getOptions().iterator().next(), list, option.getArity(), listValues.size());
 
             // Parse individual values and assign to option
-            if (option.getArity() == 1) {
-                // Arity 1 option
-                checkValidValue(state, option, listValues.get(0));
-                Object value = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(),
-                        listValues.get(0));
-                checkValidConvertedValue(state, option, value);
-                state = state.withOptionValue(option, value).popContext();
-            } else {
-                // Arity > 1 option
-                List<Object> values = new ArrayList<Object>();
-
-                for (String value : listValues) {
-                    checkValidValue(state, option, value);
-                    Object objValue = getTypeConverter(state).convert(option.getTitle(), option.getJavaType(), value);
-                    checkValidConvertedValue(state, option, objValue);
-                    values.add(objValue);
-                }
-
-                state = state.withOptionValue(option, AirlineUtils.unmodifiableListCopy(values)).popContext();
+            for (String value : listValues) {
+                state = state.withOptionValue(option, value);
             }
+
+            state = state.popContext();
+
         }
         return state;
     }
