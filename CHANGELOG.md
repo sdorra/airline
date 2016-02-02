@@ -3,14 +3,23 @@
 ## 2.2.0
 
 - Annotation Changes
-    - Removed deprecated `arity` from `@Arguments` - the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
+    - Removed deprecated `arity` from `@Arguments`, the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
     - Global restrictions can now be specified via annotations
 - Help Changes
-    - Removed the deprecated RONN help generators (use `airline-help-man` or `airline-help-markdown` instead).  This removes the `airline-help-ronn` module (**Breaking**)
+    - Removed the deprecated RONN help generators (use `airline-help-man` or `airline-help-markdown` instead)
+        - This removes the `airline-help-ronn` module (**Breaking**)
 - Restriction Changes
     - New `GlobalRestrictionsFactory` interface and corresponding registry in `RestrictionsRegistry`
         - Uses `ServiceLoader` for automatic discovery, provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.GlobalRestrictionFactory` file to specify global restriction factories
     - Global restrictions can now be specified by adding annotations to `@Cli` annotated classes
+    - Improved `OptionRestriction` and `ArgumentsRestriction` interfaces
+        - Old `postValidate()` method becomes `finalValidate()`
+        - Revised `postValidate()` method with better type signature that takes the converted value
+    - Support partial restrictions i.e. restrictions only apply to some of the values for `@Option` or `@Arguments` fields
+        - Specified via `@Partial`/`@Partials` annotations in addition 
+- Parser Changes
+    - Improve how restrictions for options and arguments are enforced
+    - Options must always receive precisely their `arity` in values or a `ParseOptionMissingValueException` is thrown (at least with the built-in parsers)
 
 ## 2.1.1
 
