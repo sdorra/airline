@@ -89,7 +89,7 @@ public class AirlineUtils {
         set.add(item);
         return set;
     }
-    
+
     public static <K, V> Map<K, V> singletonMap(K key, V value) {
         Map<K, V> map = new HashMap<K, V>();
         map.put(key, value);
@@ -182,7 +182,7 @@ public class AirlineUtils {
      */
     public static String toRangeString(Object min, boolean minInclusive, Object max, boolean maxInclusive) {
         StringBuilder builder = new StringBuilder();
-    
+
         if (min != null) {
             if (max != null) {
                 // min < value < max
@@ -201,7 +201,37 @@ public class AirlineUtils {
             builder.append(maxInclusive ? "<= " : "< ");
             builder.append(max);
         }
-    
+
+        return builder.toString();
+    }
+
+    public static String toOrdinal(int value) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(Integer.toString(value));
+
+        switch (value % 100) {
+        case 11:
+        case 12:
+        case 13:
+            builder.append("th");
+            break;
+        default:
+            switch (value % 10) {
+            case 1:
+                builder.append("st");
+                break;
+            case 2:
+                builder.append("nd");
+                break;
+            case 3:
+                builder.append("rd");
+                break;
+            default:
+                builder.append("th");
+                break;
+            }
+        }
+        
         return builder.toString();
     }
 }

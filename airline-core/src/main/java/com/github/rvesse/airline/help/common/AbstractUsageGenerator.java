@@ -250,8 +250,11 @@ public class AbstractUsageGenerator {
                 first = false;
             }
             stringBuilder.append(name);
-            if (argumentString != null)
-                stringBuilder.append(' ').append(argumentString);
+            if (argumentString != null) {
+                for (int i = 0; i < option.getArity(); i++) {
+                    stringBuilder.append(' ').append(argumentString);
+                }
+            }
         }
 
         return stringBuilder.toString();

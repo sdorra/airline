@@ -54,10 +54,12 @@ import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.restrictions.partial.PartialAnnotated;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -132,7 +134,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     public void testMultiParagraphDiscussion() throws IOException {
         SingleCommand<ArgsMultiParagraphDiscussion> cmd = singleCommand(ArgsMultiParagraphDiscussion.class);
 
@@ -155,7 +157,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-        
+
     public void testInheritedDiscussion() throws IOException {
         SingleCommand<ArgsInheritedDiscussion> cmd = singleCommand(ArgsInheritedDiscussion.class);
 
@@ -178,7 +180,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     public void testHiddenDiscussion() throws IOException {
         SingleCommand<ArgsHiddenDiscussion> cmd = singleCommand(ArgsHiddenDiscussion.class);
 
@@ -194,7 +196,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     public void testRestoredDiscussion() throws IOException {
         SingleCommand<ArgsRestoredDiscussion> cmd = singleCommand(ArgsRestoredDiscussion.class);
 
@@ -213,7 +215,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     public void testExamples() throws IOException {
         SingleCommand<ArgsExamples> cmd = singleCommand(ArgsExamples.class);
 
@@ -262,7 +264,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     public void testGit() throws IOException {
         //@formatter:off
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
@@ -499,6 +501,41 @@ public class TestHelp {
     }
 
     @Test
+    public void testPartialRestriction() throws IOException {
+        //@formatter:off
+        SingleCommand<PartialAnnotated> command = singleCommand(PartialAnnotated.class);
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage("test", null, command.getCommandMetadata().getName(), command.getCommandMetadata(), null, out);
+        assertEquals(new String(out.toByteArray()), StringUtils.join(new String[] {
+                "NAME",
+                "        test partial -",
+                "",
+                "SYNOPSIS",
+                "        test partial [ --kvp <kvps>... ] [--] [ <args>... ]",
+                "",
+                "OPTIONS",
+                "        --kvp <kvps> <kvps>",
+                "",
+                "",
+                "            The following restriction only applies to the 1st value:",
+                "            This options value cannot be blank (empty or all whitespace)",
+                "",
+                "",
+                "        --",
+                "            This option can be used to separate command-line options from the",
+                "            list of arguments (useful when arguments might be mistaken for",
+                "            command-line options)",
+                "",
+                "        <args>",
+                "",
+                "",
+                ""
+                }, '\n'));
+        //@formatter:on
+    }
+
+    @Test
     public void testArgsAritySting() throws IOException {
         //@formatter:off
         CliBuilder<Object> builder = Cli.builder("test")
@@ -519,7 +556,7 @@ public class TestHelp {
                 "        test ArgsArityString [ -pairs <pairs>... ] [--] [ <rest>... ]\n" +
                 "\n" +
                 "OPTIONS\n" +
-                "        -pairs <pairs>\n" +
+                "        -pairs <pairs> <pairs>\n" +
                 "            Pairs\n" +
                 "\n" +
                 "        --\n" +
@@ -696,7 +733,7 @@ public class TestHelp {
                 "\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testOptionsHidden02() throws IOException {
         //@formatter:off
@@ -820,7 +857,7 @@ public class TestHelp {
                 "See 'test help <command>' for more information on a specific command.\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testGroupsHidden01() throws IOException {
         //@formatter:off
@@ -849,7 +886,7 @@ public class TestHelp {
                 "See 'test help <command>' for more information on a specific command.\n");
         //@formatter:on
     }
-    
+
     @Test
     public void testGroupsHidden02() throws IOException {
         //@formatter:off
@@ -958,7 +995,7 @@ public class TestHelp {
         //@formatter:on
     }
 
-     @Test
+    @Test
     public void testExitCodes() throws IOException {
         //@formatter:off
         SingleCommand<ArgsExitCodes> command = singleCommand(ArgsExitCodes.class);

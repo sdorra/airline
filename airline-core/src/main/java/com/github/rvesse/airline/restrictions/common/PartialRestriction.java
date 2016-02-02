@@ -22,30 +22,36 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.github.rvesse.airline.help.sections.HelpFormat;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 
-public class PartialRestriction extends AbstractCommonRestriction {
+public class PartialRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final Set<Integer> indices = new TreeSet<>();
     private final OptionRestriction optionRestriction;
     private final ArgumentsRestriction argumentsRestriction;
+    private final HelpHint hint;
 
     private PartialRestriction(OptionRestriction optionRestriction) {
         this.optionRestriction = optionRestriction;
         this.argumentsRestriction = optionRestriction instanceof ArgumentsRestriction
                 ? (ArgumentsRestriction) optionRestriction : null;
+        this.hint = optionRestriction instanceof HelpHint ? (HelpHint) optionRestriction : null;
     }
 
     private PartialRestriction(ArgumentsRestriction argumentsRestriction) {
         this.optionRestriction = argumentsRestriction instanceof OptionRestriction
                 ? (OptionRestriction) argumentsRestriction : null;
         this.argumentsRestriction = argumentsRestriction;
+        this.hint = argumentsRestriction instanceof HelpHint ? (HelpHint) argumentsRestriction : null;
     }
 
     public PartialRestriction(int[] indices, OptionRestriction optionRestriction) {
@@ -61,7 +67,7 @@ public class PartialRestriction extends AbstractCommonRestriction {
             this.indices.add(i);
         }
     }
-    
+
     public PartialRestriction(Collection<Integer> indices, OptionRestriction optionRestriction) {
         this(optionRestriction);
         this.indices.addAll(indices);
@@ -73,7 +79,8 @@ public class PartialRestriction extends AbstractCommonRestriction {
     }
 
     private <T> boolean isApplicableToOption(ParseState<T> state, OptionMetadata option) {
-        int index = CollectionUtils.countMatches(state.getParsedOptions(), new ParsedOptionFinder(option)) % option.getArity();
+        int index = CollectionUtils.countMatches(state.getParsedOptions(), new ParsedOptionFinder(option))
+                % option.getArity();
         return indices.contains(index);
     }
 
@@ -120,5 +127,49 @@ public class PartialRestriction extends AbstractCommonRestriction {
             return;
 
         this.argumentsRestriction.postValidate(state, arguments, value);
+    }
+
+    @Override
+    public String getPreamble() {
+        if (this.hint == null)
+            return null;
+
+        // Add a note about the restriction to the specific arguments
+        StringBuilder builder = new StringBuilder();
+        builder.append("The following restriction only applies to the ");
+        int count = 0;
+        for (int i : this.indices) {
+            if (count > 0)
+                builder.append(", ");
+            builder.append(AirlineUtils.toOrdinal(i + 1));
+            count++;
+        }
+        builder.append(" value");
+        if (this.indices.size() > 1)
+            builder.append('s');
+        builder.append(": ");
+
+        if (this.hint.getPreamble() != null)
+            builder.append(this.hint.getPreamble());
+        return builder.toString();
+    }
+
+    @Override
+    public HelpFormat getFormat() {
+        return this.hint != null ? this.hint.getFormat() : HelpFormat.NONE_PRINTABLE;
+    }
+
+    @Override
+    public int numContentBlocks() {
+        return this.hint != null ? this.hint.numContentBlocks() : 0;
+    }
+
+    @Override
+    public String[] getContentBlock(int blockNumber) {
+        if (this.hint != null) {
+            return this.hint.getContentBlock(blockNumber);
+        } else {
+            throw new IndexOutOfBoundsException();
+        }
     }
 }
