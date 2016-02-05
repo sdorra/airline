@@ -44,6 +44,10 @@ import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
 import com.github.rvesse.airline.args.ArgsRequired;
 import com.github.rvesse.airline.args.ArgsRestoredDiscussion;
 import com.github.rvesse.airline.args.ArgsVersion;
+import com.github.rvesse.airline.args.ArgsVersion2;
+import com.github.rvesse.airline.args.ArgsVersion3;
+import com.github.rvesse.airline.args.ArgsVersionMissing;
+import com.github.rvesse.airline.args.ArgsVersionMissingSuppressed;
 import com.github.rvesse.airline.args.CommandHidden;
 import com.github.rvesse.airline.args.GlobalOptionsHidden;
 import com.github.rvesse.airline.args.OptionsHidden;
@@ -1037,6 +1041,81 @@ public class TestHelp {
                 "            Component: Airline Test\n" +
                 "            Version: 1.2.3\n" +
                 "            Build: 12345abcde\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersionComponents() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersion2> command = singleCommand(ArgsVersion2.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test - Multiple component versions\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test\n" +
+                "\n" +
+                "VERSION\n" +
+                "            Component: Airline Test\n" +
+                "            Version: 1.2.3\n" +
+                "            Build: 12345abcde\n" + 
+                "\n" +
+                "            Component: Foo\n" +
+                "            Build: 789\n" +
+                "            Build Date: Feb 2016\n" +
+                "            Author: Mr Foo\n" +
+                "\n" +
+                "            Component: Bar\n" +
+                "            Version: 1.0.7\n" +
+                "            Built With: Oracle JDK 1.7\n" +
+                "            Author: Mrs Bar\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersionComponentsTabular() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersion3> command = singleCommand(ArgsVersion3.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test - Multiple component versions\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test\n" +
+                "\n" +
+                "VERSION\n" +
+                "            Component      Version   Build        Build Date   Author    Built With\n" +
+                "            Airline Test   1.2.3     12345abcde\n" +
+                "            Foo                      789          Feb 2016     Mr Foo\n" +
+                "            Bar            1.0.7                               Mrs Bar   Oracle JDK 1.7\n\n");
+        //@formatter:on
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*missing\\.version.*")
+    public void testVersionMissing() throws IOException {
+        singleCommand(ArgsVersionMissing.class);
+    }
+    
+    @Test
+    public void testVersionMissingSupressed() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersionMissingSuppressed> command = singleCommand(ArgsVersionMissingSuppressed.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test - Missing version information\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test\n" +
+                "\n");
         //@formatter:on
     }
 

@@ -475,7 +475,7 @@ public class TroffPrinter {
 
     private String escape(String line) {
         if (StringUtils.isEmpty(line))
-            return line;
+            return "";
 
         // A leading . must be escaped
         if (line.startsWith("."))

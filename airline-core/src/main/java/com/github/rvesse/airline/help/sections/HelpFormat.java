@@ -28,11 +28,11 @@ public enum HelpFormat {
      */
     UNKNOWN,
     /**
-     * Help format is prose i.e. paragraphs of text
+     * Help format is prose i.e. paragraphs of text, each content block is a set of paragraphs
      */
     PROSE,
     /**
-     * Help format is a list
+     * Help format is a list, each content block represents a separate list
      */
     LIST,
     /**

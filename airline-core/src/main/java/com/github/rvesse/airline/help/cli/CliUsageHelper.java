@@ -94,7 +94,7 @@ public class CliUsageHelper extends AbstractUsageGenerator {
         // Ignore non-printable help
         if (hint.getFormat() == HelpFormat.NONE_PRINTABLE)
             return;
-        
+
         // Print preamble if present
         if (!StringUtils.isBlank(hint.getPreamble())) {
             out.append(hint.getPreamble());
@@ -152,12 +152,17 @@ public class CliUsageHelper extends AbstractUsageGenerator {
                 tablePrinter.flush();
                 break;
             case LIST:
-                // Print first content block as an indented list list
-                UsagePrinter listPrinter = out.newIndentedPrinter(4);
-                for (String item : hint.getContentBlock(0)) {
-                    listPrinter.append(item).newline();
+                // Print content blocks as indented lists
+                for (int i = 0; i < hint.numContentBlocks(); i++) {
+                    if (i > 0)
+                        out.newline();
+                    
+                    UsagePrinter listPrinter = out.newIndentedPrinter(4);
+                    for (String item : hint.getContentBlock(i)) {
+                        listPrinter.append(item).newline();
+                    }
+                    listPrinter.flush();
                 }
-                listPrinter.flush();
                 break;
             default:
                 // Print content blocks as text
@@ -180,7 +185,8 @@ public class CliUsageHelper extends AbstractUsageGenerator {
         return maxRows;
     }
 
-    public <T> void outputArguments(UsagePrinter out, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig) throws IOException {
+    public <T> void outputArguments(UsagePrinter out, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig)
+            throws IOException {
         if (arguments != null) {
             // Arguments separator option
             UsagePrinter optionPrinter = out.newIndentedPrinter(8);

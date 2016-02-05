@@ -32,9 +32,13 @@ import com.github.rvesse.airline.args.ArgsCopyrightAndLicense;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
+import com.github.rvesse.airline.args.ArgsVersion;
+import com.github.rvesse.airline.args.ArgsVersion2;
+import com.github.rvesse.airline.args.ArgsVersion3;
+import com.github.rvesse.airline.args.ArgsVersionMissing;
+import com.github.rvesse.airline.args.ArgsVersionMissingSuppressed;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.Help;
-
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -903,6 +907,168 @@ public class TestHelpMan {
                         ".SH SYNOPSIS",
                         ".IP \"\" 0",
                         "\\fBtest\\fR ",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersion() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersion> command = singleCommand(ArgsVersion.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR \\- ArgsVersion description",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR ",
+                        ".IP \"\" 0",
+                        "ArgsVersion description",
+                        ".SH VERSION",
+                        ".RS",
+                        ".IP \"-\" 4",
+                        "Component: Airline Test",
+                        ".IP \"-\" 4",
+                        "Version: 1.2.3",
+                        ".IP \"-\" 4",
+                        "Build: 12345abcde",
+                        ".IP \"\" 0",
+                        ""
+                }, '\n'));
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersionComponents() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersion2> command = singleCommand(ArgsVersion2.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR \\- Multiple component versions",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR ",
+                        ".IP \"\" 0",
+                        "Multiple component versions",
+                        ".SH VERSION",
+                        ".RS",
+                        ".IP \"-\" 4",
+                        "Component: Airline Test",
+                        ".IP \"-\" 4",
+                        "Version: 1.2.3",
+                        ".IP \"-\" 4",
+                        "Build: 12345abcde",
+                        ".IP \"\" 0",
+                        ".RS",
+                        ".IP \"-\" 4",
+                        "Component: Foo",
+                        ".IP \"-\" 4",
+                        "Build: 789",
+                        ".IP \"-\" 4",
+                        "Build Date: Feb 2016",
+                        ".IP \"-\" 4",
+                        "Author: Mr Foo",
+                        ".IP \"\" 0",
+                        ".RS",
+                        ".IP \"-\" 4",
+                        "Component: Bar",
+                        ".IP \"-\" 4",
+                        "Version: 1.0.7",
+                        ".IP \"-\" 4",
+                        "Built With: Oracle JDK 1.7",
+                        ".IP \"-\" 4",
+                        "Author: Mrs Bar",
+                        ".IP \"\" 0",
+                        ""
+                   }, '\n'));
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersionComponentsTabular() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersion3> command = singleCommand(ArgsVersion3.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR \\- Multiple component versions",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR ",
+                        ".IP \"\" 0",
+                        "Multiple component versions",
+                        ".SH VERSION",
+                        ".TS",
+                        "box;",
+                        "cb | cb | cb | cb | cb | cb",
+                        "l | l | l | l | l | l .",
+                        "Component\tVersion\tBuild\tBuild Date\tAuthor\tBuilt With",
+                        "_\t|\t_\t|\t_\t|\t_\t|\t_\t|\t_",
+                        "Airline Test\t1.2.3\t12345abcde\t\t\t",
+                        "Foo\t\t789\tFeb 2016\tMr Foo\t",
+                        "Bar\t1.0.7\t\t\tMrs Bar\tOracle JDK 1.7",
+                        ".TE",
+                        ""
+                   }, '\n'));
+        //@formatter:on
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = ".*missing\\.version.*")
+    public void testVersionMissing() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersionMissing> command = singleCommand(ArgsVersionMissing.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test - ArgsVersion description\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test\n" +
+                "\n" +
+                "VERSION\n" +
+                "            Component: Airline Test\n" +
+                "            Version: 1.2.3\n" +
+                "            Build: 12345abcde\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersionMissingSupressed() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersionMissingSuppressed> command = singleCommand(ArgsVersionMissingSuppressed.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ManCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                StringUtils.join(new String[] {
+                        ".TH \"test\" \"1\" \"\" \"\" \"\"",
+                        ".SH NAME",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR \\- Missing version information",
+                        ".SH SYNOPSIS",
+                        ".IP \"\" 0",
+                        "\\fBtest\\fR ",
+                        ".IP \"\" 0",
+                        "Missing version information",
                         ""
                 }, '\n'));
         //@formatter:on

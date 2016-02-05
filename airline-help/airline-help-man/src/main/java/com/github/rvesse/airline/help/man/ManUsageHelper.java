@@ -243,17 +243,20 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             break;
 
         case LIST:
-            String[] items = hint.getContentBlock(0);
-            if (items.length == 0)
-                return;
-
-            printer.startBulletedList();
-            for (int i = 0; i < items.length; i++) {
-                printer.println(items[i]);
-                if (i < items.length - 1)
-                    printer.nextBulletedListItem();
+            // Print potentially many lists
+            for (int i = 0; i < hint.numContentBlocks(); i++) {
+                String[] items = hint.getContentBlock(i);
+                if (items.length == 0)
+                    continue;
+                
+                printer.startBulletedList();
+                for (int j = 0; j < items.length; j++) {
+                    printer.println(items[j]);
+                    if (j < items.length - 1)
+                        printer.nextBulletedListItem();
+                }
+                printer.endList();
             }
-            printer.endList();
 
             break;
         default:

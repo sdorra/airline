@@ -153,23 +153,28 @@ public class VersionSection implements HelpSection {
             throw new IndexOutOfBoundsException();
 
         if (this.tabular) {
-            String[] column = new String[this.versions.size()];
+            String[] column = new String[this.versions.size() + 1];
             for (int row = 0; row < this.versions.size(); row++) {
                 switch (blockNumber) {
                 case 0:
-                    this.versions.get(row).addComponent(column, row);
+                    column[0] = "Component";
+                    this.versions.get(row).addComponent(column, row + 1);
                     break;
                 case 1:
-                    this.versions.get(row).addVersion(column, row);
+                    column[0] = "Version";
+                    this.versions.get(row).addVersion(column, row + 1);
                     break;
                 case 2:
-                    this.versions.get(row).addBuild(column, row);
+                    column[0] = "Build";
+                    this.versions.get(row).addBuild(column, row + 1);
                     break;
                 case 3:
-                    this.versions.get(row).addBuildDate(column, row);
+                    column[0] = "Build Date";
+                    this.versions.get(row).addBuildDate(column, row + 1);
                     break;
                 default:
-                    this.versions.get(row).addAdditionalColumn(column, row, this.titles[row - 4]);
+                    column[0] = this.titles[blockNumber - 4];
+                    this.versions.get(row).addAdditionalColumn(column, row + 1, this.titles[blockNumber - 4]);
                     break;
                 }
             }
@@ -218,7 +223,7 @@ public class VersionSection implements HelpSection {
         }
 
         private void fillColumn(String[] column, int row, String value) {
-            column[row] = this.version;
+            column[row] = value;
         }
 
         public void addComponent(String[] column, int row) {
