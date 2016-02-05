@@ -43,6 +43,7 @@ import com.github.rvesse.airline.args.ArgsMultiLineDescription;
 import com.github.rvesse.airline.args.ArgsMultiParagraphDiscussion;
 import com.github.rvesse.airline.args.ArgsRequired;
 import com.github.rvesse.airline.args.ArgsRestoredDiscussion;
+import com.github.rvesse.airline.args.ArgsVersion;
 import com.github.rvesse.airline.args.CommandHidden;
 import com.github.rvesse.airline.args.GlobalOptionsHidden;
 import com.github.rvesse.airline.args.OptionsHidden;
@@ -1015,6 +1016,27 @@ public class TestHelp {
                 "            0   Success\n" +
                 "            1\n" +
                 "            2   Error 2\n\n");
+        //@formatter:on
+    }
+    
+    @Test
+    public void testVersion() throws IOException {
+        //@formatter:off
+        SingleCommand<ArgsVersion> command = singleCommand(ArgsVersion.class);
+    
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new CliCommandUsageGenerator().usage(null, null, "test", command.getCommandMetadata(), null, out);
+        testStringAssert(new String(out.toByteArray(), utf8),
+                "NAME\n" +
+                "        test - ArgsVersion description\n" +
+                "\n" +
+                "SYNOPSIS\n" +
+                "        test\n" +
+                "\n" +
+                "VERSION\n" +
+                "            Component: Airline Test\n" +
+                "            Version: 1.2.3\n" +
+                "            Build: 12345abcde\n");
         //@formatter:on
     }
 

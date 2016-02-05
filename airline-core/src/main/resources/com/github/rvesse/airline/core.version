@@ -1,0 +1,5 @@
+component=Airline Core
+version=${project.version}
+build=${buildNumber}
+buildDate=${timestamp}
+author=Rob Vesse

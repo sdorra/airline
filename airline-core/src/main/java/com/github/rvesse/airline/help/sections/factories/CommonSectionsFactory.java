@@ -28,6 +28,7 @@ import com.github.rvesse.airline.annotations.help.Examples;
 import com.github.rvesse.airline.annotations.help.HideSection;
 import com.github.rvesse.airline.annotations.help.License;
 import com.github.rvesse.airline.annotations.help.ProseSection;
+import com.github.rvesse.airline.annotations.help.Version;
 import com.github.rvesse.airline.annotations.help.ExitCodes;
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpSection;
@@ -36,6 +37,7 @@ import com.github.rvesse.airline.help.sections.common.CommonSections;
 import com.github.rvesse.airline.help.sections.common.DiscussionSection;
 import com.github.rvesse.airline.help.sections.common.ExamplesSection;
 import com.github.rvesse.airline.help.sections.common.ExitCodesSection;
+import com.github.rvesse.airline.help.sections.common.VersionSection;
 
 /**
  * A help section factory that implements the common sections built into Airline
@@ -82,6 +84,12 @@ public class CommonSectionsFactory implements HelpSectionFactory {
             }
             return new com.github.rvesse.airline.help.sections.common.ProseSection(CommonSections.TITLE_LICENSE,
                     CommonSections.ORDER_LICENSE, data);
+        } else if (annotation instanceof Version) {
+            // Version section
+            Version version = (Version) annotation;
+            return new VersionSection(version.sources(), version.componentProperty(), version.versionProperty(),
+                    version.buildProperty(), version.dateProperty(), version.additionalProperties(),
+                    version.additionalTitles(), version.suppressOnError(), version.tabular());
         }
         return null;
     }
@@ -96,6 +104,7 @@ public class CommonSectionsFactory implements HelpSectionFactory {
         supported.add(ProseSection.class);
         supported.add(Copyright.class);
         supported.add(License.class);
+        supported.add(Version.class);
         return supported;
     }
 
