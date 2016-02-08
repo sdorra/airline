@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
@@ -64,6 +64,7 @@
 
     <!-- Dependency Versions -->
     <dependency.javax-inject>1</dependency.javax-inject>
+    <dependency.junit>4.12</dependency.junit>
     <dependency.testng>6.8.8</dependency.testng>
     <dependency.commons-lang3>3.3.2</dependency.commons-lang3>
     <dependency.commons-collections4>4.0</dependency.commons-collections4>
@@ -74,6 +75,8 @@
     <module>airline-examples</module>
     <module>airline-io</module>
     <module>airline-help</module>
+    <module>airline-maven-plugin</module>
+    <!--<module>airline-maven-plugin-tests</module>-->
   </modules>
 
   <dependencyManagement>
@@ -170,6 +173,7 @@
           <excludes>
             <exclude>license.txt</exclude>
             <exclude>pom.xml</exclude>
+            <exclude>**/pom.xml</exclude>
             <exclude>**/*.config</exclude>
           </excludes>
         </configuration>
@@ -225,7 +229,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
               </pluginExecutions>

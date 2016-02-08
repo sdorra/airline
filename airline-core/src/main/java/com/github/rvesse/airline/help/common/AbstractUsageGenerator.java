@@ -31,7 +31,7 @@ import com.github.rvesse.airline.model.OptionMetadata;
 
 public class AbstractUsageGenerator {
 
-    protected static final int DEFAULT_COLUMNS = 79;
+    public static final int DEFAULT_COLUMNS = 79;
     private final Comparator<? super OptionMetadata> optionComparator;
     private final Comparator<? super CommandMetadata> commandComparator;
     private final boolean includeHidden;
