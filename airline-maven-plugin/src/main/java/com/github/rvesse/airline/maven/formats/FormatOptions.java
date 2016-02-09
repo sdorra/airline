@@ -23,7 +23,7 @@ import com.github.rvesse.airline.maven.RawFormatOptions;
 
 public class FormatOptions {
     private final Integer columns, manSection;
-    private final Boolean includeHidden, multiPage;
+    private final Boolean includeHidden, multiFile;
     private final Properties properties;
     private final FormatOptions parent;
     
@@ -40,7 +40,7 @@ public class FormatOptions {
         this.columns = options.columns;
         this.manSection = options.manSection;
         this.includeHidden = options.includeHidden;
-        this.multiPage = options.includeHidden;
+        this.multiFile = options.multiFile;
         this.properties = options.properties;
     }
     
@@ -56,8 +56,8 @@ public class FormatOptions {
         return this.includeHidden != null ? this.includeHidden.booleanValue() : this.parent != null ? this.parent.includeHidden() : false;
     }
     
-    public boolean useMultiPage() {
-        return this.multiPage != null ? this.multiPage.booleanValue() : this.parent != null ? this.parent.useMultiPage() : false;
+    public boolean useMultipleFiles() {
+        return this.multiFile != null ? this.multiFile.booleanValue() : this.parent != null ? this.parent.useMultipleFiles() : false;
     }
     
     public Object get(Object key) {
@@ -74,5 +74,19 @@ public class FormatOptions {
             value = this.parent.getProperty(key);
         }
         return value;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{ columns=").append(this.columns);
+        builder.append(", manSection=").append(this.manSection);
+        builder.append(", includeHidden=").append(this.includeHidden);
+        builder.append(", multiFile=").append(this.multiFile);
+        if (parent != null) {
+            builder.append(", parent=").append(this.parent.toString());
+        }
+        builder.append("}");
+        return builder.toString();
     }
 }

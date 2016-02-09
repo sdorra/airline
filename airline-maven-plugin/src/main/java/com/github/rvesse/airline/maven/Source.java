@@ -35,15 +35,22 @@ public class Source {
     @Parameter(required = true)
     private List<String> classes;
 
+    /**
+     * Provides source specific formatting options that will inherit from the
+     * default and format specific options
+     */
+    @Parameter
+    private RawFormatOptions options;
+
     public List<PreparedSource> prepare(Log log) {
         List<PreparedSource> prepared = new ArrayList<>();
         for (String className : this.classes) {
             try {
                 Class<?> cls = getClass().getClassLoader().loadClass(className);
                 if (cls.getAnnotation(Command.class) != null) {
-                    prepared.add(new PreparedSource(cls, null, MetadataLoader.loadCommand(cls)));
+                    prepared.add(new PreparedSource(cls, null, MetadataLoader.loadCommand(cls), this.options));
                 } else if (cls.getAnnotation(Cli.class) != null) {
-                    prepared.add(new PreparedSource(cls, MetadataLoader.loadGlobal(cls), null));
+                    prepared.add(new PreparedSource(cls, MetadataLoader.loadGlobal(cls), null, this.options));
                 } else {
                     log.warn(String.format("Class %s is not annotated with @Cli or @Command", className));
                 }

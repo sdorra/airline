@@ -74,6 +74,7 @@ public class GenerateMojo extends AbstractAirlineMojo {
         // Prepare default format options
         FormatOptions defaultOptions = this.defaultOptions == null ? new FormatOptions()
                 : new FormatOptions(this.defaultOptions);
+        log.debug(String.format("Default format options are %s", defaultOptions));
 
         // Prepare format mappings
         Map<String, FormatOptions> mappedOptions = prepareFormatMappings(defaultOptions);
@@ -87,28 +88,44 @@ public class GenerateMojo extends AbstractAirlineMojo {
             FormatOptions options = mappedOptions.get(format);
             if (options == null)
                 options = defaultOptions;
+            if (options != defaultOptions)
+                log.debug(String.format("Format %s format options are %s", format, options));
 
             CommandUsageGenerator commandGenerator = provider.getCommandGenerator(options);
             if (commandGenerator == null) {
                 log.warn("Command help is not supported by format " + format);
             } else {
+                log.info(String.format("Using command help generator %s for format %s", commandGenerator.getClass(),
+                        format));
+
                 // Generate command help
                 for (PreparedSource source : sources) {
                     if (!source.isCommand())
                         continue;
-                    outputCommandHelp(format, provider, options, commandGenerator, source);
+
+                    FormatOptions sourceOptions = source.getFormatOptions(options);
+                    if (sourceOptions != options)
+                        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), options));
+                    outputCommandHelp(format, provider, sourceOptions, commandGenerator, source);
                 }
             }
 
             GlobalUsageGenerator<Object> globalGenerator = provider.getGlobalGenerator(options);
-            if (commandGenerator == null) {
+            if (globalGenerator == null) {
                 log.warn("CLI help is not supported by format " + format);
             } else {
+                log.info(
+                        String.format("Using CLI help generator %s for format %s", globalGenerator.getClass(), format));
+
                 // Generate global help
                 for (PreparedSource source : sources) {
                     if (!source.isGlobal())
                         continue;
-                    outputGlobalHelp(format, provider, options, globalGenerator, source);
+
+                    FormatOptions sourceOptions = source.getFormatOptions(options);
+                    if (sourceOptions != options)
+                        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), options));
+                    outputGlobalHelp(format, provider, sourceOptions, globalGenerator, source);
                 }
             }
 

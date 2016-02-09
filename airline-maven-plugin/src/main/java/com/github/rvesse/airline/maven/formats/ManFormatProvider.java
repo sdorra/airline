@@ -41,7 +41,7 @@ public class ManFormatProvider implements FormatProvider {
 
     @Override
     public GlobalUsageGenerator<Object> getGlobalGenerator(FormatOptions options) {
-        if (options.useMultiPage()) {
+        if (options.useMultipleFiles()) {
             return new ManMultiPageGlobalUsageGenerator<Object>(options.getManSection(), options.includeHidden());
         } else {
             return new ManGlobalUsageGenerator<Object>(options.getManSection(), options.includeHidden());

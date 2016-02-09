@@ -45,7 +45,6 @@ import com.github.rvesse.airline.maven.formats.FormatProvider;
 import com.github.rvesse.airline.maven.sources.PreparedSource;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.model.MetadataLoader;
 
 public abstract class AbstractAirlineMojo extends AbstractMojo {
 
