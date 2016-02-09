@@ -8,6 +8,9 @@
 - Help Changes
     - Removed the deprecated RONN help generators (use `airline-help-man` or `airline-help-markdown` instead)
         - This removes the `airline-help-ronn` module (**Breaking**)
+    - New `@Version` annotation for embedding version information into generated help where the version information is pulled from properties files in your JARs or on the local file system
+    - Multi-page help generators can now be configured with a base directory to control where the per-command files are created
+    - New `airline-maven-plugin` that can be used to generate help for your Airline powered CLIs directly in your Maven build
 - Restriction Changes
     - New `GlobalRestrictionsFactory` interface and corresponding registry in `RestrictionsRegistry`
         - Uses `ServiceLoader` for automatic discovery, provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.GlobalRestrictionFactory` file to specify global restriction factories
