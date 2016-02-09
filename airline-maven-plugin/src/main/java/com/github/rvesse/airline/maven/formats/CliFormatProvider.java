@@ -13,45 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.formats;
+package com.github.rvesse.airline.maven.formats;
 
-import com.github.rvesse.FormatOptions;
 import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
-import com.github.rvesse.airline.help.man.ManCommandUsageGenerator;
-import com.github.rvesse.airline.help.man.ManGlobalUsageGenerator;
-import com.github.rvesse.airline.help.man.ManMultiPageGlobalUsageGenerator;
+import com.github.rvesse.airline.help.cli.CliCommandGroupUsageGenerator;
+import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
+import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
+import com.github.rvesse.airline.help.common.AbstractUsageGenerator;
 
-public class ManFormatProvider implements FormatProvider {
+public class CliFormatProvider implements FormatProvider {
+    
+    @Override
+    public String getDefaultMappingName() {
+        return "CLI";
+    }
 
     @Override
     public String getExtension(FormatOptions options) {
-        return String.format(".%d", options.manSection);
+        return ".txt";
     }
 
     @Override
     public CommandUsageGenerator getCommandGenerator(FormatOptions options) {
-        return new ManCommandUsageGenerator(options.manSection, options.includeHidden);
+        return new CliCommandUsageGenerator(
+                options.getColumns() > 0 ? options.getColumns() : AbstractUsageGenerator.DEFAULT_COLUMNS, options.includeHidden());
     }
 
     @Override
     public CommandGroupUsageGenerator<Object> getGroupGenerator(FormatOptions options) {
-        return null;
+        return new CliCommandGroupUsageGenerator<>(
+                options.getColumns() > 0 ? options.getColumns() : AbstractUsageGenerator.DEFAULT_COLUMNS, options.includeHidden());
     }
 
     @Override
     public GlobalUsageGenerator<Object> getGlobalGenerator(FormatOptions options) {
-        if (options.multiPage) {
-            return new ManMultiPageGlobalUsageGenerator<Object>(options.manSection, options.includeHidden);
-        } else {
-            return new ManGlobalUsageGenerator<Object>(options.manSection, options.includeHidden);
-        }
-    }
-
-    @Override
-    public String getDefaultMappingName() {
-        return "MAN";
+        return new CliGlobalUsageGenerator<>(
+                options.getColumns() > 0 ? options.getColumns() : AbstractUsageGenerator.DEFAULT_COLUMNS, options.includeHidden());
     }
 
 }

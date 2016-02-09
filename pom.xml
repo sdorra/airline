@@ -175,6 +175,7 @@
             <exclude>pom.xml</exclude>
             <exclude>**/pom.xml</exclude>
             <exclude>**/*.config</exclude>
+            <exclude>**/verify.bsh</exclude>
           </excludes>
         </configuration>
         <executions>

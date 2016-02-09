@@ -3,7 +3,13 @@ import org.apache.maven.it.*;
 
 Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 
-String test1 = verifier.getBasedir() + "/target/help/Args1.1";
-verifier.assertFilePresent(test1);
-verifier.assertFileMatches(test1, "(?s).*args1 description.*");
-verifier.assertFileMatches(test1, "(?s).*[.]SH NAME.*");
+// Verify output file
+String outputFile = verifier.getBasedir() + "/target/help/Args1.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*args1 description.*");
+verifier.assertFileMatches(outputFile, "(?s).*[.]SH NAME.*");
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.args.Args1 in format MAN to file " + outputFile + ".*");

@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse;
+package com.github.rvesse.airline.maven.formats;
 
-import java.util.Properties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
-public class Mapping {
+public class TestFormatDiscovery {
     
-    @Parameter(required = true)
-    public String format;
+    @Test
+    public void loaded() {
+        Assert.assertTrue(FormatMappingRegistry.availableFormatNames().size() > 0);
+    }
 
-    @Parameter(required = true)
-    public String provider;
+    @Test
+    public void man_registered() {
+        FormatProvider provider = FormatMappingRegistry.find("MAN");
+        Assert.assertNotNull(provider);
+    }
     
-    @Parameter
-    public Properties configuration;
+    @Test
+    public void cli_registered() {
+        FormatProvider provider = FormatMappingRegistry.find("CLI");
+        Assert.assertNotNull(provider);
+    }
 }

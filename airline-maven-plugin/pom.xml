@@ -79,6 +79,11 @@
       <artifactId>plexus-utils</artifactId>
       <version>3.0.18</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
