@@ -34,6 +34,9 @@ public class Source {
      */
     @Parameter(required = true)
     private List<String> classes;
+    
+    @Parameter(defaultValue = "DEFAULT")
+    private OutputMode outputMode = OutputMode.DEFAULT;
 
     /**
      * Provides source specific formatting options that will inherit from the
@@ -48,9 +51,9 @@ public class Source {
             try {
                 Class<?> cls = getClass().getClassLoader().loadClass(className);
                 if (cls.getAnnotation(Command.class) != null) {
-                    prepared.add(new PreparedSource(cls, null, MetadataLoader.loadCommand(cls), this.options));
+                    prepared.add(new PreparedSource(cls, null, MetadataLoader.loadCommand(cls), this.options, this.outputMode));
                 } else if (cls.getAnnotation(Cli.class) != null) {
-                    prepared.add(new PreparedSource(cls, MetadataLoader.loadGlobal(cls), null, this.options));
+                    prepared.add(new PreparedSource(cls, MetadataLoader.loadGlobal(cls), null, this.options, this.outputMode));
                 } else {
                     log.warn(String.format("Class %s is not annotated with @Cli or @Command", className));
                 }

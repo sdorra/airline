@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.maven.sources;
 
+import com.github.rvesse.airline.maven.OutputMode;
 import com.github.rvesse.airline.maven.RawFormatOptions;
 import com.github.rvesse.airline.maven.formats.FormatOptions;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -29,14 +30,16 @@ public class PreparedSource {
     private final CommandMetadata command;
     private final ParserMetadata<Object> parser;
     private final RawFormatOptions rawOptions;
+    private final OutputMode outputMode;
 
     public PreparedSource(Class<?> cls, GlobalMetadata<Object> global, CommandMetadata command,
-            RawFormatOptions rawOptions) {
+            RawFormatOptions rawOptions, OutputMode outputMode) {
         this.cls = cls;
         this.global = global;
         this.command = command;
         this.parser = this.global != null ? this.global.getParserConfiguration() : MetadataLoader.loadParser(this.cls);
         this.rawOptions = rawOptions;
+        this.outputMode = outputMode;
     }
 
     public Class<?> getSourceClass() {
@@ -67,5 +70,17 @@ public class PreparedSource {
         if (this.rawOptions == null)
             return defaultOptions;
         return new FormatOptions(this.rawOptions, defaultOptions);
+    }
+
+    public OutputMode getOutputMode() {
+        return this.outputMode;
+    }
+
+    public boolean shouldOutputCommandHelp() {
+        return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.COMMAND;
+    }
+
+    public boolean shouldOutputGlobalHelp() {
+        return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.CLI;
     }
 }

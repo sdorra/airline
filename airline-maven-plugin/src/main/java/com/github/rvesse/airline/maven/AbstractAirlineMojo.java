@@ -45,6 +45,7 @@ import com.github.rvesse.airline.maven.formats.FormatProvider;
 import com.github.rvesse.airline.maven.sources.PreparedSource;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
 public abstract class AbstractAirlineMojo extends AbstractMojo {
 
@@ -145,23 +146,45 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
     }
 
     protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
-            CommandUsageGenerator commandGenerator, PreparedSource source) throws MojoFailureException {
+            CommandUsageGenerator commandGenerator, PreparedSource source, String programName, String[] groupNames)
+                    throws MojoFailureException {
         Log log = getLog();
         log.debug(String.format("Generating command help for %s in format %s", source.getSourceClass(), format));
 
-        CommandMetadata command = source.getCommmand();
+        outputCommandHelp(format, provider, options, commandGenerator, source, source.getCommmand(),
+                source.getParserConfiguration(), programName, groupNames);
+    }
+
+    protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
+            CommandUsageGenerator commandGenerator, PreparedSource source, CommandMetadata command,
+            ParserMetadata<Object> parser, String programName, String[] groupNames) throws MojoFailureException {
         File commandHelpFile = new File(this.outputDirectory, command.getName() + provider.getExtension(options));
+        outputCommandHelp(format, commandGenerator, source, commandHelpFile, command, parser, programName, groupNames);
+    }
+
+    protected void outputCommandHelp(String format, CommandUsageGenerator commandGenerator, PreparedSource source,
+            File commandHelpFile, CommandMetadata command, ParserMetadata<Object> parser, String programName,
+            String[] groupNames) throws MojoFailureException {
+        Log log = getLog();
         try (OutputStream output = new FileOutputStream(commandHelpFile)) {
-            commandGenerator.usage(null, null, command.getName(), command, source.getParserConfiguration(), output);
+            commandGenerator.usage(programName, groupNames, command.getName(), command, parser, output);
             output.flush();
             output.close();
-            
+
+            if (!commandHelpFile.exists())
+                throw new MojoFailureException(String.format("Failed to create help file %s", commandHelpFile));
+
             log.info(String.format("Generated command help for %s in format %s to file %s", source.getSourceClass(),
                     format, commandHelpFile));
         } catch (IOException e) {
             throw new MojoFailureException(
-                    String.format("Failed to generate help for %s in format %s", command.getClass(), format), e);
+                    String.format("Failed to generate help for %s in format %s", source.getSourceClass(), format), e);
         }
+    }
+
+    protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
+            CommandUsageGenerator commandGenerator, PreparedSource source) throws MojoFailureException {
+        outputCommandHelp(format, provider, options, commandGenerator, source, null, null);
     }
 
     protected void outputGlobalHelp(String format, FormatProvider provider, FormatOptions options,
@@ -175,9 +198,12 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
             globalGenerator.usage(global, output);
             output.flush();
             output.close();
-            
-            log.info(String.format("Generated CLI help for %s in format %s to file %s", source.getSourceClass(),
-                    format, cliHelpFile));
+
+            if (!cliHelpFile.exists())
+                throw new MojoFailureException(String.format("Failed to create help file %s", cliHelpFile));
+
+            log.info(String.format("Generated CLI help for %s in format %s to file %s", source.getSourceClass(), format,
+                    cliHelpFile));
         } catch (IOException e) {
             throw new MojoFailureException(
                     String.format("Failed to generate CLI help for %s in format %s", source.getSourceClass(), format),

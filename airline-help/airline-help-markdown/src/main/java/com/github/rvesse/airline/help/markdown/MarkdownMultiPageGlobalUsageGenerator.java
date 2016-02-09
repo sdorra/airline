@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.help.markdown;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
+import com.github.rvesse.airline.help.common.AbstractUsageGenerator;
 import com.github.rvesse.airline.help.markdown.MarkdownCommandUsageGenerator;
 import com.github.rvesse.airline.help.markdown.MarkdownGlobalUsageGenerator;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
@@ -34,18 +36,29 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsageGenerator<T> {
     
+    private File baseDirectory;
+    
     public MarkdownMultiPageGlobalUsageGenerator() {
-        this(false, new MarkdownCommandUsageGenerator(false));
+        this(AbstractUsageGenerator.DEFAULT_COLUMNS, false, new MarkdownCommandUsageGenerator(false), null);
     }
-
+    
     public MarkdownMultiPageGlobalUsageGenerator(boolean includeHidden) {
-        this(includeHidden, new MarkdownCommandUsageGenerator(includeHidden));
+        this(AbstractUsageGenerator.DEFAULT_COLUMNS, includeHidden, new MarkdownCommandUsageGenerator(includeHidden), null);
     }
 
-    protected MarkdownMultiPageGlobalUsageGenerator(boolean includeHidden,
-            AbstractPrintedCommandUsageGenerator commandUsageGenerator) {
-        super(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+    public MarkdownMultiPageGlobalUsageGenerator(int columns, boolean includeHidden) {
+        this(columns, includeHidden, new MarkdownCommandUsageGenerator(columns, includeHidden), null);
+    }
+    
+    public MarkdownMultiPageGlobalUsageGenerator(int columns, boolean includeHidden, File baseDirectory) {
+        this(columns, includeHidden, new MarkdownCommandUsageGenerator(columns, includeHidden), baseDirectory);
+    }
+
+    protected MarkdownMultiPageGlobalUsageGenerator(int columns, boolean includeHidden,
+            AbstractPrintedCommandUsageGenerator commandUsageGenerator, File baseDirectory) {
+        super(columns, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
                 UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden, commandUsageGenerator);
+        this.baseDirectory = baseDirectory;
     }
 
     @Override
@@ -97,7 +110,9 @@ public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsag
         StringBuilder fileName = new StringBuilder();
         fileName.append(getCommandName(global, groupNames, command));
         fileName.append(".md");
-        return new FileOutputStream(fileName.toString());
+        
+        File f = this.baseDirectory != null ? new File(this.baseDirectory, fileName.toString()) : new File(fileName.toString());
+        return new FileOutputStream(f);
     }
 
     @Override

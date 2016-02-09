@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.help.man;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,22 +33,29 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class ManMultiPageGlobalUsageGenerator<T> extends ManGlobalUsageGenerator<T> {
+    
+    private File baseDirectory;
 
     public ManMultiPageGlobalUsageGenerator() {
-        this(ManSections.GENERAL_COMMANDS, false, new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false));
+        this(ManSections.GENERAL_COMMANDS, false, new ManCommandUsageGenerator(ManSections.GENERAL_COMMANDS, false), null);
     }
 
     public ManMultiPageGlobalUsageGenerator(int manSection) {
-        this(manSection, false, new ManCommandUsageGenerator(manSection, false));
+        this(manSection, false, new ManCommandUsageGenerator(manSection, false), null);
     }
 
     public ManMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden) {
-        this(manSection, includeHidden, new ManCommandUsageGenerator(manSection, includeHidden));
+        this(manSection, includeHidden, new ManCommandUsageGenerator(manSection, includeHidden), null);
+    }
+    
+    public ManMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden, File baseDirectory) {
+        this(manSection, includeHidden, new ManCommandUsageGenerator(manSection, includeHidden), baseDirectory);
     }
 
     protected ManMultiPageGlobalUsageGenerator(int manSection, boolean includeHidden,
-            CommandUsageGenerator commandUsageGenerator) {
+            CommandUsageGenerator commandUsageGenerator, File baseDir) {
         super(manSection, includeHidden, commandUsageGenerator);
+        this.baseDirectory = baseDir;
     }
 
     @Override
@@ -125,7 +133,9 @@ public class ManMultiPageGlobalUsageGenerator<T> extends ManGlobalUsageGenerator
         fileName.append(getCommandName(global, groupNames, command));
         fileName.append(".");
         fileName.append(this.manSection);
-        return new FileOutputStream(fileName.toString());
+        
+        File f = this.baseDirectory != null ? new File(this.baseDirectory, fileName.toString()) : new File(fileName.toString());
+        return new FileOutputStream(f);
     }
 
     @Override

@@ -23,17 +23,20 @@ import com.github.rvesse.airline.help.GlobalUsageGenerator;
 import com.github.rvesse.airline.help.man.ManCommandUsageGenerator;
 import com.github.rvesse.airline.help.man.ManGlobalUsageGenerator;
 import com.github.rvesse.airline.help.man.ManMultiPageGlobalUsageGenerator;
+import com.github.rvesse.airline.help.markdown.MarkdownCommandUsageGenerator;
+import com.github.rvesse.airline.help.markdown.MarkdownGlobalUsageGenerator;
+import com.github.rvesse.airline.help.markdown.MarkdownMultiPageGlobalUsageGenerator;
 
-public class ManFormatProvider implements FormatProvider {
+public class MarkdownFormatProvider implements FormatProvider {
 
     @Override
     public String getExtension(FormatOptions options) {
-        return String.format(".%d", options.getManSection());
+        return ".md";
     }
 
     @Override
     public CommandUsageGenerator getCommandGenerator(File outputDirectory, FormatOptions options) {
-        return new ManCommandUsageGenerator(options.getManSection(), options.includeHidden());
+        return new MarkdownCommandUsageGenerator(options.getManSection(), options.includeHidden());
     }
 
     @Override
@@ -44,9 +47,9 @@ public class ManFormatProvider implements FormatProvider {
     @Override
     public GlobalUsageGenerator<Object> getGlobalGenerator(File outputDirectory, FormatOptions options) {
         if (options.useMultipleFiles()) {
-            return new ManMultiPageGlobalUsageGenerator<Object>(options.getManSection(), options.includeHidden(), outputDirectory);
+            return new MarkdownMultiPageGlobalUsageGenerator<Object>(options.getColumns(), options.includeHidden(), outputDirectory);
         } else {
-            return new ManGlobalUsageGenerator<Object>(options.getManSection(), options.includeHidden());
+            return new MarkdownGlobalUsageGenerator<Object>(options.getColumns(), options.includeHidden());
         }
     }
 

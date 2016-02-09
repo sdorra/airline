@@ -15,6 +15,8 @@
  */
 package com.github.rvesse.airline.maven.formats;
 
+import java.io.File;
+
 import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
@@ -36,19 +38,19 @@ public class CliFormatProvider implements FormatProvider {
     }
 
     @Override
-    public CommandUsageGenerator getCommandGenerator(FormatOptions options) {
+    public CommandUsageGenerator getCommandGenerator(File outputDirectory, FormatOptions options) {
         return new CliCommandUsageGenerator(
                 options.getColumns() > 0 ? options.getColumns() : AbstractUsageGenerator.DEFAULT_COLUMNS, options.includeHidden());
     }
 
     @Override
-    public CommandGroupUsageGenerator<Object> getGroupGenerator(FormatOptions options) {
+    public CommandGroupUsageGenerator<Object> getGroupGenerator(File outputDirectory, FormatOptions options) {
         return new CliCommandGroupUsageGenerator<>(
                 options.getColumns() > 0 ? options.getColumns() : AbstractUsageGenerator.DEFAULT_COLUMNS, options.includeHidden());
     }
 
     @Override
-    public GlobalUsageGenerator<Object> getGlobalGenerator(FormatOptions options) {
+    public GlobalUsageGenerator<Object> getGlobalGenerator(File outputDirectory, FormatOptions options) {
         return new CliGlobalUsageGenerator<>(
                 options.getColumns() > 0 ? options.getColumns() : AbstractUsageGenerator.DEFAULT_COLUMNS, options.includeHidden());
     }

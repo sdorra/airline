@@ -15,6 +15,8 @@
  */
 package com.github.rvesse.airline.maven.formats;
 
+import java.io.File;
+
 import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
@@ -47,32 +49,35 @@ public interface FormatProvider {
 
     /**
      * Gets a command usage generator for the format that uses the given options
-     * 
+     * @param outputDirectory TODO
      * @param options
      *            Options
+     * 
      * @return A command usage generator or {@code null} if this format does not
      *         support command help
      */
-    public CommandUsageGenerator getCommandGenerator(FormatOptions options);
+    public CommandUsageGenerator getCommandGenerator(File outputDirectory, FormatOptions options);
 
     /**
      * Gets a command group usage generator for the format that uses the given
      * options
-     * 
+     * @param outputDirectory TODO
      * @param options
      *            Options
+     * 
      * @return A command group usage generator or {@code null} if this format
      *         does not support command group help
      */
-    public CommandGroupUsageGenerator<Object> getGroupGenerator(FormatOptions options);
+    public CommandGroupUsageGenerator<Object> getGroupGenerator(File outputDirectory, FormatOptions options);
 
     /**
      * Gets a global usage generator for the format that uses the given options
-     * 
+     * @param outputDirectory TODO
      * @param options
      *            Options
+     * 
      * @return A global usage generator or {@code null} if this format does not
      *         support global help
      */
-    public GlobalUsageGenerator<Object> getGlobalGenerator(FormatOptions options);
+    public GlobalUsageGenerator<Object> getGlobalGenerator(File outputDirectory, FormatOptions options);
 }

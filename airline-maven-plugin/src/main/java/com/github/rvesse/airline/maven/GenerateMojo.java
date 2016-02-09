@@ -25,12 +25,16 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
 import com.github.rvesse.airline.maven.formats.FormatMappingRegistry;
 import com.github.rvesse.airline.maven.formats.FormatOptions;
 import com.github.rvesse.airline.maven.formats.FormatProvider;
 import com.github.rvesse.airline.maven.sources.PreparedSource;
+import com.github.rvesse.airline.model.CommandGroupMetadata;
+import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.GlobalMetadata;
 
 /**
  * Generates Airline powered help
@@ -91,26 +95,60 @@ public class GenerateMojo extends AbstractAirlineMojo {
             if (options != defaultOptions)
                 log.debug(String.format("Format %s format options are %s", format, options));
 
-            CommandUsageGenerator commandGenerator = provider.getCommandGenerator(options);
+            CommandUsageGenerator commandGenerator = provider.getCommandGenerator(this.outputDirectory, options);
             if (commandGenerator == null) {
                 log.warn("Command help is not supported by format " + format);
             } else {
-                log.info(String.format("Using command help generator %s for format %s", commandGenerator.getClass(),
-                        format));
+                log.info(String.format("Using command help generator %s as default for format %s",
+                        commandGenerator.getClass(), format));
 
                 // Generate command help
                 for (PreparedSource source : sources) {
-                    if (!source.isCommand())
-                        continue;
-
                     FormatOptions sourceOptions = source.getFormatOptions(options);
-                    if (sourceOptions != options)
-                        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), options));
-                    outputCommandHelp(format, provider, sourceOptions, commandGenerator, source);
+                    if (source.isCommand()) {
+                        if (!source.shouldOutputCommandHelp()) {
+                            log.debug(String.format(
+                                    "Skipping command help for class %s because configured output mode is %s",
+                                    source.getSourceClass(), source.getOutputMode()));
+                            continue;
+                        }
+
+                        CommandUsageGenerator sourceCommandGenerator = commandGenerator;
+                        if (sourceOptions != options) {
+                            log.debug(
+                                    String.format("Source %s format options are %s", source.getSourceClass(), options));
+                            sourceCommandGenerator = provider.getCommandGenerator(this.outputDirectory, sourceOptions);
+                            log.info(String.format("Using command help generator %s as default for source %s",
+                                    sourceCommandGenerator.getClass(), source.getSourceClass()));
+                        }
+                        outputCommandHelp(format, provider, sourceOptions, sourceCommandGenerator, source);
+                    } else if (source.isGlobal() && source.getOutputMode() == OutputMode.COMMAND) {
+                        log.debug(String.format("Generating command help from CLI class %s", source.getSourceClass()));
+
+                        if (sourceOptions != options) {
+                            log.debug(
+                                    String.format("Source %s format options are %s", source.getSourceClass(), options));
+                            // TODO Get modified command help generator based on
+                            // source specific options
+                        }
+
+                        GlobalMetadata<Object> global = source.getGlobal();
+                        for (CommandMetadata command : global.getDefaultGroupCommands()) {
+                            outputCommandHelp(format, provider, sourceOptions, commandGenerator, source, command,
+                                    global.getParserConfiguration(), global.getName(), null);
+                        }
+                        for (CommandGroupMetadata group : global.getCommandGroups()) {
+                            // TODO Dump help for each group
+                        }
+                    }
                 }
             }
 
-            GlobalUsageGenerator<Object> globalGenerator = provider.getGlobalGenerator(options);
+            CommandGroupUsageGenerator<Object> groupGenerator = provider.getGroupGenerator(this.outputDirectory,
+                    options);
+            // TODO Output group help
+
+            GlobalUsageGenerator<Object> globalGenerator = provider.getGlobalGenerator(this.outputDirectory, options);
             if (globalGenerator == null) {
                 log.warn("CLI help is not supported by format " + format);
             } else {
@@ -123,8 +161,12 @@ public class GenerateMojo extends AbstractAirlineMojo {
                         continue;
 
                     FormatOptions sourceOptions = source.getFormatOptions(options);
-                    if (sourceOptions != options)
+                    if (sourceOptions != options) {
                         log.debug(String.format("Source %s format options are %s", source.getSourceClass(), options));
+                        // TODO Get modified global help generator based on
+                        // source specific options
+                    }
+
                     outputGlobalHelp(format, provider, sourceOptions, globalGenerator, source);
                 }
             }
