@@ -51,8 +51,12 @@ import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.formats.FormatMappingRegistry;
 import com.github.rvesse.formats.FormatProvider;
 
+/**
+ * Generates Airline powered help
+ *
+ */
 //@formatter:off
-@Mojo(name = "help", 
+@Mojo(name = "generate", 
       defaultPhase = LifecyclePhase.PROCESS_CLASSES, 
       requiresOnline = false, 
       requiresDependencyResolution = ResolutionScope.RUNTIME,
@@ -60,7 +64,7 @@ import com.github.rvesse.formats.FormatProvider;
       requiresProject = true
 )
 //@formatter:on
-public class HelpMojo extends AbstractMojo {
+public class GenerateMojo extends AbstractMojo {
 
     @Component
     private PluginDescriptor pluginDescriptor;
@@ -71,7 +75,7 @@ public class HelpMojo extends AbstractMojo {
     /**
      * Location of the output
      */
-    @Parameter(defaultValue = "${project.build.directory}/airline-help/", property = "outputDir", required = true)
+    @Parameter(defaultValue = "${project.build.directory}/help/", property = "outputDir", required = true)
     private File outputDirectory;
 
     /**
