@@ -75,6 +75,9 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
     @Parameter
     protected RawFormatOptions defaultOptions;
 
+    @Parameter(defaultValue = "true")
+    protected boolean failOnNoSources = true;
+
     public AbstractAirlineMojo() {
         super();
     }
@@ -96,18 +99,21 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
     /**
      * Prepares the sources for which help will be generated
      * 
+     * @param skipBadSources
+     * 
      * @return Prepared sources
      * @throws MojoFailureException
      */
-    protected List<PreparedSource> prepareSources() throws MojoFailureException {
+    protected List<PreparedSource> prepareSources(boolean skipBadSources) throws MojoFailureException {
         List<PreparedSource> prepared = new ArrayList<>();
         Log log = getLog();
         for (Source source : this.sources) {
-            prepared.addAll(source.prepare(log));
+            prepared.addAll(source.prepare(log, skipBadSources));
         }
         if (prepared.size() == 0) {
-            throw new MojoFailureException(
-                    "Failed to locate any valid @Cli or @Command annotated classes to generate help for");
+            if (failOnNoSources)
+                throw new MojoFailureException(
+                        "Failed to locate any valid @Cli or @Command annotated classes to generate help for");
         }
         return prepared;
     }

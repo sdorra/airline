@@ -18,6 +18,7 @@ package com.github.rvesse.airline.maven;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -34,7 +35,7 @@ public class Source {
      */
     @Parameter(required = true)
     private List<String> classes;
-    
+
     @Parameter(defaultValue = "DEFAULT")
     private OutputMode outputMode = OutputMode.DEFAULT;
 
@@ -45,21 +46,31 @@ public class Source {
     @Parameter
     private RawFormatOptions options;
 
-    public List<PreparedSource> prepare(Log log) {
+    public List<PreparedSource> prepare(Log log, boolean skipBadSources) throws MojoFailureException {
         List<PreparedSource> prepared = new ArrayList<>();
         for (String className : this.classes) {
             try {
                 Class<?> cls = getClass().getClassLoader().loadClass(className);
                 if (cls.getAnnotation(Command.class) != null) {
-                    prepared.add(new PreparedSource(cls, null, MetadataLoader.loadCommand(cls), this.options, this.outputMode));
+                    prepared.add(new PreparedSource(cls, null, MetadataLoader.loadCommand(cls), this.options,
+                            this.outputMode));
                 } else if (cls.getAnnotation(Cli.class) != null) {
-                    prepared.add(new PreparedSource(cls, MetadataLoader.loadGlobal(cls), null, this.options, this.outputMode));
+                    prepared.add(new PreparedSource(cls, MetadataLoader.loadGlobal(cls), null, this.options,
+                            this.outputMode));
                 } else {
+                    if (!skipBadSources)
+                        throw new MojoFailureException(
+                                String.format("Class %s is not annotated with @Cli or @Command", className));
                     log.warn(String.format("Class %s is not annotated with @Cli or @Command", className));
+
                 }
             } catch (ClassNotFoundException e) {
+                if (!skipBadSources)
+                    throw new MojoFailureException(String.format("Failed to locate class %s", className), e);
                 log.warn(String.format("Failed to locate class %s", className));
             } catch (Throwable e) {
+                if (!skipBadSources)
+                    throw new MojoFailureException(String.format("Bad Airline metadata on class %s", className), e);
                 log.warn(String.format("Bad Airline metadata on class %s", className));
             }
         }
