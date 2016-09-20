@@ -44,7 +44,7 @@ public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsag
 
     protected MarkdownMultiPageGlobalUsageGenerator(boolean includeHidden,
             AbstractPrintedCommandUsageGenerator commandUsageGenerator) {
-        super(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+        super(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
                 UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden, commandUsageGenerator);
     }
 

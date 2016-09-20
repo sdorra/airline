@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.help;
 
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -24,6 +25,27 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public class UsageHelper {
+
+    /**
+     * Default comparator for help hints
+     * <p>
+     * Compares by class name of the implementation to give a predictable order
+     * in output. Where multiple instances of same implementation hint exists
+     * compares by identity hash codes of the instances.
+     * </p>
+     */
+    public static final Comparator<HelpHint> DEFAULT_HINT_COMPARATOR = new Comparator<HelpHint>() {
+
+        @Override
+        public int compare(HelpHint o1, HelpHint o2) {
+            int c = o1.getClass().getName().compareTo(o2.getClass().getName());
+            if (c == 0) {
+                c = Integer.compare(System.identityHashCode(o1), System.identityHashCode(o2));
+            }
+            return c;
+        }
+    };
+
     /**
      * Default comparator for options
      * <p>

@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
 
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -34,10 +35,10 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
 
     private final int columnSize;
 
-    public AbstractPrintedCommandGroupUsageGenerator(int columnSize,
+    public AbstractPrintedCommandGroupUsageGenerator(int columnSize, Comparator<? super HelpHint> hintComparator, 
             Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             boolean includeHidden) {
-        super(optionComparator, commandComparator, includeHidden);
+        super(hintComparator, optionComparator, commandComparator, includeHidden);
         if (columnSize <= 0)
             throw new IllegalArgumentException("columnSize must be greater than 0");
         this.columnSize = columnSize;

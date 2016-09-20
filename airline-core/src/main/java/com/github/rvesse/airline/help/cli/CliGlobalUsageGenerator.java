@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -37,29 +38,29 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
     private final CliUsageHelper helper;
 
     public CliGlobalUsageGenerator() {
-        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
     public CliGlobalUsageGenerator(boolean includeHidden) {
-        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
     public CliGlobalUsageGenerator(int columns) {
-        this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+        this(columns, UsageHelper.DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
     public CliGlobalUsageGenerator(int columns, boolean includeHidden) {
-        this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+        this(columns, UsageHelper.DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
-    public CliGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator,
+    public CliGlobalUsageGenerator(int columnSize, Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
-        super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
+        super(columnSize, hintComparator, optionComparator, commandComparator, commandGroupComparator, includeHidden);
         helper = createHelper(optionComparator, includeHidden);
     }
 
@@ -195,11 +196,10 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
         out.append("USER DEFINED ALIASES").newline();
 
         UsagePrinter aliasPrinter = out.newIndentedPrinter(8);
-        aliasPrinter
-                .append(String.format(
-                        "This CLI supports user defined aliases which may be placed in a %s file located in %s the following location(s):",
-                        userAliases.getFilename(), userAliases.getSearchLocations().size() > 1 ? "one/more of" : ""))
-                .newline().newline();
+        aliasPrinter.append(String.format(
+                "This CLI supports user defined aliases which may be placed in a %s file located in %s the following location(s):",
+                userAliases.getFilename(), userAliases.getSearchLocations().size() > 1 ? "one/more of" : "")).newline()
+                .newline();
 
         UsagePrinter locationPrinter = aliasPrinter.newIndentedPrinter(4);
         int i = 1;
@@ -225,7 +225,8 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
                 .newline().newline();
         examplePrinter.flush();
 
-        aliasPrinter.append("Here an alias foo is defined which causes the bar command to be invoked with the --flag option passed to it.");
+        aliasPrinter.append(
+                "Here an alias foo is defined which causes the bar command to be invoked with the --flag option passed to it.");
         if (StringUtils.isNotBlank(userAliases.getPrefix())) {
             aliasPrinter.append("Aliases are distinguished from other properties in the file by the prefix '"
                     + userAliases.getPrefix() + "' as seen in the example.").newline();

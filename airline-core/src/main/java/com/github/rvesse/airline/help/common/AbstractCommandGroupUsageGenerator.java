@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
@@ -28,16 +29,18 @@ import com.github.rvesse.airline.model.OptionMetadata;
 /**
  * Abstract command group usage generator
  */
-public abstract class AbstractCommandGroupUsageGenerator<T> extends AbstractUsageGenerator implements
-        CommandGroupUsageGenerator<T> {
+public abstract class AbstractCommandGroupUsageGenerator<T> extends AbstractUsageGenerator
+        implements CommandGroupUsageGenerator<T> {
 
     public AbstractCommandGroupUsageGenerator() {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
     }
 
-    public AbstractCommandGroupUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator, boolean includeHidden) {
-        super(optionComparator, commandComparator, includeHidden);
+    public AbstractCommandGroupUsageGenerator(Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
+            boolean includeHidden) {
+        super(hintComparator, optionComparator, commandComparator, includeHidden);
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
@@ -31,24 +32,25 @@ import com.github.rvesse.airline.model.OptionMetadata;
 /**
  * Abstract global usage generator
  */
-public abstract class AbstractGlobalUsageGenerator<T> extends AbstractUsageGenerator implements GlobalUsageGenerator<T> {
+public abstract class AbstractGlobalUsageGenerator<T> extends AbstractUsageGenerator
+        implements GlobalUsageGenerator<T> {
 
     private final Comparator<? super CommandGroupMetadata> commandGroupComparator;
 
     public AbstractGlobalUsageGenerator() {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
     public AbstractGlobalUsageGenerator(boolean includeHidden) {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
-    public AbstractGlobalUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator,
+    public AbstractGlobalUsageGenerator(Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
-        super(optionComparator, commandComparator, includeHidden);
+        super(hintComparator, optionComparator, commandComparator, includeHidden);
         this.commandGroupComparator = commandGroupComparator;
     }
 

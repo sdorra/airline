@@ -25,23 +25,29 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.restrictions.OptionRestriction;
 
 public class AbstractUsageGenerator {
 
     protected static final int DEFAULT_COLUMNS = 79;
+    private final Comparator<? super HelpHint> hintComparator;
     private final Comparator<? super OptionMetadata> optionComparator;
     private final Comparator<? super CommandMetadata> commandComparator;
     private final boolean includeHidden;
 
     public AbstractUsageGenerator() {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, false);
     }
 
-    public AbstractUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator, boolean includeHidden) {
+    public AbstractUsageGenerator(Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
+            boolean includeHidden) {
+        this.hintComparator = hintComparator;
         this.optionComparator = optionComparator;
         this.commandComparator = commandComparator;
         this.includeHidden = includeHidden;
@@ -78,6 +84,19 @@ public class AbstractUsageGenerator {
             Collections.sort(options, optionComparator);
         }
         return options;
+    }
+
+    protected List<HelpHint> sortRestrictions(List<OptionRestriction> restrictions) {
+        List<HelpHint> hints = new ArrayList<>();
+        for (OptionRestriction restriction : restrictions) {
+            if (restriction instanceof HelpHint) {
+                hints.add((HelpHint)restriction);
+            }
+        }
+        if (hintComparator != null) {
+            Collections.sort(hints, hintComparator);
+        }
+        return hints;
     }
 
     /**

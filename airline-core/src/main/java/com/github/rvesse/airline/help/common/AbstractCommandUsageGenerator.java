@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.UsageHelper;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -44,20 +45,23 @@ public abstract class AbstractCommandUsageGenerator extends AbstractUsageGenerat
     }
 
     public AbstractCommandUsageGenerator(boolean includeHidden) {
-        this(UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, includeHidden);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, includeHidden);
     }
 
     public AbstractCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator) {
-        this(optionComparator, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, false);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, optionComparator, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, false);
     }
 
     public AbstractCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
-        this(optionComparator, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR, includeHidden);
+        this(UsageHelper.DEFAULT_HINT_COMPARATOR, optionComparator, UsageHelper.DEFAULT_EXIT_CODE_COMPARATOR,
+                includeHidden);
     }
 
-    public AbstractCommandUsageGenerator(Comparator<? super OptionMetadata> optionComparator,
+    public AbstractCommandUsageGenerator(Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator,
             Comparator<? super Entry<Integer, String>> exitCodeComparator, boolean includeHidden) {
-        super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
+        super(hintComparator, optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
         this.exitCodeComparator = exitCodeComparator;
     }
 

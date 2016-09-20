@@ -17,6 +17,7 @@ package com.github.rvesse.airline.help.cli;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -34,29 +35,29 @@ import java.util.Map.Entry;
 public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsageGenerator<T> {
 
     public CliGlobalUsageSummaryGenerator() {
-        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
     public CliGlobalUsageSummaryGenerator(boolean includeHidden) {
-        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
     public CliGlobalUsageSummaryGenerator(int columnSize) {
-        this(columnSize, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
+        this(columnSize, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false);
     }
 
     public CliGlobalUsageSummaryGenerator(int columnSize, boolean includeHidden) {
-        this(columnSize, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
+        this(columnSize, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden);
     }
 
-    public CliGlobalUsageSummaryGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator,
+    public CliGlobalUsageSummaryGenerator(int columnSize, Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
-        super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
+        super(columnSize, hintComparator, optionComparator, commandComparator, commandGroupComparator, includeHidden);
     }
 
     public void usage(GlobalMetadata<T> global, UsagePrinter out) throws IOException {
@@ -105,7 +106,7 @@ public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsag
         for (CommandGroupMetadata group : sortCommandGroups(global.getCommandGroups())) {
             if (group.isHidden() && !this.includeHidden())
                 continue;
-            
+
             commands.put(group.getName(), group.getDescription());
         }
 
@@ -132,8 +133,9 @@ public class CliGlobalUsageSummaryGenerator<T> extends AbstractPrintedGlobalUsag
     protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         List<String> commandArguments = new ArrayList<>();
         for (OptionMetadata option : sortOptions(global.getOptions())) {
-            if (option.isHidden() && !includeHidden()) continue;
-            
+            if (option.isHidden() && !includeHidden())
+                continue;
+
             commandArguments.add(toUsage(option));
         }
         //@formatter:off
