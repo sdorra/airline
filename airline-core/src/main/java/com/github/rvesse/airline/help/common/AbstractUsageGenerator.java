@@ -29,6 +29,7 @@ import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 
 public class AbstractUsageGenerator {
@@ -86,9 +87,22 @@ public class AbstractUsageGenerator {
         return options;
     }
 
-    protected List<HelpHint> sortRestrictions(List<OptionRestriction> restrictions) {
+    protected List<HelpHint> sortOptionRestrictions(List<OptionRestriction> restrictions) {
         List<HelpHint> hints = new ArrayList<>();
         for (OptionRestriction restriction : restrictions) {
+            if (restriction instanceof HelpHint) {
+                hints.add((HelpHint)restriction);
+            }
+        }
+        if (hintComparator != null) {
+            Collections.sort(hints, hintComparator);
+        }
+        return hints;
+    }
+    
+    protected List<HelpHint> sortArgumentsRestrictions(List<ArgumentsRestriction> restrictions) {
+        List<HelpHint> hints = new ArrayList<>();
+        for (ArgumentsRestriction restriction : restrictions) {
             if (restriction instanceof HelpHint) {
                 hints.add((HelpHint)restriction);
             }

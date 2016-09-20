@@ -71,7 +71,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
                 printer.println(option.getDescription());
 
                 // Restrictions
-                List<HelpHint> hints = sortRestrictions(option.getRestrictions());
+                List<HelpHint> hints = sortOptionRestrictions(option.getRestrictions());
                 for (HelpHint hint : hints) {
                     // Safe to cast back to OptionRestriction as must have come
                     // from an OptionRestriction to start with
@@ -118,10 +118,11 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             printer.println(arguments.getDescription());
 
             // Restrictions
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputArgumentsRestriction(printer, arguments, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortArgumentsRestrictions(arguments.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to ArgumentsRestriction as must have come
+                // from an ArgumentsRestriction to start with
+                outputArgumentsRestriction(printer, arguments, (ArgumentsRestriction) hint, hint);
             }
             printer.endList();
 

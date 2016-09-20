@@ -64,7 +64,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
             optionPrinter.append(option.getDescription()).newline();
 
             // Restrictions
-            List<HelpHint> hints = sortRestrictions(option.getRestrictions());
+            List<HelpHint> hints = sortOptionRestrictions(option.getRestrictions());
             for (HelpHint hint : hints) {
                 // Safe to cast back to OptionRestriction as must have come from
                 // an OptionRestriction to start with
@@ -263,10 +263,11 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
             optionPrinter.append(arguments.getDescription()).newline();
 
             // Restrictions
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputArgumentsRestriction(optionPrinter, arguments, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortArgumentsRestrictions(arguments.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to ArgumentsRestriction as must have come from
+                // an ArgumentsRestriction to start with
+                outputArgumentsRestriction(optionPrinter, arguments, (ArgumentsRestriction) hint, hint);
             }
 
             optionPrinter.newline();
