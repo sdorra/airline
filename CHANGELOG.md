@@ -4,6 +4,7 @@
 
 - Bug Fixes
     - Fixed a possible infinite loop in parsing when a group contains both sub-groups and commands (#55)
+    - Fixed possible non-deterministic ordering of option and arguments help hints (#50)
 - Annotation Changes
     - Removed deprecated `arity` from `@Arguments`, the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
     - Global restrictions can now be specified via annotations
