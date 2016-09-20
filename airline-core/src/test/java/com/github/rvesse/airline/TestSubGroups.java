@@ -25,6 +25,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.Git.Add;
+import com.github.rvesse.airline.Git.RemoteShow;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.builder.GroupBuilder;
@@ -32,8 +33,11 @@ import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
+import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.GroupFinder;
+
+import bsh.Remote;
 
 
 public class TestSubGroups {
@@ -344,5 +348,77 @@ public class TestSubGroups {
         
         Object cmd = cli.parse("foo", "bar");
         Assert.assertTrue(cmd instanceof Help);
+    }
+    
+    @Test(timeOut = 3000, expectedExceptions = ParseCommandUnrecognizedException.class)
+    public void sub_groups_mixed_03() {
+        //@formatter:off
+        CliBuilder<Object> builder
+            = Cli.<Object>builder("test");
+        builder.withGroup("foo")
+               .withCommand(Add.class)
+               .withSubGroup("bar")
+               .withDefaultCommand(Help.class);
+        //@formatter:on
+        
+        Cli<Object> cli = builder.build();
+        GlobalMetadata<Object> global = cli.getMetadata();
+        Assert.assertEquals(global.getDefaultGroupCommands().size(), 0);
+        Assert.assertEquals(global.getCommandGroups().size(), 1);
+        
+        CommandGroupMetadata parentGroup = global.getCommandGroups().get(0);
+        Assert.assertEquals(parentGroup.getName(), "foo");
+        Assert.assertEquals(parentGroup.getCommands().size(), 1);
+        Assert.assertEquals(parentGroup.getSubGroups().size(), 1);
+        
+        CommandGroupMetadata subGroup = parentGroup.getSubGroups().get(0);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
+        Assert.assertEquals(subGroup.getName(), "bar");
+        Assert.assertEquals(subGroup.getDefaultCommand().getType(), Help.class);
+        
+        cli.parse("foo", "missing");
+    }
+    
+    @Test(timeOut = 3000)
+    public void sub_groups_mixed_04() {
+        //@formatter:off
+        CliBuilder<Object> builder
+            = Cli.<Object>builder("test");
+        builder.withGroup("foo")
+               .withCommand(Add.class)
+               .withSubGroup("bar")
+               .withCommand(RemoteShow.class)
+               .withSubGroup("faz")
+               .withDefaultCommand(Help.class);
+        //@formatter:on
+        
+        Cli<Object> cli = builder.build();
+        GlobalMetadata<Object> global = cli.getMetadata();
+        Assert.assertEquals(global.getDefaultGroupCommands().size(), 0);
+        Assert.assertEquals(global.getCommandGroups().size(), 1);
+        
+        CommandGroupMetadata parentGroup = global.getCommandGroups().get(0);
+        Assert.assertEquals(parentGroup.getName(), "foo");
+        Assert.assertEquals(parentGroup.getCommands().size(), 1);
+        Assert.assertEquals(parentGroup.getSubGroups().size(), 1);
+        
+        CommandGroupMetadata subGroup = parentGroup.getSubGroups().get(0);
+        Assert.assertEquals(parentGroup, subGroup.getParent());
+        Assert.assertEquals(subGroup.getName(), "bar");
+        Assert.assertEquals(subGroup.getCommands().size(), 1);
+        
+        CommandGroupMetadata leafGroup = subGroup.getSubGroups().get(0);
+        Assert.assertEquals(subGroup, leafGroup.getParent());
+        Assert.assertEquals(leafGroup.getName(), "faz");
+        Assert.assertEquals(leafGroup.getDefaultCommand().getType(), Help.class);
+        
+        Object cmd = cli.parse("foo", "bar", "faz");
+        Assert.assertTrue(cmd instanceof Help);
+        
+        cmd = cli.parse("foo", "add");
+        Assert.assertTrue(cmd instanceof Add);
+        
+        cmd = cli.parse("foo", "bar", "show");
+        Assert.assertTrue(cmd instanceof RemoteShow);
     }
 }

@@ -184,7 +184,7 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
                 tokens.next();
                 state = state.withGroup(group).pushContext(Context.GROUP);
                 state = parseOptions(tokens, state, state.getGroup().getOptions());
-                
+
                 // Possibly may have sub-groups specified
                 while (tokens.hasNext() && state.getGroup().getSubGroups().size() > 0) {
                     //@formatter:off
@@ -197,6 +197,13 @@ public abstract class AbstractCommandParser<T> extends AbstractParser<T> {
                         tokens.next();
                         state = state.withGroup(group).pushContext(Context.GROUP);
                         state = parseOptions(tokens, state, state.getGroup().getOptions());
+                    } else {
+                        // Either a group that has a mixture of sub-groups and
+                        // commands in which case we need to break out of this
+                        // loop and flow will go onto to try the token as a
+                        // command name instead or actually invalid input and
+                        // we'll hit an error
+                        break;
                     }
                 }
             }
