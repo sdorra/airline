@@ -8,9 +8,11 @@ This is a substantially rewritten fork of the original [airline library](https:/
 
 ## Breaking Changes versus 1.x
 
-Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.
+Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) for more details on how to migrate code forward.
 
-Airline 2.1 contains some further minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) in this folder for more details on how to migrate code forward.  Some users may need to add additional Maven dependencies if they were using help formats other than the basic CLI help.
+Airline 2.1 contains some further minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) for more details on how to migrate code forward.  Some users may need to add additional Maven dependencies if they were using help formats other than the basic CLI help.
+
+Airline 2.2 has some minor breaking changes that may affect users of the `@Arguments` annotation, again please see [Migrating.md](Migrating.md) for more details.
 
 ## User Guide
 
@@ -72,7 +74,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.1.1`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.2.0`
 
 Use the following maven dependency declaration:
 
@@ -80,11 +82,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `2.2.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
+Snapshot artifacts of the latest source are also available using the version `2.3.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
 ## Build Status
 
