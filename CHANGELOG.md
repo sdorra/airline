@@ -2,6 +2,8 @@
 
 ## 2.2.0
 
+- Bug Fixes
+    - Fixed a possible infinite loop in parsing when a group contains both sub-groups and commands (#55)
 - Annotation Changes
     - Removed deprecated `arity` from `@Arguments`, the `@MaxOccurrences` restriction annotation (and its related annotations) provide for much finer grained control than this property did
     - Global restrictions can now be specified via annotations
