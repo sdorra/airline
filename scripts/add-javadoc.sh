@@ -29,7 +29,7 @@ if [ ! -d "${TARGET_DIR}" ]; then
   fi
 fi
 
-ARTIFACTS=(airline airline-help-man airline-help-bash airline-help-html airline-help-ronn airline-help-markdown airline-io)
+ARTIFACTS=(airline airline-help-man airline-help-bash airline-help-html airline-help-markdown airline-io)
 for ARTIFACT in "${ARTIFACTS[@]}"; do
   # Download
   ARTIFACT_FILE=$(getArtifact ${ARTIFACT} ${VERSION} "javadoc" ".jar")
