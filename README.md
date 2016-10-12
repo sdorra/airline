@@ -31,7 +31,7 @@ You then need to use the various annotations to annotate your command classes:
 - `@Arguments` is used to annotate fields that take in arguments
 - `@Inject` can be used to modularise option definitions into separate classes
 
-Please see the [examples](examples/) module for a range of examples that show off the many features of this library and practical examples of using the annotations.
+Please see the [examples](airline-examples/) module for a range of examples that show off the many features of this library and practical examples of using the annotations.
 
 ### Single Commands
 
