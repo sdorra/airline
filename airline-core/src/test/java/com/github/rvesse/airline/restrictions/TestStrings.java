@@ -73,7 +73,7 @@ public class TestStrings {
         Assert.assertEquals(cmd.tel, "+1-555-123-4567");
     }
     
-    @Test(expectedExceptions = ParseRestrictionViolatedException.class)
+    @Test(expectedExceptions = ParseRestrictionViolatedException.class, expectedExceptionsMessageRegExp = ".*standard US format.*")
     public void pattern_tel_invalid() {
         parser().parse("--tel", "foo");
     }

@@ -43,7 +43,7 @@ public class Strings {
     public String maxLength;
     
     @Option(name = "--tel")
-    @Pattern(pattern = "(\\+1-)?\\d{3}-\\d{3}-\\d{4}")
+    @Pattern(pattern = "(\\+1-)?\\d{3}-\\d{3}-\\d{4}", description = "Must provide a telephone number in standard US format e.g. +1-800-123-4567")
     public String tel;
     
 }
