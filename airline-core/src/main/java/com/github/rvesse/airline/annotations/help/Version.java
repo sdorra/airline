@@ -19,6 +19,7 @@ import static java.lang.annotation.ElementType.TYPE;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.Properties;
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
@@ -36,6 +37,11 @@ public @interface Version {
      * <p>
      * Each source will be provided as a separate list/table row within the help
      * section depending on the setting of the {@link #tabular()} field.
+     * </p>
+     * <p>
+     * Sources are loaded using {@link Properties#load(java.io.InputStream)}
+     * which supports either normal Java properties format (key value pairs
+     * separated by {@code =} with one per line) or Java Manifest files.
      * </p>
      * 
      * @return
