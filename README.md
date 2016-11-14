@@ -56,7 +56,9 @@ Note that typically you will want to create an executable JAR for your CLI using
     #!/bin/bash
     # myapp
     
-    java -jar my-app.jar $*
+    java -jar my-app.jar "$@"
+    
+**Note:** You must use `"$@"` here as otherwise Bash may expand/interpret arguments and as a result the JVM may not receive the expected arguments that the user enters.
 
 If this is done you can then invoke your application e.g.
 
