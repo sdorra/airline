@@ -16,10 +16,19 @@
 
 package com.github.rvesse.airline.parser;
 
+import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.github.rvesse.airline.model.CommandGroupMetadata;
+import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.GlobalMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
+import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Represents parsing results
@@ -67,5 +76,43 @@ public class ParseResult<T> {
      */
     public Collection<ParseException> getErrors() {
         return this.errors;
+    }
+
+    /**
+     * Gets the command if one was successfully parsed
+     * 
+     * @return Command, or {@code null} if no command was parsed
+     */
+    public T getCommand() {
+        CommandMetadata command = this.state.getCommand();
+        if (command == null)
+            return null;
+
+        // Prepare bindings
+        Map<Class<?>, Object> bindings = new HashMap<Class<?>, Object>();
+        bindings.put(GlobalMetadata.class, state.getGlobal());
+
+        if (state.getGroup() != null) {
+            bindings.put(CommandGroupMetadata.class, state.getGroup());
+        }
+
+        if (state.getCommand() != null) {
+            bindings.put(CommandMetadata.class, state.getCommand());
+        }
+
+        bindings.put(ParserMetadata.class, state.getParserConfiguration());
+        bindings = AirlineUtils.unmodifiableMapCopy(bindings);
+
+        if (state.getGlobal() != null) {
+            // Create instance
+            return createInstance(command.getType(), command.getAllOptions(), state.getParsedOptions(),
+                    command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(), bindings,
+                    state.getParserConfiguration().getCommandFactory());
+        } else {
+            return createInstance(command.getType(), command.getAllOptions(), state.getParsedOptions(),
+                    command.getArguments(), state.getParsedArguments(), command.getMetadataInjections(), bindings,
+                    state.getParserConfiguration().getCommandFactory());
+        }
+
     }
 }

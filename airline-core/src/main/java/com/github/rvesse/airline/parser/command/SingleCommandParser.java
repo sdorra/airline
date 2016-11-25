@@ -15,9 +15,6 @@
  */
 package com.github.rvesse.airline.parser.command;
 
-import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
-
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.IteratorUtils;
@@ -33,7 +30,6 @@ import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class SingleCommandParser<T> extends AbstractCommandParser<T> {
 
@@ -52,20 +48,7 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
     public T parse(ParserMetadata<T> parserConfig, CommandMetadata commandMetadata,
             Iterable<GlobalRestriction> restrictions, Iterable<String> args) {
         ParseResult<T> result = parseWithResult(parserConfig, commandMetadata, restrictions, args);
-
-        ParseState<T> state = result.getState();
-        CommandMetadata command = state.getCommand();
-
-        //@formatter:off
-        return createInstance(command.getType(), 
-                              command.getAllOptions(), 
-                              state.getParsedOptions(),
-                              command.getArguments(), 
-                              state.getParsedArguments(), 
-                              command.getMetadataInjections(),
-                              Collections.<Class<?>, Object>unmodifiableMap(AirlineUtils.singletonMap(CommandMetadata.class, commandMetadata)),
-                              state.getParserConfiguration().getCommandFactory());
-        //@formatter:on
+        return result.getCommand();
     }
 
     /**
