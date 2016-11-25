@@ -28,6 +28,8 @@ import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.errors.handlers.FailFast;
+import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
 
 /**
@@ -109,7 +111,7 @@ public @interface Parser {
      * 
      * @return Command aliases
      */
-    Alias[]aliases() default {};
+    Alias[] aliases() default {};
 
     /**
      * Defines the name of a file from which user defined command aliases should
@@ -134,7 +136,7 @@ public @interface Parser {
      * 
      * @return
      */
-    String[]userAliasesSearchLocation() default "";
+    String[] userAliasesSearchLocation() default "";
 
     /**
      * Sets the prefix used for properties that define aliases
@@ -172,7 +174,7 @@ public @interface Parser {
      * @return Option parser classes
      */
     @SuppressWarnings("rawtypes")
-    Class<? extends OptionParser>[]optionParsers() default {};
+    Class<? extends OptionParser>[] optionParsers() default {};
 
     /**
      * Sets the command factory class to use
@@ -180,12 +182,20 @@ public @interface Parser {
      * @return Command factory class
      */
     @SuppressWarnings("rawtypes")
-    Class<? extends CommandFactory>commandFactory() default DefaultCommandFactory.class;
+    Class<? extends CommandFactory> commandFactory() default DefaultCommandFactory.class;
 
     /**
      * Sets the type converter class to use
      * 
      * @return Type converter class
      */
-    Class<? extends TypeConverter>typeConverter() default DefaultTypeConverter.class;
+    Class<? extends TypeConverter> typeConverter() default DefaultTypeConverter.class;
+
+    /**
+     * Sets the error handler to use, defaults to {@code FailFast} which throws
+     * errors as soon as they are encountered
+     * 
+     * @return Error handler to use
+     */
+    Class<? extends ParserErrorHandler> errorHandler() default FailFast.class;
 }

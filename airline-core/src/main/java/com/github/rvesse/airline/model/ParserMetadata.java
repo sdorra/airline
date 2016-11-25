@@ -24,6 +24,8 @@ import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
+import com.github.rvesse.airline.parser.errors.handlers.FailFast;
+import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
@@ -44,15 +46,19 @@ public class ParserMetadata<T> {
     private final TypeConverter typeConverter;
     private final CommandFactory<T> commandFactory;
     private final String argsSeparator;
+    private final ParserErrorHandler errorHandler;
 
     public ParserMetadata(CommandFactory<T> commandFactory, List<OptionParser<T>> optionParsers,
-            TypeConverter typeConverter, boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions,
-            List<AliasMetadata> aliases, UserAliasesSource<T> userAliases, boolean aliasesOverrideBuiltIns,
-            boolean aliasesMayChain, String argumentsSeparator) {
+            TypeConverter typeConverter, ParserErrorHandler errorHandler, boolean allowAbbreviateCommands,
+            boolean allowAbbreviatedOptions, List<AliasMetadata> aliases, UserAliasesSource<T> userAliases,
+            boolean aliasesOverrideBuiltIns, boolean aliasesMayChain, String argumentsSeparator) {
         if (optionParsers == null)
             throw new NullPointerException("optionParsers cannot be null");
         if (aliases == null)
             throw new NullPointerException("aliases cannot be null");
+
+        // Error handling
+        this.errorHandler = errorHandler != null ? errorHandler : new FailFast();
 
         // Command parsing
         this.commandFactory = commandFactory != null ? commandFactory : new DefaultCommandFactory<T>();
@@ -95,6 +101,15 @@ public class ParserMetadata<T> {
      */
     public TypeConverter getTypeConverter() {
         return typeConverter;
+    }
+
+    /**
+     * Gets the error handler to use
+     * 
+     * @return Error handler
+     */
+    public ParserErrorHandler getErrorHandler() {
+        return errorHandler;
     }
 
     /**

@@ -27,6 +27,7 @@ import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
+import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
@@ -47,6 +48,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
     protected String argsSeparator;
     protected UserAliasesSource<C> userAliases;
+    protected ParserErrorHandler errorHandler;
 
     public static <T> ParserMetadata<T> defaultConfiguration() {
         return new ParserBuilder<T>().build();
@@ -217,6 +219,16 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         return this;
     }
 
+    public ParserBuilder<C> withErrorHandler(ParserErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+        return this;
+    }
+
+    public ParserBuilder<C> withDefaultErrorHandler() {
+        this.errorHandler = null;
+        return this;
+    }
+
     /**
      * Configures the CLI to use the given option parser
      * <p>
@@ -344,7 +356,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
             aliasData = new ArrayList<>();
         }
 
-        return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, allowAbbreviatedCommands,
-                allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns, aliasesMayChain, argsSeparator);
+        return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, errorHandler,
+                allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns,
+                aliasesMayChain, argsSeparator);
     }
 }

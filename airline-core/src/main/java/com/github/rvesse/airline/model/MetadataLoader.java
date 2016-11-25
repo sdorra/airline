@@ -32,6 +32,7 @@ import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
@@ -87,6 +88,11 @@ public class MetadataLoader {
             builder = builder.withCommandFactory(ParserUtil.createInstance(parserConfig.commandFactory()));
         } else {
             builder = builder.withDefaultCommandFactory();
+        }
+        if (!parserConfig.errorHandler().equals(FailFast.class)) {
+            builder = builder.withErrorHandler(ParserUtil.createInstance(parserConfig.errorHandler()));
+        } else {
+            builder = builder.withDefaultErrorHandler();
         }
 
         // Abbreviation options
