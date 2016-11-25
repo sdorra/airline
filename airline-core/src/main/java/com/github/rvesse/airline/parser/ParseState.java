@@ -23,6 +23,7 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
@@ -88,22 +89,41 @@ public class ParseState<T> {
     public ParseState<T> withOptionValue(OptionMetadata option, String rawValue) {
         // Pre-validate
         for (OptionRestriction restriction : option.getRestrictions()) {
-            restriction.preValidate(this, option, rawValue);
+            try {
+                restriction.preValidate(this, option, rawValue);
+            } catch (ParseException e) {
+                this.parserConfig.getErrorHandler().handleError(e);
+            }
         }
 
-        // Convert value
-        Object value = this.parserConfig.getTypeConverter().convert(option.getTitle(), option.getJavaType(), rawValue);
+        try {
+            // Convert value
+            Object value = this.parserConfig.getTypeConverter().convert(option.getTitle(), option.getJavaType(),
+                    rawValue);
 
-        // Post-validate
-        for (OptionRestriction restriction : option.getRestrictions()) {
-            restriction.postValidate(this, option, value);
+            // Post-validate
+            for (OptionRestriction restriction : option.getRestrictions()) {
+                try {
+                    restriction.postValidate(this, option, value);
+                } catch (ParseException e) {
+                    this.parserConfig.getErrorHandler().handleError(e);
+                }
+            }
+
+            List<Pair<OptionMetadata, Object>> newOptions = AirlineUtils.listCopy(parsedOptions);
+            newOptions.add(Pair.of(option, value));
+
+            return new ParseState<T>(global, parserConfig, group, command, newOptions, locationStack, parsedArguments,
+                    currentOption, unparsedInput);
+        } catch (ParseException e) {
+            this.parserConfig.getErrorHandler().handleError(e);
+
+            List<String> newUnparsed = AirlineUtils.listCopy(unparsedInput);
+            newUnparsed.add(rawValue);
+            
+            return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack,
+                    parsedArguments, currentOption, newUnparsed);
         }
-
-        List<Pair<OptionMetadata, Object>> newOptions = AirlineUtils.listCopy(parsedOptions);
-        newOptions.add(Pair.of(option, value));
-
-        return new ParseState<T>(global, parserConfig, group, command, newOptions, locationStack, parsedArguments,
-                currentOption, unparsedInput);
     }
 
     public ParseState<T> withGlobal(GlobalMetadata<T> global) {
@@ -134,23 +154,41 @@ public class ParseState<T> {
     public ParseState<T> withArgument(ArgumentsMetadata arguments, String rawValue) {
         // Pre-validate
         for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-            restriction.preValidate(this, arguments, rawValue);
+            try {
+                restriction.preValidate(this, arguments, rawValue);
+            } catch (ParseException e) {
+                this.parserConfig.getErrorHandler().handleError(e);
+            }
         }
 
         // Convert value
-        Object value = this.parserConfig.getTypeConverter().convert(arguments.getTitle().get(0),
-                arguments.getJavaType(), rawValue);
+        try {
+            Object value = this.parserConfig.getTypeConverter().convert(arguments.getTitle().get(0),
+                    arguments.getJavaType(), rawValue);
 
-        // Post-validate
-        for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-            restriction.postValidate(this, arguments, value);
+            // Post-validate
+            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
+                try {
+                    restriction.postValidate(this, arguments, value);
+                } catch (ParseException e) {
+                    this.parserConfig.getErrorHandler().handleError(e);
+                }
+            }
+
+            List<Object> newArguments = AirlineUtils.listCopy(parsedArguments);
+            newArguments.add(value);
+
+            return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, newArguments,
+                    currentOption, unparsedInput);
+        } catch (ParseException e) {
+            this.parserConfig.getErrorHandler().handleError(e);
+
+            List<String> newUnparsed = AirlineUtils.listCopy(unparsedInput);
+            newUnparsed.add(rawValue);
+            
+            return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack,
+                    parsedArguments, currentOption, newUnparsed);
         }
-
-        List<Object> newArguments = AirlineUtils.listCopy(parsedArguments);
-        newArguments.add(value);
-
-        return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack, newArguments,
-                currentOption, unparsedInput);
     }
 
     public ParseState<T> withUnparsedInput(String input) {
