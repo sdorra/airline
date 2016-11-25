@@ -21,6 +21,7 @@ import org.apache.commons.collections4.IteratorUtils;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.command.SingleCommandParser;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
@@ -98,5 +99,14 @@ public class SingleCommand<C> {
     public C parse(Iterable<String> args) {
         SingleCommandParser<C> parser = new SingleCommandParser<C>();
         return parser.parse(parserConfig, commandMetadata, restrictions, args);
+    }
+    
+    public ParseResult<C> parseWithResult(String... args) {
+        return parseWithResult(AirlineUtils.arrayToList(args));
+    }
+    
+    public ParseResult<C> parseWithResult(Iterable<String> args) {
+        SingleCommandParser<C> parser = new SingleCommandParser<C>();
+        return parser.parseWithResult(parserConfig, commandMetadata, restrictions, args);
     }
 }
