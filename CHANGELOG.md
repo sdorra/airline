@@ -1,5 +1,20 @@
 # Airline - Change Log
 
+## 2.3.0
+
+- Parsing Changes
+   - New `ParserErrorHandler` interface for handling non-fatal parser errors (#53)
+        - `FailFast` - Classic behaviour, throw as soon as error encountered
+        - `FailAll` - Collect and aggregate non-fatal errors and throw as single error
+        - `CollectAll` - Collect all non-fatal errors
+     - New `ParseResult<T>` interface for representing parsing result and accessing success status and errors (if any)
+ - Help Changes
+      - Added `showHelpIfErrors()` method to `HelpOption` for use with error handlers which collect errors e.g. `CollectAll` (#53)
+ - Annotation Changes
+      - New `errorHandler` field on `@Parser` annotation for specifying error handler, defaults to `FailFast` for backwards compatible behaviour (#53)
+      - New `description` field on `@Pattern` to provide human readable explanation of regular expression restriction intent (#48)
+      - Noted in Javadoc that `@Version` supports both properties and Manifest files as data sources (#56)
+
 ## 2.2.0
 
 - Bug Fixes
