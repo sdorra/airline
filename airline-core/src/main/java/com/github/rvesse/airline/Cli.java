@@ -20,9 +20,18 @@ import org.apache.commons.collections4.ListUtils;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
+import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.command.CliParser;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
+/**
+ * Class for encapsulating and parsing CLIs
+ * 
+ * @author rvesse
+ *
+ * @param <C>
+ *            Command type
+ */
 public class Cli<C> {
     /**
      * Creates a builder for specifying a command line in fluent style
@@ -43,7 +52,8 @@ public class Cli<C> {
      * Creates a new CLI from a class annotated with the
      * {@link com.github.rvesse.airline.annotations.Cli} annotation
      * 
-     * @param cliClass CLI class
+     * @param cliClass
+     *            CLI class
      */
     public Cli(Class<?> cliClass) {
         this(MetadataLoader.<C> loadGlobal(cliClass));
@@ -61,16 +71,70 @@ public class Cli<C> {
         this.metadata = metadata;
     }
 
+    /**
+     * Gets the global meta-data
+     * 
+     * @return Meta-data
+     */
     public GlobalMetadata<C> getMetadata() {
         return metadata;
     }
 
+    /**
+     * Parses the arguments to produce a command instance, this may be
+     * {@code null} if the arguments don't identify a command and there was no
+     * appropriate default command configured
+     * 
+     * @param args
+     *            Arguments
+     * @return Command instance
+     */
     public C parse(String... args) {
         return parse(ListUtils.unmodifiableList(AirlineUtils.arrayToList(args)));
     }
 
+    /**
+     * Parses the arguments to produce a command instance, this may be
+     * {@code null} if the arguments don't identify a command and there was no
+     * appropriate default command configured
+     * 
+     * @param args
+     *            Arguments
+     * @return Command instance
+     */
     private C parse(Iterable<String> args) {
         CliParser<C> parser = new CliParser<C>();
         return parser.parse(metadata, args);
+    }
+
+    /**
+     * Parses the arguments to produce a result. The result can be inspected to
+     * see errors (assuming a suitable error handler was used e.g.
+     * {@code CollectAll}) and to get a command instance. This may be
+     * {@code null} if the arguments don't identify a command and there was no
+     * appropriate default command configured
+     * 
+     * @param args
+     *            Arguments
+     * @return Parse result
+     */
+    public ParseResult<C> parseWithResult(String... args) {
+        return parseWithResult(AirlineUtils.arrayToList(args));
+    }
+
+    /**
+     * Parses the arguments to produce a result. The result can be inspected to
+     * see errors (assuming a suitable error handler was used e.g.
+     * {@code CollectAll}) and to get a command instance. This may be
+     * {@code null} if the arguments don't identify a command and there was no
+     * appropriate default command configured
+     * 
+     * @param args
+     *            Arguments
+     * @return Parse result
+     */
+    public ParseResult<C> parseWithResult(Iterable<String> args) {
+        CliParser<C> parser = new CliParser<C>();
+        return parser.parseWithResult(metadata, args);
     }
 }
