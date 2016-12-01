@@ -54,4 +54,4 @@ This website is built with [Jekyll](http://jekyllrb.com), it uses the following 
 - [Table of Contents plugin](https://github.com/ghiculescu/jekyll-table-of-contents) by Alex Ghiculescu 
 - [Multi-Level Push Menu plugin](https://github.com/adgsm/multi-level-push-menu) by Momcilo Dzunic 
 
-All 3rd party resources used on the website are licensed under the MIT License.  Content on this website is licensed under the [Apache License 2.0](http://apache.org/licenses/LICENSE-2.0)
+All 3rd party resources used on the website are licensed under the MIT License.  Content on this website is licensed under the same [Apache License 2.0](http://apache.org/licenses/LICENSE-2.0) used for the library as stated in the above License section.
