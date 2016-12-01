@@ -27,14 +27,17 @@ public class FailAll extends AbstractCollectingHandler {
     public <T> ParseResult<T> finished(ParseState<T> state) {
         Collection<ParseException> errors = getCollection();
         if (errors.size() == 1) {
+            // Single error handled, throw as-is
             throw errors.iterator().next();
         } else if (errors.size() > 1) {
-            ParseException aggEx = new ParseException("Parsing encountered %d error(s)", errors.size());
+            // Multiple errors handled, throw aggregation noting suppressed errors
+            ParseException aggEx = new ParseException("Parsing encountered %d errors, see suppressed errors for details", errors.size());
             for (ParseException e : errors) {
                 aggEx.addSuppressed(e);
             }
             throw aggEx;
         } else {
+            // Can only reach here if there were no errors handled i.e. no errors!
             return new ParseResult<>(state, null);
         }
     }

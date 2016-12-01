@@ -80,6 +80,12 @@ public class ParseResult<T> {
 
     /**
      * Gets the command if one was successfully parsed
+     * <p>
+     * Note that a command may have been parsed even when errors have been
+     * detected and handled by the error handler. Therefore you should check
+     * {@link #wasSuccessful()} and act accordingly before assuming that it is
+     * safe to run the parsed command.
+     * </p>
      * 
      * @return Command, or {@code null} if no command was parsed
      */

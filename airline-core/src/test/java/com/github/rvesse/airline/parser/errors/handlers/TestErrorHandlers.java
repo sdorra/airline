@@ -46,16 +46,40 @@ public class TestErrorHandlers {
                 .parseWithResult();
         Assert.assertFalse(result.wasSuccessful());
         Assert.assertEquals(result.getErrors().size(), 1);
+        Assert.assertNotNull(result.getCommand());
     }
 
     @Test
     public void errorHandlerFailAll() {
         try {
-            ParseResult<Strings> result = SingleCommand
-                    .<Strings> singleCommand(Strings.class, this.<Strings> prepareParser(new FailAll()))
+            SingleCommand.<Strings> singleCommand(Strings.class, this.<Strings> prepareParser(new FailAll()))
                     .parseWithResult("--not-empty", "", "--not-blank", "  ");
         } catch (ParseException e) {
             Assert.assertEquals(e.getSuppressed().length, 2);
         }
+    }
+
+    @Test
+    public void errorHandlerCollectAllHelp01() {
+        ParseResult<Strings> result = SingleCommand.<Strings> singleCommand(Strings.class, this.<Strings> prepareParser(new CollectAll()))
+                .parseWithResult("--not-empty", "", "--not-blank", "  ");
+        Assert.assertFalse(result.wasSuccessful());
+        Assert.assertEquals(result.getErrors().size(), 2);
+        Assert.assertNotNull(result.getCommand());
+        
+        Strings cmd = result.getCommand();
+        Assert.assertTrue(cmd.helpOption.showHelpIfErrors(result));
+    }
+    
+    @Test
+    public void errorHandlerCollectAllHelp02() {
+        ParseResult<Strings> result = SingleCommand.<Strings> singleCommand(Strings.class, this.<Strings> prepareParser(new CollectAll()))
+                .parseWithResult("--not-empty", "foo", "--not-blank", "non-blank");
+        Assert.assertTrue(result.wasSuccessful());
+        Assert.assertEquals(result.getErrors().size(), 0);
+        Assert.assertNotNull(result.getCommand());
+        
+        Strings cmd = result.getCommand();
+        Assert.assertFalse(cmd.helpOption.showHelpIfErrors(result));
     }
 }

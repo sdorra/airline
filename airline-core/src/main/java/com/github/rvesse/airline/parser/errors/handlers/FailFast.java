@@ -28,6 +28,7 @@ public class FailFast implements ParserErrorHandler {
 
     @Override
     public <T> ParseResult<T> finished(ParseState<T> state) {
+        // Can only reach here if no errors handled so there were no errors
         return new ParseResult<T>(state, null);
     }
 }

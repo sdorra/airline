@@ -15,6 +15,9 @@
  */
 package com.github.rvesse.airline.restrictions;
 
+import javax.inject.Inject;
+
+import com.github.rvesse.airline.HelpOption;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.MaxLength;
@@ -45,5 +48,8 @@ public class Strings {
     @Option(name = "--tel")
     @Pattern(pattern = "(\\+1-)?\\d{3}-\\d{3}-\\d{4}", description = "Must provide a telephone number in standard US format e.g. +1-800-123-4567")
     public String tel;
+    
+    @Inject
+    public HelpOption<Strings> helpOption = new HelpOption<>();
     
 }
