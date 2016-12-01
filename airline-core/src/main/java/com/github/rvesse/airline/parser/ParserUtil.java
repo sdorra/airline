@@ -51,7 +51,6 @@ public class ParserUtil {
                 new DefaultCommandFactory<T>());
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T injectOptions(T commandInstance, Iterable<OptionMetadata> options,
             List<Pair<OptionMetadata, Object>> parsedOptions, ArgumentsMetadata arguments,
             Iterable<Object> parsedArguments, Iterable<Accessor> metadataInjection, Map<Class<?>, Object> bindings) {

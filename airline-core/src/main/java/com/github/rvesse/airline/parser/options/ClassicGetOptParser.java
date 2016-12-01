@@ -92,7 +92,14 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
             // option parser
             if (first)
                 return null;
-            throw new ParseOptionUnexpectedException("Short options style can not be used with option %s", option);
+
+            // Produce an error, can't use short style options with an option
+            // with an arity greater than one
+            // Return the modified state anyway as we don't want to retry
+            // processing this option in that case
+            state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionUnexpectedException(
+                    "Short options style can not be used with option %s as the arity was not 0 or 1", option));
+            return nextState;
         }
 
         // consume the current token

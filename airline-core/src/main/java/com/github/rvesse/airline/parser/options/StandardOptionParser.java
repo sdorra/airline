@@ -66,9 +66,12 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
             }
 
             if (count != option.getArity()) {
-                throw new ParseOptionMissingValueException(
-                        "Too few option values received for option %s (%d values expected but only found %d)",
-                        option.getTitle(), option.getOptions().iterator().next(), option.getArity(), count);
+                state.getParserConfiguration().getErrorHandler()
+                        .handleError(new ParseOptionMissingValueException(
+                                "Too few option values received for option %s (%d values expected but only found %d)",
+                                option.getTitle(), option.getOptions().iterator().next(), option.getArity(), count));
+                return state;
+
             }
             state = state.popContext();
         }

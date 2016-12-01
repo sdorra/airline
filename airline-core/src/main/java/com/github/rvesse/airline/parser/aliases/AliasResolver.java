@@ -59,7 +59,8 @@ public class AliasResolver<T> extends AbstractParser<T> {
 
         do {
             // Try to find an alias
-            AliasMetadata alias = CollectionUtils.find(state.getParserConfiguration().getAliases(), new AliasFinder(tokens.peek()));
+            AliasMetadata alias = CollectionUtils.find(state.getParserConfiguration().getAliases(),
+                    new AliasFinder(tokens.peek()));
 
             // Nothing further to do if no aliases found
             if (alias == null)
@@ -67,7 +68,10 @@ public class AliasResolver<T> extends AbstractParser<T> {
 
             // Check for circular references
             if (!aliasesSeen.add(alias.getName())) {
-                throw new ParseAliasCircularReferenceException(alias.getName(), aliasesSeen);
+                // Handle the error and exit alias resolution
+                state.getParserConfiguration().getErrorHandler()
+                        .handleError(new ParseAliasCircularReferenceException(alias.getName(), aliasesSeen));
+                return tokens;
             }
 
             // Can we override built-ins?

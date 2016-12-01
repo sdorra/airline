@@ -108,15 +108,19 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
 
             // Parse value as a list
             List<String> listValues = getValues(list);
-            if (listValues.size() < option.getArity())
-                throw new ParseOptionMissingValueException(
+            if (listValues.size() < option.getArity()) {
+                state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionMissingValueException(
                         "Too few option values received for option %s in list value '%s' (%d values expected but only found %d)",
                         option.getTitle(), option.getOptions().iterator().next(), list, option.getArity(),
-                        listValues.size());
-            if (listValues.size() > option.getArity())
-                throw new ParseOptionUnexpectedException(
+                        listValues.size()));
+                return state;
+            }
+            if (listValues.size() > option.getArity()) {
+                state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionUnexpectedException(
                         "Too many option values received for option %s in list value '%s' (%d values expected but found %d)",
-                        option.getOptions().iterator().next(), list, option.getArity(), listValues.size());
+                        option.getOptions().iterator().next(), list, option.getArity(), listValues.size()));
+                return state;
+            }
 
             // Parse individual values and assign to option
             for (String value : listValues) {
