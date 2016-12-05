@@ -24,13 +24,13 @@ import java.lang.annotation.Target;
 
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.SingleCommand;
-import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
 
 /**
  * Class annotation used to declaratively specify a parser configuration

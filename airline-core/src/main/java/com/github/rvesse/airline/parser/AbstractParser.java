@@ -15,8 +15,8 @@
  */
 package com.github.rvesse.airline.parser;
 
-import com.github.rvesse.airline.TypeConverter;
-import com.github.rvesse.airline.DefaultTypeConverter;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
 
 /**
  * Abstract base class for parsers providing some utility methods

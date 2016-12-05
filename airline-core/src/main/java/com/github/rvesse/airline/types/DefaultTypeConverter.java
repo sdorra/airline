@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.types;
 
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
@@ -68,7 +68,7 @@ public class DefaultTypeConverter implements TypeConverter {
      * @param value
      *            String to convert
      */
-    protected void checkArguments(String name, Class<?> type, String value) {
+    public static void checkArguments(String name, Class<?> type, String value) {
         if (name == null)
             throw new NullPointerException("name is null");
         if (type == null)

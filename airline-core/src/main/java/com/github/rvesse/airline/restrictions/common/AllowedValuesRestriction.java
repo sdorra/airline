@@ -18,14 +18,14 @@ package com.github.rvesse.airline.restrictions.common;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.github.rvesse.airline.DefaultTypeConverter;
-import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseInvalidRestrictionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {

@@ -39,6 +39,7 @@ import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.common.PartialRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.comparators.StringHierarchyComparator;
 import com.github.rvesse.airline.utils.predicates.parser.CommandTypeFinder;

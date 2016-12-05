@@ -21,12 +21,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
-import com.github.rvesse.airline.TypeConverter;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
 import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**

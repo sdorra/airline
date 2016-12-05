@@ -15,8 +15,8 @@
  */
 package com.github.rvesse.airline.examples.userguide.practise;
 
-import com.github.rvesse.airline.ConvertResult;
-import com.github.rvesse.airline.DefaultTypeConverter;
+import com.github.rvesse.airline.types.ConvertResult;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
 
 /**
  * An example of an extended type converter that adds support for converting

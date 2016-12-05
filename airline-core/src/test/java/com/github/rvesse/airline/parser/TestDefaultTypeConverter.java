@@ -18,9 +18,9 @@ package com.github.rvesse.airline.parser;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.rvesse.airline.DefaultTypeConverter;
-import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
 
 public class TestDefaultTypeConverter {
 
