@@ -21,7 +21,7 @@ public class KiloAs1024 extends MultiSequenceAbbreviatedNumericTypeConverter {
 
     public KiloAs1024() {
         super(false, Collections.<String, Integer> emptyMap(), 1024, new String[][] {
-                new String[] { "k", "m", "b", "g", "t", "p" }, new String[] { "kb", "mb", "gb", "tb", "pb" } });
+                new String[] { "k", "m", "g", "t", "p" }, new String[] { "kb", "mb", "gb", "tb", "pb" } });
     }
 
 }
