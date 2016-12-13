@@ -1,30 +1,42 @@
-package com.github.rvesse.airline.types;
+/**
+ * Copyright (C) 2010-16 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.rvesse.airline.types.numerics;
 
-import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
+import com.github.rvesse.airline.model.ArgumentsMetadata;
+import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.types.ConvertResult;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
+import com.github.rvesse.airline.types.TypeConverterProvider;
 
-public class NumericTypeConverter implements TypeConverter {
+public class DefaultNumericConverter implements TypeConverterProvider, NumericTypeConverter {
 
     @Override
-    public final Object convert(String name, Class<?> type, String value) {
-        DefaultTypeConverter.checkArguments(name, type, value);
-
-        ConvertResult result = tryConvertNumerics(name, type, value);
-        if (result.wasSuccessfull())
-            return result.getConvertedValue();
-
-        throw new ParseOptionConversionException(name, value, type.getSimpleName());
+    public <T> TypeConverter getTypeConverter(OptionMetadata option, ParseState<T> state) {
+        return new DefaultTypeConverter(this);
     }
 
-    /**
-     * Tries to convert common numeric types
-     * 
-     * @param type
-     *            Type
-     * @param value
-     *            Value
-     * @return Conversion result
-     */
-    protected ConvertResult tryConvertNumerics(String name, Class<?> type, String value) {
+    @Override
+    public <T> TypeConverter getTypeConverter(ArgumentsMetadata arguments, ParseState<T> state) {
+        return new DefaultTypeConverter(this);
+    }
+
+    @Override
+    public ConvertResult tryConvertNumerics(String name, Class<?> type, String value) {
         try {
             if (Byte.class.isAssignableFrom(type) || Byte.TYPE.isAssignableFrom(type)) {
                 return tryConvertByte(name, value);

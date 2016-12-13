@@ -30,7 +30,7 @@ public class ExtendedTypeConverter extends DefaultTypeConverter {
         checkArguments(name, type, value);
 
         // Try and convert from a parse(String) method
-        ConvertResult result = this.tryConvertStringMethod(type, value, "parse");
+        ConvertResult result = this.tryConvertStringMethod(name, type, value, "parse");
         if (result.wasSuccessfull())
             return result.getConvertedValue();
 

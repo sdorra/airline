@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.types;
 
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -30,28 +32,39 @@ import java.lang.reflect.Method;
  * </p>
  */
 public class DefaultTypeConverter implements TypeConverter {
+
+    private final NumericTypeConverter numericConverter;
+    
+    public DefaultTypeConverter() {
+        this(null);
+    }
+
+    public DefaultTypeConverter(NumericTypeConverter numericConverter) {
+        this.numericConverter = numericConverter != null ? numericConverter : new DefaultNumericConverter();
+    }
+
     @Override
     public Object convert(String name, Class<?> type, String value) {
         checkArguments(name, type, value);
 
         // Firstly try the standard Java types
-        ConvertResult result = tryConvertBasicTypes(type, value);
+        ConvertResult result = tryConvertBasicTypes(name, type, value);
         if (result.wasSuccessfull())
             return result.getConvertedValue();
 
         // Then look for a static fromString(String) method
-        result = tryConvertFromString(type, value);
+        result = tryConvertFromString(name, type, value);
         if (result.wasSuccessfull())
             return result.getConvertedValue();
 
         // Then look for a static valueOf(String) method
         // This covers enums which have a valueOf method
-        result = tryConvertFromValueOf(type, value);
+        result = tryConvertFromValueOf(name, type, value);
         if (result.wasSuccessfull())
             return result.getConvertedValue();
 
         // Finally look for a constructor taking a string
-        result = tryConvertStringConstructor(type, value);
+        result = tryConvertStringConstructor(name, type, value);
         if (result.wasSuccessfull())
             return result.getConvertedValue();
 
@@ -87,7 +100,7 @@ public class DefaultTypeConverter implements TypeConverter {
      *            value
      * @return Conversion result
      */
-    protected final ConvertResult tryConvertStringConstructor(Class<?> type, String value) {
+    protected final ConvertResult tryConvertStringConstructor(String name, Class<?> type, String value) {
         try {
             Constructor<?> constructor = type.getConstructor(String.class);
             return new ConvertResult(constructor.newInstance(value));
@@ -106,8 +119,8 @@ public class DefaultTypeConverter implements TypeConverter {
      *            Value
      * @return Conversion result
      */
-    protected final ConvertResult tryConvertFromValueOf(Class<?> type, String value) {
-        return tryConvertStringMethod(type, value, "valueOf");
+    protected final ConvertResult tryConvertFromValueOf(String name, Class<?> type, String value) {
+        return tryConvertStringMethod(name, type, value, "valueOf");
     }
 
     /**
@@ -120,8 +133,8 @@ public class DefaultTypeConverter implements TypeConverter {
      *            Value
      * @return Conversion result
      */
-    protected final ConvertResult tryConvertFromString(Class<?> type, String value) {
-        return tryConvertStringMethod(type, value, "fromString");
+    protected final ConvertResult tryConvertFromString(String name, Class<?> type, String value) {
+        return tryConvertStringMethod(name, type, value, "fromString");
 
     }
 
@@ -136,7 +149,7 @@ public class DefaultTypeConverter implements TypeConverter {
      *            Name of the method to invoke
      * @return Conversion Result
      */
-    protected final ConvertResult tryConvertStringMethod(Class<?> type, String value, String methodName) {
+    protected final ConvertResult tryConvertStringMethod(String name, Class<?> type, String value, String methodName) {
         try {
             Method method = type.getMethod(methodName, String.class);
             if (method.getReturnType().isAssignableFrom(type)) {
@@ -156,24 +169,14 @@ public class DefaultTypeConverter implements TypeConverter {
      *            Value
      * @return Conversion result
      */
-    protected final ConvertResult tryConvertBasicTypes(Class<?> type, String value) {
+    protected final ConvertResult tryConvertBasicTypes(String name, Class<?> type, String value) {
         try {
             if (String.class.isAssignableFrom(type)) {
                 return new ConvertResult(value);
             } else if (Boolean.class.isAssignableFrom(type) || Boolean.TYPE.isAssignableFrom(type)) {
                 return new ConvertResult(Boolean.valueOf(value));
-            } else if (Byte.class.isAssignableFrom(type) || Byte.TYPE.isAssignableFrom(type)) {
-                return new ConvertResult(Byte.valueOf(value));
-            } else if (Short.class.isAssignableFrom(type) || Short.TYPE.isAssignableFrom(type)) {
-                return new ConvertResult(Short.valueOf(value));
-            } else if (Integer.class.isAssignableFrom(type) || Integer.TYPE.isAssignableFrom(type)) {
-                return new ConvertResult(Integer.valueOf(value));
-            } else if (Long.class.isAssignableFrom(type) || Long.TYPE.isAssignableFrom(type)) {
-                return new ConvertResult(Long.valueOf(value));
-            } else if (Float.class.isAssignableFrom(type) || Float.TYPE.isAssignableFrom(type)) {
-                return new ConvertResult(Float.valueOf(value));
-            } else if (Double.class.isAssignableFrom(type) || Double.TYPE.isAssignableFrom(type)) {
-                return new ConvertResult(Double.valueOf(value));
+            } else {
+                return this.numericConverter.tryConvertNumerics(name, type, value);
             }
         } catch (Exception ignored) {
         }
