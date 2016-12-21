@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.types.numerics;
+package com.github.rvesse.airline.types.numerics.abbreviated;
 
 import java.util.Collection;
+
+import com.github.rvesse.airline.types.numerics.ComplexNumericTypeConverter;
+import com.github.rvesse.airline.types.numerics.NumericCandidate;
 
 public abstract class AbbreviatedNumericTypeConverter extends ComplexNumericTypeConverter {
 

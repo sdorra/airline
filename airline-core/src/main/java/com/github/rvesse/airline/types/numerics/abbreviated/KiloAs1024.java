@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.types.numerics;
+package com.github.rvesse.airline.types.numerics.abbreviated;
 
 import java.util.Collections;
 
-public class KiloAs1000 extends SequenceAbbreviatedNumericTypeConverter {
+public class KiloAs1024 extends MultiSequenceAbbreviatedNumericTypeConverter {
 
-    public KiloAs1000() {
-        super(false, Collections.<String, Integer> emptyMap(), 1000, "k", "m", "b", "t");
+    public KiloAs1024() {
+        super(false, Collections.<String, Integer> emptyMap(), 1024, new String[][] {
+                new String[] { "k", "m", "g", "t", "p" }, new String[] { "kb", "mb", "gb", "tb", "pb" } });
     }
+
 }

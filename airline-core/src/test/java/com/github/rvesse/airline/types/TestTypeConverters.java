@@ -21,9 +21,12 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
-import com.github.rvesse.airline.types.numerics.KiloAs1000;
-import com.github.rvesse.airline.types.numerics.KiloAs1024;
 import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
+import com.github.rvesse.airline.types.numerics.abbreviated.KiloAs1000;
+import com.github.rvesse.airline.types.numerics.abbreviated.KiloAs1024;
+import com.github.rvesse.airline.types.numerics.bases.Binary;
+import com.github.rvesse.airline.types.numerics.bases.Hexadecimal;
+import com.github.rvesse.airline.types.numerics.bases.Octal;
 
 public class TestTypeConverters {
 
@@ -187,6 +190,29 @@ public class TestTypeConverters {
                 NUMBER_RANDOM_TESTS, converter.getClass(), multiplier, min, max, type, divisor, suffix, good, bad));
     }
 
+    private ConvertResult doConversion(NumericTypeConverter converter, String value, Class<?> type) {
+        return converter.tryConvertNumerics("test", type, value);
+    }
+
+    private void checkGoodConversion(NumericTypeConverter converter, String value, Class<?> type, Object expected) {
+        ConvertResult result = doConversion(converter, value, type);
+        Assert.assertTrue(result.wasSuccessfull());
+        Assert.assertEquals(result.getConvertedValue(), expected);
+    }
+
+    private void checkBadConversion(NumericTypeConverter converter, String value, Class<?> type) {
+        ConvertResult result = doConversion(converter, value, type);
+        Assert.assertFalse(result.wasSuccessfull());
+    }
+
+    @Test
+    public void numeric_kilo_1000_specifics() {
+        KiloAs1000 converter = new KiloAs1000();
+        checkGoodConversion(converter, "1k", Short.class, (short) 1000);
+        checkGoodConversion(converter, "10k", Short.class, (short) 10000);
+        checkBadConversion(converter, "100k", Short.class);
+    }
+
     @Test
     public void numeric_kilo_1000_long_01() {
         checkIntegerAbbreviationKilo(new KiloAs1000(), 1000, Long.MIN_VALUE, Long.MAX_VALUE, Long.class, 1000l, "k");
@@ -288,5 +314,56 @@ public class TestTypeConverters {
     @Test
     public void numeric_kilo_1024_short_02() {
         checkIntegerAbbreviationKilo(new KiloAs1024(), 1024, Short.MIN_VALUE, Short.MAX_VALUE, Short.class, 1024l, "k");
+    }
+
+    private void checkAlternateRadix(NumericTypeConverter converter, int radix, long min, long max, Class<?> type) {
+        Random random = new Random();
+        int good = 0, bad = 0;
+        for (int i = 0; i < NUMBER_RANDOM_TESTS; i++) {
+            long number = random.nextLong();
+
+            ConvertResult result = converter.tryConvertNumerics("test", type,
+                    String.format("%s", Long.toString(number, radix)));
+            if (number < min || number > max) {
+                Assert.assertFalse(result.wasSuccessfull());
+                bad++;
+            } else {
+                if (!result.wasSuccessfull())
+                    System.out.println(String.format("Expected radix %d representation %s to expand to %d but failed",
+                            radix, Long.toString(number, radix), number));
+                Assert.assertTrue(result.wasSuccessfull());
+                Assert.assertEquals(result.getConvertedValue(), number);
+                good++;
+            }
+        }
+
+        System.out.println(String.format(
+                "Ran %,d test cases for %s with settings (radix=%,d, min=%,d, max=%,d, type=%s) with %,d good values and %,d bad values",
+                NUMBER_RANDOM_TESTS, converter.getClass(), radix, min, max, type, good, bad));
+    }
+    
+    private void checkAlternateRadix(NumericTypeConverter converter, int radix) {
+        checkAlternateRadix(converter, radix, Long.MIN_VALUE, Long.MAX_VALUE, Long.class);
+        checkAlternateRadix(converter, radix, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.class);
+        checkAlternateRadix(converter, radix, Short.MIN_VALUE, Short.MAX_VALUE, Short.class);
+        checkAlternateRadix(converter, radix, Byte.MIN_VALUE, Byte.MAX_VALUE, Byte.class);
+    }
+    
+    @Test
+    public void numeric_radix_16() {
+        NumericTypeConverter converter = new Hexadecimal();
+        checkAlternateRadix(converter, 16);
+    }
+    
+    @Test
+    public void numeric_radix_8() {
+        NumericTypeConverter converter = new Octal();
+        checkAlternateRadix(converter, 8);
+    }
+    
+    @Test
+    public void numeric_radix_2() {
+        NumericTypeConverter converter = new Binary();
+        checkAlternateRadix(converter, 2);
     }
 }

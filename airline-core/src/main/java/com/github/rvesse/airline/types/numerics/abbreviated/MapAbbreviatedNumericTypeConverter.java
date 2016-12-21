@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.types.numerics;
+package com.github.rvesse.airline.types.numerics.abbreviated;
 
 import java.util.Collection;
 import java.util.HashMap;
