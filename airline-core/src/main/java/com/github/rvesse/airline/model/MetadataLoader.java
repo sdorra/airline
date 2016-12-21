@@ -40,6 +40,8 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.common.PartialRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverterProvider;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.comparators.StringHierarchyComparator;
 import com.github.rvesse.airline.utils.predicates.parser.CommandTypeFinder;
@@ -84,6 +86,11 @@ public class MetadataLoader {
             builder = builder.withTypeConverter(ParserUtil.createInstance(parserConfig.typeConverter()));
         } else {
             builder = builder.withDefaultTypeConverter();
+        }
+        if (!parserConfig.numericTypeConverter().equals(DefaultNumericConverter.class)) {
+            builder = builder.withNumericTypeConverter(ParserUtil.createInstance(parserConfig.numericTypeConverter()));
+        } else {
+            builder = builder.withDefaultNumericTypeConverter();
         }
         if (!parserConfig.commandFactory().equals(DefaultCommandFactory.class)) {
             builder = builder.withCommandFactory(ParserUtil.createInstance(parserConfig.commandFactory()));
@@ -575,6 +582,9 @@ public class MetadataLoader {
                             restrictions.add(restriction);
                         }
                     }
+                    
+                    // Type Converter provider
+                    TypeConverterProvider provider = ParserUtil.createInstance(optionAnnotation.typeConverterProvider());
 
                     //@formatter:off
                     OptionMetadata optionMetadata = new OptionMetadata(optionType, 
@@ -586,6 +596,7 @@ public class MetadataLoader {
                                                                        override, 
                                                                        sealed,
                                                                        restrictions,
+                                                                       provider,
                                                                        path);
                     //@formatter:on
                     switch (optionType) {
@@ -652,6 +663,7 @@ public class MetadataLoader {
                     }
 
                     String description = argumentsAnnotation.description();
+                    TypeConverterProvider provider = ParserUtil.createInstance(argumentsAnnotation.typeConverterProvider());
 
                     Map<Class<? extends Annotation>, Set<Integer>> partials = loadPartials(field);
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();
@@ -675,6 +687,7 @@ public class MetadataLoader {
                     injectionMetadata.arguments.add(new ArgumentsMetadata(titles, 
                                                                           description,
                                                                           restrictions,
+                                                                          provider,
                                                                           path));
                     //@formatter:on
                 }

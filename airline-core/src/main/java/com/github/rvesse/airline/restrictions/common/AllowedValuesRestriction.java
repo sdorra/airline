@@ -44,13 +44,15 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
         if (this.rawValues.isEmpty())
             return;
 
-        Set<Object> allowedValues = createAllowedValues(state, option.getTitle(), option.getJavaType());
+        Set<Object> allowedValues = createAllowedValues(state, option.getTitle(), option.getJavaType(),
+                option.getTypeConverterProvider().getTypeConverter(option, state));
         if (!allowedValues.contains(value)) {
             throw new ParseOptionIllegalValueException(option.getTitle(), value, allowedValues);
         }
     }
 
-    protected synchronized <T> Set<Object> createAllowedValues(ParseState<T> state, String title, Class<?> type) {
+    protected synchronized <T> Set<Object> createAllowedValues(ParseState<T> state, String title, Class<?> type,
+            TypeConverter converter) {
         // Re-use cached values if possible
         if (currentState == state) {
             return allowedValues;
@@ -58,7 +60,6 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
 
         // Convert values
         Set<Object> actualValues = new LinkedHashSet<Object>();
-        TypeConverter converter = state.getParserConfiguration().getTypeConverter();
         if (converter == null)
             converter = new DefaultTypeConverter();
         for (String rawValue : this.rawValues) {
@@ -84,7 +85,8 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
             return;
 
         String title = getArgumentTitle(state, arguments);
-        Set<Object> allowedValues = createAllowedValues(state, title, arguments.getJavaType());
+        Set<Object> allowedValues = createAllowedValues(state, title, arguments.getJavaType(),
+                arguments.getTypeConverterProvider().getTypeConverter(arguments, state));
         if (!allowedValues.contains(value)) {
             throw new ParseArgumentsIllegalValueException(title, value, allowedValues);
         }

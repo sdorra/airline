@@ -31,10 +31,10 @@ import java.lang.reflect.Method;
  * constructor that takes a string.
  * </p>
  */
-public class DefaultTypeConverter implements TypeConverter {
+public class DefaultTypeConverter extends DefaultTypeConverterProvider implements TypeConverter  {
 
-    private final NumericTypeConverter numericConverter;
-    
+    private NumericTypeConverter numericConverter;
+
     public DefaultTypeConverter() {
         this(null);
     }
@@ -175,11 +175,19 @@ public class DefaultTypeConverter implements TypeConverter {
                 return new ConvertResult(value);
             } else if (Boolean.class.isAssignableFrom(type) || Boolean.TYPE.isAssignableFrom(type)) {
                 return new ConvertResult(Boolean.valueOf(value));
-            } else {
+            } else if (this.numericConverter != null) {
                 return this.numericConverter.tryConvertNumerics(name, type, value);
             }
         } catch (Exception ignored) {
         }
         return ConvertResult.FAILURE;
+    }
+
+    @Override
+    public void setNumericConverter(NumericTypeConverter converter) {
+        this.numericConverter = converter;
+        if (this.numericConverter == null) {
+            this.numericConverter = new DefaultNumericConverter();
+        }
     }
 }

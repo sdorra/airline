@@ -32,6 +32,8 @@ import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.parser.options.StandardOptionParser;
 import com.github.rvesse.airline.types.DefaultTypeConverter;
 import com.github.rvesse.airline.types.TypeConverter;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
 /**
  * Builder for parser configurations
@@ -42,6 +44,7 @@ import com.github.rvesse.airline.types.TypeConverter;
 public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
 
     protected TypeConverter typeConverter = new DefaultTypeConverter();
+    protected NumericTypeConverter numericTypeConverter = new DefaultNumericConverter();
     protected final Map<String, AliasBuilder<C>> aliases = new HashMap<>();
     protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
@@ -219,6 +222,29 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         return this;
     }
 
+    /**
+     * Indicates the desired numeric type converter to use, this is passed as an
+     * argument to the given type converter
+     * 
+     * @param converter
+     *            Numeric type converter
+     * @return Builder
+     */
+    public ParserBuilder<C> withNumericTypeConverter(NumericTypeConverter converter) {
+        this.numericTypeConverter = converter;
+        return this;
+    }
+
+    /**
+     * Indicates that default numeric type conversion should be used
+     * 
+     * @return Builder
+     */
+    public ParserBuilder<C> withDefaultNumericTypeConverter() {
+        this.numericTypeConverter = null;
+        return this;
+    }
+
     public ParserBuilder<C> withErrorHandler(ParserErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
         return this;
@@ -355,6 +381,11 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         } else {
             aliasData = new ArrayList<>();
         }
+        
+        if (typeConverter == null) {
+            typeConverter = new DefaultTypeConverter();
+        }
+        typeConverter.setNumericConverter(this.numericTypeConverter);
 
         return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, errorHandler,
                 allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns,

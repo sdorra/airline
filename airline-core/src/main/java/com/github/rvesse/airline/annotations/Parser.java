@@ -31,6 +31,8 @@ import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.types.DefaultTypeConverter;
 import com.github.rvesse.airline.types.TypeConverter;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
 /**
  * Class annotation used to declaratively specify a parser configuration
@@ -190,6 +192,15 @@ public @interface Parser {
      * @return Type converter class
      */
     Class<? extends TypeConverter> typeConverter() default DefaultTypeConverter.class;
+
+    /**
+     * Sets the numeric type converter to use, this is used in conjunction with
+     * the value of the {@link #typeConverter()}, if that class does not respect
+     * {@link NumericTypeConverter} instances then this field has no effect
+     * 
+     * @return Numeric type converter class
+     */
+    Class<? extends NumericTypeConverter> numericTypeConverter() default DefaultNumericConverter.class;
 
     /**
      * Sets the error handler to use, defaults to {@code FailFast} which throws

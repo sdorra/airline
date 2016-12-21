@@ -26,6 +26,7 @@ import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.types.TypeConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.ArrayList;
@@ -98,8 +99,8 @@ public class ParseState<T> {
 
         try {
             // Convert value
-            Object value = this.parserConfig.getTypeConverter().convert(option.getTitle(), option.getJavaType(),
-                    rawValue);
+            TypeConverter converter = option.getTypeConverterProvider().getTypeConverter(option, this);
+            Object value = converter.convert(option.getTitle(), option.getJavaType(), rawValue);
 
             // Post-validate
             for (OptionRestriction restriction : option.getRestrictions()) {
@@ -120,7 +121,7 @@ public class ParseState<T> {
 
             List<String> newUnparsed = AirlineUtils.listCopy(unparsedInput);
             newUnparsed.add(rawValue);
-            
+
             return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack,
                     parsedArguments, currentOption, newUnparsed);
         }
@@ -163,8 +164,8 @@ public class ParseState<T> {
 
         // Convert value
         try {
-            Object value = this.parserConfig.getTypeConverter().convert(arguments.getTitle().get(0),
-                    arguments.getJavaType(), rawValue);
+            TypeConverter converter = arguments.getTypeConverterProvider().getTypeConverter(arguments, this);
+            Object value = converter.convert(arguments.getTitle().get(0), arguments.getJavaType(), rawValue);
 
             // Post-validate
             for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
@@ -185,7 +186,7 @@ public class ParseState<T> {
 
             List<String> newUnparsed = AirlineUtils.listCopy(unparsedInput);
             newUnparsed.add(rawValue);
-            
+
             return new ParseState<T>(global, parserConfig, group, command, parsedOptions, locationStack,
                     parsedArguments, currentOption, newUnparsed);
         }
