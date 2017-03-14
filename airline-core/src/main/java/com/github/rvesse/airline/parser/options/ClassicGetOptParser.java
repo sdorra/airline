@@ -66,6 +66,9 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
             // for no argument options, process the option and remove the
             // character from the token
             if (option.getArity() == 0) {
+                // Note - Flag negation is not usable with single character
+                // options so value will always be set as true for flag i.e.
+                // zero arity options
                 nextState = nextState.withOptionValue(option, Boolean.TRUE.toString()).popContext();
                 first = false;
                 continue;

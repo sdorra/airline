@@ -53,7 +53,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         state = state.withArgument(arguments, "text");
@@ -73,7 +73,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         // Should fail restriction because first argument cannot be blank
@@ -91,7 +91,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         state = state.withArgument(arguments, "foo");
@@ -111,7 +111,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         // Should fail restriction because first argument is restricted to a set
@@ -130,7 +130,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         state = state.withArgument(arguments, "foo");
@@ -150,7 +150,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         // Should fail restriction because first argument is restricted to a set
@@ -169,7 +169,7 @@ public class TestPartialRestriction {
         List<Field> fields = Collections.singletonList(Partial.class.getField("kvps"));
 
         OptionMetadata option = new OptionMetadata(OptionType.COMMAND, names, "Key Value", "", 2, false, false, false,
-                restrictions, fields);
+                restrictions, null, fields);
 
         ParseState<Partial> state = ParseState.newInstance();
         state = state.withOptionValue(option, "a");
@@ -189,7 +189,7 @@ public class TestPartialRestriction {
         restrictions.add(restriction);
         List<Field> fields = Collections.singletonList(Partial.class.getField("args"));
 
-        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, fields);
+        ArgumentsMetadata arguments = new ArgumentsMetadata(titles, "", restrictions, null, fields);
 
         // Should pass because finalValidate() restrictions are not respected by
         // partial restrictions

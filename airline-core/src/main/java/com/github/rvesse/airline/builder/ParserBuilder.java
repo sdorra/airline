@@ -49,7 +49,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
-    protected String argsSeparator;
+    protected String argsSeparator, flagNegationPrefix;
     protected UserAliasesSource<C> userAliases;
     protected ParserErrorHandler errorHandler;
 
@@ -344,10 +344,26 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * >
      * 
      * @param separator
-     * @return
+     * @return Builder
      */
     public ParserBuilder<C> withArgumentsSeparator(String separator) {
         this.argsSeparator = separator;
+        return this;
+    }
+
+    /**
+     * Sets the flag negation prefix, this is used to determine whether to set a
+     * flag option (a zero arity option) to {@code false} rather than the usual
+     * behaviour of setting it to {@code true}. Options must have appropriately
+     * prefixed names defined for this prefix to have any effect i.e. setting it
+     * does not automatically enable negation for flag options.
+     * 
+     * @param prefix
+     *            Flag negation prefix
+     * @return Builder
+     */
+    public ParserBuilder<C> withFlagNegationPrefix(String prefix) {
+        this.flagNegationPrefix = prefix;
         return this;
     }
 
@@ -381,7 +397,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         } else {
             aliasData = new ArrayList<>();
         }
-        
+
         if (typeConverter == null) {
             typeConverter = new DefaultTypeConverter();
         }
@@ -389,6 +405,6 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
 
         return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, errorHandler,
                 allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns,
-                aliasesMayChain, argsSeparator);
+                aliasesMayChain, argsSeparator, flagNegationPrefix);
     }
 }

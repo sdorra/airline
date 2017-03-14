@@ -94,7 +94,14 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
         String list = noSep ? name.substring(2) : null;
         if (option.getArity() == 0) {
             // Zero arity option, consume token and continue
-            state = state.withOptionValue(option, Boolean.TRUE.toString()).popContext();
+            // Determine what value to set
+            // This will depend on whether flag negation is enabled and if so
+            // whether the option name used started with the configured negation
+            // prefix
+            String rawBooleanValue = state.getParserConfiguration().allowsFlagNegation()
+                    && StringUtils.startsWith(name, state.getParserConfiguration().getFlagNegationPrefix())
+                            ? Boolean.FALSE.toString() : Boolean.TRUE.toString();
+            state = state.withOptionValue(option, rawBooleanValue).popContext();
         } else {
             if (list == null) {
                 // Can't parse list value if there are no further tokens
@@ -109,16 +116,18 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
             // Parse value as a list
             List<String> listValues = getValues(list);
             if (listValues.size() < option.getArity()) {
-                state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionMissingValueException(
-                        "Too few option values received for option %s in list value '%s' (%d values expected but only found %d)",
-                        option.getTitle(), option.getOptions().iterator().next(), list, option.getArity(),
-                        listValues.size()));
+                state.getParserConfiguration().getErrorHandler()
+                        .handleError(new ParseOptionMissingValueException(
+                                "Too few option values received for option %s in list value '%s' (%d values expected but only found %d)",
+                                option.getTitle(), option.getOptions().iterator().next(), list, option.getArity(),
+                                listValues.size()));
                 return state;
             }
             if (listValues.size() > option.getArity()) {
-                state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionUnexpectedException(
-                        "Too many option values received for option %s in list value '%s' (%d values expected but found %d)",
-                        option.getOptions().iterator().next(), list, option.getArity(), listValues.size()));
+                state.getParserConfiguration().getErrorHandler()
+                        .handleError(new ParseOptionUnexpectedException(
+                                "Too many option values received for option %s in list value '%s' (%d values expected but found %d)",
+                                option.getOptions().iterator().next(), list, option.getArity(), listValues.size()));
                 return state;
             }
 

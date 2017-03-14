@@ -45,13 +45,14 @@ public class ParserMetadata<T> {
     private final UserAliasesSource<T> userAliases;
     private final TypeConverter typeConverter;
     private final CommandFactory<T> commandFactory;
-    private final String argsSeparator;
+    private final String argsSeparator, flagNegationPrefix;
     private final ParserErrorHandler errorHandler;
 
     public ParserMetadata(CommandFactory<T> commandFactory, List<OptionParser<T>> optionParsers,
             TypeConverter typeConverter, ParserErrorHandler errorHandler, boolean allowAbbreviateCommands,
             boolean allowAbbreviatedOptions, List<AliasMetadata> aliases, UserAliasesSource<T> userAliases,
-            boolean aliasesOverrideBuiltIns, boolean aliasesMayChain, String argumentsSeparator) {
+            boolean aliasesOverrideBuiltIns, boolean aliasesMayChain, String argumentsSeparator,
+            String flagNegationPrefix) {
         if (optionParsers == null)
             throw new NullPointerException("optionParsers cannot be null");
         if (aliases == null)
@@ -82,6 +83,9 @@ public class ParserMetadata<T> {
         }
         this.argsSeparator = StringUtils.isNotEmpty(argumentsSeparator) ? argumentsSeparator
                 : DEFAULT_ARGUMENTS_SEPARATOR;
+
+        // Flag negation
+        this.flagNegationPrefix = StringUtils.isNotEmpty(flagNegationPrefix) ? flagNegationPrefix : null;
 
     }
 
@@ -185,6 +189,24 @@ public class ParserMetadata<T> {
         return this.argsSeparator;
     }
 
+    /**
+     * Gets whether this configuration allows flag negation
+     * 
+     * @return True if negation is allowed, false otherwise
+     */
+    public boolean allowsFlagNegation() {
+        return StringUtils.isNotEmpty(this.flagNegationPrefix);
+    }
+
+    /**
+     * Gets the flag negation prefix that is in use (if any)
+     * 
+     * @return Flag negation prefix, may be {@code null} if not enabled
+     */
+    public String getFlagNegationPrefix() {
+        return this.flagNegationPrefix;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -197,6 +219,7 @@ public class ParserMetadata<T> {
         sb.append(", aliases=").append(aliases);
         sb.append(", aliasesOverrideBuiltIns=").append(aliasesOverrideBuiltIns);
         sb.append(", argumentsSeparator='").append(argsSeparator).append("'");
+        sb.append(", flagNegationPrefix='").append(flagNegationPrefix).append("'");
         sb.append("}");
         return sb.toString();
     }

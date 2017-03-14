@@ -209,4 +209,19 @@ public @interface Parser {
      * @return Error handler to use
      */
     Class<? extends ParserErrorHandler> errorHandler() default FailFast.class;
+
+    /**
+     * Sets the flag negation prefix
+     * <p>
+     * If set flag options (those with arity zero) will have their value set to
+     * {@code false} if the name used starts with this prefix. For example if
+     * the prefix is set to {@code --no-} and the user specifies a flag that
+     * begins with this the option will be set to {@code false}. Note that an
+     * appropriate name must be present in the {@link Option#name()} for the
+     * flag option which you wish to allow to be negated.
+     * </p>
+     * 
+     * @return Flag negation prefix
+     */
+    String flagNegationPrefix() default "";
 }

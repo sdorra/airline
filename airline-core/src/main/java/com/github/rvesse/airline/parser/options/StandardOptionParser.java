@@ -18,6 +18,7 @@ package com.github.rvesse.airline.parser.options;
 import java.util.List;
 
 import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.Context;
 import com.github.rvesse.airline.model.OptionMetadata;
@@ -39,11 +40,18 @@ public class StandardOptionParser<T> extends AbstractOptionParser<T> {
             return null;
         }
 
-        tokens.next();
+        String optionName = tokens.next();
         state = state.pushContext(Context.OPTION).withOption(option);
 
         if (option.getArity() == 0) {
-            state = state.withOptionValue(option, Boolean.TRUE.toString()).popContext();
+            // Determine what value to set
+            // This will depend on whether flag negation is enabled and if so
+            // whether the option name used started with the configured negation
+            // prefix
+            String rawBooleanValue = state.getParserConfiguration().allowsFlagNegation()
+                    && StringUtils.startsWith(optionName, state.getParserConfiguration().getFlagNegationPrefix())
+                            ? Boolean.FALSE.toString() : Boolean.TRUE.toString();
+            state = state.withOptionValue(option, rawBooleanValue).popContext();
         } else if (option.getArity() == 1) {
             if (tokens.hasNext()) {
                 state = state.withOptionValue(option, tokens.next()).popContext();
