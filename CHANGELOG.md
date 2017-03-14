@@ -12,6 +12,7 @@
       - Added `showHelpIfErrors()` method to `HelpOption` for use with error handlers which collect errors e.g. `CollectAll` (#53)
  - Annotation Changes
       - New `errorHandler` field on `@Parser` annotation for specifying error handler, defaults to `FailFast` for backwards compatible behaviour (#53)
+      - New `flagNegationPrefix` field on `@Parser` to allow specifying that if a flag option (zero arity option) name starts with that prefix the value should be set to `false` as opposed to setting flags to `true` as is the normal behaviour (#63)
       - New `description` field on `@Pattern` to provide human readable explanation of regular expression restriction intent (#48)
       - Noted in Javadoc that `@Version` supports both properties and Manifest files as data sources (#56)
 
