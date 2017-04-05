@@ -20,6 +20,9 @@ import java.util.Random;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.rvesse.airline.SingleCommand;
+import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
+import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
 import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
 import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 import com.github.rvesse.airline.types.numerics.abbreviated.KiloAs1000;
@@ -341,29 +344,71 @@ public class TestTypeConverters {
                 "Ran %,d test cases for %s with settings (radix=%,d, min=%,d, max=%,d, type=%s) with %,d good values and %,d bad values",
                 NUMBER_RANDOM_TESTS, converter.getClass(), radix, min, max, type, good, bad));
     }
-    
+
     private void checkAlternateRadix(NumericTypeConverter converter, int radix) {
         checkAlternateRadix(converter, radix, Long.MIN_VALUE, Long.MAX_VALUE, Long.class);
         checkAlternateRadix(converter, radix, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.class);
         checkAlternateRadix(converter, radix, Short.MIN_VALUE, Short.MAX_VALUE, Short.class);
         checkAlternateRadix(converter, radix, Byte.MIN_VALUE, Byte.MAX_VALUE, Byte.class);
     }
-    
+
     @Test
     public void numeric_radix_16() {
         NumericTypeConverter converter = new Hexadecimal();
         checkAlternateRadix(converter, 16);
     }
-    
+
     @Test
     public void numeric_radix_8() {
         NumericTypeConverter converter = new Octal();
         checkAlternateRadix(converter, 8);
     }
-    
+
     @Test
     public void numeric_radix_2() {
         NumericTypeConverter converter = new Binary();
         checkAlternateRadix(converter, 2);
+    }
+
+    @Test
+    public void command_mixed_converters_01() {
+        SingleCommand<ArgsRadix> cmd = SingleCommand.singleCommand(ArgsRadix.class);
+        long value = 47000;
+        ArgsRadix radix = cmd.parse("--normal", Long.toString(value), "--hex", Long.toString(value, 16), "--octal",
+                Long.toString(value, 8), "--binary", Long.toString(value, 2), "--kilo", (value / 1000) + "k");
+        
+        Assert.assertEquals(radix.normal, value);
+        Assert.assertEquals(radix.hex, value);
+        Assert.assertEquals(radix.octal, value);
+        Assert.assertEquals(radix.binary, value);
+        Assert.assertEquals(radix.abbrev, value);
+    }
+    
+    @Test
+    public void command_mixed_converters_02() {
+        SingleCommand<ArgsRadix> cmd = SingleCommand.singleCommand(ArgsRadix.class);
+        long value = 47000;
+        ArgsRadix radix = cmd.parse("--normal", Long.toString(value), "--hex", Long.toString(value), "--octal",
+                Long.toString(value));
+        
+        Assert.assertEquals(radix.normal, value);
+        Assert.assertEquals(radix.hex, Long.parseLong(Long.toString(value), 16));
+        Assert.assertEquals(radix.octal, Long.parseLong(Long.toString(value), 8));
+    }
+    
+    @Test
+    public void command_mixed_converters_03() {
+        SingleCommand<ArgsRadix> cmd = SingleCommand.singleCommand(ArgsRadix.class);
+        long value = 47000;
+        ArgsRadix radix = cmd.parse("--kilo", Long.toString(value));
+        
+        Assert.assertEquals(radix.abbrev, value);
+    }
+    
+    @Test(expectedExceptions = ParseOptionConversionException.class)
+    public void command_mixed_converters_04() {
+        SingleCommand<ArgsRadix> cmd = SingleCommand.singleCommand(ArgsRadix.class);
+        long value = 47000;
+        cmd.parse("--binary", Long.toString(value));
     }
 }
