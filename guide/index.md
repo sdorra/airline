@@ -189,6 +189,7 @@ The type parameter given (`Runnable` in this example) specifies a common type fo
 {% include alert.html %}
 Note that since `Cli` is a class and there is also a `@Cli` annotation if both are used in the same class then one will need to use the fully qualified package name to disambiguate.
 
+
 Once we have the `Cli` object we can parse a command like so:
 
 ```java
