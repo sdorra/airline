@@ -76,7 +76,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.2.0`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.3.0`
 
 Use the following maven dependency declaration:
 
@@ -84,11 +84,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `2.3.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
+Snapshot artifacts of the latest source are also available using the version `2.4.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
 ## Build Status
 

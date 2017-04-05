@@ -1,5 +1,8 @@
 # Airline - Change Log
 
+## 2.4.0
+
+
 ## 2.3.0
 
 - Parsing Changes
@@ -8,6 +11,7 @@
         - `FailAll` - Collect and aggregate non-fatal errors and throw as single error
         - `CollectAll` - Collect all non-fatal errors
      - New `ParseResult<T>` interface for representing parsing result and accessing success status and errors (if any)
+     - Support for customising type converter on a per-option/arguments basis (#54)
  - Help Changes
       - Added `showHelpIfErrors()` method to `HelpOption` for use with error handlers which collect errors e.g. `CollectAll` (#53)
  - Annotation Changes
@@ -15,6 +19,10 @@
       - New `flagNegationPrefix` field on `@Parser` to allow specifying that if a flag option (zero arity option) name starts with that prefix the value should be set to `false` as opposed to setting flags to `true` as is the normal behaviour (#63)
       - New `description` field on `@Pattern` to provide human readable explanation of regular expression restriction intent (#48)
       - Noted in Javadoc that `@Version` supports both properties and Manifest files as data sources (#56)
+      - Use new `typeConverterProvider` field on `@Option`/`@Arguments` to customise the type converter for a field (#54)
+          - Variety of built in converters provided for supporting more complex number formats
+              - Alternative Bases: `Hexadecimal`, `Octal` and `Binary`
+              - Abbreviations: `KiloAs1000`, `KiloAs1024`
 
 ## 2.2.0
 
