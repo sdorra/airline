@@ -16,3 +16,4 @@ The above example would hide the Discussion section, hiding of sections is done 
 
 {% include alert.html %}
 This annotation **cannot** be used to hide the standard sections that help generators produce, if you wish to do that you will need to create a custom help generator.
+{% include end-alert.html %}

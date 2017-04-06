@@ -11,6 +11,7 @@ This annotation should be used when you wish to make your `@Command` annotated c
 
 {% include alert.html %}
 Generally we recommend that you use the `groups` field of the [`@Cli`](cli.html) annotation to specify groups however this annotation can be useful if you are dynamically constructing your CLI and want to allow individual commands to specify their group memberships.
+{% include end-alert.html %}
 
 ### Use on an `@Command` class
 

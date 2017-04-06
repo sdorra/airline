@@ -11,6 +11,7 @@ Arguments are typically used to take in free-form inputs such as lists of files 
 
 {% include alert.html %}
 By default if no field is annotated with `@Arguments` then it is illegal to pass in string arguments that are not options.
+{% include end-alert.html %}
 	
 ### Simple Definition
 
@@ -25,6 +26,7 @@ Here we define a field `files` which is a `List<String>` so each argument receiv
 
 {% include alert.html %}
 If you do not explicitly instantiate collection arguments then they will be `null` if a user does not provide any appropriate arguments
+{% include end-alert.html %}
 
 ### Titles
 

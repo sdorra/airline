@@ -24,7 +24,8 @@ Here we specify that this option may be referred to by any of the three names - 
 
 {% include alert.html %}
 Different option definitions may not have overlapping names i.e. all values in `name` must be unique and not used by any other option defined for a command.
-If you define options that have overlapping names then Airline will throw an `IllegalArgumentException` when you attempt to create a parser.#### Title and Description
+If you define options that have overlapping names then Airline will throw an `IllegalArgumentException` when you attempt to create a parser.
+{% include end-alert.html %}#### Title and Description
 
 For help purposes you may also want to specify the `title` and the `description` for an option.
 
@@ -65,6 +66,7 @@ If an option is marked `hidden = true` then it will not be included in [Help](..
 
 {% include alert.html %}
 Marking an option `hidden = true` **DOES NOT** prevent users from using it.  **DO NOT** rely on hiding options to prevent users from invoking them.
+{% include end-alert.html %}
 
 #### Arity
 
@@ -86,6 +88,7 @@ This would place the values `x` and `y` into our `beta` field.
 
 {% include alert.html %}
 Note that when consuming the values of collection fields the field will be `null` if the user did not provide any values for that option **and** your class does not explicitly instantiate the collection.
+{% include end-alert.html %}
 
 If users invoke options with too few arguments then Airline will throw an error during parsing.
 
@@ -140,6 +143,7 @@ In order to do this we simply need to define the option again changing the relev
 {% include alert.html %}
 Airline does not allow changing an option definition unless you explicitly state `overrides = true`  
 Even then there are some things that **cannot** be overridden - namely the `name`, `type` and `arity` fields.  Also you can only change the Java type of the annotated field if the new type has a narrowing cast from the original type.
+{% include end-alert.html %}
 
 For example lets change the `hidden` state of our option:
 

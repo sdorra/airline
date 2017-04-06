@@ -20,6 +20,7 @@ Here we define a CLI named `basic` that has a default command of `GettingStarted
 
 {% include alert.html %}
 Names are restricted to not contain whitespace but otherwise can contain whatever characters you want.
+{% include end-alert.html %}
 	
 Remember that users need to be able to type the name at their command line terminal of choice so it is best to limit yourself to common characters i.e. alphanumerics and common punctuation marks.
 

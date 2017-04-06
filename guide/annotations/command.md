@@ -18,6 +18,7 @@ Where the `name` field states the name of the command, this name is the name by 
 
 {% include alert.html %}
 Names are restricted to not contain whitespace but otherwise can contain whatever characters you want.
+{% include end-alert.html %}
 	
 Remember that users need to be able to type the name at their command line terminal of choice so it is best to limit yourself to common characters i.e. alphanumerics and common punctuation marks.
 
@@ -48,6 +49,7 @@ When commands are hidden they will not be included in help (unless the help gene
 
 {% include alert.html %}
 Marking a command `hidden = true` **DOES NOT** prevent users from using it.  **DO NOT** rely on hiding commands to prevent users from invoking them.
+{% include end-alert.html %}
 
 ### Grouping Commands
 
@@ -69,6 +71,7 @@ Note that since command and group names cannot contain whitespace **any** whites
 
 {% include alert.html %}
 You can also specify groups by using the [`@Group`](group.html) annotation or as part of the [`@Cli`](cli.html) annotation.
+{% include end-alert.html %}
 
 ## Parser Configuration
 

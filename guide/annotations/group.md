@@ -9,6 +9,7 @@ The `@Group` annotation is used to specify group information.  This may be done 
 
 {% include alert.html %}
 Generally we recommend that you use the `groups` field of the [`@Cli`](cli.html) annotation to specify groups however this annotation can be useful if you are dynamically constructing your CLI and want to allow individual commands to specify their group memberships.
+{% include end-alert.html %}
 
 ### Use on an `@Command` class
 
@@ -26,6 +27,7 @@ Here we use the `@Group` annotation to place our command in the `advanced` group
 
 {% include alert.html %}
 Note that since we are annotating directly on an `@Command` annotation class we don't need to specify ourselves in the list of `commands`
+{% include end-alert.html %}
 
 ### Using as argument to `@Cli`
 
