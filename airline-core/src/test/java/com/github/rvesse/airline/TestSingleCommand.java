@@ -491,7 +491,6 @@ public class TestSingleCommand {
     public void testMutuallyExclusiveOptionsAreDescribedInException() {
         try {
             SingleCommand<MutuallyExclusiveOptions> command = singleCommand(MutuallyExclusiveOptions.class);
-            System.out.println(command.getCommandMetadata());
 	    command.parse("-verbose", "-quiet");
             assertFalse(true);
         } catch(ParseOptionGroupException expected){
