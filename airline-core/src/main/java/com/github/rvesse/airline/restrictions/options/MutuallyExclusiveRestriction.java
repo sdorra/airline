@@ -15,12 +15,14 @@
  */
 package com.github.rvesse.airline.restrictions.options;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.github.rvesse.airline.help.sections.HelpFormat;
@@ -62,7 +64,7 @@ public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint
 
             // Otherwise may need to error
             if (parsedOptions.size() > 0 && otherParsedOptions.size() > parsedOptions.size()) {
-                Collection<OptionMetadata> taggedOptions = getTaggedOptions(state);
+                Collection<OptionMetadata> taggedOptions = selectMetadata(otherParsedOptions);
                 throw new ParseOptionGroupException(
                         "Only one of the following options may be specified but %d were found: %s", tag, taggedOptions,
                         otherParsedOptions.size(), toOptionsList(taggedOptions));
@@ -85,15 +87,13 @@ public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint
         }
         return builder.toString();
     }
-
-    private <T> Collection<OptionMetadata> getTaggedOptions(ParseState<T> state) {
-        List<OptionMetadata> options = state.getCommand() != null ? state.getCommand().getAllOptions() : null;
-        if (options == null)
-            options = state.getGroup() != null ? state.getGroup().getOptions() : null;
-        if (options == null)
-            options = state.getGlobal() != null ? state.getGlobal().getOptions()
-                    : Collections.<OptionMetadata> emptyList();
-        return CollectionUtils.select(options, new RequiredTagOptionFinder(this.tag));
+    
+    private Collection<OptionMetadata> selectMetadata(Collection<Pair<OptionMetadata, Object>> pairs){
+	ArrayList<OptionMetadata> metadata = new ArrayList<>();
+	for(Pair<OptionMetadata, Object> pair : pairs){
+	    metadata.add(pair.getLeft());
+	}
+	return metadata;
     }
 
     public String getTag() {
