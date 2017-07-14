@@ -2,6 +2,9 @@
 
 ## 2.4.0
 
+- Bug Fixes
+    - Fix bug in `@MutuallyExclusiveWith` error message (#66) - Thanks to [GTarkin](http://github/com/GTarkin/) for reporting
+
 
 ## 2.3.0
 

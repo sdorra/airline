@@ -158,8 +158,8 @@ public class TestSingleCommand {
                 .withOptionParsers(new ClassicGetOptParser<ArgsSingleCharCustomParser>(),
                         new StandardOptionParser<ArgsSingleCharCustomParser>())
                 .build();
-        ArgsSingleCharCustomParser args = singleCommand(ArgsSingleCharCustomParser.class, parser).parse("-lg", "-dsn", "-pa-p",
-                "-2f", "-z", "--Dfoo");
+        ArgsSingleCharCustomParser args = singleCommand(ArgsSingleCharCustomParser.class, parser).parse("-lg", "-dsn",
+                "-pa-p", "-2f", "-z", "--Dfoo");
 
         assertTrue(args.l);
         assertTrue(args.g);
@@ -481,20 +481,27 @@ public class TestSingleCommand {
         @Option(name = "-i", description = "Interactive add mode")
         public Boolean interactive = false;
     }
-    
+
     @Test(expectedExceptions = ParseOptionGroupException.class, description = "Verify that mutually exclusive options are found")
     public void testMutuallyExclusiveOptions() {
         singleCommand(MutuallyExclusiveOptions.class).parse("-verbose", "-quiet");
     }
-    
+
     @Test(description = "Verify that mutually exclusive options are present in the thrown ParseOptionGroupException")
     public void testMutuallyExclusiveOptionsAreDescribedInException() {
         try {
             SingleCommand<MutuallyExclusiveOptions> command = singleCommand(MutuallyExclusiveOptions.class);
-	    command.parse("-verbose", "-quiet");
+            command.parse("-verbose", "-quiet");
             assertFalse(true);
-        } catch(ParseOptionGroupException expected){
-            assertEquals(expected.getMessage(), "Only one of the following options may be specified but 2 were found: -verbose, -quiet");
+        } catch (ParseOptionGroupException expected) {
+            String msg = expected.getMessage();
+            assertTrue(msg.contains("Only one of the following options may be specified but 2 were found"));
+            assertTrue(msg.contains("-all"));
+            assertTrue(msg.contains("-quiet"));
+            assertTrue(msg.contains("-verbose"));
+
+            assertTrue(expected.getOptions().size() > 0);
+            assertEquals(expected.getOptions().size(), 3);
         }
     }
 }

@@ -31,6 +31,10 @@ public class MutuallyExclusiveOptions {
   @MutuallyExclusiveWith(tag = "verbosity")
   private boolean quiet;
   
+  @Option(type = OptionType.COMMAND, name = { "-all" })
+  @MutuallyExclusiveWith(tag = "verbosity")
+  private boolean all;
+  
   @Option(type = OptionType.COMMAND, name = { "-other" })
   private boolean other;
 }
