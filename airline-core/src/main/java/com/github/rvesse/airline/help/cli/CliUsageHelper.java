@@ -37,7 +37,8 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 public class CliUsageHelper extends AbstractUsageGenerator {
 
     public CliUsageHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
-        super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
+        super(UsageHelper.DEFAULT_HINT_COMPARATOR, optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                includeHidden);
     }
 
     public void outputOptions(UsagePrinter out, List<OptionMetadata> options) throws IOException {
@@ -60,10 +61,11 @@ public class CliUsageHelper extends AbstractUsageGenerator {
             descriptionPrinter.append(option.getDescription()).newline();
 
             // Restrictions
-            for (OptionRestriction restriction : option.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputOptionRestriction(descriptionPrinter, option, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortOptionRestrictions(option.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to OptionRestriction as must have come from
+                // an OptionRestriction to start with
+                outputOptionRestriction(descriptionPrinter, option, (OptionRestriction) hint, hint);
             }
 
             descriptionPrinter.newline();
@@ -156,7 +158,7 @@ public class CliUsageHelper extends AbstractUsageGenerator {
                 for (int i = 0; i < hint.numContentBlocks(); i++) {
                     if (i > 0)
                         out.newline();
-                    
+
                     UsagePrinter listPrinter = out.newIndentedPrinter(4);
                     for (String item : hint.getContentBlock(i)) {
                         listPrinter.append(item).newline();
@@ -207,10 +209,11 @@ public class CliUsageHelper extends AbstractUsageGenerator {
             descriptionPrinter.append(arguments.getDescription()).newline();
 
             // Restrictions
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputArgumentsRestriction(descriptionPrinter, arguments, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortArgumentsRestrictions(arguments.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to ArgumentsRestriction as must have come
+                // from an ArgumentsRestriction to start with
+                outputArgumentsRestriction(descriptionPrinter, arguments, (ArgumentsRestriction) hint, hint);
             }
 
             descriptionPrinter.newline();

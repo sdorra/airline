@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
 
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -34,10 +35,10 @@ public abstract class AbstractPrintedGlobalUsageGenerator<T> extends AbstractGlo
 
     private final int columns;
 
-    public AbstractPrintedGlobalUsageGenerator(int columns, Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator,
+    public AbstractPrintedGlobalUsageGenerator(int columns, Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden) {
-        super(optionComparator, commandComparator, commandGroupComparator, includeHidden);
+        super(hintComparator, optionComparator, commandComparator, commandGroupComparator, includeHidden);
         if (columns <= 0)
             throw new IllegalArgumentException("columns must be greater than 0");
         this.columns = columns;

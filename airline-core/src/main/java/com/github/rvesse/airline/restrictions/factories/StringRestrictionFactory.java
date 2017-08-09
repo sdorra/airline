@@ -47,7 +47,7 @@ public class StringRestrictionFactory implements ArgumentsRestrictionFactory, Op
     protected AbstractCommonRestriction createCommon(Annotation annotation) {
         if (annotation instanceof Pattern) {
             Pattern pattern = (Pattern) annotation;
-            return new PatternRestriction(pattern.pattern(), pattern.flags());
+            return new PatternRestriction(pattern.pattern(), pattern.flags(), pattern.description());
         } else if (annotation instanceof MaxLength) {
             MaxLength ml = (MaxLength) annotation;
             return new LengthRestriction(ml.length(), true);

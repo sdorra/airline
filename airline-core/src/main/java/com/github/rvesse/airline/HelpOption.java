@@ -28,6 +28,8 @@ import com.github.rvesse.airline.help.cli.CliCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
+import com.github.rvesse.airline.parser.ParseResult;
+import com.github.rvesse.airline.parser.errors.ParseException;
 
 /**
  * An option that provides a simple way for the user to request help with a
@@ -72,6 +74,67 @@ public class HelpOption<C> {
             shown = true;
         }
         return help;
+    }
+
+    /**
+     * Shows help if any parsing errors were detected. If errors were detected
+     * the error messages are printed prior to the help
+     * 
+     * @param result
+     *            Parsing result, if {@code null} then this method does nothing
+     */
+    public <T> boolean showHelpIfErrors(ParseResult<T> result) {
+        return showHelpIfErrors(result, true);
+    }
+
+    /**
+     * Shows help if any parsing errors were detected
+     * 
+     * @param result
+     *            Parsing result, if {@code null} then this method does nothing
+     * @param printErrors
+     *            Whether to print error messages prior to the help, set to
+     *            {@code false} if your code has already done that
+     */
+    public <T> boolean showHelpIfErrors(ParseResult<T> result, boolean printErrors) {
+        return showHelpIfErrors(result, printErrors, new CliCommandUsageGenerator());
+    }
+
+    /**
+     * Shows help if any parsing errors were detected
+     * 
+     * @param result
+     *            Parsing result, if {@code null} then this method does nothing
+     * @param printErrors
+     *            Whether to print error messages prior to the help, set to
+     *            {@code false} if your code has already done that
+     * @param generator
+     *            Command generator for printing the help
+     * @return True if help was shown, false otherwise
+     */
+    public <T> boolean showHelpIfErrors(ParseResult<T> result, boolean printErrors, CommandUsageGenerator generator) {
+        // Ignore if no parsing result to check
+        if (result == null)
+            return false;
+
+        if (!result.wasSuccessful()) {
+            // Some errors
+            if (printErrors) {
+                // Print the errors if requested
+                System.err.println(String.format("%d parse errors were encountered:", result.getErrors().size()));
+                for (ParseException e : result.getErrors()) {
+                    System.err.print(" -");
+                    System.err.println(e.getMessage());
+                }
+            }
+
+            showHelp(generator);
+            shown = true;
+            return true;
+        }
+
+        // No errors so no need to show help
+        return false;
     }
 
     /**

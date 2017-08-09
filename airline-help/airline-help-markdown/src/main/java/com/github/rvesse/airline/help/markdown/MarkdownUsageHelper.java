@@ -38,7 +38,8 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 public class MarkdownUsageHelper extends AbstractUsageGenerator {
 
     public MarkdownUsageHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
-        super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
+        super(UsageHelper.DEFAULT_HINT_COMPARATOR, optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                includeHidden);
     }
 
     public void outputOptions(UsagePrinter out, List<OptionMetadata> options) throws IOException {
@@ -46,7 +47,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
 
         // Sort Options for consistent display across JVMs
         options = sortOptions(options);
-        
+
         for (OptionMetadata option : options) {
             // Skip hidden options
             if (option.isHidden() && !this.includeHidden()) {
@@ -63,10 +64,11 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
             optionPrinter.append(option.getDescription()).newline();
 
             // Restrictions
-            for (OptionRestriction restriction : option.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputOptionRestriction(optionPrinter, option, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortOptionRestrictions(option.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to OptionRestriction as must have come from
+                // an OptionRestriction to start with
+                outputOptionRestriction(optionPrinter, option, (OptionRestriction) hint, hint);
             }
 
             optionPrinter.newline();
@@ -261,10 +263,11 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
             optionPrinter.append(arguments.getDescription()).newline();
 
             // Restrictions
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputArgumentsRestriction(optionPrinter, arguments, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortArgumentsRestrictions(arguments.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to ArgumentsRestriction as must have come from
+                // an ArgumentsRestriction to start with
+                outputArgumentsRestriction(optionPrinter, arguments, (ArgumentsRestriction) hint, hint);
             }
 
             optionPrinter.newline();
@@ -327,7 +330,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
     public void outputOptionsSynopsis(UsagePrinter printer, List<OptionMetadata> options) {
         // Sort options for consistent display across different JVMs
         options = sortOptions(options);
-        
+
         for (int i = 0; i < options.size(); i++) {
             OptionMetadata option = options.get(i);
             if (option.isHidden() && !this.includeHidden())

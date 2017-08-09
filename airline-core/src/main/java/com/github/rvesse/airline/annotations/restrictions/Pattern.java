@@ -41,4 +41,14 @@ public @interface Pattern {
      * @return Flags
      */
     int flags() default 0;
+
+    /**
+     * Provides a description describing the intent of the regular expression,
+     * this is often more helpful to end users than an error that their input
+     * did not match a regular expression when they may not understand regular
+     * expressions
+     * 
+     * @return Description
+     */
+    String description() default "";
 }

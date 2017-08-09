@@ -16,6 +16,8 @@
 package com.github.rvesse.airline.annotations;
 
 import com.github.rvesse.airline.model.OptionMetadata;
+import com.github.rvesse.airline.types.DefaultTypeConverterProvider;
+import com.github.rvesse.airline.types.TypeConverterProvider;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -90,4 +92,14 @@ public @interface Option {
      * @return True if sealed, false otherwise
      */
     boolean sealed() default false;
+
+    /**
+     * Sets an alternative type converter provider for the option. This allows
+     * the type converter for an option to be customised appropriately. By
+     * default this will defer to using the type converter provided in the
+     * parser configuration.
+     * 
+     * @return Type converter provider
+     */
+    Class<? extends TypeConverterProvider> typeConverterProvider() default DefaultTypeConverterProvider.class;
 }

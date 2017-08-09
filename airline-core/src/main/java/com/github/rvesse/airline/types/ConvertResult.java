@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.types;
 
 /**
  * Helper class used to represent the result of an attempted conversion.
@@ -25,6 +25,7 @@ package com.github.rvesse.airline;
 public class ConvertResult {
     private final Object value;
     private final boolean success;
+    private final Throwable cause;
 
     /**
      * Special constant instance used to indicate failure
@@ -34,6 +35,7 @@ public class ConvertResult {
     private ConvertResult() {
         this.value = null;
         this.success = false;
+        this.cause = null;
     }
 
     /**
@@ -45,6 +47,13 @@ public class ConvertResult {
     public ConvertResult(Object value) {
         this.value = value;
         this.success = true;
+        this.cause = null;
+    }
+
+    public ConvertResult(Throwable cause) {
+        this.value = null;
+        this.success = false;
+        this.cause = cause;
     }
 
     /**
@@ -63,5 +72,23 @@ public class ConvertResult {
      */
     public Object getConvertedValue() {
         return this.value;
+    }
+
+    /**
+     * Gets whether a cause is available
+     * 
+     * @return Cause
+     */
+    public boolean hasCause() {
+        return this.cause != null;
+    }
+
+    /**
+     * Gets the cause if available
+     * 
+     * @return Cause, or {@code null} if none available
+     */
+    public Throwable getCause() {
+        return this.cause;
     }
 }

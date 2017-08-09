@@ -15,9 +15,6 @@
  */
 package com.github.rvesse.airline.parser.command;
 
-import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
-
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.IteratorUtils;
@@ -27,15 +24,16 @@ import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.AbstractCommandParser;
+import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class SingleCommandParser<T> extends AbstractCommandParser<T> {
 
-    public T parse(ParserMetadata<T> parserConfig, CommandMetadata commandMetadata,
+    public ParseResult<T> parseWithResult(ParserMetadata<T> parserConfig, CommandMetadata commandMetadata,
             Iterable<GlobalRestriction> restrictions, Iterable<String> args) {
         if (args == null)
             throw new NullPointerException("args is null");
@@ -43,18 +41,14 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
         ParseState<T> state = tryParse(parserConfig, commandMetadata, args);
         validate(state, IteratorUtils.toList(restrictions.iterator()));
 
-        CommandMetadata command = state.getCommand();
+        return state.getParserConfiguration().getErrorHandler().finished(state);
 
-        //@formatter:off
-        return createInstance(command.getType(), 
-                              command.getAllOptions(), 
-                              state.getParsedOptions(),
-                              command.getArguments(), 
-                              state.getParsedArguments(), 
-                              command.getMetadataInjections(),
-                              Collections.<Class<?>, Object>unmodifiableMap(AirlineUtils.singletonMap(CommandMetadata.class, commandMetadata)),
-                              state.getParserConfiguration().getCommandFactory());
-        //@formatter:on
+    }
+
+    public T parse(ParserMetadata<T> parserConfig, CommandMetadata commandMetadata,
+            Iterable<GlobalRestriction> restrictions, Iterable<String> args) {
+        ParseResult<T> result = parseWithResult(parserConfig, commandMetadata, restrictions, args);
+        return result.getCommand();
     }
 
     /**
@@ -72,7 +66,11 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
         for (GlobalRestriction restriction : restrictions) {
             if (restriction == null)
                 continue;
-            restriction.validate(state);
+            try {
+                restriction.validate(state);
+            } catch (ParseException e) {
+                state.getParserConfiguration().getErrorHandler().handleError(e);
+            }
         }
         CommandMetadata command = state.getCommand();
         if (command != null) {
@@ -82,7 +80,11 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
                 for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
                     if (restriction == null)
                         continue;
-                    restriction.finalValidate(state, arguments);
+                    try {
+                        restriction.finalValidate(state, arguments);
+                    } catch (ParseException e) {
+                        state.getParserConfiguration().getErrorHandler().handleError(e);
+                    }
                 }
             }
 
@@ -93,7 +95,11 @@ public class SingleCommandParser<T> extends AbstractCommandParser<T> {
                 for (OptionRestriction restriction : option.getRestrictions()) {
                     if (restriction == null)
                         continue;
-                    restriction.finalValidate(state, option);
+                    try {
+                        restriction.finalValidate(state, option);
+                    } catch (ParseException e) {
+                        state.getParserConfiguration().getErrorHandler().handleError(e);
+                    }
                 }
             }
         }

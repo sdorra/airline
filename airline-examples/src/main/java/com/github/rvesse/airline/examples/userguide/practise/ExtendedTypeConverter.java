@@ -15,8 +15,8 @@
  */
 package com.github.rvesse.airline.examples.userguide.practise;
 
-import com.github.rvesse.airline.ConvertResult;
-import com.github.rvesse.airline.DefaultTypeConverter;
+import com.github.rvesse.airline.types.ConvertResult;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
 
 /**
  * An example of an extended type converter that adds support for converting
@@ -30,7 +30,7 @@ public class ExtendedTypeConverter extends DefaultTypeConverter {
         checkArguments(name, type, value);
 
         // Try and convert from a parse(String) method
-        ConvertResult result = this.tryConvertStringMethod(type, value, "parse");
+        ConvertResult result = this.tryConvertStringMethod(name, type, value, "parse");
         if (result.wasSuccessfull())
             return result.getConvertedValue();
 

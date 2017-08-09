@@ -18,6 +18,8 @@ package com.github.rvesse.airline.model;
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.annotations.OptionType;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
+import com.github.rvesse.airline.types.DefaultTypeConverterProvider;
+import com.github.rvesse.airline.types.TypeConverterProvider;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.restrictions.IsRequiredOptionFinder;
 
@@ -37,6 +39,7 @@ public class OptionMetadata {
     private final int arity;
     private final boolean hidden, overrides, sealed;
     private final List<OptionRestriction> restrictions;
+    private final TypeConverterProvider provider;
     private Set<Accessor> accessors;
 
     //@formatter:off
@@ -49,6 +52,7 @@ public class OptionMetadata {
                           boolean overrides, 
                           boolean sealed,
                           Iterable<OptionRestriction> restrictions,
+                          TypeConverterProvider typeConverterProvider,
                           Iterable<Field> path) {
     //@formatter:on
         if (optionType == null)
@@ -69,6 +73,7 @@ public class OptionMetadata {
         this.overrides = overrides;
         this.sealed = sealed;
         this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions) : Collections.<OptionRestriction>emptyList();
+        this.provider = typeConverterProvider != null ? typeConverterProvider : new DefaultTypeConverterProvider();
 
         if (path != null) {
             this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
@@ -92,6 +97,7 @@ public class OptionMetadata {
         this.overrides = option.overrides;
         this.sealed = option.sealed;
         this.restrictions = option.restrictions;
+        this.provider = option.provider;
 
         Set<Accessor> accessors = new LinkedHashSet<Accessor>();
         for (OptionMetadata other : options) {
@@ -157,6 +163,10 @@ public class OptionMetadata {
     
     public List<OptionRestriction> getRestrictions() {
         return this.restrictions;
+    }
+    
+    public TypeConverterProvider getTypeConverterProvider() {
+        return this.provider;
     }
 
     @Override
@@ -310,6 +320,7 @@ public class OptionMetadata {
                                     child.overrides,
                                     child.sealed,
                                     child.restrictions.size() > 0 ? child.restrictions : parent.restrictions,
+                                    child.provider,
                                     null);
         //@formatter:on
 

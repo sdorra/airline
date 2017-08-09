@@ -66,6 +66,9 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
             // for no argument options, process the option and remove the
             // character from the token
             if (option.getArity() == 0) {
+                // Note - Flag negation is not usable with single character
+                // options so value will always be set as true for flag i.e.
+                // zero arity options
                 nextState = nextState.withOptionValue(option, Boolean.TRUE.toString()).popContext();
                 first = false;
                 continue;
@@ -92,7 +95,14 @@ public class ClassicGetOptParser<T> extends AbstractOptionParser<T> {
             // option parser
             if (first)
                 return null;
-            throw new ParseOptionUnexpectedException("Short options style can not be used with option %s", option);
+
+            // Produce an error, can't use short style options with an option
+            // with an arity greater than one
+            // Return the modified state anyway as we don't want to retry
+            // processing this option in that case
+            state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionUnexpectedException(
+                    "Short options style can not be used with option %s as the arity was not 0 or 1", option));
+            return nextState;
         }
 
         // consume the current token

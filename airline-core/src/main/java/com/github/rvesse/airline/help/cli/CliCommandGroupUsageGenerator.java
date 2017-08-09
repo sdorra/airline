@@ -20,6 +20,7 @@ import java.util.*;
 
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandGroupUsageGenerator;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -29,30 +30,34 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_COMMAND_COMPARATOR;
 import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_OPTION_COMPARATOR;
+import static com.github.rvesse.airline.help.UsageHelper.DEFAULT_HINT_COMPARATOR;
 
 public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGroupUsageGenerator<T> {
     private final boolean hideGlobalOptions;
 
     public CliCommandGroupUsageGenerator() {
-        this(DEFAULT_COLUMNS, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
+        this(DEFAULT_COLUMNS, false, DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR,
+                false);
     }
 
     public CliCommandGroupUsageGenerator(boolean includeHidden) {
-        this(DEFAULT_COLUMNS, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, includeHidden);
+        this(DEFAULT_COLUMNS, false, DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR,
+                includeHidden);
     }
 
     public CliCommandGroupUsageGenerator(int columns) {
-        this(columns, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
+        this(columns, false, DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, false);
     }
 
     public CliCommandGroupUsageGenerator(int columns, boolean includeHidden) {
-        this(columns, false, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR, includeHidden);
+        this(columns, false, DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR, DEFAULT_COMMAND_COMPARATOR,
+                includeHidden);
     }
 
     public CliCommandGroupUsageGenerator(int columns, boolean hideGlobalOptions,
-            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
-            boolean includeHidden) {
-        super(columns, optionComparator, commandComparator, includeHidden);
+            Comparator<? super HelpHint> hintComparator, Comparator<? super OptionMetadata> optionComparator,
+            Comparator<? super CommandMetadata> commandComparator, boolean includeHidden) {
+        super(columns, hintComparator, optionComparator, commandComparator, includeHidden);
         this.hideGlobalOptions = hideGlobalOptions;
     }
 

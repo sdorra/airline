@@ -22,15 +22,18 @@ import java.util.List;
 import java.util.Map;
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
-import com.github.rvesse.airline.DefaultTypeConverter;
-import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
+import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.parser.options.StandardOptionParser;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
 /**
  * Builder for parser configurations
@@ -41,12 +44,14 @@ import com.github.rvesse.airline.parser.options.StandardOptionParser;
 public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
 
     protected TypeConverter typeConverter = new DefaultTypeConverter();
+    protected NumericTypeConverter numericTypeConverter = new DefaultNumericConverter();
     protected final Map<String, AliasBuilder<C>> aliases = new HashMap<>();
     protected CommandFactory<C> commandFactory = new DefaultCommandFactory<C>();
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
-    protected String argsSeparator;
+    protected String argsSeparator, flagNegationPrefix;
     protected UserAliasesSource<C> userAliases;
+    protected ParserErrorHandler errorHandler;
 
     public static <T> ParserMetadata<T> defaultConfiguration() {
         return new ParserBuilder<T>().build();
@@ -218,6 +223,39 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     }
 
     /**
+     * Indicates the desired numeric type converter to use, this is passed as an
+     * argument to the given type converter
+     * 
+     * @param converter
+     *            Numeric type converter
+     * @return Builder
+     */
+    public ParserBuilder<C> withNumericTypeConverter(NumericTypeConverter converter) {
+        this.numericTypeConverter = converter;
+        return this;
+    }
+
+    /**
+     * Indicates that default numeric type conversion should be used
+     * 
+     * @return Builder
+     */
+    public ParserBuilder<C> withDefaultNumericTypeConverter() {
+        this.numericTypeConverter = null;
+        return this;
+    }
+
+    public ParserBuilder<C> withErrorHandler(ParserErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+        return this;
+    }
+
+    public ParserBuilder<C> withDefaultErrorHandler() {
+        this.errorHandler = null;
+        return this;
+    }
+
+    /**
      * Configures the CLI to use the given option parser
      * <p>
      * Order of registration is important, if you have previously registered any
@@ -306,10 +344,26 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * >
      * 
      * @param separator
-     * @return
+     * @return Builder
      */
     public ParserBuilder<C> withArgumentsSeparator(String separator) {
         this.argsSeparator = separator;
+        return this;
+    }
+
+    /**
+     * Sets the flag negation prefix, this is used to determine whether to set a
+     * flag option (a zero arity option) to {@code false} rather than the usual
+     * behaviour of setting it to {@code true}. Options must have appropriately
+     * prefixed names defined for this prefix to have any effect i.e. setting it
+     * does not automatically enable negation for flag options.
+     * 
+     * @param prefix
+     *            Flag negation prefix
+     * @return Builder
+     */
+    public ParserBuilder<C> withFlagNegationPrefix(String prefix) {
+        this.flagNegationPrefix = prefix;
         return this;
     }
 
@@ -344,7 +398,13 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
             aliasData = new ArrayList<>();
         }
 
-        return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, allowAbbreviatedCommands,
-                allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns, aliasesMayChain, argsSeparator);
+        if (typeConverter == null) {
+            typeConverter = new DefaultTypeConverter();
+        }
+        typeConverter.setNumericConverter(this.numericTypeConverter);
+
+        return new ParserMetadata<C>(commandFactory, optionParsers, typeConverter, errorHandler,
+                allowAbbreviatedCommands, allowAbbreviatedOptions, aliasData, userAliases, aliasesOverrideBuiltIns,
+                aliasesMayChain, argsSeparator, flagNegationPrefix);
     }
 }

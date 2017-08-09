@@ -35,29 +35,31 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsageGenerator<T> {
-    
+
     private File baseDirectory;
-    
+
     public MarkdownMultiPageGlobalUsageGenerator() {
         this(AbstractUsageGenerator.DEFAULT_COLUMNS, false, new MarkdownCommandUsageGenerator(false), null);
     }
-    
+
     public MarkdownMultiPageGlobalUsageGenerator(boolean includeHidden) {
-        this(AbstractUsageGenerator.DEFAULT_COLUMNS, includeHidden, new MarkdownCommandUsageGenerator(includeHidden), null);
+        this(AbstractUsageGenerator.DEFAULT_COLUMNS, includeHidden, new MarkdownCommandUsageGenerator(includeHidden),
+                null);
     }
 
     public MarkdownMultiPageGlobalUsageGenerator(int columns, boolean includeHidden) {
         this(columns, includeHidden, new MarkdownCommandUsageGenerator(columns, includeHidden), null);
     }
-    
+
     public MarkdownMultiPageGlobalUsageGenerator(int columns, boolean includeHidden, File baseDirectory) {
         this(columns, includeHidden, new MarkdownCommandUsageGenerator(columns, includeHidden), baseDirectory);
     }
 
     protected MarkdownMultiPageGlobalUsageGenerator(int columns, boolean includeHidden,
             AbstractPrintedCommandUsageGenerator commandUsageGenerator, File baseDirectory) {
-        super(columns, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden, commandUsageGenerator);
+        super(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
+                commandUsageGenerator);
         this.baseDirectory = baseDirectory;
     }
 
@@ -98,7 +100,7 @@ public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsag
 
     protected void outputReferenceToSuite(OutputStream output, GlobalMetadata<T> global) throws IOException {
         UsagePrinter printer = new UsagePrinter(new PrintWriter(output), DEFAULT_COLUMNS);
-        
+
         printer.append("#").append(global.getName()).newline();
         printer.append("Part of the");
         printer.append(String.format("`%s`", global.getName()));
@@ -110,14 +112,14 @@ public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsag
         StringBuilder fileName = new StringBuilder();
         fileName.append(getCommandName(global, groupNames, command));
         fileName.append(".md");
-        
-        File f = this.baseDirectory != null ? new File(this.baseDirectory, fileName.toString()) : new File(fileName.toString());
+
+        File f = this.baseDirectory != null ? new File(this.baseDirectory, fileName.toString())
+                : new File(fileName.toString());
         return new FileOutputStream(f);
     }
 
     @Override
-    protected void outputDefaultGroupCommandUsages(UsagePrinter printer, GlobalMetadata<T> global)
-            throws IOException {
+    protected void outputDefaultGroupCommandUsages(UsagePrinter printer, GlobalMetadata<T> global) throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
             if (command.isHidden() && !this.includeHidden())
                 continue;
@@ -137,7 +139,7 @@ public class MarkdownMultiPageGlobalUsageGenerator<T> extends MarkdownGlobalUsag
             output.close();
         }
     }
-    
+
     protected String getCommandName(GlobalMetadata<T> global, String[] groupNames, CommandMetadata command) {
         // Use full man page reference style since we're going to generate
         // individual man-pages for the commands so the overview man page needs

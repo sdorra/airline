@@ -18,6 +18,9 @@ package com.github.rvesse.airline.annotations;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.github.rvesse.airline.types.DefaultTypeConverterProvider;
+import com.github.rvesse.airline.types.TypeConverterProvider;
+
 import static java.lang.annotation.ElementType.FIELD;
 
 import java.lang.annotation.Documented;
@@ -35,4 +38,14 @@ public @interface Arguments {
      * A description of the arguments.
      */
     String description() default "";
+    
+    /**
+     * Sets an alternative type converter provider for the arguments. This allows
+     * the type converter for arguments to be customised appropriately. By
+     * default this will defer to using the type converter provided in the
+     * parser configuration.
+     * 
+     * @return Type converter provider
+     */
+    Class<? extends TypeConverterProvider> typeConverterProvider() default DefaultTypeConverterProvider.class;
 }

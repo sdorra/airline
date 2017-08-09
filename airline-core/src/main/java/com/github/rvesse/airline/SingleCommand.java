@@ -21,12 +21,13 @@ import org.apache.commons.collections4.IteratorUtils;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.command.SingleCommandParser;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
- * Class for encapsulating single commands
+ * Class for encapsulating and parsing single commands
  *
  * @param <C>
  *            Command type
@@ -64,9 +65,9 @@ public class SingleCommand<C> {
     private SingleCommand(Class<C> command, Iterable<GlobalRestriction> restrictions, ParserMetadata<C> parserConfig) {
         if (command == null)
             throw new NullPointerException("command is null");
-        this.parserConfig = parserConfig != null ? parserConfig : MetadataLoader.<C>loadParser(command);
-        this.restrictions = restrictions != null ? IteratorUtils.toList(restrictions.iterator()) : AirlineUtils
-                .arrayToList(GlobalRestriction.DEFAULTS);
+        this.parserConfig = parserConfig != null ? parserConfig : MetadataLoader.<C> loadParser(command);
+        this.restrictions = restrictions != null ? IteratorUtils.toList(restrictions.iterator())
+                : AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS);
         if (this.restrictions.size() == 0)
             this.restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
 
@@ -91,12 +92,53 @@ public class SingleCommand<C> {
         return parserConfig;
     }
 
+    /**
+     * Parses the arguments to produce a command instance
+     * 
+     * @param args
+     *            Arguments
+     * @return Command instance
+     */
     public C parse(String... args) {
         return parse(AirlineUtils.arrayToList(args));
     }
 
+    /**
+     * Parses the arguments to produce a command instance
+     * 
+     * @param args
+     *            Arguments
+     * @return Command instance
+     */
     public C parse(Iterable<String> args) {
         SingleCommandParser<C> parser = new SingleCommandParser<C>();
         return parser.parse(parserConfig, commandMetadata, restrictions, args);
+    }
+
+    /**
+     * Parses the arguments to produce a result. The result can be inspected to
+     * see errors (assuming a suitable error handler was used e.g.
+     * {@code CollectAll}) and to get a command instance
+     * 
+     * @param args
+     *            Arguments
+     * @return Parse result
+     */
+    public ParseResult<C> parseWithResult(String... args) {
+        return parseWithResult(AirlineUtils.arrayToList(args));
+    }
+
+    /**
+     * Parses the arguments to produce a result. The result can be inspected to
+     * see errors (assuming a suitable error handler was used e.g.
+     * {@code CollectAll}) and to get a command instance
+     * 
+     * @param args
+     *            Arguments
+     * @return Parse result
+     */
+    public ParseResult<C> parseWithResult(Iterable<String> args) {
+        SingleCommandParser<C> parser = new SingleCommandParser<C>();
+        return parser.parseWithResult(parserConfig, commandMetadata, restrictions, args);
     }
 }

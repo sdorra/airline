@@ -24,11 +24,15 @@ import java.lang.annotation.Target;
 
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.SingleCommand;
-import com.github.rvesse.airline.TypeConverter;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.errors.handlers.FailFast;
+import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
 /**
  * Class annotation used to declaratively specify a parser configuration
@@ -109,7 +113,7 @@ public @interface Parser {
      * 
      * @return Command aliases
      */
-    Alias[]aliases() default {};
+    Alias[] aliases() default {};
 
     /**
      * Defines the name of a file from which user defined command aliases should
@@ -134,7 +138,7 @@ public @interface Parser {
      * 
      * @return
      */
-    String[]userAliasesSearchLocation() default "";
+    String[] userAliasesSearchLocation() default "";
 
     /**
      * Sets the prefix used for properties that define aliases
@@ -172,7 +176,7 @@ public @interface Parser {
      * @return Option parser classes
      */
     @SuppressWarnings("rawtypes")
-    Class<? extends OptionParser>[]optionParsers() default {};
+    Class<? extends OptionParser>[] optionParsers() default {};
 
     /**
      * Sets the command factory class to use
@@ -180,12 +184,44 @@ public @interface Parser {
      * @return Command factory class
      */
     @SuppressWarnings("rawtypes")
-    Class<? extends CommandFactory>commandFactory() default DefaultCommandFactory.class;
+    Class<? extends CommandFactory> commandFactory() default DefaultCommandFactory.class;
 
     /**
      * Sets the type converter class to use
      * 
      * @return Type converter class
      */
-    Class<? extends TypeConverter>typeConverter() default DefaultTypeConverter.class;
+    Class<? extends TypeConverter> typeConverter() default DefaultTypeConverter.class;
+
+    /**
+     * Sets the numeric type converter to use, this is used in conjunction with
+     * the value of the {@link #typeConverter()}, if that class does not respect
+     * {@link NumericTypeConverter} instances then this field has no effect
+     * 
+     * @return Numeric type converter class
+     */
+    Class<? extends NumericTypeConverter> numericTypeConverter() default DefaultNumericConverter.class;
+
+    /**
+     * Sets the error handler to use, defaults to {@code FailFast} which throws
+     * errors as soon as they are encountered
+     * 
+     * @return Error handler to use
+     */
+    Class<? extends ParserErrorHandler> errorHandler() default FailFast.class;
+
+    /**
+     * Sets the flag negation prefix
+     * <p>
+     * If set flag options (those with arity zero) will have their value set to
+     * {@code false} if the name used starts with this prefix. For example if
+     * the prefix is set to {@code --no-} and the user specifies a flag that
+     * begins with this the option will be set to {@code false}. Note that an
+     * appropriate name must be present in the {@link Option#name()} for the
+     * flag option which you wish to allow to be negated.
+     * </p>
+     * 
+     * @return Flag negation prefix
+     */
+    String flagNegationPrefix() default "";
 }

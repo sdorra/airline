@@ -32,12 +32,16 @@ import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.restrictions.common.PartialRestriction;
 import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverterProvider;
+import com.github.rvesse.airline.types.numerics.DefaultNumericConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.comparators.StringHierarchyComparator;
 import com.github.rvesse.airline.utils.predicates.parser.CommandTypeFinder;
@@ -83,10 +87,20 @@ public class MetadataLoader {
         } else {
             builder = builder.withDefaultTypeConverter();
         }
+        if (!parserConfig.numericTypeConverter().equals(DefaultNumericConverter.class)) {
+            builder = builder.withNumericTypeConverter(ParserUtil.createInstance(parserConfig.numericTypeConverter()));
+        } else {
+            builder = builder.withDefaultNumericTypeConverter();
+        }
         if (!parserConfig.commandFactory().equals(DefaultCommandFactory.class)) {
             builder = builder.withCommandFactory(ParserUtil.createInstance(parserConfig.commandFactory()));
         } else {
             builder = builder.withDefaultCommandFactory();
+        }
+        if (!parserConfig.errorHandler().equals(FailFast.class)) {
+            builder = builder.withErrorHandler(ParserUtil.createInstance(parserConfig.errorHandler()));
+        } else {
+            builder = builder.withDefaultErrorHandler();
         }
 
         // Abbreviation options
@@ -568,6 +582,9 @@ public class MetadataLoader {
                             restrictions.add(restriction);
                         }
                     }
+                    
+                    // Type Converter provider
+                    TypeConverterProvider provider = ParserUtil.createInstance(optionAnnotation.typeConverterProvider());
 
                     //@formatter:off
                     OptionMetadata optionMetadata = new OptionMetadata(optionType, 
@@ -579,6 +596,7 @@ public class MetadataLoader {
                                                                        override, 
                                                                        sealed,
                                                                        restrictions,
+                                                                       provider,
                                                                        path);
                     //@formatter:on
                     switch (optionType) {
@@ -645,6 +663,7 @@ public class MetadataLoader {
                     }
 
                     String description = argumentsAnnotation.description();
+                    TypeConverterProvider provider = ParserUtil.createInstance(argumentsAnnotation.typeConverterProvider());
 
                     Map<Class<? extends Annotation>, Set<Integer>> partials = loadPartials(field);
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();
@@ -668,6 +687,7 @@ public class MetadataLoader {
                     injectionMetadata.arguments.add(new ArgumentsMetadata(titles, 
                                                                           description,
                                                                           restrictions,
+                                                                          provider,
                                                                           path));
                     //@formatter:on
                 }

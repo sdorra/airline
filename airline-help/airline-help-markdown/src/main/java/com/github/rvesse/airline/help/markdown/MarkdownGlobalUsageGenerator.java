@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.rvesse.airline.help.UsageHelper;
 import com.github.rvesse.airline.help.common.AbstractPrintedCommandUsageGenerator;
 import com.github.rvesse.airline.help.common.AbstractPrintedGlobalUsageGenerator;
+import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.io.printers.UsagePrinter;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
@@ -41,32 +42,34 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
     protected final AbstractPrintedCommandUsageGenerator commandUsageGenerator;
 
     public MarkdownGlobalUsageGenerator() {
-        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false, new MarkdownCommandUsageGenerator(false));
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false,
+                new MarkdownCommandUsageGenerator(false));
     }
 
     public MarkdownGlobalUsageGenerator(boolean includeHidden) {
-        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
+        this(DEFAULT_COLUMNS, UsageHelper.DEFAULT_HINT_COMPARATOR, UsageHelper.DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
                 new MarkdownCommandUsageGenerator(includeHidden));
     }
 
     public MarkdownGlobalUsageGenerator(int columns) {
-        this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false, new MarkdownCommandUsageGenerator(columns));
+        this(columns, UsageHelper.DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, false,
+                new MarkdownCommandUsageGenerator(columns));
     }
 
     public MarkdownGlobalUsageGenerator(int columns, boolean includeHidden) {
-        this(columns, DEFAULT_OPTION_COMPARATOR, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
-                UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
+        this(columns, UsageHelper.DEFAULT_HINT_COMPARATOR, DEFAULT_OPTION_COMPARATOR,
+                UsageHelper.DEFAULT_COMMAND_COMPARATOR, UsageHelper.DEFAULT_COMMAND_GROUP_COMPARATOR, includeHidden,
                 new MarkdownCommandUsageGenerator(columns, includeHidden));
     }
 
-    public MarkdownGlobalUsageGenerator(int columnSize, Comparator<? super OptionMetadata> optionComparator,
-            Comparator<? super CommandMetadata> commandComparator,
+    public MarkdownGlobalUsageGenerator(int columnSize, Comparator<? super HelpHint> hintComparator,
+            Comparator<? super OptionMetadata> optionComparator, Comparator<? super CommandMetadata> commandComparator,
             Comparator<? super CommandGroupMetadata> commandGroupComparator, boolean includeHidden,
             AbstractPrintedCommandUsageGenerator commandUsageGenerator) {
-        super(columnSize, optionComparator, commandComparator, commandGroupComparator, includeHidden);
+        super(columnSize, hintComparator, optionComparator, commandComparator, commandGroupComparator, includeHidden);
         helper = createHelper(optionComparator, includeHidden);
         this.commandUsageGenerator = commandUsageGenerator;
     }

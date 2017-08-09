@@ -21,10 +21,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
-import com.github.rvesse.airline.TypeConverter;
-import com.github.rvesse.airline.DefaultTypeConverter;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
+import com.github.rvesse.airline.parser.errors.handlers.FailFast;
+import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.types.DefaultTypeConverter;
+import com.github.rvesse.airline.types.TypeConverter;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
@@ -43,16 +45,21 @@ public class ParserMetadata<T> {
     private final UserAliasesSource<T> userAliases;
     private final TypeConverter typeConverter;
     private final CommandFactory<T> commandFactory;
-    private final String argsSeparator;
+    private final String argsSeparator, flagNegationPrefix;
+    private final ParserErrorHandler errorHandler;
 
     public ParserMetadata(CommandFactory<T> commandFactory, List<OptionParser<T>> optionParsers,
-            TypeConverter typeConverter, boolean allowAbbreviateCommands, boolean allowAbbreviatedOptions,
-            List<AliasMetadata> aliases, UserAliasesSource<T> userAliases, boolean aliasesOverrideBuiltIns,
-            boolean aliasesMayChain, String argumentsSeparator) {
+            TypeConverter typeConverter, ParserErrorHandler errorHandler, boolean allowAbbreviateCommands,
+            boolean allowAbbreviatedOptions, List<AliasMetadata> aliases, UserAliasesSource<T> userAliases,
+            boolean aliasesOverrideBuiltIns, boolean aliasesMayChain, String argumentsSeparator,
+            String flagNegationPrefix) {
         if (optionParsers == null)
             throw new NullPointerException("optionParsers cannot be null");
         if (aliases == null)
             throw new NullPointerException("aliases cannot be null");
+
+        // Error handling
+        this.errorHandler = errorHandler != null ? errorHandler : new FailFast();
 
         // Command parsing
         this.commandFactory = commandFactory != null ? commandFactory : new DefaultCommandFactory<T>();
@@ -77,6 +84,9 @@ public class ParserMetadata<T> {
         this.argsSeparator = StringUtils.isNotEmpty(argumentsSeparator) ? argumentsSeparator
                 : DEFAULT_ARGUMENTS_SEPARATOR;
 
+        // Flag negation
+        this.flagNegationPrefix = StringUtils.isNotEmpty(flagNegationPrefix) ? flagNegationPrefix : null;
+
     }
 
     /**
@@ -95,6 +105,15 @@ public class ParserMetadata<T> {
      */
     public TypeConverter getTypeConverter() {
         return typeConverter;
+    }
+
+    /**
+     * Gets the error handler to use
+     * 
+     * @return Error handler
+     */
+    public ParserErrorHandler getErrorHandler() {
+        return errorHandler;
     }
 
     /**
@@ -170,6 +189,24 @@ public class ParserMetadata<T> {
         return this.argsSeparator;
     }
 
+    /**
+     * Gets whether this configuration allows flag negation
+     * 
+     * @return True if negation is allowed, false otherwise
+     */
+    public boolean allowsFlagNegation() {
+        return StringUtils.isNotEmpty(this.flagNegationPrefix);
+    }
+
+    /**
+     * Gets the flag negation prefix that is in use (if any)
+     * 
+     * @return Flag negation prefix, may be {@code null} if not enabled
+     */
+    public String getFlagNegationPrefix() {
+        return this.flagNegationPrefix;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -182,6 +219,7 @@ public class ParserMetadata<T> {
         sb.append(", aliases=").append(aliases);
         sb.append(", aliasesOverrideBuiltIns=").append(aliasesOverrideBuiltIns);
         sb.append(", argumentsSeparator='").append(argsSeparator).append("'");
+        sb.append(", flagNegationPrefix='").append(flagNegationPrefix).append("'");
         sb.append("}");
         return sb.toString();
     }

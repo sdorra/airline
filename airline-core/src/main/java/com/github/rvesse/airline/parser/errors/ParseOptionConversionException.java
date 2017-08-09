@@ -22,13 +22,18 @@ package com.github.rvesse.airline.parser.errors;
  */
 public class ParseOptionConversionException extends ParseException {
     private static final long serialVersionUID = -9105701233341582179L;
-    
+
     private final String optionTitle;
     private final String value;
     private final String typeName;
 
     public ParseOptionConversionException(String optionTitle, String value, String typeName) {
-        super("%s: can not convert \"%s\" to a %s", optionTitle, value, typeName);
+        this(String.format("%s: can not convert \"%s\" to a %s", optionTitle, value, typeName), optionTitle, value,
+                typeName);
+    }
+
+    public ParseOptionConversionException(String message, String optionTitle, String value, String typeName) {
+        super(message);
         this.optionTitle = optionTitle;
         this.value = value;
         this.typeName = typeName;

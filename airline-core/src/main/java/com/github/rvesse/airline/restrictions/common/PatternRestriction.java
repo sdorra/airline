@@ -17,6 +17,8 @@ package com.github.rvesse.airline.restrictions.common;
 
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
@@ -32,25 +34,40 @@ import com.github.rvesse.airline.restrictions.AbstractCommonRestriction;
 public class PatternRestriction extends AbstractCommonRestriction implements HelpHint {
 
     private final Pattern pattern;
+    private final String description;
 
-    public PatternRestriction(String pattern, int flags) {
+    /**
+     * Creates a pattern restriction
+     * 
+     * @param pattern
+     *            Regular expression pattern
+     * @param flags
+     *            Regular expression flags
+     * @param description
+     *            Friendly description of the intent of the pattern, included in
+     *            errors when the restriction is violated
+     */
+    public PatternRestriction(String pattern, int flags, String description) {
         this.pattern = Pattern.compile(pattern, flags);
+        this.description = description;
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, OptionMetadata option, String value) {
         if (!this.pattern.matcher(value).find())
             throw new ParseRestrictionViolatedException(
-                    "Option '%s' was given value '%s' which does not match the regular expression '%s'",
-                    option.getTitle(), value, this.pattern.toString());
+                    "Option '%s' was given value '%s' which does not match the regular expression '%s'.  %s",
+                    option.getTitle(), value, this.pattern.toString(),
+                    StringUtils.isNotBlank(this.description) ? this.description : "");
     }
 
     @Override
     public <T> void preValidate(ParseState<T> state, ArgumentsMetadata arguments, String value) {
         if (!this.pattern.matcher(value).find())
             throw new ParseRestrictionViolatedException(
-                    "Argument '%s' was given value '%s' which does not match the regular expression '%s'",
-                    AbstractCommonRestriction.getArgumentTitle(state, arguments), value, this.pattern.toString());
+                    "Argument '%s' was given value '%s' which does not match the regular expression '%s'.  %s",
+                    AbstractCommonRestriction.getArgumentTitle(state, arguments), value, this.pattern.toString(),
+                    StringUtils.isNotBlank(this.description) ? this.description : "");
     }
 
     @Override
@@ -73,8 +90,8 @@ public class PatternRestriction extends AbstractCommonRestriction implements Hel
         if (blockNumber != 0)
             throw new IndexOutOfBoundsException();
 
-        return new String[] {
-                String.format("This options value must match the regular expression '%s'", this.pattern.toString()) };
+        return new String[] { String.format("This options value must match the regular expression '%s'.  %s",
+                this.pattern.toString(), StringUtils.isNotBlank(this.description) ? this.description : "") };
     }
 
 }

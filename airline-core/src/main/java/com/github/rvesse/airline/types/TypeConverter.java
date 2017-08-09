@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline;
+package com.github.rvesse.airline.types;
 
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
+import com.github.rvesse.airline.types.numerics.NumericTypeConverter;
 
 /**
  * Interface for type converters
@@ -45,5 +46,15 @@ public interface TypeConverter {
      *                value
      */
     public abstract Object convert(String name, Class<?> type, String value);
+
+    /**
+     * Sets the numeric type converter to use, if {@code null} then default
+     * behaviour of the type converter instance (whatever that might be) will be
+     * used
+     * 
+     * @param converter
+     *            Numeric type converter
+     */
+    public abstract void setNumericConverter(NumericTypeConverter converter);
 
 }

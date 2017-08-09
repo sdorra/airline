@@ -31,8 +31,8 @@ import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
 import com.github.rvesse.airline.utils.predicates.parser.ParsedOptionFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.MutuallyExclusiveWithFinder;
+import com.github.rvesse.airline.utils.predicates.restrictions.MutuallyExclusiveWithOptionFinder;
 import com.github.rvesse.airline.utils.predicates.restrictions.MutuallyExclusiveWithTagParsedOptionFinder;
-import com.github.rvesse.airline.utils.predicates.restrictions.RequiredTagOptionFinder;
 
 public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint {
 
@@ -85,7 +85,7 @@ public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint
         }
         return builder.toString();
     }
-
+    
     private <T> Collection<OptionMetadata> getTaggedOptions(ParseState<T> state) {
         List<OptionMetadata> options = state.getCommand() != null ? state.getCommand().getAllOptions() : null;
         if (options == null)
@@ -93,9 +93,9 @@ public class MutuallyExclusiveRestriction implements OptionRestriction, HelpHint
         if (options == null)
             options = state.getGlobal() != null ? state.getGlobal().getOptions()
                     : Collections.<OptionMetadata> emptyList();
-        return CollectionUtils.select(options, new RequiredTagOptionFinder(this.tag));
+        return CollectionUtils.select(options, new MutuallyExclusiveWithOptionFinder(this.tag));
     }
-
+    
     public String getTag() {
         return tag;
     }

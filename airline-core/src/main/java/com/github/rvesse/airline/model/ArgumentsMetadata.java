@@ -17,6 +17,8 @@ package com.github.rvesse.airline.model;
 
 import com.github.rvesse.airline.Accessor;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
+import com.github.rvesse.airline.types.DefaultTypeConverterProvider;
+import com.github.rvesse.airline.types.TypeConverterProvider;
 import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.restrictions.IsRequiredArgumentFinder;
 
@@ -37,11 +39,13 @@ public class ArgumentsMetadata {
     private final String description;
     private final Set<Accessor> accessors;
     private final List<ArgumentsRestriction> restrictions;
+    private final TypeConverterProvider provider;
 
     //@formatter:off
     public ArgumentsMetadata(Iterable<String> titles, 
                              String description, 
                              Iterable<ArgumentsRestriction> restrictions, 
+                             TypeConverterProvider typeConverterProvider,
                              Iterable<Field> path) {
     //@formatter:on
         if (titles == null)
@@ -55,6 +59,7 @@ public class ArgumentsMetadata {
         this.description = description;
         this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions)
                 : Collections.<ArgumentsRestriction> emptyList();
+        this.provider = typeConverterProvider != null ? typeConverterProvider : new DefaultTypeConverterProvider();
         this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
     }
 
@@ -69,6 +74,7 @@ public class ArgumentsMetadata {
         this.titles = first.titles;
         this.description = first.description;
         this.restrictions = first.restrictions;
+        this.provider = first.provider;
 
         Set<Accessor> accessors = new HashSet<>();
         for (ArgumentsMetadata other : arguments) {
@@ -107,6 +113,10 @@ public class ArgumentsMetadata {
 
     public List<ArgumentsRestriction> getRestrictions() {
         return this.restrictions;
+    }
+    
+    public TypeConverterProvider getTypeConverterProvider() {
+        return this.provider;
     }
 
     @Override

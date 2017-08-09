@@ -39,7 +39,8 @@ import com.github.rvesse.airline.restrictions.OptionRestriction;
 public class ManUsageHelper extends AbstractUsageGenerator {
 
     public ManUsageHelper(Comparator<? super OptionMetadata> optionComparator, boolean includeHidden) {
-        super(optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR, includeHidden);
+        super(UsageHelper.DEFAULT_HINT_COMPARATOR, optionComparator, UsageHelper.DEFAULT_COMMAND_COMPARATOR,
+                includeHidden);
     }
 
     public int outputOptions(TroffPrinter printer, List<OptionMetadata> options, boolean endList) throws IOException {
@@ -70,10 +71,11 @@ public class ManUsageHelper extends AbstractUsageGenerator {
                 printer.println(option.getDescription());
 
                 // Restrictions
-                for (OptionRestriction restriction : option.getRestrictions()) {
-                    if (restriction instanceof HelpHint) {
-                        outputOptionRestriction(printer, option, restriction, (HelpHint) restriction);
-                    }
+                List<HelpHint> hints = sortOptionRestrictions(option.getRestrictions());
+                for (HelpHint hint : hints) {
+                    // Safe to cast back to OptionRestriction as must have come
+                    // from an OptionRestriction to start with
+                    outputOptionRestriction(printer, option, (OptionRestriction) hint, hint);
                 }
 
                 printer.endList();
@@ -116,10 +118,11 @@ public class ManUsageHelper extends AbstractUsageGenerator {
             printer.println(arguments.getDescription());
 
             // Restrictions
-            for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
-                if (restriction instanceof HelpHint) {
-                    outputArgumentsRestriction(printer, arguments, restriction, (HelpHint) restriction);
-                }
+            List<HelpHint> hints = sortArgumentsRestrictions(arguments.getRestrictions());
+            for (HelpHint hint : hints) {
+                // Safe to cast back to ArgumentsRestriction as must have come
+                // from an ArgumentsRestriction to start with
+                outputArgumentsRestriction(printer, arguments, (ArgumentsRestriction) hint, hint);
             }
             printer.endList();
 
@@ -248,7 +251,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
                 String[] items = hint.getContentBlock(i);
                 if (items.length == 0)
                     continue;
-                
+
                 printer.startBulletedList();
                 for (int j = 0; j < items.length; j++) {
                     printer.println(items[j]);

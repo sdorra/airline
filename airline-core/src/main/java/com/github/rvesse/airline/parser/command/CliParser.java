@@ -15,27 +15,21 @@
  */
 package com.github.rvesse.airline.parser.command;
 
-import static com.github.rvesse.airline.parser.ParserUtil.createInstance;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.rvesse.airline.model.ArgumentsMetadata;
-import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.AbstractCommandParser;
+import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.ParseState;
+import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
 public class CliParser<T> extends AbstractCommandParser<T> {
 
-    public T parse(GlobalMetadata<T> metadata, Iterable<String> args) {
+    public ParseResult<T> parseWithResult(GlobalMetadata<T> metadata, Iterable<String> args) {
         if (args == null)
             throw new NullPointerException("args cannot be null");
 
@@ -52,35 +46,12 @@ public class CliParser<T> extends AbstractCommandParser<T> {
         }
 
         validate(state);
+        return metadata.getParserConfiguration().getErrorHandler().finished(state);
+    }
 
-        CommandMetadata command = state.getCommand();
-
-        Map<Class<?>, Object> bindings = new HashMap<Class<?>, Object>();
-        bindings.put(GlobalMetadata.class, metadata);
-
-        if (state.getGroup() != null) {
-            bindings.put(CommandGroupMetadata.class, state.getGroup());
-        }
-
-        if (state.getCommand() != null) {
-            bindings.put(CommandMetadata.class, state.getCommand());
-        }
-
-        bindings.put(ParserMetadata.class, state.getParserConfiguration());
-
-        if (command == null) 
-            return null;
-        
-        //@formatter:off
-        return createInstance(command.getType(), 
-                              command.getAllOptions(), 
-                              state.getParsedOptions(),
-                              command.getArguments(), 
-                              state.getParsedArguments(), 
-                              command.getMetadataInjections(), 
-                              AirlineUtils.unmodifiableMapCopy(bindings),
-                              state.getParserConfiguration().getCommandFactory());
-        //@formatter:on
+    public T parse(GlobalMetadata<T> metadata, Iterable<String> args) {
+        ParseResult<T> result = parseWithResult(metadata, args);
+        return result.getCommand();
     }
 
     /**
@@ -98,7 +69,11 @@ public class CliParser<T> extends AbstractCommandParser<T> {
         for (GlobalRestriction restriction : state.getGlobal().getRestrictions()) {
             if (restriction == null)
                 continue;
-            restriction.validate(state);
+            try {
+                restriction.validate(state);
+            } catch (ParseException e) {
+                state.getParserConfiguration().getErrorHandler().handleError(e);
+            }
         }
         CommandMetadata command = state.getCommand();
         if (command != null) {
@@ -109,7 +84,11 @@ public class CliParser<T> extends AbstractCommandParser<T> {
                 for (ArgumentsRestriction restriction : arguments.getRestrictions()) {
                     if (restriction == null)
                         continue;
-                    restriction.finalValidate(state, arguments);
+                    try {
+                        restriction.finalValidate(state, arguments);
+                    } catch (ParseException e) {
+                        state.getParserConfiguration().getErrorHandler().handleError(e);
+                    }
                 }
             }
 
@@ -120,7 +99,11 @@ public class CliParser<T> extends AbstractCommandParser<T> {
                 for (OptionRestriction restriction : option.getRestrictions()) {
                     if (restriction == null)
                         continue;
-                    restriction.finalValidate(state, option);
+                    try {
+                        restriction.finalValidate(state, option);
+                    } catch (ParseException e) {
+                        state.getParserConfiguration().getErrorHandler().handleError(e);
+                    }
                 }
             }
         }
