@@ -37,12 +37,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
+import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
 import com.github.rvesse.airline.help.CommandUsageGenerator;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
 import com.github.rvesse.airline.maven.formats.FormatMappingRegistry;
 import com.github.rvesse.airline.maven.formats.FormatOptions;
 import com.github.rvesse.airline.maven.formats.FormatProvider;
 import com.github.rvesse.airline.maven.sources.PreparedSource;
+import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
@@ -153,7 +155,7 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
 
     protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
             CommandUsageGenerator commandGenerator, PreparedSource source, String programName, String[] groupNames)
-                    throws MojoFailureException {
+            throws MojoFailureException {
         Log log = getLog();
         log.debug(String.format("Generating command help for %s in format %s", source.getSourceClass(), format));
 
@@ -191,6 +193,31 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
     protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
             CommandUsageGenerator commandGenerator, PreparedSource source) throws MojoFailureException {
         outputCommandHelp(format, provider, options, commandGenerator, source, null, null);
+    }
+
+    protected void outputGroupHelp(String format, FormatProvider provider, FormatOptions options,
+            CommandGroupUsageGenerator<Object> groupGenerator, PreparedSource source, CommandGroupMetadata[] groups)
+            throws MojoFailureException {
+        Log log = getLog();
+        log.debug(String.format("Generating Group help for %s in format %s", source.getSourceClass(), format));
+
+        GlobalMetadata<Object> global = source.getGlobal();
+        File groupHelpFile = new File(this.outputDirectory, global.getName() + provider.getExtension(options));
+        try (OutputStream output = new FileOutputStream(groupHelpFile)) {
+            groupGenerator.usage(global, groups, output);
+            output.flush();
+            output.close();
+
+            if (!groupHelpFile.exists())
+                throw new MojoFailureException(String.format("Failed to create help file %s", groupHelpFile));
+
+            log.info(String.format("Generated Group help for %s in format %s to file %s", source.getSourceClass(),
+                    format, groupHelpFile));
+        } catch (IOException e) {
+            throw new MojoFailureException(
+                    String.format("Failed to generate Group help for %s in format %s", source.getSourceClass(), format),
+                    e);
+        }
     }
 
     protected void outputGlobalHelp(String format, FormatProvider provider, FormatOptions options,
