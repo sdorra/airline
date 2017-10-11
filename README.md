@@ -37,6 +37,7 @@ Please see the [examples](airline-examples/) module for a range of examples that
 
 Simply create a parser instance via `SingleCommand.singleCommand()` passing in a class that is annotated with the `@Command` annotation e.g.
 
+```java
     public static void main(String[] args) {
         SingleCommand<YourClass> parser = SingleCommand.singleCommand(YourClass.class);
         YourClass cmd = parser.parse(args);
@@ -44,6 +45,7 @@ Simply create a parser instance via `SingleCommand.singleCommand()` passing in a
          // Execute your command however is appropriate e.g.
          cmd.run();   
     }
+```
 
 ### Multiple Commands
 
