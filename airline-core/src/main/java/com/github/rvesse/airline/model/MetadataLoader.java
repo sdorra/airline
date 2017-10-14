@@ -133,6 +133,7 @@ public class MetadataLoader {
 
         // Parsing options
         builder.withArgumentsSeparator(parserConfig.argumentsSeparator());
+        builder.withFlagNegationPrefix(parserConfig.flagNegationPrefix());
         if (parserConfig.defaultParsersFirst() && parserConfig.useDefaultOptionParsers()) {
             builder = builder.withDefaultOptionParsers();
         }
