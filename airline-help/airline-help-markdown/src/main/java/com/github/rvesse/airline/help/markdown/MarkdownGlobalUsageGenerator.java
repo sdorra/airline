@@ -111,7 +111,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandList(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
@@ -149,7 +149,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("# SYNOPSIS").newline().newline();
@@ -175,7 +175,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("# NAME").newline().newline();
@@ -193,7 +193,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      *            Group meta-data
      * @param command
      *            Command meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandDescription(UsagePrinter out, CommandGroupMetadata group, CommandMetadata command)
             throws IOException {
@@ -285,7 +285,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandUsages(UsagePrinter printer, GlobalMetadata<T> global) throws IOException {
         // Default group usages
@@ -310,7 +310,7 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputDefaultGroupCommandUsages(UsagePrinter printer, GlobalMetadata<T> global) throws IOException {
         for (CommandMetadata command : sortCommands(global.getDefaultGroupCommands())) {
@@ -333,10 +333,10 @@ public class MarkdownGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageG
      *            Usage printer
      * @param global
      *            Global Meta-data
-     * @param group
-     *            Group Meta-data
+     * @param groups
+     *            Groups Meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputGroupCommandUsages(UsagePrinter printer, GlobalMetadata<T> global,
             List<CommandGroupMetadata> groups) throws IOException {

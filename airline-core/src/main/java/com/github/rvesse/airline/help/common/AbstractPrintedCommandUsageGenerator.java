@@ -53,12 +53,17 @@ public abstract class AbstractPrintedCommandUsageGenerator extends AbstractComma
      *            Command Name
      * @param command
      *            Command Metadata
+     * @param parserConfig
+     *            Parser configuration
      * @param out
      *            Usage printer to output with
+     * @param <T>
+     *            Command type
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
-    public abstract <T> void usage(String programName, String[] groupNames, String commandName,
-            CommandMetadata command, ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException;
+    public abstract <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
+            ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException;
 
     /**
      * Creates a usage printer for the given stream

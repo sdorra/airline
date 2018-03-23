@@ -51,7 +51,7 @@ public abstract class AbstractPrintedGlobalUsageGenerator<T> extends AbstractGlo
      *            Global Metadata
      * @param out
      *            Usage printer to output with
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected abstract void usage(GlobalMetadata<T> global, UsagePrinter out) throws IOException;
 

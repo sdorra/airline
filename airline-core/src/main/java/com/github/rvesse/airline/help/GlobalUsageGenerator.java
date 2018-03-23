@@ -31,7 +31,7 @@ public interface GlobalUsageGenerator<T> {
      * 
      * @param global
      *            Global Metadata
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     public abstract void usage(GlobalMetadata<T> global) throws IOException;
 
@@ -40,9 +40,9 @@ public interface GlobalUsageGenerator<T> {
      * 
      * @param global
      *            Global metadata
-     * @param out
+     * @param output
      *            Stream to output to
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     public abstract void usage(GlobalMetadata<T> global, OutputStream output) throws IOException;
 }

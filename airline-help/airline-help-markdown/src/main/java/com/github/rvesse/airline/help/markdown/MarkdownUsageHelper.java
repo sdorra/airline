@@ -87,7 +87,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
      *            Restriction
      * @param hint
      *            Help hint
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputOptionRestriction(UsagePrinter out, OptionMetadata option, OptionRestriction restriction,
             HelpHint hint) throws IOException {
@@ -286,7 +286,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
      *            Restriction
      * @param hint
      *            Help hint
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputArgumentsRestriction(UsagePrinter descriptionPrinter, ArgumentsMetadata arguments,
             ArgumentsRestriction restriction, HelpHint hint) throws IOException {
@@ -301,7 +301,7 @@ public class MarkdownUsageHelper extends AbstractUsageGenerator {
      *            Usage printer
      * @param section
      *            Help section
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     public void outputHelpSection(UsagePrinter out, HelpSection section) throws IOException {
         if (section.getFormat() == HelpFormat.NONE_PRINTABLE)

@@ -39,6 +39,7 @@ public interface CommandUsageGenerator {
      * @param command
      *            Command Metadata
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      * @deprecated Please use the overload that takes the parser configuration
      *             explicitly
      */
@@ -57,9 +58,10 @@ public interface CommandUsageGenerator {
      *            Command Name
      * @param command
      *            Command Metadata
-     * @param out
+     * @param output
      *            Stream to output to
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      * @deprecated Please use the overload that takes the parser configuration
      *             explicitly
      */
@@ -82,7 +84,10 @@ public interface CommandUsageGenerator {
      *            Parser configuration, if {@code null} is passed then the
      *            parser configuration is automatically determined based on the
      *            command class for which we are producing help
+     * @param <T>
+     *            Command type
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     public abstract <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig) throws IOException;
@@ -102,9 +107,12 @@ public interface CommandUsageGenerator {
      *            Parser Configuration, if {@code null} is passed then the
      *            parser configuration is automatically determined based on the
      *            command class for which we are producing help
-     * @param out
+     * @param output
      *            Stream to output to
+     * @param <T>
+     *            Command type
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     public abstract <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig, OutputStream output) throws IOException;

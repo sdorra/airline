@@ -18,7 +18,6 @@ package com.github.rvesse.airline.help.man;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -112,15 +111,15 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      * commands they contain
      * <p>
      * Used only when a CLI has command groups, if no groups are present then
-     * {@link #outputCommandList(Writer, GlobalMetadata)} is used instead.
+     * {@link #outputCommandList(TroffPrinter, GlobalMetadata)} is used instead.
      * </p>
      * 
      * @param printer
-     *            Writer
+     *            Troff printer
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputGroupList(TroffPrinter printer, GlobalMetadata<T> global) throws IOException {
         printer.nextSection("COMMAND GROUPS");
@@ -207,15 +206,15 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      * Outputs a documentation section that lists the available commands
      * <p>
      * Used only when a CLI does not have command groups, if groups are present
-     * then {@link #outputGroupList(Writer, GlobalMetadata)} is used instead.
+     * then {@link #outputGroupList(TroffPrinter, GlobalMetadata)} is used instead.
      * </p>
      * 
      * @param printer
-     *            Writer
+     *            Troff Printer
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandList(TroffPrinter printer, GlobalMetadata<T> global) throws IOException {
         printer.nextSection("COMMANDS");
@@ -245,12 +244,11 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      * Outputs a documentation section with a synopsis of how to use the CLI
      * 
      * @param printer
-     *            Writer
+     *            Troff Printer
      * @param global
      *            Global meta-data
      * 
-     * @return
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputSynopsis(TroffPrinter printer, GlobalMetadata<T> global) throws IOException {
         printer.nextSection("SYNOPSIS");
@@ -283,8 +281,8 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      * @param global
      *            Global meta-data
      * @param printer
-     *            Writer
-     * @throws IOException
+     *            Troff printer
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputTitle(GlobalMetadata<T> global, TroffPrinter printer) throws IOException {
         printer.start(global.getName(), this.manSection);
@@ -305,7 +303,7 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandUsages(OutputStream output, TroffPrinter printer, GlobalMetadata<T> global)
             throws IOException {
@@ -349,10 +347,10 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      *            Writer
      * @param global
      *            Global Meta-data
-     * @param group
-     *            Group Meta-data
+     * @param groups
+     *            Groups Meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputGroupCommandUsages(OutputStream output, TroffPrinter printer, GlobalMetadata<T> global,
             List<CommandGroupMetadata> groups) throws IOException {
@@ -390,7 +388,7 @@ public class ManGlobalUsageGenerator<T> extends AbstractGlobalUsageGenerator<T> 
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputDefaultGroupCommandUsages(OutputStream output, TroffPrinter printer, GlobalMetadata<T> global)
             throws IOException {

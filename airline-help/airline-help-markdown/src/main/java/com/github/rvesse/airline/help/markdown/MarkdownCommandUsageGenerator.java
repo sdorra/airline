@@ -111,11 +111,16 @@ public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGe
      *            Options meta-data
      * @param arguments
      *            Arguments meta-data
+     * @param parserConfig
+     *            Parser configuration
+     * @param <T>
+     *            Command type
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected <T> void outputOptionsAndArguments(UsagePrinter out, CommandMetadata command,
             List<OptionMetadata> options, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig)
-                    throws IOException {
+            throws IOException {
         helper.outputOptions(out, options);
         helper.outputArguments(out, arguments, parserConfig);
     }
@@ -135,6 +140,7 @@ public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGe
      *            Command meta-data
      * @return Collection of all options (Global, Group and Command)
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected List<OptionMetadata> outputSynopsis(UsagePrinter out, String programName, String[] groupNames,
             String commandName, CommandMetadata command) throws IOException {
@@ -181,6 +187,7 @@ public class MarkdownCommandUsageGenerator extends AbstractPrintedCommandUsageGe
      * @param command
      *            Command meta-data
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected void outputDescription(UsagePrinter out, String programName, String[] groupNames, String commandName,
             CommandMetadata command) throws IOException {

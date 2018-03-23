@@ -98,7 +98,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandList(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("COMMANDS").newline();
@@ -139,7 +139,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
      * @param global
      *            Global meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("SYNOPSIS").newline();
@@ -154,7 +154,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global) throws IOException {
         out.append("NAME").newline();
@@ -172,7 +172,7 @@ public class CliGlobalUsageGenerator<T> extends AbstractPrintedGlobalUsageGenera
      *            Group meta-data
      * @param command
      *            Command meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputCommandDescription(UsagePrinter out, CommandGroupMetadata group, CommandMetadata command)
             throws IOException {
