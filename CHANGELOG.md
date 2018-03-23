@@ -1,5 +1,7 @@
 # Airline - Change Log
 
+## 2.4.1
+
 ## 2.4.0
 
 - Bug Fixes
