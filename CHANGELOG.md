@@ -4,6 +4,7 @@
 
 - Bug Fixes
     - Fix bug in `@MutuallyExclusiveWith` error message (#66) - Thanks to [GTarkin](http://github/com/GTarkin/) for reporting
+    - Fix bug with `flagNegationPrefix` specified via annotation - Thanks to [rkhaja](https://github.com/rkhaja) for the fix
 
 
 ## 2.3.0
