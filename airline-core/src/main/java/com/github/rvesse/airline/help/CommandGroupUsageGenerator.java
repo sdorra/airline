@@ -34,7 +34,7 @@ public interface CommandGroupUsageGenerator<T> {
      *            Global Metadata
      * @param groups
      *            Group path to the command
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     public abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups) throws IOException;
 
@@ -45,9 +45,9 @@ public interface CommandGroupUsageGenerator<T> {
      *            Global metadata
      * @param groups
      *            Group path to the command
-     * @param out
+     * @param output
      *            Stream to output to
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     public abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups, OutputStream output)
             throws IOException;

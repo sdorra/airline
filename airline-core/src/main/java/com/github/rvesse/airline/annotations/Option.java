@@ -36,33 +36,45 @@ import java.lang.annotation.Documented;
 public @interface Option {
     /**
      * Is this a command, group or global option
+     * 
+     * @return Option type
      */
     OptionType type() default OptionType.COMMAND;
 
     /**
      * Name use to identify the option value in documentation and error messages
+     * 
+     * @return Title
      */
     String title() default "";
 
     /**
      * An array of allowed command line parameters e.g. {@code -n},
      * {@code --name}, etc...
+     * 
+     * @return Names
      */
     String[] name();
 
     /**
      * A description of this option.
+     * 
+     * @return Description
      */
     String description() default "";
 
     /**
      * How many parameter values this option will consume. For example, an arity
      * of 2 will allow {@code -pair value1 value2}
+     * 
+     * @return Arity
      */
     int arity() default Integer.MIN_VALUE;
 
     /**
      * If true, this parameter won't appear in the usage().
+     * 
+     * @return True if hidden, false otherwise
      */
     boolean hidden() default false;
 

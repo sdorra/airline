@@ -53,20 +53,46 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected UserAliasesSource<C> userAliases;
     protected ParserErrorHandler errorHandler;
 
+    /**
+     * Gets the default configuration
+     * 
+     * @param <T>
+     *            Command type to parse
+     * @return Default configuraiton
+     */
     public static <T> ParserMetadata<T> defaultConfiguration() {
         return new ParserBuilder<T>().build();
     }
 
+    /**
+     * Specifies the command factory to use
+     * 
+     * @param commandFactory
+     *            Command Factory
+     * @return Builder
+     */
     public ParserBuilder<C> withCommandFactory(CommandFactory<C> commandFactory) {
         this.commandFactory = commandFactory;
         return this;
     }
 
+    /**
+     * Specifies that the default command factory should be used
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withDefaultCommandFactory() {
         this.commandFactory = null;
         return this;
     }
 
+    /**
+     * Adds an alias
+     * 
+     * @param name
+     *            Alias name
+     * @return Alias Builder
+     */
     public AliasBuilder<C> withAlias(final String name) {
         checkNotBlank(name, "Alias name");
 
@@ -79,6 +105,13 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         return alias;
     }
 
+    /**
+     * Retrieves an alias builder for the given alias
+     * 
+     * @param name
+     *            Alias name
+     * @return Alias Builder
+     */
     public AliasBuilder<C> getAlias(final String name) {
         checkNotBlank(name, "Alias name");
         if (!aliases.containsKey(name))
@@ -104,8 +137,9 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * {@link #withUserAliases(String, String, String...)} method
      * </p>
      * 
+     * @param programName
+     *            Program Name
      * @return Builder
-     * @throws IOException
      */
     public ParserBuilder<C> withUserAliases(String programName) {
         // Use default filename and search location
@@ -126,11 +160,12 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * {@link #withUserAliases(String, String, String...)} method
      * </p>
      * 
+     * @param programName
+     *            Program name
      * @param searchLocation
      *            Location to search
      * 
      * @return Builder
-     * @throws IOException
      */
     public ParserBuilder<C> withUserAliases(String programName, String searchLocation) {
         // Use default filename
@@ -183,8 +218,15 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * {@link #withAliasesOverridingBuiltIns()} on your builder</li>
      * </ul>
      * 
-     * @return
-     * @throws IOException
+     * @param filename
+     *            Filename to look for
+     * @param prefix
+     *            Prefix used to distinguish alias related properties from other
+     *            properties
+     * @param searchLocations
+     *            Search locations in order of preference
+     * 
+     * @return Builder
      */
     public ParserBuilder<C> withUserAliases(final String filename, final String prefix,
             final String... searchLocations) {
@@ -192,31 +234,63 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         return this;
     }
 
+    /**
+     * Sets that aliases should override built-in commands
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withAliasesOverridingBuiltIns() {
         this.aliasesOverrideBuiltIns = true;
         return this;
     }
 
+    /**
+     * Sets that aliases may be defined in terms of other aliases
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withAliasesChaining() {
         this.aliasesMayChain = true;
         return this;
     }
 
+    /**
+     * Sets that command abbreviation is enabled
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withCommandAbbreviation() {
         this.allowAbbreviatedCommands = true;
         return this;
     }
 
+    /**
+     * Sets that option abbreviation is enabled
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withOptionAbbreviation() {
         this.allowAbbreviatedOptions = true;
         return this;
     }
 
+    /**
+     * Sets the type converter for the parser
+     * 
+     * @param converter
+     *            Type converter
+     * @return Builder
+     */
     public ParserBuilder<C> withTypeConverter(TypeConverter converter) {
         this.typeConverter = converter;
         return this;
     }
 
+    /**
+     * Sets that the default type converter should be used
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withDefaultTypeConverter() {
         this.typeConverter = null;
         return this;
@@ -245,11 +319,23 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
         return this;
     }
 
+    /**
+     * Sets the error handler to use
+     * 
+     * @param errorHandler
+     *            Error handler
+     * @return Builder
+     */
     public ParserBuilder<C> withErrorHandler(ParserErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
         return this;
     }
 
+    /**
+     * Sets that the default error handler should be used
+     * 
+     * @return Builder
+     */
     public ParserBuilder<C> withDefaultErrorHandler() {
         this.errorHandler = null;
         return this;
@@ -262,8 +348,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * parsers then those will be used prior to the one given here
      * </p>
      * 
-     * @param optionParsers
-     *            Option parsers
+     * @param optionParser
+     *            Option parser
      * @return Builder
      */
     public ParserBuilder<C> withOptionParser(OptionParser<C> optionParser) {
@@ -301,8 +387,9 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * <p>
      * This is the default behaviour so this need only be called if you have
      * previously configured some option parsers using the
-     * {@link #withOptionParser(Class)} or {@link #withOptionParsers(Class...)}
-     * methods and wish to reset the configuration to the default.
+     * {@link #withOptionParser(OptionParser)} or
+     * {@link #withOptionParsers(OptionParser...)} methods and wish to reset the
+     * configuration to the default.
      * </p>
      * <p>
      * If you wish to instead add the default parsers in addition to your custom
@@ -341,9 +428,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * as options. The default value of this is the standard {@code --} used by
      * many command line tools.
      * </p>
-     * >
      * 
-     * @param separator
+     * @param separator Arguments separator
      * @return Builder
      */
     public ParserBuilder<C> withArgumentsSeparator(String separator) {

@@ -44,20 +44,52 @@ public @interface Version {
      * separated by {@code =} with one per line) or Java Manifest files.
      * </p>
      * 
-     * @return
+     * @return Sources for version information
      */
     String[] sources();
 
+    /**
+     * Sets the property used to find the component information (if any)
+     * 
+     * @return Component property
+     */
     String componentProperty() default "component";
 
+    /**
+     * Sets the property used to find version information (if any)
+     * 
+     * @return Version property
+     */
     String versionProperty() default "version";
 
+    /**
+     * Sets the proeprty used to find build information (if any)
+     * 
+     * @return Build property
+     */
     String buildProperty() default "build";
 
+    /**
+     * Sets the property used to find build date information (if any)
+     * 
+     * @return Build Date property
+     */
     String dateProperty() default "buildDate";
 
+    /**
+     * Any additional properties from which information should be obtained
+     * 
+     * @return Additional properties
+     */
     String[] additionalProperties() default {};
 
+    /**
+     * The titles for the additional properties specified by
+     * {@link #additionalProperties()} used to present this information in
+     * generated help output
+     * 
+     * @return Additional titles
+     */
     String[] additionalTitles() default {};
 
     /**

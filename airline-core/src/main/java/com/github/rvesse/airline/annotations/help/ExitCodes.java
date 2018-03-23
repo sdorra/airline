@@ -46,7 +46,7 @@ public @interface ExitCodes {
      * the exit codes are given by the {@link #codes()} property. The data in
      * these two properties is collated based on array indices.
      * 
-     * @return
+     * @return Exit Codes descriptions
      */
     String[]descriptions() default {};
 }

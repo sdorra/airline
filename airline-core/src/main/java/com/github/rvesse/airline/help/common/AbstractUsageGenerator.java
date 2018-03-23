@@ -149,7 +149,7 @@ public class AbstractUsageGenerator {
      * 
      * @param command
      *            Default command name
-     * @return
+     * @return Command representation
      */
     protected String toDefaultCommand(String command) {
         if (StringUtils.isEmpty(command)) {
@@ -169,7 +169,7 @@ public class AbstractUsageGenerator {
      * 
      * @param options
      *            Options
-     * @return
+     * @return Option synopses
      */
     protected List<String> toSynopsisUsage(List<OptionMetadata> options) {
         List<String> synopsisOptions = new ArrayList<String>();

@@ -49,11 +49,11 @@ public abstract class AbstractPrintedCommandGroupUsageGenerator<T> extends Abstr
      * 
      * @param global
      *            Global Metadata
-     * @param group
-     *            Group Metadata
+     * @param groups
+     *            Groups Metadata
      * @param out
      *            Usage printer to output with
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected abstract void usage(GlobalMetadata<T> global, CommandGroupMetadata[] groups, UsagePrinter out)
             throws IOException;

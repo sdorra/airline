@@ -82,6 +82,9 @@ public class HelpOption<C> {
      * 
      * @param result
      *            Parsing result, if {@code null} then this method does nothing
+     * @param <T>
+     *            Command type we were attempting to parse
+     * @return True if help was shown
      */
     public <T> boolean showHelpIfErrors(ParseResult<T> result) {
         return showHelpIfErrors(result, true);
@@ -95,6 +98,9 @@ public class HelpOption<C> {
      * @param printErrors
      *            Whether to print error messages prior to the help, set to
      *            {@code false} if your code has already done that
+     * @param <T>
+     *            Command type we were attempting to parse
+     * @return True if help was shown
      */
     public <T> boolean showHelpIfErrors(ParseResult<T> result, boolean printErrors) {
         return showHelpIfErrors(result, printErrors, new CliCommandUsageGenerator());
@@ -110,6 +116,8 @@ public class HelpOption<C> {
      *            {@code false} if your code has already done that
      * @param generator
      *            Command generator for printing the help
+     * @param <T>
+     *            Command type we were attempting to parse
      * @return True if help was shown, false otherwise
      */
     public <T> boolean showHelpIfErrors(ParseResult<T> result, boolean printErrors, CommandUsageGenerator generator) {

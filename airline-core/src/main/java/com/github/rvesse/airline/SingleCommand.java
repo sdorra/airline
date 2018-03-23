@@ -38,6 +38,8 @@ public class SingleCommand<C> {
      * 
      * @param command
      *            Command class
+     * @param <C>
+     *            Command type we wish to parse to
      * @return Single command parser
      */
     public static <C> SingleCommand<C> singleCommand(Class<C> command) {
@@ -52,6 +54,8 @@ public class SingleCommand<C> {
      * @param parserConfig
      *            Parser configuration to use, if {@code null} the default
      *            configuration is used
+     * @param <C>
+     *            Command type we wish to parse to
      * @return Single command parser
      */
     public static <C> SingleCommand<C> singleCommand(Class<C> command, ParserMetadata<C> parserConfig) {

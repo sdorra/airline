@@ -136,7 +136,7 @@ public @interface Parser {
      * the target platform) to refer to the home directory
      * </p>
      * 
-     * @return
+     * @return Search locations for alises
      */
     String[] userAliasesSearchLocation() default "";
 
@@ -166,7 +166,7 @@ public @interface Parser {
      * Sets whether to use the default option parsers first before any
      * additional option parsers that may be defined (default true)
      * 
-     * @return
+     * @return True if default parsers are used first, false otherwise
      */
     boolean defaultParsersFirst() default true;
 

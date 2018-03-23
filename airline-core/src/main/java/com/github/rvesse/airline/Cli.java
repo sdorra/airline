@@ -38,6 +38,8 @@ public class Cli<C> {
      * 
      * @param name
      *            Program name
+     * @param <T>
+     *            Command type to be built 
      * @return CLI Builder
      */
     public static <T> CliBuilder<T> builder(String name) {
