@@ -7,7 +7,7 @@ title: Inheritance and Composition
 
 ## Inheritance
 
-When you define a class as being a [`@Command`](../annotations/command.html) Airline will automatically discover command metadata by examining the class hierarchy of the annotated class.  By this we mean that it will walk up the hierarchy to base classes to discover additional Airline annotations that are inherited by the command class.  This means that you can use standard inheritance to define base classes that contain [`@Option`](../annotations/option.html) definitions that can be inherited by mutliple command implementations.
+When you define a class as being a [`@Command`](../annotations/command.html) Airline will automatically discover command metadata by examining the class hierarchy of the annotated class.  By this we mean that it will walk up the hierarchy to base classes to discover additional Airline annotations that are inherited by the command class.  This means that you can use standard inheritance to define base classes that contain [`@Option`](../annotations/option.html) definitions that can be inherited by multiple command implementations.
 
 For example we might want to have all our commands have a verbose option available e.g.
 
