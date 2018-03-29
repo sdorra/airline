@@ -3,11 +3,17 @@ layout: page
 title: Supported Types
 ---
 
+{% include toc.html %}
+
 Airline converts the string arguments that users pass into the JVM at the command line into the appropriate Java types using a `TypeConverter` and uses these values to populate `@Option` and `@Arguments` annotated fields.
 
 ## Default Type Converter
 
 The `TypeConverter` may be specified as part of the [Parser Configuration](../parser/) but if not explicitly configured will use the `DefaultTypeConverter`.  Out of the box this will support most common types, any Java `enum` and any Java class that conforms to certain constraints.
+
+### Type Converter Providers
+
+Individual [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) can specify a `TypeConverterProvider` via their `typeConverterProvider` field which provides a way to override the type converter used on a per-field basis.  This can be used for features such as our [Numeric Converions](#numeric-converions) support.
 
 ### Common Types
 
@@ -41,6 +47,26 @@ More generally Airline supports any Java class that meets one of the following c
 Airline also supports any type which is a `Collection` of another supported type.
 
 The advantage of using collection types e.g. `List<String>` is that your `@Option` or `@Arguments` annotated field stores all the values passed in.  If your field has a non-collection type then only the last use of that option/argument will be stored in the final class that Airline creates.
+
+## Numeric Conversions
+
+One advanced feature of Airline available for numeric fields e.g. `Integer` is the ability to customise the numeric formats supported.  By default we just use the standard `parseFrom(String)` method for numeric types which only permits the default representation of those types to be used.
+
+Often it may be desirable to allow users to specify numeric values in more natural formats e.g. `1m` to represent `1000000`.  This is enabled on a per-field basis by setting a specific `typeConverterProvider` on your [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) definition.  Alternatively it may be enabled at a parser level by setting the `numericTypeConverter` on the [`@Parser`](../annotations/parser.html) annotation.
+
+The following table details the built in alternative numeric formats that are supported out of the box:
+
+| `TypeConverterProvider` | Support Formats |
+| --------------------------------  | ---------------------- |
+| `Binary` | Numbers expressed in binary e.g. `11` converts to `3` |
+| `Octal` | Numbers expressed in octal e.g. `71` converts to  `57` |
+| `Hexadecimal` | Numbers expressed in hexadecimal e.g. `F6` converts to `246` | 
+| `KiloAs1000` | Numbers optionally shortened using postfix units where kilo is treated as 1000 e.g. `1k` converts to `1000` and `1b` converts to `1000000000` |
+| `KiloAs1024` | Numbers optionally shortened using postfix units where kilo is treated as 1024 e.g. `1k` converts to `1024` and `1g` converts to `1073741824` |
+
+There are also several abstract classes that can be used to implement alternative custom formats as desired such as `SequenceAbbreviatedNumericTypeConverter`.
+
+Additionally if you wish to use the default logic you can also use `DefaultNumericConverter`.
 
 ## Custom Type Converters
 
@@ -109,3 +135,15 @@ ParserBuilder<Runnable> builder
   = new ParserBuilder<Runnable>()
            .withTypeConverter(new ExtendedTypeConverter());
 ```
+
+### Using a Custom Type Converter on a per-field basis
+
+As discussed earlier you can specify ` TypeConverterProvider` on a per-field basis on your [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) to control the type converter used for that specific field.  A `TypeConverterProvider` has the following methods:
+
+```java
+<T> TypeConverter getTypeConverter(OptionMetadata option, ParseState<T> state)
+
+<T> TypeConverter getTypeConverter(ArgumentsMetadata arguments, ParseState<T> state)
+```
+
+These methods should simply return the desired `TypeConverter`, all of our `TypeConverter` implementations also implement `TypeConverterProvider` by returning `this`

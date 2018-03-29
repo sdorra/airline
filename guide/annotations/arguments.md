@@ -47,3 +47,14 @@ The `description` field may be used to describe how arguments are intended to be
 @Arguments(description = "Provides the names of one/more files to process")
 private List<String> files;
 ```
+
+### Type Converter Provider
+
+To override how user inputs are converted into values for these arguments specify a custom `TypeConverterProvider` to use e.g.
+
+```java
+@Arguments(description = "Provides hexadecimal values", typeConverterProvider = Hexadecimal.class)
+private List<Integer> hexCodes;
+```
+
+The above example uses the `Hexadecimal` type converter which parses users inputs as hexadecimal numbers when converting to `Integer`.

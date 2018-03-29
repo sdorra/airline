@@ -169,3 +169,16 @@ private String alphabet;
 ```
 
 Using this prevents the option from being redefined further down the inheritance hierarchy.
+
+### Type Converter Provider
+
+To override how user inputs are converted into values for these arguments specify a custom `TypeConverterProvider` to use e.g.
+
+```java
+@Option(name = "--hex",
+               description = "Sets hexadecimal value", 
+               typeConverterProvider = Hexadecimal.class)
+private Integer hexCode;
+```
+
+The above example uses the `Hexadecimal` type converter which parses users input as hexadecimal numbers when converting to `Integer`.
