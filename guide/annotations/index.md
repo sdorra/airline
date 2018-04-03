@@ -57,3 +57,4 @@ All these annotations are added to an [`@Command`](command.html) annotated class
 - The [`@HideSection`](hide-section.html) annotation is used to hide an inherited help section
 - The [`@License`](license.html) annotation adds a license statement
 - The [`@ProseSection`](prose-section.html) annotation adds an custom titled text section
+- The [`@Version`](version.html) annotation adds a version statement
