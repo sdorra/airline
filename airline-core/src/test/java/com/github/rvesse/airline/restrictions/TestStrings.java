@@ -99,4 +99,24 @@ public class TestStrings {
     public void max_length_invalid() {
         parser().parse("--max", "foobar");
     }
+    
+    @Test
+    public void pattern_case_insensitive_01() {
+        parser().parse("--other", "foo");
+    }
+    
+    @Test
+    public void pattern_case_insensitive_02() {
+        parser().parse("--other", "BaR");
+    }
+    
+    @Test
+    public void pattern_case_insensitive_03() {
+        parser().parse("--other", "fooBAR");
+    }
+    
+    @Test(expectedExceptions = ParseRestrictionViolatedException.class)
+    public void pattern_case_insensitive_invalid() {
+        parser().parse("--other", "test");
+    }
 }

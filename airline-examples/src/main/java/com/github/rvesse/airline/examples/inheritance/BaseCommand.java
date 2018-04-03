@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.examples.modules;
+
+package com.github.rvesse.airline.examples.inheritance;
 
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.AllowedRawValues;
+import com.github.rvesse.airline.examples.ExampleRunnable;
 
-public class VerbosityModule {
+public abstract class BaseCommand implements ExampleRunnable {
 
-    @Option(name = { "-v", "--verbosity" }, arity = 1, title = "Level", description = "Sets the desired verbosity")
-    // The AllowedRawValues annotation allows an option to be restricted to a given set of values
-    @AllowedRawValues(allowedValues = { "1", "2", "3" })
-    public int verbosity = 1;
+    @Option(name = { "-v", "--verbose" }, description = "Enables verbose mode")
+    protected boolean verbose = false;
 }
