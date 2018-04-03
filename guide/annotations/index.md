@@ -44,6 +44,24 @@ The following annotations are used to specify the number of times that options/a
 - The [`@MinOccurrences`](min-occurrences.html) annotation indicates that an option/argument must be specified a minimum number of times
 - The [`@MaxOccurrences`](max-occurrences.html) annotation indicates that an option/argument may be specified a maximum number of times
 
+### Value Restrictions
+
+The following annotations are used to specify restrictions on the values for options/arguments:
+
+- The [`@AllowedRawValues`](allowed-raw-values.html) annotation specifies a set of strings that may be specified as the value
+- The [`@AllowedValues`](allowed-values.html) annotation specifies a set of values that may be specified as the value
+- The [`@MaxLength`](max-length.html) annotation specifies the maximum length of the value that may be given
+- The [`@MinLength`](min-length.html) annotation specifies the minimum length of the value that may be given
+- The [`@NotBlank`](not-blank.html) annotation specifies that a value may not consist entirely of white space
+- The [`@NotEmpty`](not-empty.html) annotation specifies that the value may not be an empty string
+- The [`@Path`](path.html) annotation specifies restrictions on values that refer to files and/or directories
+- The [`@Pattern`](pattern.html) annotation specifies that a value must match a regular expression
+- The [`@Port`](port.html) annotation specifies restrictions on values that represent port numbers
+
+#### Range Value Restrictions
+
+A further subset of annotations specify restrictions on the values for options/arguments in terms of ranges of acceptable values:
+
 ## Help Annotations
 
 The following annotations are used to add additional help information to commands that may be consumed by the various help generators provided by Airline by producing additional help sections.
