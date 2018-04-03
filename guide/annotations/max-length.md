@@ -7,8 +7,7 @@ title: MaxLength Annotation
 
 The `@MaxLength` annotation may be applied to fields annotated with [`@Option`](option.html) and [`@Arguments`](arguments.html) to limit the length of the value provided e.g.
 
-```
-java
+```java
 @Option(name = "--reference", arity = 1)
 @MaxLength(length = 10)
 private String reference;

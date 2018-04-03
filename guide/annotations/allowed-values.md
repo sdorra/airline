@@ -7,8 +7,7 @@ title: AllowedValues Annotation
 
 The `@AllowedValues` annotation may be applied to fields annotated with [`@Option`](option.html) and [`@Arguments`](arguments.html) to limit the set of values that an option may be used with e.g.
 
-```
-java
+```java
 @Option(name = { "-v", "--verbosity" }, arity = 1, title = "Level", description = "Sets the desired verbosity")
 @AllowedValues(allowedValues = { "1", "2", "3" })
 public int verbosity = 1;
@@ -20,3 +19,5 @@ Note that the restriction applies to the option value **after** the parser conve
 ### Related Annotations
 
 If there is only one way that a given value may be specified then it may be simpler and more efficient to use the [`@AllowedRawValues`](allowed-raw-values.html) annotation instead.
+
+For more complex value restrictions a regular expression based restriction using [`@Pattern`](pattern.html) might be appropriate.

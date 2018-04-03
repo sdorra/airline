@@ -7,8 +7,7 @@ title: MinLength Annotation
 
 The `@MinLength` annotation may be applied to fields annotated with [`@Option`](option.html) and [`@Arguments`](arguments.html) to limit the length of the value provided e.g.
 
-```
-java
+```java
 @Option(name = "--reference", arity = 1)
 @MinLength(length = 5)
 private String reference;
