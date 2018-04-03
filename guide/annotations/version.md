@@ -25,8 +25,8 @@ For example:
 
 ```java
 @Version(sources = "/version-info.txt", 
-                versionProperty = "ver", 
-                buildProperty = "bld")
+         versionProperty = "ver", 
+         buildProperty = "bld")
 ```
 Would look for version information specified in the `ver` and `bld` properties.
 
@@ -46,8 +46,8 @@ If you want to include additional version related information in this section th
 
 ```java
 @Version(sources = "/version-info.txt", 
-                 additionalProperties = [ "author", "commit" ],
-                 additionalTitles = [ "Author", "Commit" ])
+         additionalProperties = [ "author", "commit" ],
+         additionalTitles = [ "Author", "Commit" ])
 ```
 
 Would grab the `author` and `commit` properties from your version information files and title them `Author` and `Commit` in the output
