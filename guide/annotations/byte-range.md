@@ -9,11 +9,16 @@ The `@ByteRange` annotation may be applied to fields annotated with [`@Option`](
 
 ```java
 @Option(name = "--version", title = "Version", version = "Version to use")
-@LongRange(min = 1, minInclusive = true, max = 5, maxInclusive = true)
+@ByteRange(min = 1, minInclusive = true, max = 5, maxInclusive = true)
 public byte version;
 ```
 This specifies that the `--version` option only allows values in the range `1` through `5` to be specified by the user.  Any other value will be rejected.
 
+### Advanced Ranges
+
+The `minInclusive` and `maxInclusive` fields of the annotation specify whether the given `min` and `max` are included in the range or not.
+
+The `min` and `max` automatically default to the minimum and maximum for the corresponding type e.g. `Byte.MAX_VALUE` so there is no need to specify these explicitly if you simply wish to specify a minimum or maximum value only.
 
 ### Related Annotations
 
