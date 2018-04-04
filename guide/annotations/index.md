@@ -62,6 +62,14 @@ The following annotations are used to specify restrictions on the values for opt
 
 A further subset of annotations specify restrictions on the values for options/arguments in terms of ranges of acceptable values:
 
+- The [`@ByteRange`](byte-range.html) annotation specifies a range of `byte` values that are acceptable
+- The [`@DoubleRange`](double-range.html) annotation specifies a range of `double` values that are acceptable
+- The [`@FloatRange`](float-range.html) annotation specifies a range of `float` values that are acceptable
+- The [`@IntegerRange`](integer-range.html) annotation specifies a range of `int` values that are acceptable
+- The [`@LexicalRange`](lexical-range.html) annotation specifies a range of `string` values that are acceptable
+- The [`@LongRange`](long-range.html) annotation specifies a range of `long` values that are acceptable
+- The [`@ShortRange`](short-range.html) annotation specifies a range of `short` values that are acceptable
+
 ## Help Annotations
 
 The following annotations are used to add additional help information to commands that may be consumed by the various help generators provided by Airline by producing additional help sections.
