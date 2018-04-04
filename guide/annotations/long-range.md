@@ -8,7 +8,7 @@ title: LongRange Annotation
 The `@LongRange` annotation may be applied to fields annotated with [`@Option`](option.html) and [`@Arguments`](arguments.html) to limit the set of values that an option may be used with to a range of `long` values e.g.
 
 ```java
-@Option(name = "--birth-year", title = "Birth Year", version = "Year of Birth")
+@Option(name = "--birth-year", title = "Birth Year", description = "Year of Birth")
 @IntegerRange(min = 1900, minInclusive = true, max = 2018, maxInclusive = true)
 public long birthYear;
 ```

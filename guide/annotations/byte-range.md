@@ -8,7 +8,7 @@ title: ByteRange Annotation
 The `@ByteRange` annotation may be applied to fields annotated with [`@Option`](option.html) and [`@Arguments`](arguments.html) to limit the set of values that an option may be used with to a range of `byte` values e.g.
 
 ```java
-@Option(name = "--version", title = "Version", version = "Version to use")
+@Option(name = "--version", title = "Version", description = "Version to use")
 @ByteRange(min = 1, minInclusive = true, max = 5, maxInclusive = true)
 public byte version;
 ```

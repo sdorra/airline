@@ -8,7 +8,7 @@ title: DoubleRange Annotation
 The `@DoubleRange` annotation may be applied to fields annotated with [`@Option`](option.html) and [`@Arguments`](arguments.html) to limit the set of values that an option may be used with to a range of `double` values e.g.
 
 ```java
-@Option(name = "--opacity", title = "Opacity", version = "Desired opacity")
+@Option(name = "--opacity", title = "Opacity", description = "Desired opacity")
 @DoubleRange(min = 0.0, minInclusive = true, max = 1.0, maxInclusive = true)
 public double opacity;
 ```
