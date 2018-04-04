@@ -101,7 +101,7 @@ You can have as many `@Option` definitions as you need provided that none of the
 
 We can accept additional arbitrary inputs by annotating a field with the [`@Arguments`](annotations/arguments.html) annotation e.g.
 
-```
+```java
 @Arguments(description = "Additional arguments")
 private List<String> args;
 ```

@@ -11,13 +11,9 @@ Airline converts the string arguments that users pass into the JVM at the comman
 
 The `TypeConverter` may be specified as part of the [Parser Configuration](../parser/) but if not explicitly configured will use the `DefaultTypeConverter`.  Out of the box this will support most common types, any Java `enum` and any Java class that conforms to certain constraints.
 
-### Type Converter Providers
-
-Individual [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) can specify a `TypeConverterProvider` via their `typeConverterProvider` field which provides a way to override the type converter used on a per-field basis.  This can be used for features such as our [Numeric Converions](#numeric-converions) support.
-
 ### Common Types
 
-All of the following common Java types and any dervied type that may be assigned to them as determined by `Class.isAssignableFrom()` are supported:
+All of the following common Java types and any derived type that may be assigned to them as determined by `Class.isAssignableFrom()` are supported:
 
 - `String`
 - `Boolean`
@@ -67,6 +63,10 @@ The following table details the built in alternative numeric formats that are su
 There are also several abstract classes that can be used to implement alternative custom formats as desired such as `SequenceAbbreviatedNumericTypeConverter`.
 
 Additionally if you wish to use the default logic you can also use `DefaultNumericConverter`.
+
+## Type Converter Providers
+
+Individual [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) can specify a `TypeConverterProvider` via their `typeConverterProvider` field which provides a way to override the type converter used on a per-field basis.  This can be used for features such as our [Numeric Converions](#numeric-conversions) support.
 
 ## Custom Type Converters
 
@@ -138,7 +138,7 @@ ParserBuilder<Runnable> builder
 
 ### Using a Custom Type Converter on a per-field basis
 
-As discussed earlier you can specify ` TypeConverterProvider` on a per-field basis on your [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) to control the type converter used for that specific field.  A `TypeConverterProvider` has the following methods:
+As discussed earlier you can specify `TypeConverterProvider` on a per-field basis on your [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) to control the type converter used for that specific field.  A `TypeConverterProvider` has the following methods:
 
 ```java
 <T> TypeConverter getTypeConverter(OptionMetadata option, ParseState<T> state)
