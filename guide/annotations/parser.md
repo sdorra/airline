@@ -46,6 +46,30 @@ If we wanted to use a custom type converter as detailed in [Supported Types](../
 ```java
 @Parser(typeConverter = ExtendedTypeConverter.class)
 ```
+The provided class must implement the `TypeConverter` interface.
+
+#### Numeric Type Converter
+
+If we wanted to customise how numeric values are converted as detailed in [Supported Types](../practise/types.html) then we can use the `numericTypeConverter` field to do this e.g.
+
+```java
+@Parser(numericTypeConverter = KiloAs1000.class)
+```
+The provided class must implement the `NumericTypeConverter` interface.
+
+In this example the numeric type converter is set to use the built-in `KiloAs1000` numeric converter which allows for users to abbreviate numbers e.g. `4k` would be converted to `4000`
+
+### Boolean Flag Negation
+
+Often when using flag arguments i.e. those with `boolean` type and arity zero it is useful to allow users to specify both a positive and negative version of the flag.  For example we might want to have `--overwrite` and `--no-overwrite`.  In order to do this we need to define an option that has both versions present in its `name` array and set a `flagNegationPrefix` on our parser:
+
+```java
+@Parser(flagNegationPrefix = "--no-")
+```
+
+Now if a boolean arity zero option is used and its name starts with `--no-` then the parser will set its value to `false`, if the name does not start with the configured prefix then it will be set to `true` as usual.
+
+This behaviour is off by default and must be explicitly enabled.
 
 ### Command Factory
 
