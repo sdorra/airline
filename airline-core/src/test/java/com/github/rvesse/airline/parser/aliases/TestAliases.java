@@ -588,4 +588,22 @@ public class TestAliases {
         cli.parse("a");
     }
 
+    @Test(expectedExceptions = ParseAliasCircularReferenceException.class)
+    public void user_aliases_chained_04() throws IOException {
+        // Override a built-in and create a circular reference
+        prepareConfig(f, "Args1=a", "a=b", "b=Args1");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases("test", "target/")
+               .withAliasesOverridingBuiltIns()
+               .withAliasesChaining();
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        cli.parse("a");
+    }
 }
