@@ -5,9 +5,10 @@ title: User Defined Aliases
 
 In many more powerful CLIs such as `git` much of the power comes from providing the user with the ability to define their own command aliases.  Aliases are essentially user defined shortcuts that allow users to define their own commands that call other commands with specific options.
 
-For example say we have a `log` command that is going to output log information in a variety of formats:
+For example say we have a `logs` command that is going to output log information in a variety of formats:
 
 ```java
+@Command(name = "logs", description = "Show log information")
 public class Logs implements ExampleRunnable {
     
     public static enum Format {
