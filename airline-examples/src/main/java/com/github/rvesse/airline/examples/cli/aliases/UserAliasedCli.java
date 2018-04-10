@@ -46,7 +46,7 @@ public class UserAliasedCli {
                                                  .withDescription("A simple CLI with several commands available")
                                                  // Define some commands
                                                  .withCommand(Simple.class)
-                                                 .withCommands(Parent.class, Child.class, GoodGrandchild.class)
+                                                 .withCommands(Parent.class, Child.class, GoodGrandchild.class, Logs.class)
                                                  .withCommand(Help.class);
         //@formatter:on
         // Read aliases from user configuration file
@@ -54,7 +54,7 @@ public class UserAliasedCli {
         // src/main/resources/aliases.config
         //@formatter:off
         builder.withParser()
-               .withUserAliases("aliases.config", null, "src/main/resources/");
+               .withUserAliases("aliases.config", null, "~/.cli/", "src/main/resources/");
         //@formatter:on
 
         ExampleExecutor.executeCli(builder.build(), args);

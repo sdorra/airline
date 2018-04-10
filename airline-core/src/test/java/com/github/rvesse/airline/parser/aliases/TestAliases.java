@@ -33,6 +33,7 @@ import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.model.AliasMetadata;
+import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
 public class TestAliases {
@@ -467,6 +468,124 @@ public class TestAliases {
                 ""
                 }, '\n'));
         //@formatter:on
+    }
+
+    private String[] generateAliasesChain(int links, boolean circular, String terminal) {
+        String[] aliases = new String[links];
+        for (int i = 0; i < links; i++) {
+            if (i < links - 1) {
+                aliases[i] = String.format("%s=%s", (char) ('a' + i), (char) ('a' + i + 1));
+            } else if (circular) {
+                aliases[i] = String.format("%s=a", (char) ('a' + i));
+            } else {
+                aliases[i] = String.format("%s=%s", (char) ('a' + i), terminal);
+            }
+        }
+        return aliases;
+    }
+
+    @Test
+    public void user_aliases_chained_01() throws IOException {
+        String[] aliases = generateAliasesChain(2, false, "Args1");
+        prepareConfig(f, aliases);
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases("test", "target/")
+               .withAliasesChaining();
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        cli.parse(aliases[0].substring(0, aliases[0].indexOf('=')));
+    }
+    
+    @Test
+    public void user_aliases_chained_02() throws IOException {
+        for (int i = 1; i < 20; i++) {
+            String[] aliases = generateAliasesChain(i, false, "Args1");
+            prepareConfig(f, aliases);
+
+            //@formatter:off
+            CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                           .withCommand(Args1.class);
+            builder.withParser()
+                   .withUserAliases("test", "target/")
+                   .withAliasesChaining();
+            Cli<Args1> cli = builder.build();
+            //@formatter:on
+
+            // Check parsing
+            for (int j = 0; j < aliases.length; j++) {
+                cli.parse(aliases[j].substring(0, aliases[j].indexOf('=')));
+            }
+        }
+    }
+    
+    @Test(expectedExceptions = ParseAliasCircularReferenceException.class)
+    public void user_aliases_circular_01() throws IOException {
+        String[] aliases = generateAliasesChain(2, true, null);
+        prepareConfig(f, aliases);
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases("test", "target/")
+               .withAliasesChaining();
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        cli.parse(aliases[0].substring(0, aliases[0].indexOf('=')));
+    }
+
+    @Test
+    public void user_aliases_circular_02() throws IOException {
+        for (int i = 1; i < 20; i++) {
+            String[] aliases = generateAliasesChain(i, true, null);
+            prepareConfig(f, aliases);
+
+            //@formatter:off
+            CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                           .withCommand(Args1.class);
+            builder.withParser()
+                   .withUserAliases("test", "target/")
+                   .withAliasesChaining();
+            Cli<Args1> cli = builder.build();
+            //@formatter:on
+
+            // Check parsing
+            for (int j = 0; j < aliases.length; j++) {
+                try {
+                    cli.parse(aliases[j].substring(0, aliases[j].indexOf('=')));
+                    
+                    Assert.fail("Did not produce circular reference exception");
+                } catch (ParseAliasCircularReferenceException e) {
+                    // Expected, continue
+                }
+            }
+        }
+    }
+    
+    @Test(expectedExceptions = ParseAliasCircularReferenceException.class)
+    public void user_aliases_chained_03() throws IOException {
+        // Self-referential
+        prepareConfig(f, "a=a");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases("test", "target/")
+               .withAliasesChaining();
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        cli.parse("a");
     }
 
 }
