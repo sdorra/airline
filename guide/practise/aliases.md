@@ -181,3 +181,11 @@ Positional parameters are resolved by taking the user inputs after the alias in 
 {% include alert.html %}
 If you use positional parameters in your aliases and no suitable user input is provided to resolve those parameters they are expanded as-is.  For example if a user types `cli l` this expands to `cli logs --format $1` which would result in a parsing error as `$1` is not a valid format.
 {% include end-alert.html %}
+
+You can of course use positional parameters to do more complex rewrites.  For example lets say you have a command that takes in input then output but you prefer to specify them the other way around:
+
+```
+reversed=command $2 $1
+```
+
+Here invoking `reversed out in` expands to `command in out`
