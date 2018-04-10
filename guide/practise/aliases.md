@@ -125,7 +125,11 @@ So what happens if a CLI defines a `logs` command and the user tries to define a
 
 The default is that the built-in command takes precedence so the users alias would be ignored.
 
-Some times if might be desirable to allow users to override built-ins in which case you can either call `withAliasesOverridingBuiltIns()` on the Fluent API or adding the `aliasesOverrideBuiltIns = true` field to your `@Parser` annotation.
+Some times if might be desirable to allow users to override built-ins in which case you can either call `withAliasesOverridingBuiltIns()` on the Fluent API or add the `aliasesOverrideBuiltIns = true` field to your `@Parser` annotation.
+
+{% include alert.html %}
+If you enable overriding it *MAY* prevent users from accessing the overridden built-in's depending on whether you have also enabled chaining (see below) and the users alias definition.  Therefore carefully consider whether you want to allow overriding before enabling it.
+{% include end-alert.html %}
 
 #### Alias Chaining
 
