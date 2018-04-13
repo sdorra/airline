@@ -9,7 +9,7 @@ Airline includes a powerful and extensible restrictions system that allows users
 
 ## Available Restrictions
 
-{% include restrictions.md path="../annotations/" }
+{% include restrictions.md path="../annotations/" %}
 
 ## Custom Restrictions
 
