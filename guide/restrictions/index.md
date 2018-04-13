@@ -9,13 +9,7 @@ Airline includes a powerful and extensible restrictions system that allows users
 
 ## Available Restrictions
 
-### Required Restrictions
-
-**TODO List required restrictions**
-
-### Value Restrictions
-
-**TODO List value restrictions**
+{% include restrictions.md path="../annotations/" }
 
 ## Custom Restrictions
 

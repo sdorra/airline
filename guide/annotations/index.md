@@ -27,48 +27,7 @@ The following annotations are used to define various restrictions on options and
 
 All these annotations are applied to fields that are annotated with [`@Option`](option.html) or [`@Arguments`](arguments.html) and are automatically discovered during meta-data extraction.  If you are overriding the definition of an option then restrictions are automatically inherited unless you specify new restrictions further as part of your override.  In the case where you wish to remove inherited restrictions you can use the special [`@Unrestricted`](unrestricted.html) annotation to indicate that.
 
-### Requirement Restrictions
-
-The following annotations are used to specify that options/arguments (or combinations thereof) are required:
-
-- The [`@Required`](required.html) annotation indicates that an option/argument must be specified
-- The [`@RequireSome`](require-some.html) annotation indicates that one/more from some set of options must be specified
-- The [`@RequireOnlyOne`](require-only-one.html) annotation indicates that precisely one of some set of options must be specified
-- The [`@MutuallyExclusiveWith`](mutually-exclusive-with.html) annotation indicates that precisely one of some set of options may be specified
-
-### Occurrence Restrictions
-
-The following annotations are used to specify the number of times that options/arguments can be specified:
-
-- The [`@Once`](once.html) annotation indicates that at option/argument may be specified only once
-- The [`@MinOccurrences`](min-occurrences.html) annotation indicates that an option/argument must be specified a minimum number of times
-- The [`@MaxOccurrences`](max-occurrences.html) annotation indicates that an option/argument may be specified a maximum number of times
-
-### Value Restrictions
-
-The following annotations are used to specify restrictions on the values for options/arguments:
-
-- The [`@AllowedRawValues`](allowed-raw-values.html) annotation specifies a set of strings that may be specified as the value
-- The [`@AllowedValues`](allowed-values.html) annotation specifies a set of values that may be specified as the value
-- The [`@MaxLength`](max-length.html) annotation specifies the maximum length of the value that may be given
-- The [`@MinLength`](min-length.html) annotation specifies the minimum length of the value that may be given
-- The [`@NotBlank`](not-blank.html) annotation specifies that a value may not consist entirely of white space
-- The [`@NotEmpty`](not-empty.html) annotation specifies that the value may not be an empty string
-- The [`@Path`](path.html) annotation specifies restrictions on values that refer to files and/or directories
-- The [`@Pattern`](pattern.html) annotation specifies that a value must match a regular expression
-- The [`@Port`](port.html) annotation specifies restrictions on values that represent port numbers
-
-#### Range Value Restrictions
-
-A further subset of annotations specify restrictions on the values for options/arguments in terms of ranges of acceptable values:
-
-- The [`@ByteRange`](byte-range.html) annotation specifies a range of `byte` values that are acceptable
-- The [`@DoubleRange`](double-range.html) annotation specifies a range of `double` values that are acceptable
-- The [`@FloatRange`](float-range.html) annotation specifies a range of `float` values that are acceptable
-- The [`@IntegerRange`](integer-range.html) annotation specifies a range of `int` values that are acceptable
-- The [`@LexicalRange`](lexical-range.html) annotation specifies a range of `string` values that are acceptable
-- The [`@LongRange`](long-range.html) annotation specifies a range of `long` values that are acceptable
-- The [`@ShortRange`](short-range.html) annotation specifies a range of `short` values that are acceptable
+{% include restrictions.md path="" %}
 
 ## Help Annotations
 
