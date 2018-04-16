@@ -169,7 +169,8 @@
           <excludes>
             <exclude>license.txt</exclude>
             <exclude>pom.xml</exclude>
-            <exclude>**/*.config</exclude>
+	    <exclude>**/*.config</exclude>
+	    <exclude>docs/</exclude>
           </excludes>
         </configuration>
         <executions>
