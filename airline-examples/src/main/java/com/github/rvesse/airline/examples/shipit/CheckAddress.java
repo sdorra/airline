@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.examples.cli.aliases;
+package com.github.rvesse.airline.examples.shipit;
+
+import javax.inject.Inject;
 
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.examples.ExampleRunnable;
 
-@Command(name = "logs", description = "Show log information")
-public class Logs implements ExampleRunnable {
-    
-    public static enum Format {
-        PlainText,
-        Json,
-        Xml
-    }
-    
-    @Option(name = { "-f", "--format" }, title = "Format", description = "Sets the desired output format")
-    private Format format = Format.PlainText;
+@Command(name = "check-address", description = "Check if an address meets our restrictions")
+public class CheckAddress implements ExampleRunnable {
+
+    @Inject
+    private PostalAddress address = new PostalAddress();
 
     @Override
     public int run() {
-        // In a real command actual implementation would go here...
-        System.out.println("Output Format: " + this.format.name());
+        System.out.println(this.address.toString());
         return 0;
     }
 }
