@@ -1,0 +1,32 @@
+# Dependencies
+markdown: kramdown
+highlighter: rouge
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Permalinks
+permalink:        none
+
+# Site settings
+title: Airline
+email: rvesse@dotnetrdf.org
+description: > 
+  Annotation-driven Java framework for building powerful Git style CLIs in Java
+baseurl: "/airline" 
+url: "http://rvesse.github.io"
+twitter_username: RobVesse
+github_username:  rvesse
+exclude: [ "scripts" ]
+
+author:
+  name:           "Rob Vesse"
+  url:            https://twitter.com/RobVesse
+
+# Custom vars
+version:          2.4.0
+dev_version:	"2.4.1-SNAPSHOT"
+
+github:
+  repo:           https://github.com/rvesse/airline

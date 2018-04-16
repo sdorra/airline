@@ -1,0 +1,27 @@
+# Maven Artifacts
+target/
+pom.xml.versionsBackup
+test-output/
+dependency-reduced-pom.xml
+release.properties
+*.xml.releaseBackup
+
+# OS X Artifacts
+.DS_Store
+
+# Eclipse Artifacts
+.classpath
+.project
+.settings
+
+# Idea Artifacts
+.idea
+*.iml
+*.iws
+*.ipr
+
+# Bundle/Jekyll Artifacts
+Gemfile.lock
+_site/
+scripts/*.jar
+scripts/*.jar.md5

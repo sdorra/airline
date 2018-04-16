@@ -1,0 +1,65 @@
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    {% if page.title == "Home" %}
+      {{ site.title }} &middot; {{ site.tagline }}
+    {% else %}
+      {{ page.title }} &middot; {{ site.title }}
+    {% endif %}
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ site.baseurl }}/public/css/poole.css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/public/css/syntax.css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{ site.baseurl}}/public/css/jquery.multilevelpushmenu.css">
+
+  <!-- Icons -->
+  <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ site.baseurl }}/public/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="{{ site.baseurl }}/public/favicon.ico">-->
+
+  <!-- Scripts -->
+  <script src="{{ site.baseurl }}/public/js/jquery.js" type="text/javascript"></script>
+  <script src="{{ site.baseurl }}/public/js/jquery.multilevelpushmenu.js" type="text/javascript"></script>
+  <script type="text/javascript">
+  $(document).ready(function(){
+    $( '#menu' ).multilevelpushmenu({
+      containersToPush: [$( '#menu' )],
+      direction: "ltr",
+      menuWidth: "100%",
+      menuHeight: "480px",
+      preventItemClick: false,
+      mode: "cover",
+      durationTransition: 0,
+      backItemIcon: "fa fa-angle-left",
+      groupIcon: "fa fa-angle-right"
+    });
+  
+    // Expand menu to currently selected page if possible
+    var currMenuItem = $("#menu a[href='" + location.pathname + "']").first();
+    if (currMenuItem.length > 0) {
+      //console.log("Current Menu Item:");
+      //console.log(currMenuItem);
+      var menuLevelObj = currMenuItem.parents(".levelHolderClass").first();
+      //console.log("Menu Level Object:");
+      //console.log(menuLevelObj);
+      if (menuLevelObj.length > 0) {
+        $('#menu').multilevelpushmenu('expand', menuLevelObj);
+      }
+    }  
+
+    // Resize when window resized
+   $( window ).resize(function() {
+     $('#menu').multilevelpushmenu('redraw');
+   });
+  });
+</script> 
+</head>
