@@ -27,6 +27,8 @@ import com.github.rvesse.airline.parser.options.ListValueOptionParser;
      defaultCommand = Help.class, 
      commands = {
              CheckAddress.class,
+             Send.class,
+             Price.class,
              Help.class
      },
      description = "A demonstration CLI around shipping",
