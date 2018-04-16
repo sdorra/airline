@@ -15,8 +15,6 @@
  */
 package com.github.rvesse.airline.examples;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.parser.errors.ParseException;
@@ -56,7 +54,6 @@ public class ExampleExecutor {
 
     public static <T extends ExampleRunnable> void executeCli(Cli<T> cli, String[] args) {
         try {
-            System.out.println(StringUtils.join(args, '\n'));
             T cmd = cli.parse(args);
             execute(cmd);
         } catch (ParseException e) {

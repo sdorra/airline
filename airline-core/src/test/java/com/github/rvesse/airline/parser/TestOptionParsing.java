@@ -259,31 +259,31 @@ public class TestOptionParsing {
         }
     }
     
-    @Test(expectedExceptions = ParseOptionMissingValueException.class)
+    @Test(expectedExceptions = ParseOptionMissingValueException.class, expectedExceptionsMessageRegExp = "Required values.*")
     public void option_parsing_list_value_bad_01() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-c");
     }
 
-    @Test(expectedExceptions = ParseOptionMissingValueException.class)
+    @Test(expectedExceptions = ParseOptionMissingValueException.class, expectedExceptionsMessageRegExp = "Too few.*")
     public void option_parsing_list_value_bad_02() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-c", "one");
     }
     
-    @Test(expectedExceptions = ParseOptionUnexpectedException.class)
+    @Test(expectedExceptions = ParseOptionUnexpectedException.class, expectedExceptionsMessageRegExp = "Too many.*")
     public void option_parsing_list_value_bad_03() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-c", "one,two,three");
     }
     
-    @Test(expectedExceptions = ParseOptionMissingValueException.class)
+    @Test(expectedExceptions = ParseOptionMissingValueException.class, expectedExceptionsMessageRegExp = "Too few.*")
     public void option_parsing_list_value_bad_04() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-cone");
     }
     
-    @Test(expectedExceptions = ParseOptionUnexpectedException.class)
+    @Test(expectedExceptions = ParseOptionUnexpectedException.class, expectedExceptionsMessageRegExp = "Too many.*")
     public void option_parsing_list_value_bad_05() {
         Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
         testParsing(parser, "OptionParsing1", "-cone,two,three");
@@ -323,6 +323,26 @@ public class TestOptionParsing {
         Assert.assertEquals(cmd.charlie.size(), 2);
         Assert.assertEquals(cmd.charlie.get(0), "one");
         Assert.assertEquals(cmd.charlie.get(1), "two");
+    }
+    
+    @Test
+    public void option_parsing_list_value_05() {
+        Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
+        OptionParsing cmd = testParsing(parser, "OptionParsing1", "-b", "foo,bar");
+
+        Assert.assertEquals(cmd.beta, "bar");
+    }
+    
+    @Test
+    public void option_parsing_list_value_06() {
+        Cli<OptionParsing> parser = createListValueParser(OptionParsing.class, ',');
+        OptionParsing cmd = testParsing(parser, "OptionParsing1", "-cone,two,three,four");
+
+        Assert.assertEquals(cmd.charlie.size(), 4);
+        Assert.assertEquals(cmd.charlie.get(0), "one");
+        Assert.assertEquals(cmd.charlie.get(1), "two");
+        Assert.assertEquals(cmd.charlie.get(2), "three");
+        Assert.assertEquals(cmd.charlie.get(3), "four");
     }
     
     private <T> Cli<T> createListValueParser(Class<? extends T> cls, char listSeparator) {

@@ -8,6 +8,8 @@
     - Fix bug in `@MutuallyExclusiveWith` error message (#66) - Thanks to [GTarkin](http://github/com/GTarkin/) for reporting
     - Fix bug with `flagNegationPrefix` specified via annotation - Thanks to [rkhaja](https://github.com/rkhaja) for the fix
     - Add missing Javadoc
+- Parser Changes
+    - `ListValuesOptionParser` now accepts any number of values that are a multiple of the arity of the option so can now be used for options that wish to allow multiple values in a single list 
 
 
 ## 2.3.0

@@ -36,7 +36,8 @@ import com.github.rvesse.airline.utils.AirlineUtils;
  * differs from the {@link StandardOptionParser} in that the standard parser
  * would treat {@code foo,bar} as a single value passed to the name option. This
  * parser expects that the list it receives contains the correct number of items
- * for the arity of the option and if not produces an error
+ * for the arity of the option, or an exact multiple thereof and if not produces
+ * an error
  * </p>
  * <p>
  * You can also omit the whitespace between the name and the value list when
@@ -100,7 +101,8 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
             // prefix
             String rawBooleanValue = state.getParserConfiguration().allowsFlagNegation()
                     && StringUtils.startsWith(name, state.getParserConfiguration().getFlagNegationPrefix())
-                            ? Boolean.FALSE.toString() : Boolean.TRUE.toString();
+                            ? Boolean.FALSE.toString()
+                            : Boolean.TRUE.toString();
             state = state.withOptionValue(option, rawBooleanValue).popContext();
         } else {
             if (list == null) {
@@ -114,20 +116,23 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
             }
 
             // Parse value as a list
+            // Check the size of the list
+            // Must receive either the exact arity of the option OR an exact
+            // multiple of the arity of the option
             List<String> listValues = getValues(list);
             if (listValues.size() < option.getArity()) {
-                state.getParserConfiguration().getErrorHandler()
-                        .handleError(new ParseOptionMissingValueException(
-                                "Too few option values received for option %s in list value '%s' (%d values expected but only found %d)",
-                                option.getTitle(), option.getOptions().iterator().next(), list, option.getArity(),
-                                listValues.size()));
+                // Too few arguments
+                state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionMissingValueException(
+                        "Too few option values received for option %s in list value '%s' (%d values expected but only found %d)",
+                        option.getTitle(), option.getOptions().iterator().next(), list, option.getArity(),
+                        listValues.size()));
                 return state;
             }
-            if (listValues.size() > option.getArity()) {
-                state.getParserConfiguration().getErrorHandler()
-                        .handleError(new ParseOptionUnexpectedException(
-                                "Too many option values received for option %s in list value '%s' (%d values expected but found %d)",
-                                option.getOptions().iterator().next(), list, option.getArity(), listValues.size()));
+            if (listValues.size() > option.getArity() && listValues.size() % option.getArity() != 0) {
+                // Too many arguments
+                state.getParserConfiguration().getErrorHandler().handleError(new ParseOptionUnexpectedException(
+                        "Too many option values received for option %s in list value '%s' (%d values expected but found %d)",
+                        option.getOptions().iterator().next(), list, option.getArity(), listValues.size()));
                 return state;
             }
 

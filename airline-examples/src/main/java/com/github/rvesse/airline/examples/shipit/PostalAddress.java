@@ -27,6 +27,11 @@ import com.github.rvesse.airline.annotations.restrictions.RequireOnlyOne;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
 
+/**
+ * Represents a UK postal address
+ * @author rvesse
+ *
+ */
 public class PostalAddress {
     
     @Option(name = "--recipient", title = "Recipient", description = "Specifies the name of the receipient")
