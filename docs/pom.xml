@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.github.rvesse</groupId>
+    <artifactId>airline-parent</artifactId>
+    <version>2.4.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>airline-docs</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Airline - Documentation</name>
+  <description>Documentation for Airline</description>
+
+  <properties>
+    <license.header.path>${project.parent.basedir}</license.header.path>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <configuration>
+              <target>
+                <exec executable="./scripts/build-site.sh"
+                  failonerror="false" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-offline-site</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <appendAssemblyId>true</appendAssemblyId>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <tarLongFileFormat>gnu</tarLongFileFormat>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

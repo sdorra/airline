@@ -18,7 +18,7 @@ baseurl: "/airline"
 url: "http://rvesse.github.io"
 twitter_username: RobVesse
 github_username:  rvesse
-exclude: [ "scripts" ]
+exclude: [ "scripts", "pom.xml", "assembly.xml", "target" ]
 
 author:
   name:           "Rob Vesse"

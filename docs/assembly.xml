@@ -1,0 +1,20 @@
+<assembly
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>offline-site</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+  <baseDirectory>airline-docs-${project.version}</baseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>_site/</directory>
+      <includes />
+      <directoryMode>0755</directoryMode>
+      <fileMode>0644</fileMode>
+    </fileSet>
+  </fileSets>
+</assembly>
