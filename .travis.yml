@@ -1,3 +1,4 @@
 language: java
 sudo: false
-script: mvn install -Prelease
+install: true
+script: mvn install -Prelease -Dgpg.skip=true
