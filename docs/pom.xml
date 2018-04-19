@@ -17,8 +17,11 @@
   <properties>
     <license.header.path>${project.parent.basedir}</license.header.path>
   </properties>
- 
+
   <dependencies>
+    <!-- We want to grab the Javadoc from these modules for inclusion in 
+      the generated website so ensure that they build first by declaring dependencies 
+      upon them -->
     <dependency>
       <groupId>com.github.rvesse</groupId>
       <artifactId>airline-help-bash</artifactId>
@@ -58,6 +61,7 @@
         <artifactId>license-maven-plugin</artifactId>
         <executions>
           <execution>
+            <!-- No license checking needed for the site -->
             <phase>none</phase>
           </execution>
         </executions>
@@ -68,6 +72,7 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
+            <id>generate-offline-site</id>
             <phase>package</phase>
             <configuration>
               <target>
