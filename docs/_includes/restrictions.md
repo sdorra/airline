@@ -40,3 +40,9 @@ A further subset of annotations specify restrictions on the values for options/a
 - The [`@LexicalRange`]({{ include.path }}lexical-range.html) annotation specifies a range of `string` values that are acceptable
 - The [`@LongRange`]({{ include.path }}long-range.html) annotation specifies a range of `long` values that are acceptable
 - The [`@ShortRange`]({{ include.path }}short-range.html) annotation specifies a range of `short` values that are acceptable
+
+### Special Restrictions
+
+The following are special purpose restrictions:
+
+- The [`@Unrestricted`]({{ include.path }}unrestricted.html) annotation indicates that no restrictions apply to the option.  Used in conjunction with option overriding to clear restrictions.
