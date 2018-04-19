@@ -17,6 +17,39 @@
   <properties>
     <license.header.path>${project.parent.basedir}</license.header.path>
   </properties>
+ 
+  <dependencies>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-help-bash</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-help-html</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-help-man</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-help-markdown</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-io</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>

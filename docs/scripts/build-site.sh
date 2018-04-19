@@ -14,5 +14,7 @@ SCRIPT_DIR=$(cd ${SCRIPT_DIR} && pwd)
 "${SCRIPT_DIR}/add-javadoc.sh" "${VERSION}"
 
 # Regenerate the site
+# Make sure we always have the latest dependencies
+bundle install
 bundle exec jekyll build -b "." -V
 exit $?
