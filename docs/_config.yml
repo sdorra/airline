@@ -30,3 +30,5 @@ dev_version:	"2.4.1-SNAPSHOT"
 
 github:
   repo:           https://github.com/rvesse/airline
+  
+javadoc_versions: [ "2.3.0", "2.2.0", "2.1.0" ]

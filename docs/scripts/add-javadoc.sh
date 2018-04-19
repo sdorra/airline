@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 while [ -L "${SCRIPT_DIR}" ];
@@ -30,14 +30,24 @@ if [ ! -d "${TARGET_DIR}" ]; then
 fi
 
 ARTIFACTS=(airline airline-help-man airline-help-bash airline-help-html airline-help-markdown airline-io)
-for ARTIFACT in "${ARTIFACTS[@]}"; do
-  # Download
-  ARTIFACT_FILE=$(getArtifact ${ARTIFACT} ${VERSION} "javadoc" ".jar")
-  if [ -z "${ARTIFACT_FILE}" ]; then
-    echo "Failed to download Javadoc for Artifact ${ARTIFACT} version ${VERSION}"
-    exit 1
+MODULES=("airline-core" "airline-help/airline-help-man" "airline-help/airline-help-bash" "airline-help/airline-help-html" "airline-help/airline-help-markdown" "airline-io")
+for i in "${!ARTIFACTS[@]}"; do
+  ARTIFACT="${ARTIFACTS[$i]}"
+  MODULE="${MODULES[$i]}"
+
+  # Copy or Download as appropriate
+  if [ -f "${SCRIPT_DIR}/../../${MODULE}/target/${ARTIFACT}-${VERSION}-javadoc.jar" ]; then
+    ARTIFACT_FILE="${ARTIFACT}-${VERSION}-javadoc.jar"
+    cp "${SCRIPT_DIR}/../../${MODULE}/target/${ARTIFACT}-${VERSION}-javadoc.jar" "${SCRIPT_DIR}/${ARTIFACT_FILE}"
+    echo "Copied local Javadoc for ${ARTIFACT} version ${VERSION} (${ARTIFACT_FILE})"
+  else
+    ARTIFACT_FILE=$(getArtifact ${ARTIFACT} ${VERSION} "javadoc" ".jar")
+    if [ -z "${ARTIFACT_FILE}" ]; then
+      echo "Failed to download Javadoc for Artifact ${ARTIFACT} version ${VERSION}"
+      exit 1
+    fi
+    echo "Got Javadoc for ${ARTIFACT} version ${VERSION} (${ARTIFACT_FILE})"
   fi
-  echo "Got Javadoc for ${ARTIFACT} version ${VERSION} (${ARTIFACT_FILE})"
   echo
 
   # Unpack

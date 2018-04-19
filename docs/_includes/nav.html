@@ -3,11 +3,11 @@
   <li>
   	<a href="#">User Guide</a>
   	<ul>
-      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/">Introduction to Airline</a>
+      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/index.html">Introduction to Airline</a>
   	  <li>
   	  	<a href="#">Annotations</a>
   	  	<ul>
-          <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/">Annotations Overview</a></li>
+          <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/annotations/index.html">Annotations Overview</a></li>
           <li>
             <a href="#">Meta-data Annotations</a>
             <ul>
@@ -86,16 +86,16 @@
         </ul>
   	  </li>
   	  <li>
-  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/parser/">Parser</a> 
+  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/parser/index.html">Parser</a> 
       </li>
   	  <li>
-  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/restrictions/">Restrictions</a> 
+  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/restrictions/index.html">Restrictions</a> 
       </li>
       <li>
-  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/help/">Help</a> 
+  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/help/index.html">Help</a> 
       </li>
       <li>
-  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/">Airline In Practise</a>
+  	    <a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/index.html">Airline In Practise</a>
   	    <ul>
   	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/oop.html">Inheritance and Composition</a></li>
   	      <li><a class="sidebar-nav-item" href="{{ site.baseurl }}/guide/practise/types.html">Supported Types</a></li>
@@ -118,22 +118,12 @@
       <li>
         <a href="#">Past Versions</a>
 	<ul>
+	    {% for javadoc in site.javadoc_versions %}
           <li>
-            <a href="#">2.4.0</a>
-	    {% include javadoc-nav.html version="2.4.0" %}
-	  </li>
-          <li>
-            <a href="#">2.3.0</a>
-	    {% include javadoc-nav.html version="2.3.0" %}
-	  </li>
-          <li>
-            <a href="#">2.2.0</a>
-	    {% include javadoc-nav.html version="2.2.0" %}
-	  </li>
-          <li>
-            <a href="#">2.1.0</a>
-            {% include javadoc-nav.html version="2.1.0" %}
-          </li>
+            <a href="#">{{ javadoc }}</a>
+	    {% include javadoc-nav.html version=javadoc %}
+	    </li>
+	    {% endfor %}
         </ul>
       </li>
     </ul>

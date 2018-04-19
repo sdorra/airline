@@ -39,7 +39,9 @@
             <configuration>
               <target>
                 <exec executable="./scripts/build-site.sh"
-                  failonerror="false" />
+                  failonerror="false">
+                  <arg value="${project.version}" />
+                </exec>
               </target>
             </configuration>
             <goals>

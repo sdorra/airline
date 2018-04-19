@@ -1,4 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
+while [ -L "${SCRIPT_DIR}" ];
+do
+  SCRIPT_DIR=$(readlink "${SCRIPT_DIR}")
+done
+SCRIPT_DIR=$(cd ${SCRIPT_DIR} && pwd)
 
 export RELEASE_REPO=https://repo1.maven.org/maven2
 export DEV_REPO=https://oss.sonatype.org/content/repositories/snapshots/
@@ -29,8 +36,8 @@ function getArtifact() {
   URL="${URL}${EXT}"
   local CHECKSUM_URL="${URL}.md5"
 
-  local DOWNLOAD_FILE="${ARTIFACT_ID}-${FILE_VERSION}-${CLASSIFIER}${EXT}"
-  local CHECKSUM_FILE="${DOWNLOAD_FILE}.md5"
+  local DOWNLOAD_FILE="${SCRIPT_DIR}/${ARTIFACT_ID}-${FILE_VERSION}-${CLASSIFIER}${EXT}"
+  local CHECKSUM_FILE="${SCRIPT_DIR}/${DOWNLOAD_FILE}.md5"
   curl -f "${URL}" > "${DOWNLOAD_FILE}"
   if [ $? -ne 0 ]; then
     echo "CURL failed to download artifact from URL ${URL}"     1>&2
