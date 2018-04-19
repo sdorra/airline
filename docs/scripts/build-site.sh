@@ -15,6 +15,6 @@ SCRIPT_DIR=$(cd ${SCRIPT_DIR} && pwd)
 
 # Regenerate the site
 # Make sure we always have the latest dependencies
-bundle install
+bundle update
 bundle exec jekyll build -b "." -V
 exit $?
