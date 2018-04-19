@@ -59,7 +59,7 @@ for i in "${!ARTIFACTS[@]}"; do
     exit 1
   fi
   pushd "${ARTIFACT_DIR}"
-  tar -xvf "${SCRIPT_DIR}/${ARTIFACT_FILE}" > extract.log 2>&1
+  unzip "${SCRIPT_DIR}/${ARTIFACT_FILE}" > extract.log 2>&1
   if [ $? -ne 0 ]; then
     cat extract.log
     echo "Failed to unpack Javadoc from file ${ARTIFACT_FILE}"
