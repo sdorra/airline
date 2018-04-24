@@ -110,7 +110,7 @@ public class TestParametersDelegate
         public static class LeafDelegate
         {
             @Option(name = "--list")
-            public List<String> list = Arrays.asList(new String[] { "value1", "value2" });
+            public List<String> list = new ArrayList<String>(Arrays.asList(new String[] { "value1", "value2" }));
 
             @Option(name = "--bool")
             public boolean bool;

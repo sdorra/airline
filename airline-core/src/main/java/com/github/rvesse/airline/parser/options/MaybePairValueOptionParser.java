@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.parser.options;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,7 +69,8 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
     }
 
     protected final List<String> getValues(String list) {
-        return Arrays.asList(StringUtils.split(list, new String(new char[] { this.separator }), 2));
+        // NB - Arrays.asList() is a fixed length list so need to copy as we may try to add to this list
+        return new ArrayList<String>(Arrays.asList(StringUtils.split(list, new String(new char[] { this.separator }), 2)));
     }
 
     @Override
