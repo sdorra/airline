@@ -24,6 +24,7 @@ import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.utils.AirlineUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class ParserUtil {
             Object injectee = bindings.get(accessor.getJavaType());
 
             if (injectee != null) {
-                accessor.addValues(commandInstance, ListUtils.unmodifiableList(AirlineUtils.singletonList(injectee)));
+                accessor.addValues(commandInstance, ListUtils.unmodifiableList(Collections.singletonList(injectee)));
             }
         }
 

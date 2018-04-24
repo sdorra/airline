@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,7 +128,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
     }
 
     public CliBuilder<C> withDefaultRestrictions() {
-        restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
+        restrictions.addAll(Arrays.asList(GlobalRestriction.DEFAULTS));
         return this;
     }
 

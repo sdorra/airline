@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.github.rvesse.airline.TestingUtil.singleCommandParser;
@@ -109,7 +110,7 @@ public class TestParametersDelegate
         public static class LeafDelegate
         {
             @Option(name = "--list")
-            public List<String> list = AirlineUtils.arrayToList(new String[] { "value1", "value2" });
+            public List<String> list = Arrays.asList(new String[] { "value1", "value2" });
 
             @Option(name = "--bool")
             public boolean bool;
@@ -148,7 +149,7 @@ public class TestParametersDelegate
     {
         CombinedAndNestedDelegates p = singleCommandParser(CombinedAndNestedDelegates.class)
                 .parse("-d", "234", "--list", "a", "--list", "b", "-a");
-        assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, AirlineUtils.arrayToList(new String[] { "value1", "value2", "a", "b" }));
+        assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, Arrays.asList(new String[] { "value1", "value2", "a", "b" }));
         assertFalse(p.nestedDelegate2.nestedDelegate1.leafDelegate.bool);
         assertEquals(p.nestedDelegate2.nestedDelegate1.d, Integer.valueOf(234));
         assertFalse(p.nestedDelegate2.isC);
@@ -254,8 +255,8 @@ public class TestParametersDelegate
     public void duplicateMainParametersAreAllowed()
     {
         DuplicateMainParametersAreAllowed value = singleCommandParser(DuplicateMainParametersAreAllowed.class).parse("main", "params");
-        assertEquals(value.delegate1.mainParams1, AirlineUtils.arrayToList(new String[] { "main", "params" }));
-        assertEquals(value.delegate2.mainParams1, AirlineUtils.arrayToList(new String[] { "main", "params" }));
+        assertEquals(value.delegate1.mainParams1, Arrays.asList(new String[] { "main", "params" }));
+        assertEquals(value.delegate2.mainParams1, Arrays.asList(new String[] { "main", "params" }));
     }
 
     // ========================================================================================================================

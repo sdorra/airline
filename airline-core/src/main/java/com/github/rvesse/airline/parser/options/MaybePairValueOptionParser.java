@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.parser.options;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections4.iterators.PeekingIterator;
@@ -67,7 +68,7 @@ public class MaybePairValueOptionParser<T> extends AbstractOptionParser<T> {
     }
 
     protected final List<String> getValues(String list) {
-        return AirlineUtils.arrayToList(StringUtils.split(list, new String(new char[] { this.separator }), 2));
+        return Arrays.asList(StringUtils.split(list, new String(new char[] { this.separator }), 2));
     }
 
     @Override

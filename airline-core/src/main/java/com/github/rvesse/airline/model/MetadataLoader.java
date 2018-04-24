@@ -190,7 +190,7 @@ public class MetadataLoader {
             restrictions.add(ParserUtil.createInstance(cls));
         }
         if (cliConfig.includeDefaultRestrictions()) {
-            restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
+            restrictions.addAll(Arrays.asList(GlobalRestriction.DEFAULTS));
         }
 
         // Prepare groups
@@ -543,7 +543,7 @@ public class MetadataLoader {
                         name = field.getName();
                     }
 
-                    List<String> options = AirlineUtils.arrayToList(optionAnnotation.name());
+                    List<String> options = Arrays.asList(optionAnnotation.name());
                     String description = optionAnnotation.description();
 
                     int arity = optionAnnotation.arity();
@@ -658,7 +658,7 @@ public class MetadataLoader {
                     List<String> titles = new ArrayList<>();
 
                     if (!(argumentsAnnotation.title().length == 1 && argumentsAnnotation.title()[0].equals(""))) {
-                        titles.addAll(AirlineUtils.arrayToList(argumentsAnnotation.title()));
+                        titles.addAll(Arrays.asList(argumentsAnnotation.title()));
                     } else {
                         titles.add(field.getName());
                     }
@@ -719,7 +719,7 @@ public class MetadataLoader {
             indices = new HashSet<>();
             partials.put(partial.restriction(), indices);
         }
-        indices.addAll(AirlineUtils.arrayToList(ArrayUtils.toObject(partial.appliesTo())));
+        indices.addAll(Arrays.asList(ArrayUtils.toObject(partial.appliesTo())));
     }
 
     private static List<OptionMetadata> mergeOptionSet(List<OptionMetadata> options) {
@@ -1044,7 +1044,7 @@ public class MetadataLoader {
             }
 
             if (arguments.size() > 1) {
-                arguments = ListUtils.unmodifiableList(AirlineUtils.singletonList(new ArgumentsMetadata(arguments)));
+                arguments = ListUtils.unmodifiableList(Collections.singletonList(new ArgumentsMetadata(arguments)));
             }
         }
     }

@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +108,7 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
     @SuppressWarnings("unchecked")
     public GroupBuilder<C> withCommands(Class<? extends C> command, Class<? extends C>... moreCommands) {
         this.commands.add(command);
-        this.commands.addAll(AirlineUtils.arrayToList(moreCommands));
+        this.commands.addAll(Arrays.asList(moreCommands));
         return this;
     }
 

@@ -233,7 +233,7 @@ public class TestCommand
     private void argsBoolean1(String[] params, Boolean expected)
     {
         List<String> values = new ArrayList<String>();
-        values.addAll(AirlineUtils.arrayToList(params));
+        values.addAll(Arrays.asList(params));
         ArgsBooleanArity args = singleCommandParser(ArgsBooleanArity.class).parse(values);
         assertEquals(args.debug, expected);
     }
@@ -241,7 +241,7 @@ public class TestCommand
     private void argsBoolean0(String[] params, Boolean expected)
     {
         List<String> values = new ArrayList<String>();
-        values.addAll(AirlineUtils.arrayToList(params));
+        values.addAll(Arrays.asList(params));
         ArgsBooleanArity0 args = singleCommandParser(ArgsBooleanArity0.class).parse(values);
         assertEquals(args.debug, expected);
     }

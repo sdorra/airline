@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.parser.options;
 
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.collections4.iterators.PeekingIterator;
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +69,7 @@ public class ListValueOptionParser<T> extends AbstractOptionParser<T> {
     }
 
     protected final List<String> getValues(String list) {
-        return AirlineUtils.arrayToList(StringUtils.split(list, this.separator));
+        return Arrays.asList(StringUtils.split(list, this.separator));
     }
 
     @Override

@@ -60,7 +60,7 @@ public class ArgumentsMetadata {
         this.restrictions = restrictions != null ? AirlineUtils.unmodifiableListCopy(restrictions)
                 : Collections.<ArgumentsRestriction> emptyList();
         this.provider = typeConverterProvider != null ? typeConverterProvider : new DefaultTypeConverterProvider();
-        this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
+        this.accessors = SetUtils.unmodifiableSet(Collections.singleton(new Accessor(path)));
     }
 
     public ArgumentsMetadata(Iterable<ArgumentsMetadata> arguments) {

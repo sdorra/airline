@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class AllowedValuesRestriction extends AbstractAllowedValuesRestriction {
 
     public AllowedValuesRestriction(String... rawValues) {
         super(false);
-        this.rawValues.addAll(AirlineUtils.arrayToList(rawValues));
+        this.rawValues.addAll(Arrays.asList(rawValues));
     }
 
     @Override

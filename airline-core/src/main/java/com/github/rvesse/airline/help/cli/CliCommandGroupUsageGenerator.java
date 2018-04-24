@@ -288,7 +288,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
             synopsis.newline().append("Where * indicates the default command(s)");
         }
         synopsis.newline().append("See").append("'" + global.getName()).append("help ")
-                .appendWords(UsageHelper.toGroupNames(AirlineUtils.arrayToList(groups)))
+                .appendWords(UsageHelper.toGroupNames(Arrays.asList(groups)))
                 .appendOnOneLine(" <command>' for more information on a specific command.").newline();
     }
 

@@ -5,8 +5,10 @@
 - Parser Changes
     - `ListValuesOptionParser` now accepts any number of values that are a multiple of the arity of the option so can now be used for options that wish to allow multiple values in a single list
 - Documentation Improvements
-    - Documentation website now located in `docs/` subfolder of `master` branch
-    - New `airline-docs-VERSION-offline-site.zip` and `.tar.gz` artifacts contain a static build of the documentation website for offline reference
+    - Documentation website now located in `docs/` subfolder of `master` branch (#35)
+    - New `airline-docs-VERSION-offline-site.zip` and `.tar.gz` artifacts contain a static build of the documentation website for offline reference (#70)
+- Core Improvements
+    - Removed some unnecessary helper methods from `AirlineUtils` in favour of JDK built-ins (#64)
 
 ## 2.4.0
 

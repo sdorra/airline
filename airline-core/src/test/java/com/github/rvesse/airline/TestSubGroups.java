@@ -17,6 +17,7 @@ package com.github.rvesse.airline;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -165,7 +166,7 @@ public class TestSubGroups {
         //@formatter:on
         
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo", "bar" }), false, output);
+        Help.help(builder.build().getMetadata(), Arrays.asList(new String[] { "foo", "bar" }), false, output);
         String actual = new String(output.toByteArray());
         
         //@formatter:off
@@ -199,7 +200,7 @@ public class TestSubGroups {
         //@formatter:on
         
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Help.help(builder.build().getMetadata(), AirlineUtils.arrayToList(new String[] { "foo" }), false, output);
+        Help.help(builder.build().getMetadata(), Arrays.asList(new String[] { "foo" }), false, output);
         String actual = new String(output.toByteArray());
         
         //@formatter:off

@@ -61,6 +61,7 @@ import javax.inject.Inject;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
@@ -218,7 +219,7 @@ public class TestSingleCommand {
     @Test
     public void repeatedArgs() {
         SingleCommand<Args1> parser = singleCommand(Args1.class);
-        CommandMetadata command = CollectionUtils.find(AirlineUtils.singletonList(parser.getCommandMetadata()),
+        CommandMetadata command = CollectionUtils.find(Collections.singletonList(parser.getCommandMetadata()),
                 new CommandFinder("Args1"));
         assertEquals(command.getAllOptions().size(), 8);
     }

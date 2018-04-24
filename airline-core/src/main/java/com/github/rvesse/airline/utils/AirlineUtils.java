@@ -16,6 +16,7 @@
 package com.github.rvesse.airline.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,10 +34,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
 
 public class AirlineUtils {
-
-    public static <T> List<T> arrayToList(T[] array) {
-        return IteratorUtils.toList(IteratorUtils.arrayIterator(array));
-    }
 
     public static <T> T first(Iterable<T> iterable) {
         return first(iterable.iterator(), null);
@@ -76,18 +73,6 @@ public class AirlineUtils {
             value = iter.next();
         }
         return value;
-    }
-
-    public static <T> List<T> singletonList(T item) {
-        List<T> list = new ArrayList<T>();
-        list.add(item);
-        return list;
-    }
-
-    public static <T> Set<T> singletonSet(T item) {
-        Set<T> set = new HashSet<T>();
-        set.add(item);
-        return set;
     }
 
     public static <K, V> Map<K, V> singletonMap(K key, V value) {
@@ -132,7 +117,7 @@ public class AirlineUtils {
     public static <T> List<T> unmodifiableListCopy(T[] array) {
         if (array == null)
             return Collections.emptyList();
-        return ListUtils.unmodifiableList(arrayToList(array));
+        return ListUtils.unmodifiableList(Arrays.asList(array));
     }
 
     public static <K, V> Map<K, V> unmodifiableMapCopy(Map<K, V> map) {

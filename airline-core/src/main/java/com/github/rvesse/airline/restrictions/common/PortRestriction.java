@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
     private Set<PortRange> acceptablePorts = new HashSet<>();
 
     public PortRestriction(PortRange... portTypes) {
-        this.acceptablePorts.addAll(AirlineUtils.arrayToList(portTypes));
+        this.acceptablePorts.addAll(Arrays.asList(portTypes));
     }
 
     @Override

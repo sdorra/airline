@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections4.IteratorUtils;
@@ -71,9 +72,9 @@ public class SingleCommand<C> {
             throw new NullPointerException("command is null");
         this.parserConfig = parserConfig != null ? parserConfig : MetadataLoader.<C> loadParser(command);
         this.restrictions = restrictions != null ? IteratorUtils.toList(restrictions.iterator())
-                : AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS);
+                : Arrays.asList(GlobalRestriction.DEFAULTS);
         if (this.restrictions.size() == 0)
-            this.restrictions.addAll(AirlineUtils.arrayToList(GlobalRestriction.DEFAULTS));
+            this.restrictions.addAll(Arrays.asList(GlobalRestriction.DEFAULTS));
 
         commandMetadata = MetadataLoader.loadCommand(command);
     }
@@ -104,7 +105,7 @@ public class SingleCommand<C> {
      * @return Command instance
      */
     public C parse(String... args) {
-        return parse(AirlineUtils.arrayToList(args));
+        return parse(Arrays.asList(args));
     }
 
     /**
@@ -129,7 +130,7 @@ public class SingleCommand<C> {
      * @return Parse result
      */
     public ParseResult<C> parseWithResult(String... args) {
-        return parseWithResult(AirlineUtils.arrayToList(args));
+        return parseWithResult(Arrays.asList(args));
     }
 
     /**
