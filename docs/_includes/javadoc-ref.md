@@ -1,0 +1,1 @@
+[`{{ include.class }}`]({{ site.baseurl }}/javadoc/{{ site.version }}/{{ include.module | default: "airline" }}/com/github/rvesse/airline/{{ include.package | replace: '.', '/' }}/{{ include.class }}.html)

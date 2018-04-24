@@ -22,7 +22,7 @@ This is explained in depth in the [Introduction to Airline](guide/) but essentia
 
 ## How to Use
 
-Please start reading the [User Guide](guide/) to learn how to use Airline for your applications.
+Please start reading the [User Guide](guide/index.html) to learn how to use Airline for your applications.
 
 ## Get Airline
 

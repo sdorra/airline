@@ -70,7 +70,6 @@ OPTIONS
 
             This option must occur a minimum of 1 times
 
-
         --name <HouseName>
             Specifies the house name
 
@@ -106,4 +105,4 @@ OPTIONS
 
 ## Custom Restrictions
 
-**TODO Document creating custom restrictions**
+Airline includes the ability to create [Custom Restrictions](custom.html) which allow you to define and use your own restriction annotations.
