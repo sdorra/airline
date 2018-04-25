@@ -1,0 +1,57 @@
+---
+layout: default
+title: Airline
+permalink: index.html
+---
+
+# Airline
+
+Airline is an annotation-driven Java library for building Command Line Interfaces (CLIs), it supports simple commands all the way through to complex Git style CLIs with groups and user defined command aliases.
+
+Airline aims to reduce the boiler plate code typically associated with CLIs in Java, many common behaviours can be achieved purely with annotations and zero user code.  Let's take a look at an ultra simple example:
+
+{% include code/getting-started.md %}
+
+This is explained in depth in the [Introduction to Airline](guide/) but essentially we had to do the following:
+
+- Annotate our class with [`@Command`](annotations/command.html) to indicate that it is a command
+- Annotate fields with [`@Option`](annotations/option.html) and [`@Arguments`](annotations/arguments.html) to indicate that they receive values from the command line
+- Use `SingleCommand.singleCommand()` to create a parser from our class
+- Call `parse()` to pass the command line arguments
+- Implement our command logic as desired, here it is contained in the `run()` method
+
+## How to Use
+
+Please start reading the [User Guide](guide/index.html) to learn how to use Airline for your applications.
+
+## Get Airline
+
+You can get Airline from Maven central by specifying the following Maven coordinates:
+
+```xml
+<dependency>
+  <groupId>com.github.rvesse</groupId>
+  <artifactId>airline</artifactId>
+  <version>X.Y.Z</version>
+</dependency>
+```
+
+Where `X.Y.Z` is your desired version, the current stable release is `{{ site.version }}`
+
+## License
+
+Airline is open source software licensed under the [Apache License 2.0](http://apache.org/licenses/LICENSE-2.0) and this license also applies to the documentation found here.
+
+Please see `license.txt` in this repository for further details
+
+## Acknowledgements
+
+This project was forked from [http://github.com/airlift/airline](http://github.com/airlift/airline) and would not exist at all were it not for that library.
+
+This website is built with [Jekyll](http://jekyllrb.com), it uses the following 3rd party resources:
+
+- [Hyde theme](https://github.com/poole/hyde) by Mark Otto
+- [Table of Contents plugin](https://github.com/ghiculescu/jekyll-table-of-contents) by Alex Ghiculescu 
+- [Multi-Level Push Menu plugin](https://github.com/adgsm/multi-level-push-menu) by Momcilo Dzunic 
+
+All 3rd party resources used on the website are licensed under the MIT License.  Content on this website is licensed under the same [Apache License 2.0](http://apache.org/licenses/LICENSE-2.0) used for the library as stated in the above License section.

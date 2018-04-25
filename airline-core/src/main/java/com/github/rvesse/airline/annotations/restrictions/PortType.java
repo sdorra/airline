@@ -22,7 +22,7 @@ import java.util.TreeSet;
 /**
  * Port types
  */
-public enum PortType implements Comparable<PortType> {
+public enum PortType implements PortRange {
 
     /**
      * Any port
@@ -55,46 +55,24 @@ public enum PortType implements Comparable<PortType> {
         this.min = min;
         this.max = max;
     }
-
-    /**
-     * Gets the minimum port
-     * 
-     * @return Minimum port
-     */
+    
+    @Override
     public int getMinimumPort() {
         return this.min;
     }
-
-    /**
-     * Gets the maximum port
-     * 
-     * @return Maximum port
-     */
+    
+    @Override
     public int getMaximumPort() {
         return this.max;
     }
 
-    /**
-     * Gets whether a port falls within the range of this port type
-     * 
-     * @param port
-     *            Port
-     * @return True if in range, false otherwise
-     */
+    @Override
     public boolean inRange(int port) {
         return port >= min && port <= max;
     }
 
-    /**
-     * Gets whether the port type contains another port type i.e. does this
-     * cover at least the same range of ports as the other
-     * 
-     * @param other
-     *            Other port type
-     * @return True if this covers at least the same range of ports as the
-     *         other, false otherwise
-     */
-    public boolean contains(PortType other) {
+    @Override
+    public boolean contains(PortRange other) {
         if (this == other)
             return true;
 
@@ -109,25 +87,25 @@ public enum PortType implements Comparable<PortType> {
             return Integer.toString(min);
         }
     }
-
+    
     /**
      * Gets a string denoting all the acceptable port ranges
      * 
-     * @param portTypes
+     * @param acceptablePorts
      *            Port types
      * @return String detailing acceptable ranges
      */
-    public static String toRangesString(Iterable<PortType> portTypes) {
+    public static String toRangesString(Set<PortRange> acceptablePorts) {
         StringBuilder builder = new StringBuilder();
-        Iterator<PortType> iter = portTypes.iterator();
-        Set<PortType> types = new TreeSet<>();
+        Iterator<PortRange> iter = acceptablePorts.iterator();
+        Set<PortRange> types = new TreeSet<>();
         while (iter.hasNext()) {
-            PortType range = iter.next();
+            PortRange range = iter.next();
 
             // Check that the port range is not contained in another port range
             // we've already seen
             boolean add = true;
-            for (PortType other : types) {
+            for (PortRange other : types) {
                 if (other.contains(range)) {
                     add = false;
                     break;

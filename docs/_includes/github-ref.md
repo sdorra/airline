@@ -1,0 +1,1 @@
+[`{{ include.class }}`]({{ site.github.repo }}/blob/master/{{ include.module | default: "airline-core" }}/src/main/java/com/github/rvesse/airline/{{ include.package | replace: '.', '/' }}/{{ include.class }}.java)

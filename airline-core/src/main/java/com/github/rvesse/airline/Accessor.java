@@ -25,6 +25,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,7 +47,7 @@ public class Accessor
 
     public Accessor(Field... path)
     {
-        this(AirlineUtils.arrayToList(path));
+        this(Arrays.asList(path));
     }
     
     public Accessor(Iterable<Field> path) {

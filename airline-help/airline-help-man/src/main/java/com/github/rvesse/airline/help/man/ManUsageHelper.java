@@ -133,8 +133,8 @@ public class ManUsageHelper extends AbstractUsageGenerator {
     /**
      * Outputs documentation about a restriction on an option
      * 
-     * @param out
-     *            Usage printer
+     * @param printer
+     *            Troff printer
      * @param option
      *            Option meta-data
      * @param restriction
@@ -142,6 +142,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
      * @param hint
      *            Help hint
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected void outputOptionRestriction(TroffPrinter printer, OptionMetadata option, OptionRestriction restriction,
             HelpHint hint) throws IOException {
@@ -151,8 +152,8 @@ public class ManUsageHelper extends AbstractUsageGenerator {
     /**
      * Outputs documentation about a restriction on an option
      * 
-     * @param descriptionPrinter
-     *            Description printer
+     * @param printer
+     *            Troff Printer
      * @param arguments
      *            Arguments meta-data
      * @param restriction
@@ -160,6 +161,7 @@ public class ManUsageHelper extends AbstractUsageGenerator {
      * @param hint
      *            Help hint
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected void outputArgumentsRestriction(TroffPrinter printer, ArgumentsMetadata arguments,
             ArgumentsRestriction restriction, HelpHint hint) throws IOException {
@@ -169,11 +171,11 @@ public class ManUsageHelper extends AbstractUsageGenerator {
     /**
      * Outputs a help section
      * 
-     * @param out
-     *            Usage printer
+     * @param printer
+     *            Troff printer
      * @param section
      *            Help section
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     public void outputHelpSection(TroffPrinter printer, HelpSection section) throws IOException {
         if (section.getFormat() == HelpFormat.NONE_PRINTABLE)

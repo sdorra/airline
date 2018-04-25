@@ -15,6 +15,7 @@
  */
 package com.github.rvesse.airline.restrictions.options;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class RequiredOnlyIfRestriction implements OptionRestriction, HelpHint {
     private final Set<String> names = new LinkedHashSet<>();
 
     public RequiredOnlyIfRestriction(String... names) {
-        this.names.addAll(AirlineUtils.arrayToList(names));
+        this.names.addAll(Arrays.asList(names));
     }
 
     @Override

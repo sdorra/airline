@@ -76,7 +76,7 @@ public class OptionMetadata {
         this.provider = typeConverterProvider != null ? typeConverterProvider : new DefaultTypeConverterProvider();
 
         if (path != null) {
-            this.accessors = SetUtils.unmodifiableSet(AirlineUtils.singletonSet(new Accessor(path)));
+            this.accessors = SetUtils.unmodifiableSet(Collections.singleton(new Accessor(path)));
         }
     }
 

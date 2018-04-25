@@ -64,11 +64,11 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
     @Override
     public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig, UsagePrinter out) throws IOException {
-        
+
         if (parserConfig == null) {
             parserConfig = MetadataLoader.loadParser(command.getType());
         }
-        
+
         // Name and description
         outputDescription(out, programName, groupNames, commandName, command);
 
@@ -108,10 +108,16 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Options meta-data
      * @param arguments
      *            Arguments meta-data
+     * @param parserConfig
+     *            Parser configuration
+     * @param <T>
+     *            Command type
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
-    protected <T> void outputOptionsAndArguments(UsagePrinter out, CommandMetadata command, List<OptionMetadata> options,
-            ArgumentsMetadata arguments, ParserMetadata<T> parserConfig) throws IOException {
+    protected <T> void outputOptionsAndArguments(UsagePrinter out, CommandMetadata command,
+            List<OptionMetadata> options, ArgumentsMetadata arguments, ParserMetadata<T> parserConfig)
+            throws IOException {
         helper.outputOptions(out, options);
         helper.outputArguments(out, arguments, parserConfig);
     }
@@ -131,6 +137,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Command meta-data
      * @return Collection of all options (Global, Group and Command)
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected List<OptionMetadata> outputSynopsis(UsagePrinter out, String programName, String[] groupNames,
             String commandName, CommandMetadata command) throws IOException {
@@ -171,7 +178,7 @@ public class CliCommandUsageGenerator extends AbstractPrintedCommandUsageGenerat
      *            Command name
      * @param command
      *            Command meta-data
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputDescription(UsagePrinter out, String programName, String[] groupNames, String commandName,
             CommandMetadata command) throws IOException {

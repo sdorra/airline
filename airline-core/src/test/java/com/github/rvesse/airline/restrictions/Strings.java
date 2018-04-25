@@ -49,6 +49,10 @@ public class Strings {
     @Pattern(pattern = "(\\+1-)?\\d{3}-\\d{3}-\\d{4}", description = "Must provide a telephone number in standard US format e.g. +1-800-123-4567")
     public String tel;
     
+    @Option(name = "--other")
+    @Pattern(pattern = "foo|bar|foobar", flags = java.util.regex.Pattern.CASE_INSENSITIVE)
+    public String other;
+    
     @Inject
     public HelpOption<Strings> helpOption = new HelpOption<>();
     

@@ -37,6 +37,7 @@ Please see the [examples](airline-examples/) module for a range of examples that
 
 Simply create a parser instance via `SingleCommand.singleCommand()` passing in a class that is annotated with the `@Command` annotation e.g.
 
+```java
     public static void main(String[] args) {
         SingleCommand<YourClass> parser = SingleCommand.singleCommand(YourClass.class);
         YourClass cmd = parser.parse(args);
@@ -44,6 +45,7 @@ Simply create a parser instance via `SingleCommand.singleCommand()` passing in a
          // Execute your command however is appropriate e.g.
          cmd.run();   
     }
+```
 
 ### Multiple Commands
 
@@ -76,7 +78,7 @@ See provided **Notice.md** for Copyright Holders
 
 ## Maven Artifacts
 
-This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.3.0`
+This library is available from [Maven Central](http://search.maven.org) with the latest stable release being `2.4.0`
 
 Use the following maven dependency declaration:
 
@@ -84,11 +86,11 @@ Use the following maven dependency declaration:
 <dependency>
     <groupId>com.github.rvesse</groupId>
     <artifactId>airline</artifactId>
-    <version>2.3.0</version>
+    <version>2.4.0</version>
 </dependency>
 ```
 
-Snapshot artifacts of the latest source are also available using the version `2.4.0-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
+Snapshot artifacts of the latest source are also available using the version `2.4.1-SNAPSHOT` from the [OSSRH repositories](http://central.sonatype.org/pages/ossrh-guide.html#ossrh-usage-notes).
 
 ## Build Status
 

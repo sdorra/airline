@@ -47,26 +47,36 @@ public @interface Group {
      * can appear on any given class you would need to use the {@link Groups}
      * annotation to place multiple {@link Group} annotations on a class.
      * </p>
+     * 
+     * @return Name
      */
     String name();
 
     /**
      * Description of the group.
+     * 
+     * @return Description
      */
     String description() default "";
 
     /**
      * Default command class for the group (optional)
+     * 
+     * @return Default Command for the group
      */
     Class<?> defaultCommand() default NO_DEFAULT.class;
 
     /**
-     * command classes to add to the group (optional)
+     * Command classes to add to the group (optional)
+     * 
+     * @return Command classes for the group
      */
     Class<?>[] commands() default {};
 
     /**
      * Whether the group should be hidden
+     * 
+     * @return True if hidden, false otherwise
      */
     boolean hidden() default false;
 }

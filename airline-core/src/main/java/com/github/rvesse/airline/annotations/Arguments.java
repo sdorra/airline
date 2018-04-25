@@ -31,18 +31,22 @@ import java.lang.annotation.Documented;
 public @interface Arguments {
     /**
      * Name or names of the arguments.
+     * 
+     * @return Name(s) of the arguments
      */
     String[] title() default { "" };
 
     /**
      * A description of the arguments.
+     * 
+     * @return Description
      */
     String description() default "";
-    
+
     /**
-     * Sets an alternative type converter provider for the arguments. This allows
-     * the type converter for arguments to be customised appropriately. By
-     * default this will defer to using the type converter provided in the
+     * Sets an alternative type converter provider for the arguments. This
+     * allows the type converter for arguments to be customised appropriately.
+     * By default this will defer to using the type converter provided in the
      * parser configuration.
      * 
      * @return Type converter provider

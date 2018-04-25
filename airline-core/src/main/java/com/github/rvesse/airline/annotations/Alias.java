@@ -75,7 +75,7 @@ public @interface Alias {
      * error.
      * </p>
      * 
-     * @return
+     * @return Arguments
      */
     String[]arguments();
 }

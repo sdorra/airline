@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
   <artifactId>airline-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.4.0-SNAPSHOT</version>
+  <version>2.4.1-SNAPSHOT</version>
 
   <name>Airline - Parent</name>
   <description>Java annotation-based framework for parsing Git like command line structures</description>
@@ -51,7 +53,9 @@
     <license.header.path>${project.basedir}</license.header.path>
 
     <!-- Plugin Versions -->
-    <plugin.buildnumber.version>1.4</plugin.buildnumber.version>
+    <plugin.antrun>1.8</plugin.antrun>
+    <plugin.assembly>3.1.0</plugin.assembly>
+    <plugin.buildnumber>1.4</plugin.buildnumber>
     <plugin.compiler>3.2</plugin.compiler>
     <plugin.enforcer>1.3.1</plugin.enforcer>
     <plugin.license>2.11</plugin.license>
@@ -77,6 +81,7 @@
     <module>airline-help</module>
     <module>airline-maven-plugin</module>
     <!--<module>airline-maven-plugin-tests</module>-->
+    <module>docs</module>
   </modules>
 
   <dependencyManagement>
@@ -176,6 +181,7 @@
             <exclude>**/pom.xml</exclude>
             <exclude>**/*.config</exclude>
             <exclude>**/verify.bsh</exclude>
+            <exclude>docs/</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -192,7 +198,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>${plugin.buildnumber.version}</version>
+        <version>${plugin.buildnumber}</version>
         <executions>
           <execution>
             <phase>validate</phase>
@@ -236,6 +242,18 @@
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${plugin.antrun}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${plugin.assembly}</version>
         </plugin>
       </plugins>
     </pluginManagement>

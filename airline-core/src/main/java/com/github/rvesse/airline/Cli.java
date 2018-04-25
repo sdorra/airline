@@ -15,6 +15,8 @@
  */
 package com.github.rvesse.airline;
 
+import java.util.Arrays;
+
 import org.apache.commons.collections4.ListUtils;
 
 import com.github.rvesse.airline.builder.CliBuilder;
@@ -38,6 +40,8 @@ public class Cli<C> {
      * 
      * @param name
      *            Program name
+     * @param <T>
+     *            Command type to be built 
      * @return CLI Builder
      */
     public static <T> CliBuilder<T> builder(String name) {
@@ -90,7 +94,7 @@ public class Cli<C> {
      * @return Command instance
      */
     public C parse(String... args) {
-        return parse(ListUtils.unmodifiableList(AirlineUtils.arrayToList(args)));
+        return parse(ListUtils.unmodifiableList(Arrays.asList(args)));
     }
 
     /**
@@ -119,7 +123,7 @@ public class Cli<C> {
      * @return Parse result
      */
     public ParseResult<C> parseWithResult(String... args) {
-        return parseWithResult(AirlineUtils.arrayToList(args));
+        return parseWithResult(Arrays.asList(args));
     }
 
     /**

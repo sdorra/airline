@@ -51,6 +51,8 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @param manSection
      *            Man section to which this command belongs, use constants from
      *            {@link ManSections}
+     * @param includeHidden
+     *            Whether to include hidden items in the help output
      */
     public ManCommandUsageGenerator(int manSection, boolean includeHidden) {
         super(includeHidden);
@@ -65,7 +67,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
     @Override
     public <T> void usage(String programName, String[] groupNames, String commandName, CommandMetadata command,
             ParserMetadata<T> parserConfig, OutputStream output) throws IOException {
-        
+
         // Get the parser metadata
         if (parserConfig == null) {
             parserConfig = MetadataLoader.loadParser(command.getType());
@@ -114,11 +116,15 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Command
      * @param options
      *            Option meta-data
-     * 
+     * @param parserConfig
+     *            Parser configuration
+     * @param <T>
+     *            Command type
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
-    protected <T> void outputOptions(TroffPrinter printer, CommandMetadata command, List<OptionMetadata> options, ParserMetadata<T> parserConfig)
-            throws IOException {
+    protected <T> void outputOptions(TroffPrinter printer, CommandMetadata command, List<OptionMetadata> options,
+            ParserMetadata<T> parserConfig) throws IOException {
         // Options
         // Can end the list if there are no arguments
         int optionsOutput = helper.outputOptions(printer, options, command.getArguments() == null);
@@ -144,6 +150,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Command
      * @return List of all the available options (global, group and command)
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected List<OptionMetadata> outputSynopsis(TroffPrinter printer, String programName, String[] groupNames,
             String commandName, CommandMetadata command) throws IOException {
@@ -209,8 +216,8 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
     /**
      * Outputs a title section for the document
      * 
-     * @param writer
-     *            Writer
+     * @param printer
+     *            Troff Printer
      * @param programName
      *            Program name
      * @param groupNames
@@ -220,6 +227,7 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      * @param command
      *            Command meta-data
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected void outputTitle(TroffPrinter printer, String programName, String[] groupNames, String commandName,
             CommandMetadata command) throws IOException {
@@ -241,11 +249,11 @@ public class ManCommandUsageGenerator extends AbstractCommandUsageGenerator {
      *            Program name
      * @param groupNames
      *            Group name(s)
-     * @param command
-     *            Command meta-data
-     * @param writer
-     *            Writer
+     * @param commandName
+     *            Command name
+     * @return Full command name
      * @throws IOException
+     *             Thrown if there is a problem generating usage output
      */
     protected String getFullCommandName(String programName, String[] groupNames, String commandName)
             throws IOException {

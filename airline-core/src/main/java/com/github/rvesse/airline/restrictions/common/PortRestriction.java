@@ -15,9 +15,11 @@
  */
 package com.github.rvesse.airline.restrictions.common;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.github.rvesse.airline.annotations.restrictions.PortRange;
 import com.github.rvesse.airline.annotations.restrictions.PortType;
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpHint;
@@ -32,10 +34,10 @@ import com.github.rvesse.airline.utils.AirlineUtils;
 public class PortRestriction extends AbstractCommonRestriction implements HelpHint {
     private static final int MIN_PORT = 0, MAX_PORT = 65535;
 
-    private Set<PortType> acceptablePorts = new HashSet<>();
+    private Set<PortRange> acceptablePorts = new HashSet<>();
 
-    public PortRestriction(PortType... portTypes) {
-        this.acceptablePorts.addAll(AirlineUtils.arrayToList(portTypes));
+    public PortRestriction(PortRange... portTypes) {
+        this.acceptablePorts.addAll(Arrays.asList(portTypes));
     }
 
     @Override
@@ -122,8 +124,8 @@ public class PortRestriction extends AbstractCommonRestriction implements HelpHi
 
     protected boolean inAnyAcceptableRange(int port) {
         // Check acceptable port ranges
-        for (PortType portType : this.acceptablePorts) {
-            if (portType.inRange(port))
+        for (PortRange range : this.acceptablePorts) {
+            if (range.inRange(port))
                 return true;
         }
         return false;

@@ -88,7 +88,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      * @param groups
      *            Group(s) meta-data
      * 
-     * @throws IOException
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputOptions(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata[] groups)
             throws IOException {
@@ -128,9 +128,9 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @param group
-     *            Group meta-data
-     * @throws IOException
+     * @param groups
+     *            Groups meta-data
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputSynopsis(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata[] groups)
             throws IOException {
@@ -288,7 +288,7 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
             synopsis.newline().append("Where * indicates the default command(s)");
         }
         synopsis.newline().append("See").append("'" + global.getName()).append("help ")
-                .appendWords(UsageHelper.toGroupNames(AirlineUtils.arrayToList(groups)))
+                .appendWords(UsageHelper.toGroupNames(Arrays.asList(groups)))
                 .appendOnOneLine(" <command>' for more information on a specific command.").newline();
     }
 
@@ -299,9 +299,9 @@ public class CliCommandGroupUsageGenerator<T> extends AbstractPrintedCommandGrou
      *            Usage printer
      * @param global
      *            Global meta-data
-     * @param group
-     *            Group meta-data
-     * @throws IOException
+     * @param groups
+     *            Groups meta-data
+     * @throws IOException Thrown if there is a problem generating usage output
      */
     protected void outputDescription(UsagePrinter out, GlobalMetadata<T> global, CommandGroupMetadata[] groups)
             throws IOException {
