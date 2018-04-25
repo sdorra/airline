@@ -64,6 +64,9 @@ public class Source {
                     log.warn(String.format("Class %s is not annotated with @Cli or @Command", className));
 
                 }
+            } catch (MojoFailureException e) {
+                // NB - If we get this then we aren't skipping bad sources so no need to check again
+                throw e;
             } catch (ClassNotFoundException e) {
                 if (!skipBadSources)
                     throw new MojoFailureException(String.format("Failed to locate class %s", className), e);

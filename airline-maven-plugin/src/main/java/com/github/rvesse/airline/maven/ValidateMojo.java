@@ -20,9 +20,21 @@ import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.github.rvesse.airline.maven.sources.PreparedSource;
 
+//@formatter:off
+@Mojo(name = "validate", 
+    defaultPhase = LifecyclePhase.VERIFY, 
+    requiresOnline = false, 
+    requiresDependencyResolution = ResolutionScope.RUNTIME,
+    threadSafe = true,
+    requiresProject = true
+)
+//@formatter:on
 public class ValidateMojo extends AbstractAirlineMojo {
 
     @Override
@@ -38,10 +50,16 @@ public class ValidateMojo extends AbstractAirlineMojo {
         prepareClassRealm();
 
         // Discover classes and get their meta-data as appropriate
+        // Don't ignore bad sources, this will fail if any bad source is found
+        // thus failing the mojo and the build
         List<PreparedSource> sources = prepareSources(false);
         if (sources.size() == 0) {
             log.info("No valid sources discovered so nothing to do");
             return;
+        }
+        
+        for (PreparedSource source : sources) {
+            log.info(String.format("Validated Airline metadata for class %s", source.getSourceClass()));
         }
     }
 
