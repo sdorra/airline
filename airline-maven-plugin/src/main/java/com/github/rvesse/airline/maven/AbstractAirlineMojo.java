@@ -89,6 +89,8 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
      * the build if not
      * 
      * @throws MojoFailureException
+     *             Thrown if the output directory does not exist or cannot be
+     *             created
      */
     protected void ensureOutputDirectory() throws MojoFailureException {
         if (!outputDirectory.exists() || !outputDirectory.isDirectory()) {
@@ -105,6 +107,7 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
      * 
      * @return Prepared sources
      * @throws MojoFailureException
+     *             Thrown if sources cannot be successfully prepared
      */
     protected List<PreparedSource> prepareSources(boolean skipBadSources) throws MojoFailureException {
         List<PreparedSource> prepared = new ArrayList<>();
@@ -124,6 +127,7 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
      * Prepares the class realm failing the build if unable to do so
      * 
      * @throws MojoFailureException
+     *             Thrown if the class realm cannot be successfully prepared
      */
     protected void prepareClassRealm() throws MojoFailureException {
         try {
@@ -275,8 +279,9 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
                     // If specific options are defined use them (with
                     // inheritance from the defaults) otherwise just use the
                     // defaults
-                    mappedOptions.put(mapping.format, mapping.options != null
-                            ? new FormatOptions(mapping.options, defaultOptions) : defaultOptions);
+                    mappedOptions.put(mapping.format,
+                            mapping.options != null ? new FormatOptions(mapping.options, defaultOptions)
+                                    : defaultOptions);
                 } catch (Throwable e) {
                     throw new MojoFailureException(
                             String.format("Format mapping for format %s specifies provider %s which is not valid",

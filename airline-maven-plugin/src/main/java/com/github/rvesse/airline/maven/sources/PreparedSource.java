@@ -79,6 +79,10 @@ public class PreparedSource {
     public boolean shouldOutputCommandHelp() {
         return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.COMMAND;
     }
+    
+    public boolean shouldOutputGroupHelp() {
+        return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.GROUP;
+    }
 
     public boolean shouldOutputGlobalHelp() {
         return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.CLI;

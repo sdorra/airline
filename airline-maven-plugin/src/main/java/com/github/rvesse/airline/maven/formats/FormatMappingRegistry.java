@@ -22,6 +22,13 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+/**
+ * {@link ServiceLoader} driven registry of available {@link FormatProvider}
+ * instances
+ * 
+ * @author rvesse
+ *
+ */
 public class FormatMappingRegistry {
 
     private static Map<String, FormatProvider> providers = new HashMap<>();
@@ -91,7 +98,7 @@ public class FormatMappingRegistry {
     /**
      * Gets the available format names
      * 
-     * @return
+     * @return Available format names
      */
     public static Set<String> availableFormatNames() {
         return Collections.unmodifiableSet(providers.keySet());

@@ -133,7 +133,7 @@ public class GenerateMojo extends AbstractAirlineMojo {
                     if (source.isCommand()) {
                         if (!source.shouldOutputCommandHelp()) {
                             log.debug(String.format(
-                                    "Skipping command help for class %s because configured output mode is %s",
+                                    "Skipping command help for %s because configured output mode is %s",
                                     source.getSourceClass(), source.getOutputMode()));
                             continue;
                         }
@@ -145,8 +145,14 @@ public class GenerateMojo extends AbstractAirlineMojo {
                         }
 
                         outputCommandHelp(format, provider, sourceOptions, sourceCommandGenerator, source);
-                    } else if (source.isGlobal() && source.getOutputMode() == OutputMode.COMMAND) {
-                        log.debug(String.format("Generating command help for all commands provided by CLI class %s",
+                    } else if (source.isGlobal()) {
+                        if (!source.shouldOutputCommandHelp()) {
+                            log.debug(String.format(
+                                    "Skipping command help for %s because configured output mode is %s",
+                                    source.getSourceClass(), source.getOutputMode()));
+                            continue;    
+                        }
+                        log.debug(String.format("Generating command help for all commands provided by CLI %s",
                                 source.getSourceClass()));
 
                         if (sourceOptions != options) {
@@ -182,7 +188,13 @@ public class GenerateMojo extends AbstractAirlineMojo {
                     if (source.isCommand())
                         continue;
 
-                    if (source.isGlobal() && source.getOutputMode() == OutputMode.GROUP) {
+                    if (source.isGlobal()) {
+                        if (!source.shouldOutputGroupHelp()) {
+                            log.debug(String.format(
+                                    "Skipping group help for %s because configured output mode is %s",
+                                    source.getSourceClass(), source.getOutputMode()));
+                            continue;
+                        }
                         CommandGroupUsageGenerator<Object> sourceGroupGenerator = groupGenerator;
                         FormatOptions sourceOptions = source.getFormatOptions(options);
                         if (sourceOptions != options) {
@@ -212,15 +224,21 @@ public class GenerateMojo extends AbstractAirlineMojo {
                 for (PreparedSource source : sources) {
                     if (!source.isGlobal())
                         continue;
-
-                    FormatOptions sourceOptions = source.getFormatOptions(options);
-                    if (sourceOptions != options) {
-                        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), options));
-                        // TODO Get modified global help generator based on
-                        // source specific options
+                    
+                    if  (!source.shouldOutputGlobalHelp()) {
+                        log.debug(String.format(
+                                "Skipping global help for %s because configured output mode is %s",
+                                source.getSourceClass(), source.getOutputMode()));
+                        continue;
                     }
 
-                    outputGlobalHelp(format, provider, sourceOptions, globalGenerator, source);
+                    GlobalUsageGenerator<Object> sourceGlobalGenerator = globalGenerator;
+                    FormatOptions sourceOptions = source.getFormatOptions(options);
+                    if (sourceOptions != options) {
+                        globalGenerator = prepareGlobalUsageGenerator(provider, source, sourceOptions);
+                    }
+
+                    outputGlobalHelp(format, provider, sourceOptions, sourceGlobalGenerator, source);
                 }
             }
 
@@ -302,5 +320,16 @@ public class GenerateMojo extends AbstractAirlineMojo {
         log.info(String.format("Using command group help generator %s for source %s", sourceGroupGenerator.getClass(),
                 source.getSourceClass()));
         return sourceGroupGenerator;
+    }
+
+    private GlobalUsageGenerator<Object> prepareGlobalUsageGenerator(FormatProvider provider, PreparedSource source,
+            FormatOptions sourceOptions) {
+        Log log = getLog();
+        GlobalUsageGenerator<Object> sourceGlobalGenerator;
+        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), sourceOptions));
+        sourceGlobalGenerator = provider.getGlobalGenerator(this.outputDirectory, sourceOptions);
+        log.info(String.format("Using global generator %s for source %s", sourceGlobalGenerator.getClass(),
+                source.getSourceClass()));
+        return sourceGlobalGenerator;
     }
 }

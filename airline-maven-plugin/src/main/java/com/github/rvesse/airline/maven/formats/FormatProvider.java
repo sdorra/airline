@@ -33,7 +33,7 @@ public interface FormatProvider {
      * Gets the default name for this format used when automatically registering
      * {@code ServiceLoader} discovered implementations
      * 
-     * @return
+     * @return Default mapping name
      */
     public String getDefaultMappingName();
 
@@ -49,7 +49,9 @@ public interface FormatProvider {
 
     /**
      * Gets a command usage generator for the format that uses the given options
-     * @param outputDirectory TODO
+     * 
+     * @param outputDirectory
+     *            Output directory
      * @param options
      *            Options
      * 
@@ -61,7 +63,9 @@ public interface FormatProvider {
     /**
      * Gets a command group usage generator for the format that uses the given
      * options
-     * @param outputDirectory TODO
+     * 
+     * @param outputDirectory
+     *            Output directory
      * @param options
      *            Options
      * 
@@ -72,7 +76,9 @@ public interface FormatProvider {
 
     /**
      * Gets a global usage generator for the format that uses the given options
-     * @param outputDirectory TODO
+     * 
+     * @param outputDirectory
+     *            Output directory
      * @param options
      *            Options
      * 
