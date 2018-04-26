@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
-  <artifactId>airline-plugin-validate-simple-cli</artifactId>
+  <artifactId>airline-plugin-validate-no-sources</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Test MyMojo</name>
@@ -23,14 +23,7 @@
         <artifactId>airline-maven-plugin</artifactId>
         <version>@plugin.version@</version>
         <configuration>
-          <sources>
-            <source>
-              <classes>
-                <class>com.github.rvesse.airline.examples.simple.Simple</class>
-                <class>com.github.rvesse.airline.examples.userguide.BasicCli</class>
-              </classes>
-            </source>
-          </sources>
+          <!-- No sources to validate -->
         </configuration>
         <executions>
           <execution>

@@ -1,0 +1,8 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);

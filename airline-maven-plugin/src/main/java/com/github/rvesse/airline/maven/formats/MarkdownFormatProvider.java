@@ -52,7 +52,7 @@ public class MarkdownFormatProvider implements FormatProvider {
 
     @Override
     public String getDefaultMappingName() {
-        return "MAN";
+        return "MARKDOWN";
     }
 
 }

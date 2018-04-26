@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
-  <artifactId>airline-plugin-man-args1-failed-output-mode</artifactId>
+  <artifactId>airline-plugin-validate-bad</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Test MyMojo</name>
@@ -11,9 +11,8 @@
   <dependencies>
     <dependency>
       <groupId>com.github.rvesse</groupId>
-      <artifactId>airline</artifactId>
+      <artifactId>airline-examples</artifactId>
       <version>@airline.version@</version>
-      <classifier>tests</classifier>
     </dependency>
   </dependencies>
 
@@ -24,23 +23,20 @@
         <artifactId>airline-maven-plugin</artifactId>
         <version>@plugin.version@</version>
         <configuration>
-          <formats>
-            <format>MAN</format>
-          </formats>
           <sources>
             <source>
               <classes>
-                <class>com.github.rvesse.airline.args.Args1</class>
+                <!-- Invalid source as uses fluent API rather than annotations -->
+                <class>com.github.rvesse.airline.examples.cli.SimpleCli</class>
               </classes>
-              <outputMode>CLI</outputMode>
             </source>
           </sources>
-          <failOnUnsupportedOutputMode>true</failOnUnsupportedOutputMode>
         </configuration>
         <executions>
           <execution>
+            <phase>verify</phase>
             <goals>
-              <goal>generate</goal>
+              <goal>validate</goal>
             </goals>
           </execution>
         </executions>

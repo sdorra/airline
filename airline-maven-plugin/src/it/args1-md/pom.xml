@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
-  <artifactId>airline-plugin-man-args1-failed-output-mode</artifactId>
+  <artifactId>airline-plugin-man-args1</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Test MyMojo</name>
@@ -25,17 +25,15 @@
         <version>@plugin.version@</version>
         <configuration>
           <formats>
-            <format>MAN</format>
+            <format>MARKDOWN</format>
           </formats>
           <sources>
             <source>
               <classes>
                 <class>com.github.rvesse.airline.args.Args1</class>
               </classes>
-              <outputMode>CLI</outputMode>
             </source>
           </sources>
-          <failOnUnsupportedOutputMode>true</failOnUnsupportedOutputMode>
         </configuration>
         <executions>
           <execution>

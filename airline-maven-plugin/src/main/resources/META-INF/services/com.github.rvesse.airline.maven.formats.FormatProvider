@@ -1,2 +1,3 @@
 com.github.rvesse.airline.maven.formats.CliFormatProvider
 com.github.rvesse.airline.maven.formats.ManFormatProvider
+com.github.rvesse.airline.maven.formats.MarkdownFormatProvider
