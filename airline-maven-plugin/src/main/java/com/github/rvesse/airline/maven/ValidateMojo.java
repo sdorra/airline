@@ -59,7 +59,7 @@ public class ValidateMojo extends AbstractAirlineMojo {
         }
         
         for (PreparedSource source : sources) {
-            log.info(String.format("Validated Airline metadata for class %s", source.getSourceClass()));
+            log.info(String.format("Validated Airline metadata for %s", source.getSourceClass()));
         }
     }
 
