@@ -180,7 +180,13 @@
             <exclude>pom.xml</exclude>
             <exclude>**/pom.xml</exclude>
             <exclude>**/*.config</exclude>
+            
+            <!-- Integration Tests -->
             <exclude>**/verify.bsh</exclude>
+            <exclude>**/it/*</exclude>
+            <exclude>**/invoker.properties</exclude>
+            
+            <!-- Documentation -->
             <exclude>docs/</exclude>
           </excludes>
         </configuration>
