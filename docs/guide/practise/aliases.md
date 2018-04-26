@@ -117,6 +117,35 @@ So if Airline now finds that the user has typed in `json` as the command name it
 
 Essentially the left hand side is the name of the alias i.e. the name users will enter at your CLI and the right hand side is the expansion of that alias.
 
+#### Mixing Aliases and Other Config
+
+Often you will want to use a single configuration file that contains both aliases and other config for your application.  Airline supports this through the notion of a prefix, when a prefix is set Airline will only treat properties that start with that prefix as being alias definitions and ignores other configuration.
+
+A prefix can be set either via the `userAliasesPrefix` field on your `@Parser` definition or when calling `withUserAliases()` on the parser builder e.g.
+
+```java
+builder.withParser()
+        withUserAliases("aliases.config", "alias.", "~/.cli/", "src/main/resources/");
+```
+Or:
+
+```java
+@Parser(userAliasesFile = "aliases.config",
+        userAliasesPrefix = "alias."
+        userAliasesSearchLocation = { "~/.cli/", "src/main/resources/" })
+```
+So now our aliases file can look like the following:
+
+```
+# An alias definition
+alias.json=logs --format Json
+
+# Some other config
+verbosity=3
+foo=bar
+```
+And we'd still have a `json` alias created but the other config would be ignored for the purposes of aliases.
+
 ### Advanced Alias Behaviours
 
 #### Aliases vs Built-In's
