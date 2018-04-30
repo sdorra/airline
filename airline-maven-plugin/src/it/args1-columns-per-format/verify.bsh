@@ -1,0 +1,19 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify output file
+String outputFile = verifier.getBasedir() + "/target/help/Args1.txt";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*args1 description.*");
+verifier.assertFileMatches(outputFile, "(?s).*SYNOPSIS.*");
+lines = verifier.loadLines("/target/help/Args1.txt", null);
+for (String line : lines) {
+  if (line.length() > 68) throw new VerificationException("Line length is greater than configured columns 68");
+}
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.args.Args1 in format CLI to file " + outputFile + ".*");

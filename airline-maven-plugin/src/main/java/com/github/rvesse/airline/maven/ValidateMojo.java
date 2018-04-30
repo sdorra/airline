@@ -16,7 +16,6 @@
 package com.github.rvesse.airline.maven;
 
 import java.util.List;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -36,6 +35,7 @@ import com.github.rvesse.airline.maven.sources.PreparedSource;
 )
 //@formatter:on
 public class ValidateMojo extends AbstractAirlineMojo {
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -59,5 +59,4 @@ public class ValidateMojo extends AbstractAirlineMojo {
             log.info(String.format("Validated Airline metadata for %s", source.getSourceClass()));
         }
     }
-
 }

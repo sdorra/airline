@@ -17,6 +17,7 @@ package com.github.rvesse.airline.io.printers;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -145,9 +146,9 @@ public class UsagePrinter {
         if (value == null)
             return this;
         if (avoidNewlines) {
-            return appendWords(arrayToList(value.split("\\s+")), avoidNewlines);
+            return appendWords(Arrays.asList(value.split("\\s+")), avoidNewlines);
         } else {
-            return appendLines(arrayToList(StringUtils.split(value, '\n')), avoidNewlines);
+            return appendLines(Arrays.asList(StringUtils.split(value, '\n')), avoidNewlines);
         }
     }
 
@@ -161,7 +162,7 @@ public class UsagePrinter {
             String line = iter.next();
             if (line == null || line.isEmpty())
                 continue;
-            appendWords(arrayToList(line.split("\\s+")), avoidNewlines);
+            appendWords(Arrays.asList(line.split("\\s+")), avoidNewlines);
             if (iter.hasNext()) {
                 this.newline();
             }
@@ -170,20 +171,20 @@ public class UsagePrinter {
     }
     
     public UsagePrinter appendWords(String[] words, boolean avoidNewlines) {
-        return appendWords(arrayToList(words), avoidNewlines);
+        return appendWords(Arrays.asList(words), avoidNewlines);
     }
 
     public UsagePrinter appendWords(Iterable<String> words, boolean avoidNewlines)  {
         int bracketCount = 0;
         for (String word : words) {
-            if (null == word || "".equals(word)) {
+            if (StringUtils.isEmpty(word)) {
                 continue;
             }
             if (currentPosition.get() == 0) {
                 // beginning of line
                 out.append(spaces(indent));
                 currentPosition.getAndAdd((indent));
-            } else if (word.length() > maxSize || currentPosition.get() + word.length() <= maxSize || bracketCount > 0
+            } else if (word.length() > maxSize || currentPosition.get() + word.length() + 1 <= maxSize || bracketCount > 0
                     || avoidNewlines) {
                 // between words
                 out.append(" ");
@@ -191,7 +192,7 @@ public class UsagePrinter {
             } else {
                 // wrap line
                 out.append("\n").append(spaces(indent)).append(spaces(hangingIndent));
-                currentPosition.set(indent);
+                currentPosition.set(indent + hangingIndent);
             }
 
             out.append(word);
@@ -220,13 +221,5 @@ public class UsagePrinter {
             result.append(" ");
         }
         return result.toString();
-    }
-    
-    private static List<String> arrayToList(String[] values) {
-        List<String> list = new ArrayList<String>();
-        for (String value : values) {
-            list.add(value);
-        }
-        return list;
     }
 }

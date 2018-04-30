@@ -15,8 +15,6 @@
  */
 package com.github.rvesse.airline.maven;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +23,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import com.github.rvesse.airline.help.CommandGroupUsageGenerator;
@@ -36,9 +33,7 @@ import com.github.rvesse.airline.maven.formats.FormatOptions;
 import com.github.rvesse.airline.maven.formats.FormatProvider;
 import com.github.rvesse.airline.maven.sources.PreparedSource;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
-import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.GlobalMetadata;
-import com.github.rvesse.airline.model.ParserMetadata;
 
 /**
  * Generates Airline powered help
@@ -53,22 +48,7 @@ import com.github.rvesse.airline.model.ParserMetadata;
       requiresProject = true
 )
 //@formatter:on
-public class GenerateMojo extends AbstractAirlineMojo {
-
-    /**
-     * Formats to produce help in
-     */
-    @Parameter(defaultValue = "MAN")
-    private List<String> formats;
-
-    @Parameter(defaultValue = "true")
-    private boolean failOnUnknownFormat = true;
-
-    @Parameter(defaultValue = "false")
-    private boolean failOnUnsupportedOutputMode = false;
-
-    @Parameter(defaultValue = "true")
-    private boolean skipBadSources = true;
+public class GenerateMojo extends AbstractAirlineOutputMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -243,93 +223,5 @@ public class GenerateMojo extends AbstractAirlineMojo {
             }
 
         }
-    }
-
-    private void outputGroupCommandsHelp(String format, FormatProvider provider, FormatOptions sourceOptions,
-            CommandUsageGenerator commandGenerator, PreparedSource source, Collection<CommandMetadata> commands,
-            ParserMetadata<Object> parser, String programName, String... groupNames) throws MojoFailureException {
-        for (CommandMetadata command : commands) {
-            outputCommandHelp(format, provider, sourceOptions, commandGenerator, source, command, parser, programName,
-                    groupNames);
-        }
-    }
-
-    private void outputGroupCommandsHelp(String format, FormatProvider provider, FormatOptions sourceOptions,
-            CommandUsageGenerator commandGenerator, PreparedSource source, CommandGroupMetadata group,
-            ParserMetadata<Object> parser, String programName, String... groupNames) throws MojoFailureException {
-
-        // Add our group name to the group names path
-        groupNames = concatGroupNames(groupNames, group.getName());
-
-        // Output help for commands in this group
-        outputGroupCommandsHelp(format, provider, sourceOptions, commandGenerator, source, group.getCommands(), parser,
-                programName, groupNames);
-
-        // Recurse to output help for commands in sub-groups
-        for (CommandGroupMetadata subGroup : group.getSubGroups()) {
-            outputGroupCommandsHelp(format, provider, sourceOptions, commandGenerator, source, subGroup, parser,
-                    programName, groupNames);
-        }
-    }
-
-    private void outputGroupsHelp(String format, FormatProvider provider, FormatOptions sourceOptions,
-            CommandGroupUsageGenerator<Object> groupGenerator, PreparedSource source, CommandGroupMetadata[] groups,
-            ParserMetadata<Object> parser, String programName) throws MojoFailureException {
-
-        // Output help for this group
-        outputGroupHelp(format, provider, sourceOptions, groupGenerator, source, groups);
-
-        // Recurse to output help for sub-groups
-        CommandGroupMetadata group = groups[groups.length - 1];
-        for (CommandGroupMetadata subGroup : group.getSubGroups()) {
-            CommandGroupMetadata[] subGroups = Arrays.copyOf(groups, groups.length + 1);
-            subGroups[subGroups.length - 1] = subGroup;
-
-            outputGroupsHelp(format, provider, sourceOptions, groupGenerator, source, subGroups, parser, programName);
-        }
-    }
-
-    private String[] concatGroupNames(String[] names, String finalName) {
-        String[] finalNames;
-        if (names != null) {
-            finalNames = Arrays.copyOf(names, names.length + 1);
-        } else {
-            finalNames = new String[1];
-        }
-        finalNames[finalNames.length - 1] = finalName;
-        return finalNames;
-    }
-
-    private CommandUsageGenerator prepareCommandGenerator(FormatProvider provider, PreparedSource source,
-            FormatOptions sourceOptions) {
-        Log log = getLog();
-        CommandUsageGenerator sourceCommandGenerator;
-        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), sourceOptions));
-        sourceCommandGenerator = provider.getCommandGenerator(this.outputDirectory, sourceOptions);
-        log.info(String.format("Using command help generator %s for source %s", sourceCommandGenerator.getClass(),
-                source.getSourceClass()));
-        return sourceCommandGenerator;
-    }
-
-    private CommandGroupUsageGenerator<Object> prepareCommandGroupUsageGenerator(FormatProvider provider,
-            PreparedSource source, FormatOptions sourceOptions) {
-        Log log = getLog();
-        CommandGroupUsageGenerator<Object> sourceGroupGenerator;
-        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), sourceOptions));
-        sourceGroupGenerator = provider.getGroupGenerator(this.outputDirectory, sourceOptions);
-        log.info(String.format("Using command group help generator %s for source %s", sourceGroupGenerator.getClass(),
-                source.getSourceClass()));
-        return sourceGroupGenerator;
-    }
-
-    private GlobalUsageGenerator<Object> prepareGlobalUsageGenerator(FormatProvider provider, PreparedSource source,
-            FormatOptions sourceOptions) {
-        Log log = getLog();
-        GlobalUsageGenerator<Object> sourceGlobalGenerator;
-        log.debug(String.format("Source %s format options are %s", source.getSourceClass(), sourceOptions));
-        sourceGlobalGenerator = provider.getGlobalGenerator(this.outputDirectory, sourceOptions);
-        log.info(String.format("Using global generator %s for source %s", sourceGlobalGenerator.getClass(),
-                source.getSourceClass()));
-        return sourceGlobalGenerator;
     }
 }

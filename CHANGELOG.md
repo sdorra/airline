@@ -9,6 +9,8 @@
     - New `airline-docs-VERSION-offline-site.zip` and `.tar.gz` artifacts contain a static build of the documentation website for offline reference (#70)
 - Core Improvements
     - Removed some unnecessary helper methods from `AirlineUtils` in favour of JDK built-ins (#64)
+- Help Improvements
+    - Fixed some issues with UsagePrinter not correctly respecting configured column limits in some cases
 
 ## 2.4.0
 
