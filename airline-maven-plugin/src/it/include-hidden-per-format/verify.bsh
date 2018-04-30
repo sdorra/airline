@@ -1,0 +1,32 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify output file
+// CLI
+String outputFile = verifier.getBasedir() + "/target/help/help.txt";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*A command that provides help on other commands.*");
+verifier.assertFileMatches(outputFile, "(?s).*SYNOPSIS.*");
+verifier.assertFileMatches(outputFile, "(?s).*--include-hidden.*");
+// MAN
+outputFile = verifier.getBasedir() + "/target/help/help.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*A command that provides help on other commands.*");
+verifier.assertFileMatches(outputFile, "(?s).*[.]SH NAME.*");
+// Escaping backslashes in Java regex's sucks!
+verifier.assertFileMatches(outputFile, "(?s).*\\\\-\\\\-include\\\\-hidden.*");
+// MARKDOWN
+outputFile = verifier.getBasedir() + "/target/help/help.md";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*`help`.*");
+verifier.assertFileMatches(outputFile, "(?s).*# NAME.*");
+verifier.assertFileMatches(outputFile, "(?s).*`--include-hidden`.*");
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.examples.cli.commands.Help in format CLI.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.examples.cli.commands.Help in format MAN.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.examples.cli.commands.Help in format MARKDOWN.*");

@@ -1,0 +1,16 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify output file
+String outputFile = verifier.getBasedir() + "/target/help/help.txt";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*A command that provides help on other commands.*");
+verifier.assertFileMatches(outputFile, "(?s).*SYNOPSIS.*");
+verifier.assertFileMatches(outputFile, "(?s).*--include-hidden.*");
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.examples.cli.commands.Help in format CLI to file " + outputFile + ".*");

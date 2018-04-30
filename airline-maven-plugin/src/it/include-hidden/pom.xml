@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.rvesse</groupId>
+  <artifactId>airline-plugin-include-hidden</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>Test MyMojo</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-examples</artifactId>
+      <version>@airline.version@</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.rvesse</groupId>
+        <artifactId>airline-maven-plugin</artifactId>
+        <version>@plugin.version@</version>
+        <configuration>
+          <formats>
+            <format>CLI</format>
+          </formats>
+          <defaultOptions>
+            <includeHidden>true</includeHidden>
+          </defaultOptions>
+          <sources>
+            <source>
+              <classes>
+                <class>com.github.rvesse.airline.examples.cli.commands.Help</class>
+              </classes>
+            </source>
+          </sources>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
