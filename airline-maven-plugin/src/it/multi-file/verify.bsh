@@ -1,0 +1,29 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify output files
+// BasicCli Output
+// Main File
+String outputFile = verifier.getBasedir() + "/target/help/basic.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*Provides a basic example CLI.*");
+verifier.assertFileMatches(outputFile, "(?s).*[.]SH NAME.*");
+// Getting Started
+outputFile = verifier.getBasedir() + "/target/help/basic-getting-started.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*basic\\\\-getting\\\\-started.*");
+
+// Tool
+outputFile = verifier.getBasedir() + "/target/help/basic-foo-bar-tool.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*basic\\\\-foo\\\\-bar\\\\-tool.*");
+outputFile = verifier.getBasedir() + "/target/help/basic-common-tool.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*basic\\\\-common\\\\-tool.*");
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated CLI help for class com.github.rvesse.airline.examples.userguide.BasicCli in format MAN to file.*");

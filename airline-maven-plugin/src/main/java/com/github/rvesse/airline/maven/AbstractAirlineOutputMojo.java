@@ -188,6 +188,9 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
     protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
             CommandUsageGenerator commandGenerator, PreparedSource source, String programName, String[] groupNames)
             throws MojoFailureException {
+        
+        // TODO Skip hidden commands unless explicitly included
+        
         Log log = getLog();
         log.debug(String.format("Generating command help for %s in format %s", source.getSourceClass(), format));
 

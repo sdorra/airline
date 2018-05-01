@@ -26,28 +26,28 @@ public class RawFormatOptions {
      * the output
      */
     @Parameter(defaultValue = "79")
-    public Integer columns;
+    public Integer columns = null;
 
     /**
      * Indicates whether to include hidden groups, commands and options in
      * generated help
      */
     @Parameter(defaultValue = "false")
-    public Boolean includeHidden;
+    public Boolean includeHidden = null;
 
     /**
      * Indicates what section of the manual that Man based help should be
      * generated to
      */
     @Parameter(defaultValue = "1")
-    public Integer manSection;
+    public Integer manSection = null;
 
     /**
      * Indicates whether help should be generated to multiple files where
      * possible
      */
     @Parameter(defaultValue = "false")
-    public Boolean multiFile;
+    public Boolean multiFile = null;
 
     /**
      * Provides additional properties which custom formats may use

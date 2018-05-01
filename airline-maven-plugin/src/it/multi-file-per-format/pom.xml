@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
-  <artifactId>airline-plugin-man-args1-failed-output-mode</artifactId>
+  <artifactId>airline-plugin-multi-file-per-format</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Test MyMojo</name>
@@ -14,6 +14,11 @@
       <artifactId>airline</artifactId>
       <version>@airline.version@</version>
       <classifier>tests</classifier>
+    </dependency>
+    <dependency>
+      <groupId>com.github.rvesse</groupId>
+      <artifactId>airline-examples</artifactId>
+      <version>@airline.version@</version>
     </dependency>
   </dependencies>
 
@@ -27,15 +32,25 @@
           <formats>
             <format>MAN</format>
           </formats>
+          <defaultOptions>
+            <multiFile>false</multiFile>
+            <includeHidden>true</includeHidden>
+          </defaultOptions>
+          <formatMappings>
+            <mapping>
+              <format>MAN</format>
+              <options>
+                <multiFile>true</multiFile>
+              </options>
+            </mapping>
+          </formatMappings>
           <sources>
             <source>
               <classes>
-                <class>com.github.rvesse.airline.args.Args1</class>
+                <class>com.github.rvesse.airline.examples.userguide.BasicCli</class>
               </classes>
-              <outputMode>GROUP</outputMode>
             </source>
           </sources>
-          <failOnUnsupportedOutputMode>true</failOnUnsupportedOutputMode>
         </configuration>
         <executions>
           <execution>

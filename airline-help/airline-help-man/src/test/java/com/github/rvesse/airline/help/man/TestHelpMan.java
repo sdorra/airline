@@ -28,6 +28,7 @@ import com.github.rvesse.airline.Git.Add;
 import com.github.rvesse.airline.Git.RemoteAdd;
 import com.github.rvesse.airline.Git.RemoteShow;
 import com.github.rvesse.airline.SingleCommand;
+import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.args.ArgsCopyrightAndLicense;
 import com.github.rvesse.airline.args.ArgsExamples;
 import com.github.rvesse.airline.args.ArgsExitCodes;
@@ -656,6 +657,27 @@ public class TestHelpMan {
                 }, '\n'));
         gitRemoteAdd.delete();
         //@formatter:on
+    }
+    
+    public void testManMultiPageNoGroups() throws IOException {
+        @SuppressWarnings("unchecked")
+        CliBuilder<Object> builder = new CliBuilder<Object>("multi-page")
+                .withDefaultCommand(Args1.class)
+                .withCommands(Args1.class, ArgsVersion.class);
+        Cli<Object> cli = builder.build();
+        
+        ManMultiPageGlobalUsageGenerator<Object> generator = new ManMultiPageGlobalUsageGenerator<>(ManSections.GENERAL_COMMANDS, false, new File("target/"));
+        FileOutputStream mainFile = new FileOutputStream("target/multi-page.1");
+        generator.usage(cli.getMetadata(), mainFile);
+        mainFile.close();
+        new File("target/multi-page.1").delete();
+        
+        File args1File = new File("target/multi-page-Args1.1");
+        Assert.assertTrue(args1File.exists());
+        args1File.delete();
+        File argsVersionFile = new File("target/multi-page-ArgsVersion.1");
+        Assert.assertTrue(argsVersionFile.exists());
+        argsVersionFile.delete();
     }
 
     public void testExitCodesMan() throws IOException {

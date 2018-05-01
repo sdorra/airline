@@ -69,6 +69,19 @@ public class GenerateMojo extends AbstractAirlineOutputMojo {
             return;
         }
 
+        // See how many of each type of output we have
+        int commandOutputs, groupOutputs, cliOutputs;
+        commandOutputs = groupOutputs = cliOutputs = 0;
+        for (PreparedSource source : sources) {
+            if (source.shouldOutputCommandHelp()) {
+                commandOutputs++;
+            } else if (source.shouldOutputGroupHelp()) {
+                groupOutputs++;
+            } else if (source.shouldOutputGlobalHelp()) {
+                cliOutputs++;
+            }
+        }
+
         // Ensure directory is created
         ensureOutputDirectory();
 
@@ -97,129 +110,148 @@ public class GenerateMojo extends AbstractAirlineOutputMojo {
             if (options != defaultOptions)
                 log.debug(String.format("Format %s format options are %s", format, options));
 
-            CommandUsageGenerator commandGenerator = provider.getCommandGenerator(this.outputDirectory, options);
-            if (commandGenerator == null) {
-                if (failOnUnsupportedOutputMode)
-                    throw new MojoFailureException(String.format("Command help is not supported by format %s", format));
-                log.warn("Command help is not supported by format " + format);
-            } else {
-                log.info(String.format("Using command help generator %s as default for format %s",
-                        commandGenerator.getClass(), format));
+            if (commandOutputs > 0) {
+                // Command outputs
+                CommandUsageGenerator commandGenerator = provider.getCommandGenerator(this.outputDirectory, options);
+                if (commandGenerator == null) {
+                    if (failOnUnsupportedOutputMode)
+                        throw new MojoFailureException(
+                                String.format("Command help is not supported by format %s", format));
+                    log.warn("Command help is not supported by format " + format);
+                } else {
+                    log.info(String.format("Using command help generator %s for format %s",
+                            commandGenerator.getClass(), format));
 
-                // Generate command help
-                for (PreparedSource source : sources) {
-                    FormatOptions sourceOptions = source.getFormatOptions(options);
-                    CommandUsageGenerator sourceCommandGenerator = commandGenerator;
-                    if (source.isCommand()) {
-                        if (!source.shouldOutputCommandHelp()) {
-                            log.debug(String.format(
-                                    "Skipping command help for %s because configured output mode is %s",
-                                    source.getSourceClass(), source.getOutputMode()));
-                            continue;
-                        }
+                    // Generate command help
+                    for (PreparedSource source : sources) {
+                        FormatOptions sourceOptions = source.getFormatOptions(options);
+                        CommandUsageGenerator sourceCommandGenerator = commandGenerator;
+                        if (source.isCommand()) {
+                            if (!source.shouldOutputCommandHelp()) {
+                                log.debug(String.format(
+                                        "Skipping command help for %s because configured output mode is %s",
+                                        source.getSourceClass(), source.getOutputMode()));
+                                continue;
+                            }
 
-                        if (sourceOptions != options) {
-                            // Source specific options and thus potentially
-                            // generator
-                            sourceCommandGenerator = prepareCommandGenerator(provider, source, sourceOptions);
-                        }
+                            if (sourceOptions != options) {
+                                // Source specific options and thus potentially
+                                // generator
+                                sourceCommandGenerator = prepareCommandGenerator(provider, source, sourceOptions);
+                            }
+                            
+                            outputCommandHelp(format, provider, sourceOptions, sourceCommandGenerator, source);
+                        } else if (source.isGlobal()) {
+                            if (!source.shouldOutputCommandHelp()) {
+                                log.debug(String.format(
+                                        "Skipping command help for %s because configured output mode is %s",
+                                        source.getSourceClass(), source.getOutputMode()));
+                                continue;
+                            }
+                            log.debug(String.format("Generating command help for all commands provided by CLI %s",
+                                    source.getSourceClass()));
 
-                        outputCommandHelp(format, provider, sourceOptions, sourceCommandGenerator, source);
-                    } else if (source.isGlobal()) {
-                        if (!source.shouldOutputCommandHelp()) {
-                            log.debug(String.format(
-                                    "Skipping command help for %s because configured output mode is %s",
-                                    source.getSourceClass(), source.getOutputMode()));
-                            continue;    
-                        }
-                        log.debug(String.format("Generating command help for all commands provided by CLI %s",
-                                source.getSourceClass()));
+                            if (sourceOptions != options) {
+                                sourceCommandGenerator = prepareCommandGenerator(provider, source, sourceOptions);
+                            }
 
-                        if (sourceOptions != options) {
-                            sourceCommandGenerator = prepareCommandGenerator(provider, source, sourceOptions);
-                        }
-
-                        // Firstly dump the default commands group and then dump
-                        // the command groups
-                        GlobalMetadata<Object> global = source.getGlobal();
-                        outputGroupCommandsHelp(format, provider, sourceOptions, sourceCommandGenerator, source,
-                                global.getDefaultGroupCommands(), global.getParserConfiguration(), global.getName(),
-                                (String[]) null);
-                        for (CommandGroupMetadata group : global.getCommandGroups()) {
+                            // Firstly dump the default commands group and then
+                            // dump
+                            // the command groups
+                            GlobalMetadata<Object> global = source.getGlobal();
                             outputGroupCommandsHelp(format, provider, sourceOptions, sourceCommandGenerator, source,
-                                    group, global.getParserConfiguration(), global.getName(), (String[]) null);
+                                    global.getDefaultGroupCommands(), global.getParserConfiguration(), global.getName(),
+                                    (String[]) null);
+                            for (CommandGroupMetadata group : global.getCommandGroups()) {
+                                outputGroupCommandsHelp(format, provider, sourceOptions, sourceCommandGenerator, source,
+                                        group, global.getParserConfiguration(), global.getName(), (String[]) null);
+                            }
                         }
                     }
                 }
+            } else {
+                log.debug("Skipping command help as no configured sources were commands or had their output mode set to COMMAND");
             }
 
-            CommandGroupUsageGenerator<Object> groupGenerator = provider.getGroupGenerator(this.outputDirectory,
-                    options);
-            if (groupGenerator == null) {
-                if (failOnUnsupportedOutputMode)
-                    throw new MojoFailureException(String.format("Group help is not supported by format %s", format));
-                log.warn("Group help is not supported by format " + format);
+            if (groupOutputs > 0) {
+                // Group Outputs
+                CommandGroupUsageGenerator<Object> groupGenerator = provider.getGroupGenerator(this.outputDirectory,
+                        options);
+                if (groupGenerator == null) {
+                    if (failOnUnsupportedOutputMode)
+                        throw new MojoFailureException(
+                                String.format("Group help is not supported by format %s", format));
+                    log.warn("Group help is not supported by format " + format);
+                } else {
+                    log.info(String.format("Using group help generator %s for format %s", groupGenerator.getClass(),
+                            format));
+
+                    // Generate group help
+                    for (PreparedSource source : sources) {
+                        if (source.isCommand())
+                            continue;
+
+                        if (source.isGlobal()) {
+                            if (!source.shouldOutputGroupHelp()) {
+                                log.debug(
+                                        String.format("Skipping group help for %s because configured output mode is %s",
+                                                source.getSourceClass(), source.getOutputMode()));
+                                continue;
+                            }
+                            CommandGroupUsageGenerator<Object> sourceGroupGenerator = groupGenerator;
+                            FormatOptions sourceOptions = source.getFormatOptions(options);
+                            if (sourceOptions != options) {
+                                sourceGroupGenerator = prepareCommandGroupUsageGenerator(provider, source,
+                                        sourceOptions);
+                            }
+
+                            GlobalMetadata<Object> global = source.getGlobal();
+                            for (CommandGroupMetadata group : global.getCommandGroups()) {
+                                outputGroupsHelp(format, provider, sourceOptions, sourceGroupGenerator, source,
+                                        new CommandGroupMetadata[] { group }, global.getParserConfiguration(),
+                                        global.getName());
+                            }
+                        }
+                    }
+                }
             } else {
-                log.info(String.format("Using group help generator %s for format %s", groupGenerator.getClass(),
-                        format));
+                log.debug("Skipping group help as no configured sources had their output mode set to GROUP");
+            }
 
-                // Generate group help
-                for (PreparedSource source : sources) {
-                    if (source.isCommand())
-                        continue;
+            if (cliOutputs > 0) {
+                // CLI outputs
+                GlobalUsageGenerator<Object> globalGenerator = provider.getGlobalGenerator(this.outputDirectory,
+                        options);
+                if (globalGenerator == null) {
+                    if (failOnUnsupportedOutputMode)
+                        throw new MojoFailureException(String.format("CLI help is not supported by format %s", format));
+                    log.warn("CLI help is not supported by format " + format);
+                } else {
+                    log.info(String.format("Using CLI help generator %s for format %s", globalGenerator.getClass(),
+                            format));
 
-                    if (source.isGlobal()) {
-                        if (!source.shouldOutputGroupHelp()) {
-                            log.debug(String.format(
-                                    "Skipping group help for %s because configured output mode is %s",
+                    // Generate global help
+                    for (PreparedSource source : sources) {
+                        if (!source.isGlobal())
+                            continue;
+
+                        if (!source.shouldOutputGlobalHelp()) {
+                            log.debug(String.format("Skipping global help for %s because configured output mode is %s",
                                     source.getSourceClass(), source.getOutputMode()));
                             continue;
                         }
-                        CommandGroupUsageGenerator<Object> sourceGroupGenerator = groupGenerator;
+
+                        GlobalUsageGenerator<Object> sourceGlobalGenerator = globalGenerator;
                         FormatOptions sourceOptions = source.getFormatOptions(options);
                         if (sourceOptions != options) {
-                            sourceGroupGenerator = prepareCommandGroupUsageGenerator(provider, source, sourceOptions);
+                            globalGenerator = prepareGlobalUsageGenerator(provider, source, sourceOptions);
                         }
 
-                        GlobalMetadata<Object> global = source.getGlobal();
-                        for (CommandGroupMetadata group : global.getCommandGroups()) {
-                            outputGroupsHelp(format, provider, sourceOptions, sourceGroupGenerator, source,
-                                    new CommandGroupMetadata[] { group }, global.getParserConfiguration(),
-                                    global.getName());
-                        }
+                        outputGlobalHelp(format, provider, sourceOptions, sourceGlobalGenerator, source);
                     }
                 }
-            }
-
-            GlobalUsageGenerator<Object> globalGenerator = provider.getGlobalGenerator(this.outputDirectory, options);
-            if (globalGenerator == null) {
-                if (failOnUnsupportedOutputMode)
-                    throw new MojoFailureException(String.format("CLI help is not supported by format %s", format));
-                log.warn("CLI help is not supported by format " + format);
             } else {
-                log.info(
-                        String.format("Using CLI help generator %s for format %s", globalGenerator.getClass(), format));
-
-                // Generate global help
-                for (PreparedSource source : sources) {
-                    if (!source.isGlobal())
-                        continue;
-                    
-                    if  (!source.shouldOutputGlobalHelp()) {
-                        log.debug(String.format(
-                                "Skipping global help for %s because configured output mode is %s",
-                                source.getSourceClass(), source.getOutputMode()));
-                        continue;
-                    }
-
-                    GlobalUsageGenerator<Object> sourceGlobalGenerator = globalGenerator;
-                    FormatOptions sourceOptions = source.getFormatOptions(options);
-                    if (sourceOptions != options) {
-                        globalGenerator = prepareGlobalUsageGenerator(provider, source, sourceOptions);
-                    }
-
-                    outputGlobalHelp(format, provider, sourceOptions, sourceGlobalGenerator, source);
-                }
+                log.debug("Skipping command help as no configured sources were CLIs");
             }
 
         }

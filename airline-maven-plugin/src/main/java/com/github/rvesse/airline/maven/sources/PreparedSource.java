@@ -39,7 +39,21 @@ public class PreparedSource {
         this.command = command;
         this.parser = this.global != null ? this.global.getParserConfiguration() : MetadataLoader.loadParser(this.cls);
         this.rawOptions = rawOptions;
-        this.outputMode = outputMode;
+        switch (outputMode) {
+        case DEFAULT:
+            if (this.global != null) {
+                this.outputMode = OutputMode.CLI;
+            } else if (this.command != null) {
+                this.outputMode = OutputMode.COMMAND;
+            } else {
+                throw new IllegalArgumentException(
+                        "outputMode was DEFAULT which requires either CLI or Command metadata to be present");
+            }
+            break;
+        default:
+            this.outputMode = outputMode;
+            break;
+        }
     }
 
     public Class<?> getSourceClass() {
@@ -79,7 +93,7 @@ public class PreparedSource {
     public boolean shouldOutputCommandHelp() {
         return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.COMMAND;
     }
-    
+
     public boolean shouldOutputGroupHelp() {
         return this.outputMode == OutputMode.DEFAULT || this.outputMode == OutputMode.GROUP;
     }

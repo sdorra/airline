@@ -10,4 +10,4 @@ verifier.assertFileNotPresent(outputFile);
 // Verify log file
 String logFile = verifier.getBasedir() + "/build.log";
 verifier.assertFilePresent(logFile);
-verifier.assertFileMatches(logFile, "(?s).*Skipping command help for class com.github.rvesse.airline.args.Args1 because configured output mode is CLI.*");
+verifier.assertFileMatches(logFile, "(?s).*Skipping command help as no configured sources were commands or had their output mode set to COMMAND.*");
