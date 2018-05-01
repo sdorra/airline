@@ -121,7 +121,7 @@
           <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
           <postBuildHookScript>verify</postBuildHookScript>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-          <goals>install</goals>
+          <goals>clean,install</goals>
         </configuration>
         <executions>
           <execution>

@@ -11,6 +11,7 @@
     - Removed some unnecessary helper methods from `AirlineUtils` in favour of JDK built-ins (#64)
 - Help Improvements
     - Fixed some issues with UsagePrinter not correctly respecting configured column limits in some cases
+    - New `airline-maven-plugin` that can be used to generate help for your Airline powered CLIs directly in your Maven build (#45)
 
 ## 2.4.0
 
@@ -53,7 +54,6 @@
         - This removes the `airline-help-ronn` module (**Breaking**)
     - New `@Version` annotation for embedding version information into generated help where the version information is pulled from properties files in your JARs or on the local file system
     - Multi-page help generators can now be configured with a base directory to control where the per-command files are created
-    - New `airline-maven-plugin` that can be used to generate help for your Airline powered CLIs directly in your Maven build
 - Restriction Changes
     - New `GlobalRestrictionsFactory` interface and corresponding registry in `RestrictionsRegistry`
         - Uses `ServiceLoader` for automatic discovery, provide a `META-INF/services/com.github.rvesse.airline.restrictions.factories.GlobalRestrictionFactory` file to specify global restriction factories

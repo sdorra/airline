@@ -159,10 +159,13 @@ public class GenerateMojo extends AbstractAirlineOutputMojo {
                             // dump
                             // the command groups
                             GlobalMetadata<Object> global = source.getGlobal();
-                            outputGroupCommandsHelp(format, provider, sourceOptions, sourceCommandGenerator, source,
+                            outputCommandsInGroup(format, provider, sourceOptions, sourceCommandGenerator, source,
                                     global.getDefaultGroupCommands(), global.getParserConfiguration(), global.getName(),
                                     (String[]) null);
                             for (CommandGroupMetadata group : global.getCommandGroups()) {
+                                if (group.isHidden() && !sourceOptions.includeHidden())
+                                    continue;
+                                
                                 outputGroupCommandsHelp(format, provider, sourceOptions, sourceCommandGenerator, source,
                                         group, global.getParserConfiguration(), global.getName(), (String[]) null);
                             }

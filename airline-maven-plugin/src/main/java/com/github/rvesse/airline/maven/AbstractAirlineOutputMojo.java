@@ -81,10 +81,14 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
         super();
     }
 
-    protected void outputGroupCommandsHelp(String format, FormatProvider provider, FormatOptions sourceOptions,
+    protected void outputCommandsInGroup(String format, FormatProvider provider, FormatOptions sourceOptions,
             CommandUsageGenerator commandGenerator, PreparedSource source, Collection<CommandMetadata> commands,
             ParserMetadata<Object> parser, String programName, String... groupNames) throws MojoFailureException {
         for (CommandMetadata command : commands) {
+            // Skip command if hidden and not including hiddens
+            if (command.isHidden() && !sourceOptions.includeHidden())
+                continue;
+            
             outputCommandHelp(format, provider, sourceOptions, commandGenerator, source, command, parser, programName,
                     groupNames);
         }
@@ -96,13 +100,20 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
 
         // Add our group name to the group names path
         groupNames = concatGroupNames(groupNames, group.getName());
+        
+        // Skip group if hidden and not including hiddens
+        if (group.isHidden() && !sourceOptions.includeHidden())
+            return;
 
-        // Output help for commands in this group
-        outputGroupCommandsHelp(format, provider, sourceOptions, commandGenerator, source, group.getCommands(), parser,
+        // Output help for commands in this group        
+        outputCommandsInGroup(format, provider, sourceOptions, commandGenerator, source, group.getCommands(), parser,
                 programName, groupNames);
 
         // Recurse to output help for commands in sub-groups
         for (CommandGroupMetadata subGroup : group.getSubGroups()) {
+            if (subGroup.isHidden() && !sourceOptions.includeHidden())
+                continue;
+            
             outputGroupCommandsHelp(format, provider, sourceOptions, commandGenerator, source, subGroup, parser,
                     programName, groupNames);
         }
@@ -188,9 +199,11 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
     protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
             CommandUsageGenerator commandGenerator, PreparedSource source, String programName, String[] groupNames)
             throws MojoFailureException {
-        
-        // TODO Skip hidden commands unless explicitly included
-        
+
+        // Skip hidden commands unless explicitly included
+        if (source.getCommmand().isHidden() && !options.includeHidden())
+            return;
+
         Log log = getLog();
         log.debug(String.format("Generating command help for %s in format %s", source.getSourceClass(), format));
 
@@ -201,11 +214,15 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
     protected void outputCommandHelp(String format, FormatProvider provider, FormatOptions options,
             CommandUsageGenerator commandGenerator, PreparedSource source, CommandMetadata command,
             ParserMetadata<Object> parser, String programName, String[] groupNames) throws MojoFailureException {
+        // Skip hidden commands unless explicitly included
+        if (command.isHidden() && !options.includeHidden())
+            return;
+
         File commandHelpFile = new File(this.outputDirectory, command.getName() + provider.getExtension(options));
         outputCommandHelp(format, commandGenerator, source, commandHelpFile, command, parser, programName, groupNames);
     }
 
-    protected void outputCommandHelp(String format, CommandUsageGenerator commandGenerator, PreparedSource source,
+    private void outputCommandHelp(String format, CommandUsageGenerator commandGenerator, PreparedSource source,
             File commandHelpFile, CommandMetadata command, ParserMetadata<Object> parser, String programName,
             String[] groupNames) throws MojoFailureException {
         Log log = getLog();
@@ -293,7 +310,8 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
             for (Mapping mapping : this.formatMappings) {
                 try {
                     FormatProvider provider;
-                    // If default specified or not specified use the default from the ServiceLoader built registry
+                    // If default specified or not specified use the default
+                    // from the ServiceLoader built registry
                     if (Mapping.DEFAULT.equals(mapping.provider) || StringUtils.isEmpty(mapping.provider)) {
                         provider = FormatMappingRegistry.find(mapping.format);
                         if (provider == null)
