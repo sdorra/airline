@@ -41,8 +41,8 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
 
     @Component
     protected MavenProject project;
-    
-    @Parameter(required = true)
+
+    @Parameter
     protected List<Source> sources;
 
     @Parameter(defaultValue = "true")
@@ -64,8 +64,10 @@ public abstract class AbstractAirlineMojo extends AbstractMojo {
     protected List<PreparedSource> prepareSources(boolean skipBadSources) throws MojoFailureException {
         List<PreparedSource> prepared = new ArrayList<>();
         Log log = getLog();
-        for (Source source : this.sources) {
-            prepared.addAll(source.prepare(log, skipBadSources));
+        if (this.sources != null) {
+            for (Source source : this.sources) {
+                prepared.addAll(source.prepare(log, skipBadSources));
+            }
         }
         if (prepared.size() == 0) {
             if (failOnNoSources)

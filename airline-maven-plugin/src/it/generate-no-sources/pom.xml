@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
-  <artifactId>airline-plugin-validate-no-sources</artifactId>
+  <artifactId>airline-plugin-generate-no-sources</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Test MyMojo</name>
@@ -23,14 +23,12 @@
         <artifactId>airline-maven-plugin</artifactId>
         <version>@plugin.version@</version>
         <configuration>
-          <!-- No sources to validate -->
           <failOnNoSources>false</failOnNoSources>
         </configuration>
         <executions>
           <execution>
-            <phase>verify</phase>
             <goals>
-              <goal>validate</goal>
+              <goal>generate</goal>
             </goals>
           </execution>
         </executions>

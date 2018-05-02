@@ -53,6 +53,10 @@ public class ValidateMojo extends AbstractAirlineMojo {
         // Don't ignore bad sources, this will fail if any bad source is found
         // thus failing the mojo and the build
         List<PreparedSource> sources = prepareSources(false);
+        if (sources.size() == 0) {
+            log.info("No sources specified so nothing to do");
+            return;
+        }
 
         // Confirm that we have validated each class
         for (PreparedSource source : sources) {

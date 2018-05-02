@@ -6,4 +6,4 @@ Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 // Verify log file
 String logFile = verifier.getBasedir() + "/build.log";
 verifier.assertFilePresent(logFile);
-verifier.assertFileMatches(logFile, "(?s).*No sources specified so nothing to do.*");
+verifier.assertFileMatches(logFile, "(?s).*No valid sources discovered so nothing to do.*");

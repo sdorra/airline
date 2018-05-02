@@ -61,7 +61,7 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
     /**
      * Location of the output
      */
-    @Parameter(defaultValue = "${project.build.directory}/help/", property = "outputDir", required = true)
+    @Parameter(defaultValue = "${project.build.directory}/help/", required = true)
     protected File outputDirectory;
 
     /**
@@ -189,6 +189,9 @@ public abstract class AbstractAirlineOutputMojo extends AbstractAirlineMojo {
      *             created
      */
     protected void ensureOutputDirectory() throws MojoFailureException {
+        Log log = getLog();
+        log.debug(String.format("Configured output directory is %s", outputDirectory));
+        
         if (!outputDirectory.exists() || !outputDirectory.isDirectory()) {
             if (!outputDirectory.mkdirs())
                 throw new MojoFailureException(String.format("Failed to create required output directory %s",

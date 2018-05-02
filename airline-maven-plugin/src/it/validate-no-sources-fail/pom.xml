@@ -24,7 +24,6 @@
         <version>@plugin.version@</version>
         <configuration>
           <!-- No sources to validate -->
-          <failOnNoSources>false</failOnNoSources>
         </configuration>
         <executions>
           <execution>
