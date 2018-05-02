@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
-  <artifactId>airline-plugin-include-hidden-per-format</artifactId>
+  <artifactId>airline-plugin-args1-cli-columns-per-source</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Test MyMojo</name>
@@ -11,8 +12,9 @@
   <dependencies>
     <dependency>
       <groupId>com.github.rvesse</groupId>
-      <artifactId>airline-examples</artifactId>
+      <artifactId>airline</artifactId>
       <version>@airline.version@</version>
+      <classifier>tests</classifier>
     </dependency>
   </dependencies>
 
@@ -25,34 +27,15 @@
         <configuration>
           <formats>
             <format>CLI</format>
-            <format>MAN</format>
-            <format>MARKDOWN</format>
           </formats>
-          <formatMappings>
-            <mapping>
-              <format>CLI</format>
-              <options>
-                <includeHidden>true</includeHidden>
-              </options>
-            </mapping>
-            <mapping>
-              <format>MAN</format>
-              <options>
-                <includeHidden>true</includeHidden>
-              </options>
-            </mapping>
-            <mapping>
-              <format>MARKDOWN</format>
-              <options>
-                <includeHidden>true</includeHidden>
-              </options>
-            </mapping>
-          </formatMappings>
           <sources>
             <source>
               <classes>
-                <class>com.github.rvesse.airline.examples.cli.commands.Help</class>
+                <class>com.github.rvesse.airline.args.Args1</class>
               </classes>
+              <options>
+                <columns>68</columns>
+              </options>
             </source>
           </sources>
         </configuration>
