@@ -1,0 +1,23 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify output files
+
+// BasicCli Output
+// Main file
+String outputFile = verifier.getBasedir() + "/target/help/basic.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*Provides a basic example CLI.*");
+verifier.assertFileMatches(outputFile, "(?s).*[.]SH NAME.*");
+// Getting Started
+outputFile = verifier.getBasedir() + "/target/help/getting-started.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*basic\\\\-getting\\\\-started.*");
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated CLI help for class com.github.rvesse.airline.examples.userguide.BasicCli in format MAN to file.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.examples.userguide.BasicCli in format MAN to file.*");

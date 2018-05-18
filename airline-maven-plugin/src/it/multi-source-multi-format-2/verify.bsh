@@ -1,0 +1,49 @@
+import java.io.*;
+import org.apache.maven.it.*;
+
+Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+
+// Verify output files
+// Args1 Output
+// MAN
+String outputFile = verifier.getBasedir() + "/target/help/Args1.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*args1 description.*");
+verifier.assertFileMatches(outputFile, "(?s).*[.]SH NAME.*");
+// CLI
+outputFile = verifier.getBasedir() + "/target/help/Args1.txt";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*args1 description.*");
+verifier.assertFileMatches(outputFile, "(?s).*SYNOPSIS.*");
+// MARKDOWN
+outputFile = verifier.getBasedir() + "/target/help/Args1.md";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*`Args1`.*");
+verifier.assertFileMatches(outputFile, "(?s).*# NAME.*");
+
+// BasicCli Output
+// MAN
+String outputFile = verifier.getBasedir() + "/target/help/basic.1";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*Provides a basic example CLI.*");
+verifier.assertFileMatches(outputFile, "(?s).*[.]SH NAME.*");
+// CLI
+outputFile = verifier.getBasedir() + "/target/help/basic.txt";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*Provides a basic example CLI.*");
+verifier.assertFileMatches(outputFile, "(?s).*SYNOPSIS.*");
+// MARKDOWN
+outputFile = verifier.getBasedir() + "/target/help/basic.md";
+verifier.assertFilePresent(outputFile);
+verifier.assertFileMatches(outputFile, "(?s).*`basic`.*");
+verifier.assertFileMatches(outputFile, "(?s).*# NAME.*");
+
+// Verify log file
+String logFile = verifier.getBasedir() + "/build.log";
+verifier.assertFilePresent(logFile);
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.args.Args1 in format MAN to file.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.args.Args1 in format CLI to file.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated command help for class com.github.rvesse.airline.args.Args1 in format MARKDOWN to file.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated CLI help for class com.github.rvesse.airline.examples.userguide.BasicCli in format MAN to file.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated CLI help for class com.github.rvesse.airline.examples.userguide.BasicCli in format CLI to file.*");
+verifier.assertFileMatches(logFile, "(?s).*Generated CLI help for class com.github.rvesse.airline.examples.userguide.BasicCli in format MARKDOWN to file.*");
