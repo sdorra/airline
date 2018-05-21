@@ -1,5 +1,11 @@
 # Airline - Change Log
 
+## 2.5.0
+
+- *NEW* - Added `airline-maven-plugin` that provides two goals (#45)
+    - A `generate` goal for generating help for your commands and CLIs during a Maven build
+    - A `validate` goal for validating that your `@Command` and `@Cli` annotated classes have valid annotations that Airline can generate a CLI from
+
 ## 2.4.1
 
 - Parser Changes
