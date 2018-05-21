@@ -4,11 +4,11 @@
   <parent>
     <artifactId>airline-parent</artifactId>
     <groupId>com.github.rvesse</groupId>
-    <version>2.5.0</version>
+    <version>2.5.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>airline-maven-plugin</artifactId>
-  <version>2.5.0</version>
+  <version>2.5.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Airline - Maven Plugin</name>
