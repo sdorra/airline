@@ -1,5 +1,9 @@
 # Airline - Change Log
 
+## 2.5.1
+
+
+
 ## 2.5.0
 
 - *NEW* - Added `airline-maven-plugin` that provides two goals (#45)
