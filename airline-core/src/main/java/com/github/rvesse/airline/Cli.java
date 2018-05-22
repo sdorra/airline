@@ -22,9 +22,9 @@ import org.apache.commons.collections4.ListUtils;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.command.CliParser;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Class for encapsulating and parsing CLIs
@@ -41,7 +41,7 @@ public class Cli<C> {
      * @param name
      *            Program name
      * @param <T>
-     *            Command type to be built 
+     *            Command type to be built
      * @return CLI Builder
      */
     public static <T> CliBuilder<T> builder(String name) {
@@ -61,6 +61,22 @@ public class Cli<C> {
      */
     public Cli(Class<?> cliClass) {
         this(MetadataLoader.<C> loadGlobal(cliClass));
+    }
+
+    /**
+     * Creates a new CLI from a class annotated with the
+     * {@link com.github.rvesse.airline.annotations.Cli} annotation
+     * 
+     * @param cliClass
+     *            CLI class
+     * @param parserConfig
+     *            Parser configuration, this will override any configuration
+     *            specified by the
+     *            {@link com.github.rvesse.airline.annotations.Cli#parserConfiguration()}
+     *            field
+     */
+    public Cli(Class<?> cliClass, ParserMetadata<C> parserConfig) {
+        this(MetadataLoader.<C> loadGlobal(cliClass, parserConfig));
     }
 
     /**

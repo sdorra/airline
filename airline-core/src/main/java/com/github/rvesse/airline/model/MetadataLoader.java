@@ -28,10 +28,12 @@ import com.github.rvesse.airline.annotations.Parser;
 import com.github.rvesse.airline.annotations.restrictions.Partial;
 import com.github.rvesse.airline.annotations.restrictions.Partials;
 import com.github.rvesse.airline.builder.ParserBuilder;
+import com.github.rvesse.airline.builder.UserAliasSourceBuilder;
 import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
 import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.options.OptionParser;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
@@ -122,12 +124,28 @@ public class MetadataLoader {
             builder.withAlias(alias.name()).withArguments(alias.arguments());
         }
         if (!StringUtils.isEmpty(parserConfig.userAliasesFile())) {
+            UserAliasSourceBuilder<C> userAliasBuilder = builder.withUserAliases();
+            userAliasBuilder.withFilename(parserConfig.userAliasesFile());
+            userAliasBuilder.withPrefix(parserConfig.userAliasesPrefix());
+            
+            // Determine the search locations that are in use
             if (parserConfig.userAliasesSearchLocation().length > 0) {
-                builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
-                        parserConfig.userAliasesSearchLocation());
+                userAliasBuilder.withSearchLocations(parserConfig.userAliasesSearchLocation());
             } else {
-                builder = builder.withUserAliases(parserConfig.userAliasesFile(), parserConfig.userAliasesPrefix(),
-                        new String[] { new File(".").getAbsolutePath() });
+                // Use the working directory as no search location specified
+                userAliasBuilder.withSearchLocation("." + File.separator);
+            }
+            
+            // Determine the locators that are in use
+            if (parserConfig.useDefaultAliasLocators() && parserConfig.defaultAliasLocatorsFirst()) {
+                userAliasBuilder.withDefaultLocators();
+            }
+            for (Class<? extends UserAliasSourceLocator> locatorClass : parserConfig.userAliasLocators()) {
+                UserAliasSourceLocator locator = ParserUtil.createInstance(locatorClass);
+                userAliasBuilder.withLocator(locator);
+            }
+            if (parserConfig.useDefaultAliasLocators() && !parserConfig.defaultAliasLocatorsFirst()) {
+                userAliasBuilder.withDefaultLocators();
             }
         }
 
@@ -149,6 +167,27 @@ public class MetadataLoader {
     }
 
     public static <C> GlobalMetadata<C> loadGlobal(Class<?> cliClass) {
+        return loadGlobal(cliClass, null);
+    }
+
+    /**
+     * Loads the metadata for a CLI
+     * 
+     * @param cliClass
+     *            Class that has the
+     *            {@link com.github.rvesse.airline.annotations.Cli} annotation
+     * @param parserConfigOverride
+     *            Optional parser configuration, note that the
+     *            {@link com.github.rvesse.airline.annotations.Cli#parserConfiguration()}
+     *            field is normally used to provide a parser configuration via
+     *            annotation but in some situations this may not be possible,
+     *            e.g. constructing user alias search paths programmatically, in
+     *            which case providing a parser configuration here
+     *            <strong>overrides</strong> anything specified directly on the
+     *            annotation
+     * @return Global metadata
+     */
+    public static <C> GlobalMetadata<C> loadGlobal(Class<?> cliClass, ParserMetadata<C> parserConfigOverride) {
         Annotation annotation = cliClass.getAnnotation(com.github.rvesse.airline.annotations.Cli.class);
         if (annotation == null)
             throw new IllegalArgumentException(String.format("Class %s does not have the @Cli annotation", cliClass));
@@ -166,9 +205,10 @@ public class MetadataLoader {
         }
 
         // Prepare parser configuration
-        ParserMetadata<C> parserConfig = cliConfig.parserConfiguration() != null
-                ? MetadataLoader.<C> loadParser(cliConfig.parserConfiguration())
-                : MetadataLoader.<C> loadParser(cliClass);
+        ParserMetadata<C> parserConfig = parserConfigOverride != null ? parserConfigOverride
+                : (cliConfig.parserConfiguration() != null
+                        ? MetadataLoader.<C> loadParser(cliConfig.parserConfiguration())
+                        : MetadataLoader.<C> loadParser(cliClass));
 
         // Prepare restrictions
         // We find restrictions in the following order:
@@ -583,9 +623,10 @@ public class MetadataLoader {
                             restrictions.add(restriction);
                         }
                     }
-                    
+
                     // Type Converter provider
-                    TypeConverterProvider provider = ParserUtil.createInstance(optionAnnotation.typeConverterProvider());
+                    TypeConverterProvider provider = ParserUtil
+                            .createInstance(optionAnnotation.typeConverterProvider());
 
                     //@formatter:off
                     OptionMetadata optionMetadata = new OptionMetadata(optionType, 
@@ -664,7 +705,8 @@ public class MetadataLoader {
                     }
 
                     String description = argumentsAnnotation.description();
-                    TypeConverterProvider provider = ParserUtil.createInstance(argumentsAnnotation.typeConverterProvider());
+                    TypeConverterProvider provider = ParserUtil
+                            .createInstance(argumentsAnnotation.typeConverterProvider());
 
                     Map<Class<? extends Annotation>, Set<Integer>> partials = loadPartials(field);
                     List<ArgumentsRestriction> restrictions = new ArrayList<>();

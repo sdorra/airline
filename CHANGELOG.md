@@ -2,7 +2,11 @@
 
 ## 2.5.1
 
-
+- Core Improvements
+    - Allow creating a `Cli` instance with an explicit `ParserMetadata` for situations where parser configuration cannot be specified via annotation e.g. using dynamically determined paths for user aliases
+- Parser Improvements
+    - Allow `./` as a user alias search location resolved as the current working directory
+    - Allow extending how user alias search locations are resolved to support custom behaviours
 
 ## 2.5.0
 

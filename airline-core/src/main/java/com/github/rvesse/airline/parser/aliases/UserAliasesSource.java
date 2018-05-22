@@ -15,10 +15,9 @@
  */
 package com.github.rvesse.airline.parser.aliases;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,23 +30,32 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.builder.AliasBuilder;
 import com.github.rvesse.airline.model.AliasMetadata;
+import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
 
 /**
  * Represents the source of user defined aliases
  * 
  * @author rvesse
  *
- * @param <C>
+ * @param <C> Command type
  */
 public class UserAliasesSource<C> {
 
+    private final List<UserAliasSourceLocator> locators;
     private final List<String> searchLocations;
     private final String filename, prefix;
-
+    
     public UserAliasesSource(String filename, String prefix, String... searchLocations) {
+        this(filename, prefix, null, Arrays.asList(searchLocations));
+    }
+
+    public UserAliasesSource(String filename, String prefix, List<UserAliasSourceLocator> locators,
+            List<String> searchLocations) {
         this.filename = filename;
         this.prefix = prefix;
-        this.searchLocations = Collections.unmodifiableList(Arrays.asList(searchLocations));
+        this.searchLocations = Collections.unmodifiableList(searchLocations);
+        this.locators = locators == null ? Arrays.asList(UserAliasSourceLocator.DEFAULTS)
+                : Collections.unmodifiableList(locators);
 
         if (StringUtils.isBlank(this.filename)) {
             throw new IllegalArgumentException("Filename cannot be null/empty/blank");
@@ -90,14 +98,17 @@ public class UserAliasesSource<C> {
         return this.prefix;
     }
 
+    /**
+     * Loads the alias metadata based on the configured sources
+     * 
+     * @return Alias metadata
+     * @throws FileNotFoundException
+     *             Thrown if unable to find a properties file
+     * @throws IOException
+     *             Thrown if unable to read a properties file
+     */
     public List<AliasMetadata> load() throws FileNotFoundException, IOException {
         Properties properties = new Properties();
-
-        // Find the home directory since we will use this
-        File homeDir = null;
-        if (!StringUtils.isEmpty(System.getProperty("user.home"))) {
-            homeDir = new File(System.getProperty("user.home"));
-        }
 
         // Search locations in reverse order overwriting previously found values
         // each time. Thus the first location in the list has highest precedence
@@ -108,29 +119,29 @@ public class UserAliasesSource<C> {
             if (StringUtils.isBlank(loc))
                 continue;
 
-            // Allow use of ~/ or ~\ as reference to user home directory
-            if (loc.startsWith("~" + File.separator)) {
-                if (homeDir == null)
-                    continue;
-                loc = homeDir.getAbsolutePath()
-                        + loc.substring(homeDir.getAbsolutePath().endsWith(File.separator) ? 2 : 1);
-            }
-
             // Don't read property files multiple times
             if (loaded.contains(loc))
                 continue;
 
-            File f = new File(loc);
-            f = new File(f, filename);
-            if (f.exists() && f.isFile() && f.canRead()) {
-                try (FileInputStream input = new FileInputStream(f)) {
+            for (UserAliasSourceLocator locator : this.locators) {
+                try (InputStream input = locator.open(loc, filename)) {
+                    // May not be supported by the locator in which case null
+                    // will be returned and we should try the next locator
+                    if (input == null)
+                        continue;
+
                     properties.load(input);
+
+                    // If we successfully load the input no need to try further
+                    // locators
+                    break;
                 } finally {
                     // Remember we've tried to read this file so we don't try
                     // and read it multiple times
                     loaded.add(loc);
                 }
             }
+
         }
 
         // Strip any irrelevant properties

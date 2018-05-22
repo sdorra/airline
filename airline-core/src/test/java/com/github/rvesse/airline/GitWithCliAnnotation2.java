@@ -18,6 +18,7 @@ package com.github.rvesse.airline;
 import com.github.rvesse.airline.Git.Add;
 import com.github.rvesse.airline.Git.RemoteAdd;
 import com.github.rvesse.airline.Git.RemoteShow;
+import com.github.rvesse.airline.annotations.Alias;
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.annotations.Parser;
@@ -33,14 +34,21 @@ import com.github.rvesse.airline.help.Help;
                description = "Manage set of tracked repositories",
                defaultCommand = RemoteShow.class,
                commands = { RemoteShow.class, RemoteAdd.class })
-     }
+     },
+     parserConfiguration = @Parser(
+         aliases = {
+             @Alias(
+                 name = "foo", 
+                 arguments = { "remote", "show" }
+             ) 
+         })
 )
 //@formatter:on
-public class GitWithCliAnnotation extends Git {
+public class GitWithCliAnnotation2 extends Git {
 
     public static void run(String[] args) {
         com.github.rvesse.airline.Cli<Runnable> gitParser = new com.github.rvesse.airline.Cli<Runnable>(
-                GitWithCliAnnotation.class);
+                GitWithCliAnnotation2.class);
 
         gitParser.parse(args).run();
     }

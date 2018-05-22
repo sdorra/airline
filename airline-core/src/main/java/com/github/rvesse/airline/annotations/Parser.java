@@ -26,6 +26,7 @@ import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.model.ParserMetadata;
+import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
 import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
@@ -154,6 +155,28 @@ public @interface Parser {
      * @return User defined aliases prefix
      */
     String userAliasesPrefix() default "";
+
+    /**
+     * Sets whether to use the default user alias locators (default true)
+     * 
+     * @return True if defaults are used, false otherwise
+     */
+    boolean useDefaultAliasLocators() default true;
+
+    /**
+     * Sets whether to use the default alias locators first before any
+     * additional alias locators that may be defined (default false)
+     * 
+     * @return True if defaults are used first, false otherwise
+     */
+    boolean defaultAliasLocatorsFirst() default false;
+
+    /**
+     * Sets the user alias locator classes to be used
+     * 
+     * @return User alias locator classes
+     */
+    Class<? extends UserAliasSourceLocator>[] userAliasLocators() default {};
 
     /**
      * Sets whether to use the default set of option parsers (default true)

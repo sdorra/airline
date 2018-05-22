@@ -25,7 +25,6 @@ import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.command.SingleCommandParser;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Class for encapsulating and parsing single commands

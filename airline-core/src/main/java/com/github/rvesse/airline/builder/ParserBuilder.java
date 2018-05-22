@@ -25,6 +25,7 @@ import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
+import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
 import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
@@ -50,7 +51,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
     protected String argsSeparator, flagNegationPrefix;
-    protected UserAliasesSource<C> userAliases;
+    protected UserAliasSourceBuilder<C> userAliasesBuilder = new UserAliasSourceBuilder<>();
     protected ParserErrorHandler errorHandler;
 
     /**
@@ -121,6 +122,15 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     }
 
     /**
+     * Gets a builder that provides detailed control over building user aliases
+     * 
+     * @return User aliases builder
+     */
+    public UserAliasSourceBuilder<C> withUserAliases() {
+        return this.userAliasesBuilder;
+    }
+
+    /**
      * Reads in user aliases from the default configuration file in the default
      * location.
      * <p>
@@ -143,8 +153,9 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      */
     public ParserBuilder<C> withUserAliases(String programName) {
         // Use default filename and search location
-        return withUserAliases(programName + ".config", null,
-                System.getProperty("user.home") + "/." + programName + "/");
+        this.userAliasesBuilder.withProgramName(programName);
+        this.userAliasesBuilder.withDefaultSearchLocation(programName);
+        return this;
     }
 
     /**
@@ -169,12 +180,14 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      */
     public ParserBuilder<C> withUserAliases(String programName, String searchLocation) {
         // Use default filename
-        return withUserAliases(programName + ".config", null, searchLocation);
+        this.userAliasesBuilder.withProgramName(programName);
+        this.userAliasesBuilder.withSearchLocation(searchLocation);
+        return this;
     }
 
     /**
-     * Reads in user aliases from the default configuration file in the default
-     * location
+     * Reads in user aliases from the defined configuration file in the provided
+     * search locations
      * <p>
      * This file is in standard Java properties format with the key being the
      * alias and the value being the arguments for this alias. Arguments are
@@ -230,7 +243,79 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      */
     public ParserBuilder<C> withUserAliases(final String filename, final String prefix,
             final String... searchLocations) {
-        this.userAliases = new UserAliasesSource<C>(filename, prefix, searchLocations);
+        this.userAliasesBuilder.withFilename(filename);
+        this.userAliasesBuilder.withPrefix(prefix);
+        this.userAliasesBuilder.withSearchLocations(searchLocations);
+        return this;
+    }
+
+    /**
+     * Reads in user aliases from the defined configuration file in the provided
+     * search location
+     * <p>
+     * This file is in standard Java properties format with the key being the
+     * alias and the value being the arguments for this alias. Arguments are
+     * whitespace separated though quotes ({@code "}) may be used to wrap
+     * arguments that need to contain whitespace. Quotes may be escaped within
+     * quoted arguments and whitespace may be escaped within unquoted arguments.
+     * Note that since Java property values are interpreted as Java strings it
+     * is necessary to double escape the backslash i.e. {@code \\"} for this to
+     * work properly.
+     * </p>
+     * 
+     * <pre>
+     * example=command --option value
+     * quoted=command "long argument"
+     * escaped=command whitespace\\ escape "quote\\"escape"
+     * </pre>
+     * <p>
+     * The search locations should be given in order of preference, the file
+     * will be loaded from all search locations in which it exists such that
+     * values from the locations occurring first in the search locations list
+     * take precedence. This allows for having multiple locations for your
+     * configuration file and layering different sets of aliases over each other
+     * e.g. system, user and local aliases.
+     * </p>
+     * <p>
+     * The {@code prefix} is used to filter properties from the properties file
+     * such that you can include aliases with other configuration settings in
+     * your configuration files. When a prefix is used only properties that
+     * start with the prefix are interpreted as alias definitions and the actual
+     * alias is the property name with the prefix removed. For example if your
+     * prefix was {@code alias.} and you had a property {@code alias.foo} the
+     * resulting alias would be {@code foo}.
+     * </p>
+     * <h3>Notes</h3>
+     * <ul>
+     * <li>Recursive aliases are only supported if
+     * {@link #withAliasesChaining()}} is specified and will result in errors
+     * when used otherwise. Even when recursive aliases are enabled aliases
+     * cannot use circular references.</li>
+     * <li>Aliases cannot override built-ins unless you have called
+     * {@link #withAliasesOverridingBuiltIns()} on your builder</li>
+     * </ul>
+     * 
+     * @param filename
+     *            Filename to look for
+     * @param prefix
+     *            Prefix used to distinguish alias related properties from other
+     *            properties
+     * @param locators
+     *            Locators used to resolve search locations to actual locations,
+     *            this is what enables things like {@code ~/} to be used to
+     *            refer to the users home directory. If {@code null} then a
+     *            default set are used.
+     * @param searchLocations
+     *            Search locations in order of preference
+     * 
+     * @return Builder
+     */
+    public ParserBuilder<C> withUserAliases(final String filename, final String prefix,
+            final List<UserAliasSourceLocator> locators, final String... searchLocations) {
+        this.userAliasesBuilder.withFilename(filename);
+        this.userAliasesBuilder.withPrefix(prefix);
+        this.userAliasesBuilder.withSearchLocations(searchLocations);
+        this.userAliasesBuilder.withLocators(locators);
         return this;
     }
 
@@ -429,7 +514,8 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * many command line tools.
      * </p>
      * 
-     * @param separator Arguments separator
+     * @param separator
+     *            Arguments separator
      * @return Builder
      */
     public ParserBuilder<C> withArgumentsSeparator(String separator) {
@@ -462,9 +548,11 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
 
         // Load user aliases
         // These may override explicitly defined aliases
-        if (this.userAliases != null) {
+        UserAliasesSource<C> userAliases = null;
+        if (this.userAliasesBuilder.isBuildable()) {
             try {
-                for (AliasMetadata alias : this.userAliases.load()) {
+                userAliases = this.userAliasesBuilder.build();
+                for (AliasMetadata alias : userAliases.load()) {
                     aliases.put(alias.getName(), new AliasBuilder<C>(alias.getName())
                             .withArguments(alias.getArguments().toArray(new String[alias.getArguments().size()])));
                 }
