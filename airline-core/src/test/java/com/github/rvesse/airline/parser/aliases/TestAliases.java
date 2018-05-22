@@ -19,8 +19,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
@@ -33,6 +38,8 @@ import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.model.AliasMetadata;
+import com.github.rvesse.airline.parser.aliases.locators.EnvVarLocator;
+import com.github.rvesse.airline.parser.aliases.locators.JvmSystemPropertyLocator;
 import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 
@@ -64,6 +71,35 @@ public class TestAliases {
             writer.append('\n');
         }
         writer.close();
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static void customEnvironment(Map<String, String> customEnvironment) throws Exception {
+        try {
+            Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
+            Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
+            theEnvironmentField.setAccessible(true);
+            Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
+            env.putAll(customEnvironment);
+            Field theCaseInsensitiveEnvironmentField = processEnvironmentClass
+                    .getDeclaredField("theCaseInsensitiveEnvironment");
+            theCaseInsensitiveEnvironmentField.setAccessible(true);
+            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
+            cienv.putAll(customEnvironment);
+        } catch (NoSuchFieldException e) {
+            Class[] classes = Collections.class.getDeclaredClasses();
+            Map<String, String> env = System.getenv();
+            for (Class cl : classes) {
+                if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
+                    Field field = cl.getDeclaredField("m");
+                    field.setAccessible(true);
+                    Object obj = field.get(env);
+                    Map<String, String> map = (Map<String, String>) obj;
+                    //map.clear();
+                    map.putAll(customEnvironment);
+                }
+            }
+        }
     }
 
     @Test
@@ -226,6 +262,264 @@ public class TestAliases {
         Args1 cmd = cli.parse("foo");
         Assert.assertEquals(cmd.parameters.size(), 1);
         Assert.assertEquals(cmd.parameters.get(0), "faz");
+    }
+
+    @Test
+    public void user_aliases_home_dir_03() throws IOException {
+        // Empty aliases
+        prepareConfig(f, "");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "~/", "~\\");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 0);
+    }
+
+    @Test
+    public void user_aliases_working_dir_01() throws IOException {
+        File workingDir = Paths.get("").toAbsolutePath().toFile();
+        File config = new File(workingDir, "test.config");
+        prepareConfig(config, "foo=Args1 bar");
+
+        try {
+            //@formatter:off
+            CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                           .withCommand(Args1.class);
+            builder.withParser()
+                   .withUserAliases(config.getName(), null, "./", ".\\");
+            Cli<Args1> cli = builder.build();
+            //@formatter:on
+
+            // Check definition
+            List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+            Assert.assertEquals(aliases.size(), 1);
+
+            AliasMetadata alias = aliases.get(0);
+            Assert.assertEquals(alias.getName(), "foo");
+            List<String> args = alias.getArguments();
+            Assert.assertEquals(args.size(), 2);
+            Assert.assertEquals(args.get(0), "Args1");
+            Assert.assertEquals(args.get(1), "bar");
+
+            // Check parsing
+            Args1 cmd = cli.parse("foo");
+            Assert.assertEquals(cmd.parameters.size(), 1);
+            Assert.assertEquals(cmd.parameters.get(0), "bar");
+        } finally {
+            config.delete();
+        }
+    }
+
+    @Test
+    public void user_aliases_working_dir_02() throws IOException {
+        File workingDir = Paths.get("").toAbsolutePath().toFile();
+        File config = new File(workingDir, "test.config");
+        // Empty aliases
+        prepareConfig(config, "");
+
+        try {
+            //@formatter:off
+            CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                           .withCommand(Args1.class);
+            builder.withParser()
+                   .withUserAliases(config.getName(), null, "./", ".\\");
+            Cli<Args1> cli = builder.build();
+            //@formatter:on
+
+            // Check definition
+            List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+            Assert.assertEquals(aliases.size(), 0);
+        } finally {
+            config.delete();
+        }
+    }
+
+    @Test
+    public void user_aliases_env_01() throws Exception {
+        Map<String, String> custom = new HashMap<>();
+        custom.put("FOO", f.getParentFile().getAbsolutePath());
+        
+        customEnvironment(custom);
+        prepareConfig(f, "foo=Args1 bar");
+        
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "${FOO}/")
+               .withUserAliases()
+                   .withLocator(new EnvVarLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+    
+    @Test
+    public void user_aliases_env_02() throws Exception {
+        Map<String, String> custom = new HashMap<>();
+        custom.put("FOO", f.getParentFile().getAbsolutePath());
+        
+        customEnvironment(custom);
+        prepareConfig(f, "foo=Args1 bar");
+        
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+                // Bad placeholder
+               .withUserAliases(f.getName(), null, "${FOO/")
+               .withUserAliases()
+                   .withLocator(new EnvVarLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 0);
+    }
+    
+    @Test
+    public void user_aliases_env_03() throws Exception {
+        Map<String, String> custom = new HashMap<>();
+        custom.put("FOO", new File(f.getAbsolutePath()).getParentFile().getParentFile().getAbsolutePath());
+        custom.put("BAR", f.getParentFile().getName());
+        
+        customEnvironment(custom);
+        prepareConfig(f, "foo=Args1 bar");
+        
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "${FOO}/${BAR}/")
+               .withUserAliases()
+                   .withLocator(new EnvVarLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+    
+    @Test
+    public void user_aliases_sysprop_01() throws Exception {
+        System.getProperties().put("FOO", f.getParentFile().getAbsolutePath());
+        prepareConfig(f, "foo=Args1 bar");
+        
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "${FOO}/")
+               .withUserAliases()
+                   .withLocator(new JvmSystemPropertyLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+    
+    @Test
+    public void user_aliases_sysprop_02() throws Exception {
+        System.getProperties().put("FOO", f.getParentFile().getAbsolutePath());
+        prepareConfig(f, "foo=Args1 bar");
+        
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+                // Bad placeholder
+               .withUserAliases(f.getName(), null, "${FOO/")
+               .withUserAliases()
+                   .withLocator(new JvmSystemPropertyLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 0);
+    }
+    
+    @Test
+    public void user_aliases_sysprop_03() throws Exception {
+        System.getProperties().put("FOO", new File(f.getAbsolutePath()).getParentFile().getParentFile().getAbsolutePath());
+        System.getProperties().put("BAR", f.getParentFile().getName());
+        prepareConfig(f, "foo=Args1 bar");
+        
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases(f.getName(), null, "${FOO}/${BAR}/")
+               .withUserAliases()
+                   .withLocator(new JvmSystemPropertyLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
     }
 
     @Test(expectedExceptions = ParseOptionConversionException.class)
@@ -501,7 +795,7 @@ public class TestAliases {
         // Check parsing
         cli.parse(aliases[0].substring(0, aliases[0].indexOf('=')));
     }
-    
+
     @Test
     public void user_aliases_chained_02() throws IOException {
         for (int i = 1; i < 20; i++) {
@@ -523,7 +817,7 @@ public class TestAliases {
             }
         }
     }
-    
+
     @Test(expectedExceptions = ParseAliasCircularReferenceException.class)
     public void user_aliases_circular_01() throws IOException {
         String[] aliases = generateAliasesChain(2, true, null);
@@ -561,7 +855,7 @@ public class TestAliases {
             for (int j = 0; j < aliases.length; j++) {
                 try {
                     cli.parse(aliases[j].substring(0, aliases[j].indexOf('=')));
-                    
+
                     Assert.fail("Did not produce circular reference exception");
                 } catch (ParseAliasCircularReferenceException e) {
                     // Expected, continue
@@ -569,7 +863,7 @@ public class TestAliases {
             }
         }
     }
-    
+
     @Test(expectedExceptions = ParseAliasCircularReferenceException.class)
     public void user_aliases_chained_03() throws IOException {
         // Self-referential

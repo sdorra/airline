@@ -29,17 +29,13 @@ import java.nio.file.Paths;
  */
 public class WorkingDirectoryLocator extends FileLocator {
 
-    private final File workingDir;
-
-    public WorkingDirectoryLocator() {
-        // Find the working directory since we will also potentially use this to
-        // resolve the special ./ alias
-        this.workingDir = Paths.get("").toAbsolutePath().toFile();
-    }
-
     @Override
     protected String resolve(String searchLocation) {
-        // Can't resolve if no home directory available
+        // Find the working directory since we will also potentially use this to
+        // resolve the special ./ alias
+        File workingDir = Paths.get("").toAbsolutePath().toFile();
+        
+        // Can't resolve if no working directory available
         if (workingDir == null)
             return searchLocation;
 

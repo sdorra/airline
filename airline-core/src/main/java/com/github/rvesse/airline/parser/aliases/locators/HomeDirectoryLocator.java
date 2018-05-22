@@ -34,23 +34,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HomeDirectoryLocator extends FileLocator {
 
-    private final File homeDir;
-
-    public HomeDirectoryLocator() {
+    @Override
+    protected String resolve(String searchLocation) {
         // Find the home directory since we will potentially use this to resolve
         // the special ~/ alias
+        File homeDir;
         if (!StringUtils.isEmpty(System.getProperty("user.home"))) {
             homeDir = new File(System.getProperty("user.home"));
         } else {
-            homeDir = null;
-        }
-    }
-
-    @Override
-    protected String resolve(String searchLocation) {
-        // Can't resolve if no home directory available
-        if (homeDir == null)
+            // Can't resolve as no home directory available
             return searchLocation;
+        }
 
         // Expand ~/ or ~\ alias (platform dependent)
         if (searchLocation.startsWith("~" + File.separator)) {
