@@ -30,17 +30,19 @@ public class Git
 {
     public static void main(String... args)
     {
+        //@formatter:off
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
                 .withDescription("the stupid content tracker")
                 .withDefaultCommand(Help.class)
                 .withCommand(Help.class)
-                .withCommand(Add.class);
-
-        builder.withGroup("remote")
-                .withDescription("Manage set of tracked repositories")
-                .withDefaultCommand(RemoteShow.class)
-                .withCommand(RemoteShow.class)
-                .withCommand(RemoteAdd.class);
+                .withCommand(Add.class)
+                .withGroup("remote")
+                    .withDescription("Manage set of tracked repositories")
+                    .withDefaultCommand(RemoteShow.class)
+                    .withCommand(RemoteShow.class)
+                    .withCommand(RemoteAdd.class)
+                    .parent();
+        //@formatter:on
 
         Cli<Runnable> gitParser = builder.build();
 

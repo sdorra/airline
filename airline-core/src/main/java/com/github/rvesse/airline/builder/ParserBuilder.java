@@ -25,7 +25,7 @@ import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
-import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
+import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
 import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.ClassicGetOptParser;
 import com.github.rvesse.airline.parser.options.LongGetOptParser;
@@ -51,7 +51,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
     protected boolean allowAbbreviatedCommands, allowAbbreviatedOptions, aliasesOverrideBuiltIns, aliasesMayChain;
     protected final List<OptionParser<C>> optionParsers = new ArrayList<>();
     protected String argsSeparator, flagNegationPrefix;
-    protected UserAliasSourceBuilder<C> userAliasesBuilder = new UserAliasSourceBuilder<>();
+    protected UserAliasSourceBuilder<C> userAliasesBuilder = new UserAliasSourceBuilder<>(this);
     protected ParserErrorHandler errorHandler;
 
     /**
@@ -101,7 +101,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
             return aliases.get(name);
         }
 
-        AliasBuilder<C> alias = new AliasBuilder<C>(name);
+        AliasBuilder<C> alias = new AliasBuilder<C>(this, name);
         aliases.put(name, alias);
         return alias;
     }
@@ -150,7 +150,10 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      * @param programName
      *            Program Name
      * @return Builder
+     * @deprecated Use {@link #withUserAliases()} to access the user alias
+     *             builder directly instead
      */
+    @Deprecated
     public ParserBuilder<C> withUserAliases(String programName) {
         // Use default filename and search location
         this.userAliasesBuilder.withProgramName(programName);
@@ -177,7 +180,10 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      *            Location to search
      * 
      * @return Builder
+     * @deprecated Use {@link #withUserAliases()} to access the user alias
+     *             builder directly instead
      */
+    @Deprecated
     public ParserBuilder<C> withUserAliases(String programName, String searchLocation) {
         // Use default filename
         this.userAliasesBuilder.withProgramName(programName);
@@ -240,7 +246,10 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      *            Search locations in order of preference
      * 
      * @return Builder
+     * @deprecated Use {@link #withUserAliases()} to access the user alias
+     *             builder directly instead
      */
+    @Deprecated
     public ParserBuilder<C> withUserAliases(final String filename, final String prefix,
             final String... searchLocations) {
         this.userAliasesBuilder.withFilename(filename);
@@ -309,9 +318,12 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
      *            Search locations in order of preference
      * 
      * @return Builder
+     * @deprecated Use {@link #withUserAliases()} to access the user alias
+     *             builder directly instead
      */
+    @Deprecated
     public ParserBuilder<C> withUserAliases(final String filename, final String prefix,
-            final List<UserAliasSourceLocator> locators, final String... searchLocations) {
+            final List<ResourceLocator> locators, final String... searchLocations) {
         this.userAliasesBuilder.withFilename(filename);
         this.userAliasesBuilder.withPrefix(prefix);
         this.userAliasesBuilder.withSearchLocations(searchLocations);
@@ -553,7 +565,7 @@ public class ParserBuilder<C> extends AbstractBuilder<ParserMetadata<C>> {
             try {
                 userAliases = this.userAliasesBuilder.build();
                 for (AliasMetadata alias : userAliases.load()) {
-                    aliases.put(alias.getName(), new AliasBuilder<C>(alias.getName())
+                    aliases.put(alias.getName(), new AliasBuilder<C>(this, alias.getName())
                             .withArguments(alias.getArguments().toArray(new String[alias.getArguments().size()])));
                 }
             } catch (IOException e) {

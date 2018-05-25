@@ -33,7 +33,6 @@ import com.github.rvesse.airline.model.GlobalMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.None;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
 /**
  * Builder for CLIs
@@ -93,7 +92,7 @@ public class CliBuilder<C> extends AbstractBuilder<Cli<C>> {
             return groups.get(name);
         }
 
-        GroupBuilder<C> group = new GroupBuilder<C>(name);
+        GroupBuilder<C> group = new GroupBuilder<C>(this, name);
         groups.put(name, group);
         return group;
     }

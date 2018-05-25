@@ -26,7 +26,7 @@ import com.github.rvesse.airline.CommandFactory;
 import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.model.ParserMetadata;
-import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
+import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
 import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.errors.handlers.ParserErrorHandler;
 import com.github.rvesse.airline.parser.options.OptionParser;
@@ -176,7 +176,7 @@ public @interface Parser {
      * 
      * @return User alias locator classes
      */
-    Class<? extends UserAliasSourceLocator>[] userAliasLocators() default {};
+    Class<? extends ResourceLocator>[] userAliasLocators() default {};
 
     /**
      * Sets whether to use the default set of option parsers (default true)

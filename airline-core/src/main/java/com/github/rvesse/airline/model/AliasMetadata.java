@@ -21,11 +21,25 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.utils.AirlineUtils;
 
+/**
+ * Metadata about command aliases
+ * 
+ * @author rvesse
+ *
+ */
 public class AliasMetadata {
 
     private final String name;
     private final List<String> arguments;
 
+    /**
+     * Creates a new alias metadata
+     * 
+     * @param name
+     *            Alias name
+     * @param arguments
+     *            Arguments the alias expands to
+     */
     public AliasMetadata(String name, List<String> arguments) {
         if (StringUtils.isBlank(name))
             throw new IllegalArgumentException("Alias name cannot be null/empty/whitespace");
@@ -33,10 +47,20 @@ public class AliasMetadata {
         this.arguments = AirlineUtils.unmodifiableListCopy(arguments);
     }
 
+    /**
+     * Gets the alias name
+     * 
+     * @return Alias name
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Gets the arguments that the alias expands to
+     * 
+     * @return Arguments
+     */
     public List<String> getArguments() {
         return this.arguments;
     }

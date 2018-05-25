@@ -19,6 +19,12 @@ import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseException;
 
+/**
+ * An error handler which fails as soon as a parser error is encountered
+ * 
+ * @author rvesse
+ *
+ */
 public class FailFast implements ParserErrorHandler {
 
     @Override

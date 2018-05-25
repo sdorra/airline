@@ -28,33 +28,48 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.github.rvesse.airline.builder.AliasBuilder;
 import com.github.rvesse.airline.model.AliasMetadata;
-import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
+import com.github.rvesse.airline.parser.aliases.locators.FileLocator;
+import com.github.rvesse.airline.parser.aliases.locators.HomeDirectoryLocator;
+import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
+import com.github.rvesse.airline.parser.aliases.locators.WorkingDirectoryLocator;
 
 /**
  * Represents the source of user defined aliases
  * 
  * @author rvesse
  *
- * @param <C> Command type
+ * @param <C>
+ *            Command type
  */
 public class UserAliasesSource<C> {
+    
+    //@formatter:off
+    /**
+     * Default user alias source locators
+     */
+    public static final ResourceLocator[] DEFAULT_LOCATORS = 
+        { 
+            new WorkingDirectoryLocator(), 
+            new HomeDirectoryLocator(),
+            new FileLocator() 
+        };
+    //@formatter:on
 
-    private final List<UserAliasSourceLocator> locators;
+    private final List<ResourceLocator> locators;
     private final List<String> searchLocations;
     private final String filename, prefix;
-    
+
     public UserAliasesSource(String filename, String prefix, String... searchLocations) {
         this(filename, prefix, null, Arrays.asList(searchLocations));
     }
 
-    public UserAliasesSource(String filename, String prefix, List<UserAliasSourceLocator> locators,
+    public UserAliasesSource(String filename, String prefix, List<ResourceLocator> locators,
             List<String> searchLocations) {
         this.filename = filename;
         this.prefix = prefix;
         this.searchLocations = Collections.unmodifiableList(searchLocations);
-        this.locators = locators == null ? Arrays.asList(UserAliasSourceLocator.DEFAULTS)
+        this.locators = locators == null ? Arrays.asList(DEFAULT_LOCATORS)
                 : Collections.unmodifiableList(locators);
 
         if (StringUtils.isBlank(this.filename)) {
@@ -99,6 +114,16 @@ public class UserAliasesSource<C> {
     }
 
     /**
+     * Gets the locators that are used to resolve search locations to actual
+     * usable locations
+     * 
+     * @return User alias locators
+     */
+    public List<ResourceLocator> getLocators() {
+        return this.locators;
+    }
+
+    /**
      * Loads the alias metadata based on the configured sources
      * 
      * @return Alias metadata
@@ -123,7 +148,7 @@ public class UserAliasesSource<C> {
             if (loaded.contains(loc))
                 continue;
 
-            for (UserAliasSourceLocator locator : this.locators) {
+            for (ResourceLocator locator : this.locators) {
                 try (InputStream input = locator.open(loc, filename)) {
                     // May not be supported by the locator in which case null
                     // will be returned and we should try the next locator
@@ -162,18 +187,16 @@ public class UserAliasesSource<C> {
             String name = key.toString();
             if (!StringUtils.isBlank(prefix))
                 name = name.substring(prefix.length());
-            AliasBuilder<C> alias = new AliasBuilder<C>(name);
 
             String value = properties.getProperty(key.toString());
             if (StringUtils.isEmpty(value)) {
-                aliases.add(alias.build());
+                aliases.add(new AliasMetadata(name, Collections.<String>emptyList()));
                 continue;
             }
 
             // Process property value into arguments
             List<String> args = AliasArgumentsParser.parse(value);
-            alias.withArguments(args.toArray(new String[args.size()]));
-            aliases.add(alias.build());
+            aliases.add(new AliasMetadata(name, args));
         }
 
         return aliases;

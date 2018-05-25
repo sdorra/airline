@@ -21,6 +21,13 @@ import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.ParseState;
 import com.github.rvesse.airline.parser.errors.ParseException;
 
+/**
+ * An error handler which collects all errors during parsing and then fails at
+ * the end of parsing
+ * 
+ * @author rvesse
+ *
+ */
 public class FailAll extends AbstractCollectingHandler {
 
     @Override
@@ -30,14 +37,17 @@ public class FailAll extends AbstractCollectingHandler {
             // Single error handled, throw as-is
             throw errors.iterator().next();
         } else if (errors.size() > 1) {
-            // Multiple errors handled, throw aggregation noting suppressed errors
-            ParseException aggEx = new ParseException("Parsing encountered %d errors, see suppressed errors for details", errors.size());
+            // Multiple errors handled, throw aggregation noting suppressed
+            // errors
+            ParseException aggEx = new ParseException(
+                    "Parsing encountered %d errors, see suppressed errors for details", errors.size());
             for (ParseException e : errors) {
                 aggEx.addSuppressed(e);
             }
             throw aggEx;
         } else {
-            // Can only reach here if there were no errors handled i.e. no errors!
+            // Can only reach here if there were no errors handled i.e. no
+            // errors!
             return new ParseResult<>(state, null);
         }
     }

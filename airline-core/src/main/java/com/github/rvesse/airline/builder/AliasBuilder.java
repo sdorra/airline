@@ -21,17 +21,66 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.model.AliasMetadata;
+import com.github.rvesse.airline.model.ParserMetadata;
 
-public class AliasBuilder<C> {
-    private final String name;
+/**
+ * Builds a command alias
+ * 
+ * @author rvesse
+ *
+ * @param <C>
+ *            Command type
+ */
+public class AliasBuilder<C> extends AbstractChildBuilder<AliasMetadata, ParserMetadata<C>, ParserBuilder<C>> {
+    private String name;
     private final List<String> arguments = new ArrayList<String>();
 
-    public AliasBuilder(String name) {
+    /**
+     * Creates a new alias builder
+     * 
+     * @param parserBuilder
+     *            Parser builder
+     * @param name
+     *            Alias name
+     */
+    public AliasBuilder(ParserBuilder<C> parserBuilder) {
+        super(parserBuilder);
+    }
+
+    /**
+     * Creates a new alias builder
+     * 
+     * @param parserBuilder
+     *            Parser builder
+     * @param name
+     *            Alias name
+     */
+    public AliasBuilder(ParserBuilder<C> parserBuilder, String name) {
+        this(parserBuilder);
+        this.withName(name);
+    }
+
+    /**
+     * Sets the name for the alias
+     * 
+     * @param name
+     *            Alias name
+     * @return Alias builder
+     */
+    public AliasBuilder<C> withName(String name) {
         if (StringUtils.isBlank(name))
             throw new IllegalArgumentException("Alias name cannot be null/empty/whitespace");
         this.name = name;
+        return this;
     }
 
+    /**
+     * Sets an argument for the alias
+     * 
+     * @param arg
+     *            Argument
+     * @return Alias builder
+     */
     public AliasBuilder<C> withArgument(String arg) {
         if (StringUtils.isEmpty(arg))
             throw new IllegalArgumentException("Alias argument cannot be null");
@@ -39,6 +88,13 @@ public class AliasBuilder<C> {
         return this;
     }
 
+    /**
+     * Sets arguments for the alias
+     * 
+     * @param args
+     *            Arguments
+     * @return Alias builder
+     */
     public AliasBuilder<C> withArguments(String... args) {
         for (String arg : args) {
             if (arg == null)
@@ -48,7 +104,12 @@ public class AliasBuilder<C> {
         return this;
     }
 
+    /**
+     * Builds the alias metadata
+     */
     public AliasMetadata build() {
+        if (StringUtils.isBlank(name))
+            throw new IllegalArgumentException("Alias name cannot be null/empty/whitespace");
         return new AliasMetadata(name, arguments);
     }
 }

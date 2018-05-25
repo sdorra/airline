@@ -19,8 +19,9 @@ package com.github.rvesse.airline.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
-import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
+import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
 
 /**
  * User alias source builder
@@ -30,14 +31,18 @@ import com.github.rvesse.airline.parser.aliases.locators.UserAliasSourceLocator;
  * @param <C>
  *            Command type
  */
-public class UserAliasSourceBuilder<C> extends AbstractBuilder<UserAliasesSource<C>> {
+public class UserAliasSourceBuilder<C> extends AbstractChildBuilder<UserAliasesSource<C>, ParserMetadata<C>, ParserBuilder<C>> {
 
     public static final String DEFAULT_EXTENSION = ".config";
 
     private List<String> searchLocations = new ArrayList<>();
     private String filename, prefix;
-    private List<UserAliasSourceLocator> locators = new ArrayList<>();
-
+    private List<ResourceLocator> locators = new ArrayList<>();
+    
+    public UserAliasSourceBuilder(ParserBuilder<C> parserBuilder) {
+        super(parserBuilder);
+    }
+    
     public UserAliasSourceBuilder<C> withProgramName(String programName) {
         this.filename = programName + DEFAULT_EXTENSION;
         return this;
@@ -54,24 +59,24 @@ public class UserAliasSourceBuilder<C> extends AbstractBuilder<UserAliasesSource
     }
 
     public UserAliasSourceBuilder<C> withDefaultLocators() {
-        for (UserAliasSourceLocator locator : UserAliasSourceLocator.DEFAULTS) {
+        for (ResourceLocator locator : UserAliasesSource.DEFAULT_LOCATORS) {
             this.locators.add(locator);
         }
         return this;
     }
 
-    public UserAliasSourceBuilder<C> withLocator(UserAliasSourceLocator locator) {
+    public UserAliasSourceBuilder<C> withLocator(ResourceLocator locator) {
         this.locators.add(locator);
         return this;
     }
 
-    public UserAliasSourceBuilder<C> withLocators(List<UserAliasSourceLocator> locators) {
+    public UserAliasSourceBuilder<C> withLocators(List<ResourceLocator> locators) {
         this.locators.addAll(locators);
         return this;
     }
 
-    public UserAliasSourceBuilder<C> withLocators(UserAliasSourceLocator... locators) {
-        for (UserAliasSourceLocator locator : locators) {
+    public UserAliasSourceBuilder<C> withLocators(ResourceLocator... locators) {
+        for (ResourceLocator locator : locators) {
             this.locators.add(locator);
         }
         return this;

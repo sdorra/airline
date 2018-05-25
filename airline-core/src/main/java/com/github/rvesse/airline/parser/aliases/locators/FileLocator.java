@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Locator that does no resolution i.e. treats paths as literal files
+ * Locator that does no resolution other than removing any leading
+ * {@code file://} prefix i.e. treats paths as literal files
  *
  */
-public class FileLocator implements UserAliasSourceLocator {
+public class FileLocator implements ResourceLocator {
+
+    public static final String FILE_URI_PREFIX = "file://";
 
     /**
      * Resolves the search location
@@ -35,6 +38,9 @@ public class FileLocator implements UserAliasSourceLocator {
      * @return Resolved location
      */
     protected String resolve(String searchLocation) {
+        if (searchLocation.startsWith(FILE_URI_PREFIX)) {
+            return searchLocation.substring(FILE_URI_PREFIX.length());
+        }
         return searchLocation;
     }
 
@@ -47,9 +53,17 @@ public class FileLocator implements UserAliasSourceLocator {
         // may override the method to provide their own resolution logic
         searchLocation = resolve(searchLocation);
 
+        // Get a file for the search location
         File f = new File(searchLocation);
+        if (f.exists() && f.isFile() && f.canRead()) {
+            // If the location is itself a valid readable file just return that
+            return new FileInputStream(f);
+        }
+
+        // Otherwise look for the desired filename in this location
         f = new File(f, filename);
         if (f.exists() && f.isFile() && f.canRead()) {
+            // If the location is valid return it
             return new FileInputStream(f);
         }
 

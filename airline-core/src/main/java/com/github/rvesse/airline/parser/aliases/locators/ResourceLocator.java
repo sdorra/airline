@@ -26,19 +26,9 @@ import java.io.InputStream;
  * @author rvesse
  *
  */
-public interface UserAliasSourceLocator {
+public interface ResourceLocator {
 
-    //@formatter:off
-    /**
-     * Default user alias source locators
-     */
-    public static final UserAliasSourceLocator[] DEFAULTS = 
-        { 
-            new WorkingDirectoryLocator(), 
-            new HomeDirectoryLocator(),
-            new FileLocator() 
-        };
-    //@formatter:on
+
 
     /**
      * Opens a search location, potentially applying some resolution rules to

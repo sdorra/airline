@@ -163,7 +163,7 @@ You will be passed the current parser state, the option/arguments metadata as ap
 
 #### finalValidate()
 
-`finalValidate()` is called after all tokens have been parsed but before the parser returns the generated command to the caller.  Therefore this can be used to enforce restrictions that need to expect the final state of the parser e.g. [`@MutuallyExclusiveWith`](../annotations/mutually-exclusive-with.html) or [`@Required`](../annotations/required.html)
+`finalValidate()` is called after all tokens have been parsed but before the parser returns the generated command to the caller.  Therefore this can be used to enforce restrictions that need to inspect the final state of the parser e.g. [`@MutuallyExclusiveWith`](../annotations/mutually-exclusive-with.html) or [`@Required`](../annotations/required.html)
 
 You will be passed the current parser state and the option/arguments metadata as appropriate.
 

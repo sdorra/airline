@@ -24,27 +24,41 @@ import java.util.Map;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.model.CommandGroupMetadata;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.model.MetadataLoader;
-import com.github.rvesse.airline.utils.AirlineUtils;
 
-public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
+public class GroupBuilder<C> extends AbstractChildBuilder<CommandGroupMetadata, Cli<C>, CliBuilder<C>> {
 
     private final String name;
     private String description = null;
     private Class<? extends C> defaultCommand = null;
     private boolean hidden = false;
     protected final Map<String, GroupBuilder<C>> subGroups = new HashMap<>();
+    private final GroupBuilder<C> parentGroupBuilder;
 
     private final List<Class<? extends C>> commands = new ArrayList<>();
 
-    GroupBuilder(String name) {
+    GroupBuilder(CliBuilder<C> cliBuilder, String name) {
+        this(cliBuilder, null, name);
+    }
+
+    GroupBuilder(CliBuilder<C> cliBuilder, GroupBuilder<C> parentGroupBuilder, String name) {
+        super(cliBuilder);
         if (StringUtils.isBlank(name))
             throw new IllegalArgumentException("Group name cannot be null/empty/whitespace");
         this.name = name;
+        this.parentGroupBuilder = parentGroupBuilder;
     }
 
+    /**
+     * Sets the description for the group
+     * 
+     * @param description
+     *            Description
+     * @return Group builder
+     */
     public GroupBuilder<C> withDescription(String description) {
         if (description == null)
             throw new NullPointerException("description cannot be null");
@@ -76,15 +90,15 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
             return subGroups.get(name);
         }
 
-        GroupBuilder<C> group = new GroupBuilder<C>(name);
-        subGroups.put(name, group);
-        return group;
+        GroupBuilder<C> subGroup = new GroupBuilder<C>(this.parent(), this, name);
+        subGroups.put(name, subGroup);
+        return subGroup;
     }
 
     public GroupBuilder<C> getSubGroup(final String name) {
         checkNotBlank(name, "Group name");
         if (!subGroups.containsKey(name))
-            throw new IllegalArgumentException(String.format("Group %s has not been declared", name));
+            throw new IllegalArgumentException(String.format("Sub-group %s has not been declared", name));
 
         return subGroups.get(name);
     }
@@ -117,6 +131,17 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
         return this;
     }
 
+    /**
+     * Gets the parent group builder which may be {@code null} if this is a top
+     * level group. You may alternatively want to call {@link #parent()} to get
+     * the actual CLI builder
+     * 
+     * @return Parent group builder (if any) or {@code null}
+     */
+    public GroupBuilder<C> parentGroup() {
+        return this.parentGroupBuilder;
+    }
+
     @Override
     public CommandGroupMetadata build() {
         CommandMetadata groupDefault = MetadataLoader.loadCommand(defaultCommand);
@@ -126,8 +151,8 @@ public class GroupBuilder<C> extends AbstractBuilder<CommandGroupMetadata> {
             subGroups.add(builder.build());
         }
 
-        CommandGroupMetadata group = MetadataLoader.loadCommandGroup(name, description, hidden, subGroups,
-                groupDefault, groupCommands);
+        CommandGroupMetadata group = MetadataLoader.loadCommandGroup(name, description, hidden, subGroups, groupDefault,
+                groupCommands);
         for (CommandGroupMetadata subGroup : subGroups) {
             subGroup.setParent(group);
         }

@@ -38,6 +38,7 @@ import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.model.AliasMetadata;
+import com.github.rvesse.airline.parser.aliases.locators.ClasspathLocator;
 import com.github.rvesse.airline.parser.aliases.locators.EnvVarLocator;
 import com.github.rvesse.airline.parser.aliases.locators.JvmSystemPropertyLocator;
 import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
@@ -502,6 +503,35 @@ public class TestAliases {
                .withUserAliases(f.getName(), null, "${FOO}/${BAR}/")
                .withUserAliases()
                    .withLocator(new JvmSystemPropertyLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+    
+    @Test
+    public void user_aliases_classpath_01() throws Exception {
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases("aliases.config", null, "/")
+               .withUserAliases()
+                   .withLocator(new ClasspathLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
