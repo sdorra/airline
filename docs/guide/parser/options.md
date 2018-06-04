@@ -46,7 +46,7 @@ Where possible parsers should prefer option 3 to 2 i.e. If they cannot parse any
 
 ### Simple Custom Option Parser
 
-If you simply wish to change the name and value separator then you can trivially do this by sub-classing {% javadoc-ref.md class="AbstractNameValueOptionParser" package="parser.options" %} and specify the desired separator e.g.
+If you simply wish to change the name and value separator then you can trivially do this by sub-classing {% include javadoc-ref.md class="AbstractNameValueOptionParser" package="parser.options" %} and specify the desired separator e.g.
 
 ```java
 package com.github.rvesse.airline.examples.userguide.parser.options;
