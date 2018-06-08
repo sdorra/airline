@@ -46,11 +46,7 @@
     // Expand menu to currently selected page if possible
     var currMenuItem = $("#menu a[href='" + location.pathname + "']").first();
     if (currMenuItem.length > 0) {
-      //console.log("Current Menu Item:");
-      //console.log(currMenuItem);
       var menuLevelObj = currMenuItem.parents(".levelHolderClass").first();
-      //console.log("Menu Level Object:");
-      //console.log(menuLevelObj);
       if (menuLevelObj.length > 0) {
         $('#menu').multilevelpushmenu('expand', menuLevelObj);
       }

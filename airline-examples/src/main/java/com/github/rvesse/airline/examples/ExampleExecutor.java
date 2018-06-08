@@ -17,6 +17,7 @@ package com.github.rvesse.airline.examples;
 
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.SingleCommand;
+import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
 
 /**
@@ -41,6 +42,19 @@ public class ExampleExecutor {
 
     public static <T extends ExampleRunnable> void executeSingleCommand(Class<T> cls, String[] args) {
         SingleCommand<T> parser = SingleCommand.singleCommand(cls);
+        try {
+            T cmd = parser.parse(args);
+            execute(cmd);
+        } catch (ParseException e) {
+            System.err.println("Parser error: " + e.getMessage());
+        } catch (Throwable e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+    }
+    
+    public static <T extends ExampleRunnable> void executeSingleCommand(Class<T> cls, ParserMetadata<T> parserConfig, String[] args) {
+        SingleCommand<T> parser = SingleCommand.singleCommand(cls, parserConfig);
         try {
             T cmd = parser.parse(args);
             execute(cmd);

@@ -75,6 +75,16 @@ public abstract class AbstractOptionParser<T> extends AbstractParser<T> implemen
         return AirlineUtils.find(options, findOptionPredicate, defaultValue);
     }
 
+    /**
+     * Return true if the option has a short name prefix i.e. starts with a
+     * single {@code -} character. This does not mean that it actually is a
+     * short option since definitions of what are considered a short option will
+     * vary by concrete implementation
+     * 
+     * @param name
+     *            Option name
+     * @return True if a short name prefix, false otherwise
+     */
     protected boolean hasShortNamePrefix(String name) {
         return SHORT_OPTIONS_PREFIX.matcher(name).matches();
     }
