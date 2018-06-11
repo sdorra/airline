@@ -49,6 +49,8 @@
   <properties>
     <jdk.target>1.7</jdk.target>
     <license.header.path>${project.basedir}</license.header.path>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+    <coveralls.skip>true</coveralls.skip>
 
     <!-- Plugin Versions -->
     <plugin.antrun>1.8</plugin.antrun>
@@ -80,7 +82,6 @@
     <module>airline-io</module>
     <module>airline-help</module>
     <module>airline-maven-plugin</module>
-    <!--<module>airline-maven-plugin-tests</module>-->
     <module>docs</module>
   </modules>
 
@@ -351,6 +352,10 @@
                 <goals>
                   <goal>report</goal>
                 </goals>
+                <configuration>
+                  <timestampFormat>yyyy-MM-dd HH:mm:ss</timestampFormat>
+                  <repoToken>gZC1X240fX8YXEo2T5Sgofe00S1bSaGdV</repoToken>
+                </configuration>
               </execution>
             </executions>
           </plugin>
