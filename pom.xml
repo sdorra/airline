@@ -219,7 +219,7 @@
         </configuration>
       </plugin>
       
-      !-- Code Coverage Plugins -->
+      <!-- Code Coverage Plugins -->
       <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
