@@ -219,17 +219,11 @@
         </configuration>
       </plugin>
       
-              <!-- Code Coverage Plugins -->
-        <plugin>
+      !-- Code Coverage Plugins -->
+      <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${plugin.jacoco}</version>
-          <!-- Note that since JaCoCo relies on an agent to perform tests,
-            it changes the surefire arguments line. If a component also
-            needs to change the argument line of maven-surefire-plugin,
-            then it must add ${argLine} property (which is set by JaCoCo)
-            in the argLine configuration element of maven-surefire-plugin
-            to preserve JaCoCo settings. -->
           <executions>
             <execution>
               <id>prepare-agent</id>
@@ -350,6 +344,15 @@
             <groupId>org.eluder.coveralls</groupId>
             <artifactId>coveralls-maven-plugin</artifactId>
             <version>${plugin.coveralls}</version>
+            <executions>
+              <execution>
+                <id>upload-coveralls-status</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
