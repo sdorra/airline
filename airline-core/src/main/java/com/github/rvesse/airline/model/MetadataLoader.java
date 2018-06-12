@@ -214,7 +214,7 @@ public class MetadataLoader {
         // We find restrictions in the following order:
         // 1 - Those declared via annotations
         // 2 - Those declared via the restrictions field of the @Cli annotation
-        // 3 - Standard restrictions if the includeDefaultRestrctions field of
+        // 3 - Standard restrictions if the includeDefaultRestrictions field of
         // the @Cli annotation is true
         List<GlobalRestriction> restrictions = new ArrayList<GlobalRestriction>();
         for (Class<? extends Annotation> annotationClass : RestrictionRegistry

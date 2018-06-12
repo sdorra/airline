@@ -66,7 +66,7 @@ Additionally if you wish to use the default logic you can also use `DefaultNumer
 
 ## Type Converter Providers
 
-Individual [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) can specify a `TypeConverterProvider` via their `typeConverterProvider` field which provides a way to override the type converter used on a per-field basis.  This can be used for features such as our [Numeric Converions](#numeric-conversions) support.
+Individual [`@Option`](../annotations/option.html) and [`@Arguments`](../annotations/arguments.html) can specify a `TypeConverterProvider` via their `typeConverterProvider` field which provides a way to override the type converter used on a per-field basis.  This can be used for features such as our [Numeric Conversions](#numeric-conversions) support.
 
 ## Custom Type Converters
 
@@ -146,4 +146,4 @@ As discussed earlier you can specify `TypeConverterProvider` on a per-field basi
 <T> TypeConverter getTypeConverter(ArgumentsMetadata arguments, ParseState<T> state)
 ```
 
-These methods should simply return the desired `TypeConverter`, all of our `TypeConverter` implementations also implement `TypeConverterProvider` by returning `this`
+These methods should simply return the desired `TypeConverter`, for simplicity all of our `TypeConverter` implementations also implement `TypeConverterProvider` by returning `this`

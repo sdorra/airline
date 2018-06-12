@@ -25,6 +25,18 @@ Once you have a `Cli` or `SingleCommand` instance and call the `parse()` or `par
 
 Steps 1-5 only apply to CLIs, for single commands step 6 onwards apply. Each of these steps may in of itself have multiple steps within it.
 
+#### Error Handling
+
+Error handling during the parsing process is described in the [Error Handling and Exceptions](../practise/exceptions.html) document.
+
+#### Command Aliases
+
+Command aliases are a feature of Airline that allows for both developer and user-defined command shortcuts. Please take a look at the [User Defined Aliases](../practise/aliases.html) document for more detail on this feature.
+
+#### Command and Option Abbreviation
+
+Airline optionally allows developers to enable a feature whereby command/group names and option names may be abbreviated provided those abbreviations are unambiguous. This is described in more detail in the [`@Parser`](../annotations/parser.html) annotation documentation.
+
 #### Option Parsing
 
 `OptionParser` implementations control how Airline parses inputs into options and their values. By default Airline supports 3 common option styles with a further two that may be enabled if desired. The default parsers are as follows:
@@ -55,3 +67,21 @@ So both `--conf key=value` and `--conf key value` are acceptable to set the `--c
 ##### `ListValueOptionParser`
 
 This parser requires that the list of values provided be an exact multiple of the arity of the option being set.  So for example if option `--conf` has arity 2 it would allow `--conf foo,bar` but not `--conf foo,bar,faz`
+
+#### Value Conversion
+
+Airline converts the raw string values to the appropriate strong types as described in the [Supported Types](../practise/types.html) documentation. We make this process fully extensible as described in that document.
+
+#### Global Restrictions
+
+Global restrictions apply near the end of the passing process and so are able to inspect the final parser state and make appropriate decisions. See the [Global Restrictions](../restrictions/global.html) documentation for more details.
+
+#### Command Instantiation
+
+Assuming a successful parse of the user arguments Airline instantiates an instance of your command class and populates it's fields appropriately based upon the options and arguments that were seen. By default it uses the `DefaultCommandFactory` to create an instance of your command class, this supports any command class that has a zero arguments constructor.
+
+Like other aspects this can be customised where necessary by setting the `commandFactory` field of your [`@Parser`](../annotations/parser.html) annotation. This might be useful this can be useful if you want to integrate your CLI with a dependency injection framework or if your command classes have a more complex constructor.
+
+#### Metadata Introspection
+
+If your command class declares fields with the Java `@Inject` annotation that have Airline metadata types - `GlobalMetadata`, `CommandGroupMetadata` and `CommandMetadata` - then your command class instance will also have those populated with the relevant parser metadata. This allows commands to introspect the CLI they belong to which can be extremely useful for things like help commands.

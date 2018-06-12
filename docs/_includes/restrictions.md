@@ -47,3 +47,11 @@ The following are special purpose restrictions:
 
 - The [`@Unrestricted`]({{ include.path }}unrestricted.html) annotation indicates that no restrictions apply to the option.  Used in conjunction with option overriding to clear restrictions.
 - The [`@Partials/@Partial`]({{ include.path }}partials.html) annotation is used to apply restrictions to only some parts of options/arguments where multiple values are accepted by those fields
+
+### Global Restrictions
+
+The following are [Global restrictions](../restrictions/global.html) which apply over the final parser state:
+
+- The [`@CommandRequired`]({{ include.path}}command-required.html) annotation indicates that a command must be specified.
+- The [`@NoMissingOptionValues`]({{ include.path}}no-missing-option-values.html) annotation indicates that specifying an option without its corresponding value(s) is not permitted.
+- The [`@NoUnexpectedArguments`]({{ include.path}}no-unexpected-arguments.html) annotation indicates that any unrecognised inputs are not permitted.
