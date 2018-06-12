@@ -3,4 +3,4 @@ sudo: false
 install: true
 jdk: openjdk7
 script: mvn install -Prelease -Dgpg.skip=true
-after_sucess: mvn package -Pcoveralls
+after_success: mvn package -Pcoveralls
