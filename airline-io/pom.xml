@@ -11,7 +11,7 @@
   
   <properties>
     <license.header.path>${project.parent.basedir}</license.header.path>
-    <coveralls.skip>false</coveralls.skip> 
+    <coveralls.skip>true</coveralls.skip>
   </properties>
 
   <dependencies>

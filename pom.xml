@@ -50,7 +50,6 @@
     <jdk.target>1.7</jdk.target>
     <license.header.path>${project.basedir}</license.header.path>
     <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-    <coveralls.skip>true</coveralls.skip>
 
     <!-- Plugin Versions -->
     <plugin.antrun>1.8</plugin.antrun>
@@ -338,7 +337,7 @@
 
   <profiles>
     <profile>
-      <id>travis</id>
+      <id>coveralls</id>
       <build>
         <plugins>
           <plugin>
@@ -355,6 +354,10 @@
                 <configuration>
                   <timestampFormat>yyyy-MM-dd HH:mm:ss</timestampFormat>
                   <repoToken>gZC1X240fX8YXEo2T5Sgofe00S1bSaGdV</repoToken>
+                  <scanForSources>true</scanForSources>
+                  <sourceDirectories>
+                    <sourceDirectory>airline-maven-plugin/target/generated-sources/</sourceDirectory>
+                  </sourceDirectories>
                 </configuration>
               </execution>
             </executions>
