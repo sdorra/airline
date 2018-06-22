@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.rvesse</groupId>
@@ -180,12 +182,12 @@
             <exclude>pom.xml</exclude>
             <exclude>**/pom.xml</exclude>
             <exclude>**/*.config</exclude>
-            
+
             <!-- Integration Tests -->
             <exclude>**/verify.bsh</exclude>
             <exclude>**/it/*</exclude>
             <exclude>**/invoker.properties</exclude>
-            
+
             <!-- Documentation -->
             <exclude>docs/</exclude>
           </excludes>
@@ -218,76 +220,76 @@
           <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
         </configuration>
       </plugin>
-      
+
       <!-- Code Coverage Plugins -->
       <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>${plugin.jacoco}</version>
-          <executions>
-            <execution>
-              <id>prepare-agent</id>
-              <phase>process-test-classes</phase>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>report</id>
-              <phase>package</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>check</id>
-              <phase>package</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <rule>
-                    <element>BUNDLE</element>
-                    <limits>
-                      <limit>
-                        <counter>CLASS</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>0.75</minimum>
-                      </limit>
-                      <limit>
-                        <counter>INSTRUCTION</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>0.75</minimum>
-                      </limit>
-                      <limit>
-                        <counter>METHOD</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>0.75</minimum>
-                      </limit>
-                      <limit>
-                        <counter>BRANCH</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>0.75</minimum>
-                      </limit>
-                      <limit>
-                        <counter>LINE</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>0.75</minimum>
-                      </limit>
-                      <limit>
-                        <counter>COMPLEXITY</counter>
-                        <value>COVEREDRATIO</value>
-                        <minimum>0.75</minimum>
-                      </limit>
-                    </limits>
-                  </rule>
-                </rules>
-                <haltOnFailure>false</haltOnFailure>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${plugin.jacoco}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <phase>package</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>CLASS</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.75</minimum>
+                    </limit>
+                    <limit>
+                      <counter>INSTRUCTION</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.75</minimum>
+                    </limit>
+                    <limit>
+                      <counter>METHOD</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.75</minimum>
+                    </limit>
+                    <limit>
+                      <counter>BRANCH</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.75</minimum>
+                    </limit>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.75</minimum>
+                    </limit>
+                    <limit>
+                      <counter>COMPLEXITY</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.75</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+              <haltOnFailure>false</haltOnFailure>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <!-- M2E Configuration -->
@@ -365,7 +367,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>release</id>
       <build>
@@ -412,7 +414,17 @@
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
 
+    <profile>
+      <id>javadoc-jdk7</id>
+      <activation>
+        <jdk>(,1.7]</jdk>
+      </activation>
+      <build>
+        <plugins>
           <!-- Javadoc Plugin -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -431,7 +443,39 @@
               <quiet>true</quiet>
               <encoding>UTF-8</encoding>
               <charset>UTF-8</charset>
-	      <docencoding>UTF-8</docencoding>
+              <docencoding>UTF-8</docencoding>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>javadoc-jdk8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Javadoc Plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${plugin.javadoc}</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <javadocVersion>${jdk.target}</javadocVersion>
+              <quiet>true</quiet>
+              <encoding>UTF-8</encoding>
+              <charset>UTF-8</charset>
+              <docencoding>UTF-8</docencoding>
               <additionalparam>-Xdoclint:none</additionalparam>
             </configuration>
           </plugin>
