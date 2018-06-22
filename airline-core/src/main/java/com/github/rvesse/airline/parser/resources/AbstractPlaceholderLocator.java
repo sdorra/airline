@@ -13,8 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rvesse.airline.parser.aliases.locators;
+package com.github.rvesse.airline.parser.resources;
 
+/**
+ * A resource locator that supports placeholders of the form
+ * <code>${name}</code> which when found calls the
+ * {@link #resolvePlaceholder(String)} method to try and resolve the encountered
+ * placeholders. If the placeholder is not resolved then the string is left
+ * as-is.
+ * 
+ * @author rvesse
+ *
+ */
 public abstract class AbstractPlaceholderLocator extends FileLocator {
 
     private static final String PLACEHOLDER_START = "${";

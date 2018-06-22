@@ -33,9 +33,9 @@ import com.github.rvesse.airline.help.sections.HelpSection;
 import com.github.rvesse.airline.help.sections.factories.HelpSectionRegistry;
 import com.github.rvesse.airline.help.suggester.Suggester;
 import com.github.rvesse.airline.parser.ParserUtil;
-import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
 import com.github.rvesse.airline.parser.errors.handlers.FailFast;
 import com.github.rvesse.airline.parser.options.OptionParser;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
 import com.github.rvesse.airline.restrictions.ArgumentsRestriction;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
 import com.github.rvesse.airline.restrictions.OptionRestriction;
@@ -140,8 +140,7 @@ public class MetadataLoader {
             if (parserConfig.useDefaultAliasLocators() && parserConfig.defaultAliasLocatorsFirst()) {
                 userAliasBuilder.withDefaultLocators();
             }
-            for (Class<? extends ResourceLocator> locatorClass : parserConfig.userAliasLocators()) {
-                ResourceLocator locator = ParserUtil.createInstance(locatorClass);
+            for (ResourceLocator locator : ParserUtil.createResourceLocators(parserConfig.userAliasLocators())) {
                 userAliasBuilder.withLocator(locator);
             }
             if (parserConfig.useDefaultAliasLocators() && !parserConfig.defaultAliasLocatorsFirst()) {

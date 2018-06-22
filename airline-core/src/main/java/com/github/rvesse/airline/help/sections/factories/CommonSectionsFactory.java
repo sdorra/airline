@@ -38,6 +38,8 @@ import com.github.rvesse.airline.help.sections.common.DiscussionSection;
 import com.github.rvesse.airline.help.sections.common.ExamplesSection;
 import com.github.rvesse.airline.help.sections.common.ExitCodesSection;
 import com.github.rvesse.airline.help.sections.common.VersionSection;
+import com.github.rvesse.airline.parser.ParserUtil;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
 
 /**
  * A help section factory that implements the common sections built into Airline
@@ -77,8 +79,9 @@ public class CommonSectionsFactory implements HelpSectionFactory {
         } else if (annotation instanceof License) {
             // License section
             License license = (License) annotation;
-            String[] data = Arrays.copyOf(license.paragraphs(), StringUtils.isNotBlank(license.url())
-                    ? license.paragraphs().length + 1 : license.paragraphs().length);
+            String[] data = Arrays.copyOf(license.paragraphs(),
+                    StringUtils.isNotBlank(license.url()) ? license.paragraphs().length + 1
+                            : license.paragraphs().length);
             if (StringUtils.isNotBlank(license.url())) {
                 data[data.length - 1] = String.format("Please see %s for more information", license.url());
             }
@@ -87,9 +90,11 @@ public class CommonSectionsFactory implements HelpSectionFactory {
         } else if (annotation instanceof Version) {
             // Version section
             Version version = (Version) annotation;
-            return new VersionSection(version.sources(), version.componentProperty(), version.versionProperty(),
-                    version.buildProperty(), version.dateProperty(), version.additionalProperties(),
-                    version.additionalTitles(), version.suppressOnError(), version.tabular());
+            ResourceLocator[] locators = ParserUtil.createResourceLocators(version.sourceLocators());
+            return new VersionSection(version.sources(), locators, version.componentProperty(),
+                    version.versionProperty(), version.buildProperty(), version.dateProperty(),
+                    version.additionalProperties(), version.additionalTitles(), version.suppressOnError(),
+                    version.tabular());
         }
         return null;
     }

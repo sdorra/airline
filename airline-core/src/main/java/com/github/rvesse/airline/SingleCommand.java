@@ -15,6 +15,8 @@
  */
 package com.github.rvesse.airline;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +27,7 @@ import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.ParseResult;
 import com.github.rvesse.airline.parser.command.SingleCommandParser;
 import com.github.rvesse.airline.restrictions.GlobalRestriction;
+import com.github.rvesse.airline.restrictions.factories.RestrictionRegistry;
 
 /**
  * Class for encapsulating and parsing single commands
@@ -70,12 +73,38 @@ public class SingleCommand<C> {
         if (command == null)
             throw new NullPointerException("command is null");
         this.parserConfig = parserConfig != null ? parserConfig : MetadataLoader.<C> loadParser(command);
-        this.restrictions = restrictions != null ? IteratorUtils.toList(restrictions.iterator())
-                : Arrays.asList(GlobalRestriction.DEFAULTS);
-        if (this.restrictions.size() == 0)
-            this.restrictions.addAll(Arrays.asList(GlobalRestriction.DEFAULTS));
+        
+        // Dynamically obtain restrictions if annotated onto the class
+        this.restrictions = createRestrictions(command, restrictions);
 
         commandMetadata = MetadataLoader.loadCommand(command);
+    }
+    
+    private List<GlobalRestriction> createRestrictions(Class<C> commandClass, Iterable<GlobalRestriction> restrictions) {
+        List<GlobalRestriction> foundRestrictions = new ArrayList<GlobalRestriction>();
+        
+        // If any were explicitly provided use those
+        if (restrictions != null && restrictions.iterator().hasNext()) {
+            foundRestrictions.addAll(IteratorUtils.toList(restrictions.iterator()));
+        }
+        
+        // Look for annotation declared restrictions
+        for (Class<? extends Annotation> annotationClass : RestrictionRegistry
+                .getGlobalRestrictionAnnotationClasses()) {
+            Annotation annotation = commandClass.getAnnotation(annotationClass);
+            if (annotation == null)
+                continue;
+            GlobalRestriction restriction = RestrictionRegistry.getGlobalRestriction(annotationClass, annotation);
+            if (restriction != null)
+                foundRestrictions.add(restriction);
+        }
+        
+        // Add defaults if none found
+        if (foundRestrictions.isEmpty()) {
+            foundRestrictions.addAll(Arrays.asList(GlobalRestriction.DEFAULTS));
+        }
+        
+        return foundRestrictions;
     }
 
     /**

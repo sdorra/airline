@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser.aliases.locators;
+package com.github.rvesse.airline.parser.resources;
 
 import java.io.File;
 import java.nio.file.Paths;

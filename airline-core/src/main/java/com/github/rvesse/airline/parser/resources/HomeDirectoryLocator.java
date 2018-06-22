@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser.aliases.locators;
+package com.github.rvesse.airline.parser.resources;
 
 import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * A user alias locator that allows the {@code ~/} or {@code ~\} alias
+ * A resource locator that allows the {@code ~/} or {@code ~\} alias
  * (depending on your platforms file separator) to be used to refer to the users
  * home directory
  * <p>

@@ -21,7 +21,7 @@ import java.util.List;
 
 import com.github.rvesse.airline.model.ParserMetadata;
 import com.github.rvesse.airline.parser.aliases.UserAliasesSource;
-import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
 
 /**
  * User alias source builder

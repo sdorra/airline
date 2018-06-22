@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser.aliases.locators;
+package com.github.rvesse.airline.parser.resources;
 
-public class JvmSystemPropertyLocator extends AbstractPlaceholderLocator {
+/**
+ * A resource locator that supports <code>${NAME}</code> style placeholders to
+ * refer to environment variables to locate resources referred to by those
+ * environment variables
+ * 
+ * @author rvesse
+ *
+ */
+public class EnvVarLocator extends AbstractPlaceholderLocator {
 
     @Override
     protected String resolvePlaceholder(String name) {
-        return System.getProperty(name);
+        return System.getenv(name);
     }
 
 }

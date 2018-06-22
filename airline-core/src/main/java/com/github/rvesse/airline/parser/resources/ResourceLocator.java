@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.rvesse.airline.parser.aliases.locators;
+package com.github.rvesse.airline.parser.resources;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Interface for making user alias search locations extensible e.g. supporting
+ * Interface for making resource search locations extensible e.g. supporting
  * special paths like {@code ~/} to represent the home directory
  * 
  * @author rvesse
@@ -28,20 +28,24 @@ import java.io.InputStream;
  */
 public interface ResourceLocator {
 
-
-
     /**
      * Opens a search location, potentially applying some resolution rules to
      * that location
+     * <p>
+     * If the given {@code resourceName} exists in the search location then that
+     * resource should be returned. If that is not a valid resource but the
+     * search location itself is a valid resource then the locator should return
+     * that instead.
+     * </p>
      * 
      * @param searchLocation
      *            Search location
-     * @param filename
-     *            Filename expected in the search location
+     * @param resourceName
+     *            Resource name expected in the search location
      * @return Input stream to read the search location or {@code null} if not a
      *         valid location
      * @throws IOException
      *             Thrown if there is a problem accessing the search location
      */
-    public InputStream open(String searchLocation, String filename) throws IOException;
+    public InputStream open(String searchLocation, String resourceName) throws IOException;
 }

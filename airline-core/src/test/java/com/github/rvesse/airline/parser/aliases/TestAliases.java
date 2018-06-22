@@ -38,11 +38,11 @@ import com.github.rvesse.airline.args.Args1;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.model.AliasMetadata;
-import com.github.rvesse.airline.parser.aliases.locators.ClasspathLocator;
-import com.github.rvesse.airline.parser.aliases.locators.EnvVarLocator;
-import com.github.rvesse.airline.parser.aliases.locators.JvmSystemPropertyLocator;
 import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
+import com.github.rvesse.airline.parser.resources.ClasspathLocator;
+import com.github.rvesse.airline.parser.resources.EnvVarLocator;
+import com.github.rvesse.airline.parser.resources.JvmSystemPropertyLocator;
 
 public class TestAliases {
 
@@ -111,7 +111,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("test", "target/");
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -140,7 +142,8 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("other")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("target/");
+               .withUserAliases()
+                   .withProgramName("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -157,7 +160,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -186,7 +191,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), "b.", "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withPrefix("b.")
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -215,7 +223,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "~/", "~\\");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocations("~/", "~\\");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -244,7 +254,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), "b.", "~/", "~\\");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withPrefix("b.")
+                   .withSearchLocations("~/", "~\\");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -274,7 +287,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "~/", "~\\");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocations("~/", "~\\");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -294,7 +309,9 @@ public class TestAliases {
             CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                            .withCommand(Args1.class);
             builder.withParser()
-                   .withUserAliases(config.getName(), null, "./", ".\\");
+                   .withUserAliases()
+                       .withFilename(config.getName())
+                       .withSearchLocations("./", ".\\");
             Cli<Args1> cli = builder.build();
             //@formatter:on
 
@@ -330,7 +347,9 @@ public class TestAliases {
             CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                            .withCommand(Args1.class);
             builder.withParser()
-                   .withUserAliases(config.getName(), null, "./", ".\\");
+                   .withUserAliases()
+                       .withFilename(config.getName())
+                       .withSearchLocations("./", ".\\");
             Cli<Args1> cli = builder.build();
             //@formatter:on
 
@@ -354,8 +373,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "${FOO}/")
                .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("${FOO}/")
                    .withLocator(new EnvVarLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -390,8 +410,9 @@ public class TestAliases {
                             .withCommand(Args1.class);
         builder.withParser()
                 // Bad placeholder
-               .withUserAliases(f.getName(), null, "${FOO/")
                .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("${FOO/")
                    .withLocator(new EnvVarLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -414,8 +435,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "${FOO}/${BAR}/")
                .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("${FOO}/${BAR}/")
                    .withLocator(new EnvVarLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -446,8 +468,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "${FOO}/")
                .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("${FOO}/")
                    .withLocator(new JvmSystemPropertyLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -479,8 +502,9 @@ public class TestAliases {
                             .withCommand(Args1.class);
         builder.withParser()
                 // Bad placeholder
-               .withUserAliases(f.getName(), null, "${FOO/")
                .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("${FOO/")
                    .withLocator(new JvmSystemPropertyLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -500,8 +524,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "${FOO}/${BAR}/")
                .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("${FOO}/${BAR}/")
                    .withLocator(new JvmSystemPropertyLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -529,8 +554,39 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                             .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("aliases.config", null, "/")
                .withUserAliases()
+                   .withFilename("aliases.config")
+                   .withSearchLocation("/")
+                   .withLocator(new ClasspathLocator());
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check definition
+        List<AliasMetadata> aliases = cli.getMetadata().getParserConfiguration().getAliases();
+        Assert.assertEquals(aliases.size(), 1);
+
+        AliasMetadata alias = aliases.get(0);
+        Assert.assertEquals(alias.getName(), "foo");
+        List<String> args = alias.getArguments();
+        Assert.assertEquals(args.size(), 2);
+        Assert.assertEquals(args.get(0), "Args1");
+        Assert.assertEquals(args.get(1), "bar");
+
+        // Check parsing
+        Args1 cmd = cli.parse("foo");
+        Assert.assertEquals(cmd.parameters.size(), 1);
+        Assert.assertEquals(cmd.parameters.get(0), "bar");
+    }
+    
+    @Test
+    public void user_aliases_classpath_02() throws Exception {
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                            .withCommand(Args1.class);
+        builder.withParser()
+               .withUserAliases()
+                   .withFilename("aliases.config")
+                   .withSearchLocation("classpath:/")
                    .withLocator(new ClasspathLocator());
         Cli<Args1> cli = builder.build();
         //@formatter:on
@@ -560,7 +616,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -591,7 +649,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -663,7 +723,9 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -692,8 +754,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "target/")
-               .withAliasesOverridingBuiltIns();
+               .withAliasesOverridingBuiltIns()
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -724,7 +788,9 @@ public class TestAliases {
                                        .withCommand(Args1.class)
                                        .withDefaultCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), null, "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -751,7 +817,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases(f.getName(), "b.", "target/");
+               .withUserAliases()
+                   .withFilename(f.getName())
+                   .withPrefix("b.")
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -817,8 +886,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("test", "target/")
-               .withAliasesChaining();
+               .withAliasesChaining()
+               .withUserAliases()
+                    .withProgramName("test")
+                    .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -836,8 +907,10 @@ public class TestAliases {
             CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                            .withCommand(Args1.class);
             builder.withParser()
-                   .withUserAliases("test", "target/")
-                   .withAliasesChaining();
+                   .withAliasesChaining()
+                   .withUserAliases()
+                       .withProgramName("test")
+                       .withSearchLocation("target/");
             Cli<Args1> cli = builder.build();
             //@formatter:on
 
@@ -857,8 +930,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("test", "target/")
-               .withAliasesChaining();
+               .withAliasesChaining()
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -876,8 +951,10 @@ public class TestAliases {
             CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                            .withCommand(Args1.class);
             builder.withParser()
-                   .withUserAliases("test", "target/")
-                   .withAliasesChaining();
+                   .withAliasesChaining()
+                   .withUserAliases()
+                       .withProgramName("test")
+                       .withSearchLocation("target/");
             Cli<Args1> cli = builder.build();
             //@formatter:on
 
@@ -903,8 +980,10 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("test", "target/")
-               .withAliasesChaining();
+               .withAliasesChaining()
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 
@@ -921,9 +1000,11 @@ public class TestAliases {
         CliBuilder<Args1> builder = Cli.<Args1>builder("test")
                                        .withCommand(Args1.class);
         builder.withParser()
-               .withUserAliases("test", "target/")
                .withAliasesOverridingBuiltIns()
-               .withAliasesChaining();
+               .withAliasesChaining()
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
         Cli<Args1> cli = builder.build();
         //@formatter:on
 

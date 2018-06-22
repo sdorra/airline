@@ -21,6 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Properties;
 
+import com.github.rvesse.airline.parser.resources.ClasspathLocator;
+import com.github.rvesse.airline.parser.resources.FileLocator;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
+
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
 public @interface Version {
@@ -29,10 +33,10 @@ public @interface Version {
      * <p>
      * When this annotation is converted into a help section these are the files
      * that are scanned for the version information used to produce the Version
-     * help section. Paths are scanned for both on the classpath and on the
-     * local file system, if a path identifies both then the classpath source is
-     * used and the file system source is ignored. If you want to force a file
-     * system path to be used then you can prepend the path with {@code file://}
+     * help section. Files are located using the resource locators specified
+     * by {@link #sourceLocators()} which by default looks for resources on the
+     * classpath then as files. You can add the prefixes {@code classpath:} or
+     * {@code file://} to your source paths to force a specific location to be used
      * </p>
      * <p>
      * Each source will be provided as a separate list/table row within the help
@@ -114,4 +118,12 @@ public @interface Version {
      * @return True if tabular format, false for list format
      */
     boolean tabular() default false;
+
+    /**
+     * Resource locators used to find the properties files specified in
+     * {@link #sources()}
+     * 
+     * @return Resource locators to use
+     */
+    Class<? extends ResourceLocator>[] sourceLocators() default { ClasspathLocator.class, FileLocator.class };
 }

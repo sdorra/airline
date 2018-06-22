@@ -35,6 +35,8 @@ import com.github.rvesse.airline.args.ArgsEnum;
 import com.github.rvesse.airline.args.ArgsInherited;
 import com.github.rvesse.airline.args.ArgsMultipleDefaultOptions;
 import com.github.rvesse.airline.args.ArgsMultipleUnparsed;
+import com.github.rvesse.airline.args.ArgsNoArguments;
+import com.github.rvesse.airline.args.ArgsNoArgumentsIgnored;
 import com.github.rvesse.airline.args.ArgsOutOfMemory;
 import com.github.rvesse.airline.args.ArgsPrivate;
 import com.github.rvesse.airline.args.ArgsRequired;
@@ -44,11 +46,11 @@ import com.github.rvesse.airline.args.OptionsRequired;
 import com.github.rvesse.airline.command.CommandAdd;
 import com.github.rvesse.airline.command.CommandCommit;
 import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.parser.ParseResult;
+import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 import com.github.rvesse.airline.parser.errors.ParseException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
-import com.github.rvesse.airline.utils.AirlineUtils;
-
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -500,5 +502,27 @@ public class TestCommand
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void defaultOptionOnGlobalOptionForbidden() {
         singleCommandParser(ArgsDefaultOptionGlobalScope.class);
+    }
+    
+    @Test
+    public void unexpectedArgs1() {
+        ArgsNoArguments args = singleCommandParser(ArgsNoArguments.class).parse("-f");
+        Assert.assertTrue(args.flag);
+    }
+    
+    @Test(expectedExceptions = ParseArgumentsUnexpectedException.class)
+    public void unexpectedArgs2() {
+        singleCommandParser(ArgsNoArguments.class).parse("foo");
+    }
+    
+    @Test
+    public void unexpectedArgs3() {
+        ArgsNoArgumentsIgnored args = singleCommandParser(ArgsNoArgumentsIgnored.class).parse("-f", "foo");
+        Assert.assertTrue(args.flag);
+        
+        ParseResult<ArgsNoArgumentsIgnored> result = singleCommandParser(ArgsNoArgumentsIgnored.class).parseWithResult("-f", "foo");
+        Assert.assertTrue(result.wasSuccessful());
+        Assert.assertEquals(result.getState().getUnparsedInput().size(), 1);
+        Assert.assertEquals(result.getState().getUnparsedInput().get(0), "foo");
     }
 }

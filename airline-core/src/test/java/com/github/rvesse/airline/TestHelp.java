@@ -61,7 +61,6 @@ import com.github.rvesse.airline.help.cli.CliGlobalUsageSummaryGenerator;
 import com.github.rvesse.airline.help.common.AbstractCommandUsageGenerator;
 import com.github.rvesse.airline.model.CommandMetadata;
 import com.github.rvesse.airline.restrictions.partial.PartialAnnotated;
-import com.github.rvesse.airline.utils.AirlineUtils;
 import com.github.rvesse.airline.utils.predicates.parser.CommandFinder;
 
 import org.apache.commons.collections4.CollectionUtils;

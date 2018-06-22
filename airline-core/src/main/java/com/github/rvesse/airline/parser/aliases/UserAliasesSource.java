@@ -29,10 +29,10 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.model.AliasMetadata;
-import com.github.rvesse.airline.parser.aliases.locators.FileLocator;
-import com.github.rvesse.airline.parser.aliases.locators.HomeDirectoryLocator;
-import com.github.rvesse.airline.parser.aliases.locators.ResourceLocator;
-import com.github.rvesse.airline.parser.aliases.locators.WorkingDirectoryLocator;
+import com.github.rvesse.airline.parser.resources.FileLocator;
+import com.github.rvesse.airline.parser.resources.HomeDirectoryLocator;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
+import com.github.rvesse.airline.parser.resources.WorkingDirectoryLocator;
 
 /**
  * Represents the source of user defined aliases

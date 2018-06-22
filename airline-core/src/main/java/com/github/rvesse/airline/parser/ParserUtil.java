@@ -21,6 +21,8 @@ import com.github.rvesse.airline.DefaultCommandFactory;
 import com.github.rvesse.airline.model.ArgumentsMetadata;
 import com.github.rvesse.airline.model.OptionMetadata;
 import com.github.rvesse.airline.parser.errors.ParseException;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,5 +95,16 @@ public class ParserUtil {
 
         return injectOptions(commandInstance, options, parsedOptions, arguments, parsedArguments, metadataInjection,
                 bindings);
+    }
+    
+    public static ResourceLocator[] createResourceLocators(Class<? extends ResourceLocator>[] locatorClasses) {
+        ResourceLocator[] locators = new ResourceLocator[locatorClasses.length];
+        int i = 0;
+        for (Class<? extends ResourceLocator> locatorClass :locatorClasses) {
+            ResourceLocator locator = ParserUtil.createInstance(locatorClass);
+            locators[i] = locator;
+            i++;
+        }
+        return locators;
     }
 }

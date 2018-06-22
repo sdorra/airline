@@ -15,9 +15,6 @@
  */
 package com.github.rvesse.airline.help.sections.common;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.rvesse.airline.help.sections.HelpFormat;
 import com.github.rvesse.airline.help.sections.HelpSection;
+import com.github.rvesse.airline.parser.resources.ResourceLocator;
 
 public class VersionSection implements HelpSection {
 
@@ -38,9 +36,9 @@ public class VersionSection implements HelpSection {
     private final boolean tabular;
     private final String[] titles;
 
-    public VersionSection(String[] dataSources, String componentProperty, String versionProperty, String buildProperty,
-            String dateProperty, String[] additionalProperties, String[] additionalTitles, boolean suppressErrors,
-            boolean tabular) {
+    public VersionSection(String[] dataSources, ResourceLocator[] resourceLocators, String componentProperty,
+            String versionProperty, String buildProperty, String dateProperty, String[] additionalProperties,
+            String[] additionalTitles, boolean suppressErrors, boolean tabular) {
 
         this.tabular = tabular;
         this.titles = new String[additionalProperties != null ? additionalProperties.length : 0];
@@ -50,7 +48,7 @@ public class VersionSection implements HelpSection {
 
         for (String dataSource : dataSources) {
             try {
-                Properties source = loadDataSource(dataSource);
+                Properties source = loadDataSource(resourceLocators, dataSource);
                 if (source == null) {
                     if (suppressErrors)
                         continue;
@@ -90,38 +88,20 @@ public class VersionSection implements HelpSection {
                 dataSource));
     }
 
-    private Properties loadDataSource(String source) throws IOException {
-        if (source.startsWith("file://")) {
-            return loadFile(source);
-        } else {
-            Properties p = loadResource(source);
-            if (p == null)
-                p = loadFile(source);
-            return p;
-        }
-    }
+    private Properties loadDataSource(ResourceLocator[] resourceLocators, String source) throws IOException {
+        for (ResourceLocator locator : resourceLocators) {
+            if (locator == null)
+                continue;
 
-    private Properties loadResource(String source) throws IOException {
-        try (InputStream input = VersionSection.class.getResourceAsStream(source)) {
+            InputStream input = locator.open(source, "");
             if (input == null)
-                return null;
+                continue;
+
             Properties p = new Properties();
             p.load(input);
-            input.close();
             return p;
         }
-    }
 
-    private Properties loadFile(String source) throws IOException, FileNotFoundException {
-        File f = new File(source);
-        if (f.exists() && f.isFile() && f.canRead()) {
-            Properties p = new Properties();
-            try (InputStream input = new FileInputStream(f)) {
-                p.load(input);
-                input.close();
-            }
-            return p;
-        }
         return null;
     }
 
