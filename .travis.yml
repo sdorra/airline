@@ -4,5 +4,7 @@ install: true
 jdk: 
   - openjdk7
   - openjdk8
+env:
+  - MAVEN_OPTS="-Dhttps.protocol=TLSv1.2"
 script: mvn install -Prelease -Dgpg.skip=true
 after_success: mvn package -Pcoveralls
