@@ -6,7 +6,11 @@
     - Allow creating a `Cli` instance with an explicit `ParserMetadata` for situations where parser configuration cannot be specified via annotation e.g. using dynamically determined paths for user aliases
 - Parser Improvements
     - Allow `./` as a user alias search location resolved as the current working directory
-    - Allow extending how user alias search locations are resolved to support custom behaviours
+    - Allow extending how user alias search locations are resolved to support custom behaviours via new `ResourceLocator` interface
+- Annotation Improvements
+    - Allow specifying global restriction annotations directly on classes used with `SingleCommand`
+    - `@Unrestricted` can now be applied directly to classes to specify no global restrictions on single commands and CLIs
+    - `@Version` can now use `ResourceLocator` to modify search locations
 
 ## 2.5.0
 
