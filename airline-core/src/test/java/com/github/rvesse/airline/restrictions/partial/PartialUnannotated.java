@@ -22,15 +22,11 @@ import java.util.List;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.NotBlank;
-import com.github.rvesse.airline.annotations.restrictions.Partial;
 
 @Command(name = "partial")
-public class PartialAnnotated {
+public class PartialUnannotated {
 
     @Option(name = "--kvp", arity = 2)
-    @Partial(appliesTo = { 0 }, restriction = NotBlank.class)
-    @NotBlank
     public List<String> kvps = new ArrayList<>();
 
     @Arguments

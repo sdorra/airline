@@ -8,22 +8,18 @@
       </h1>
       <p class="lead">{{ site.description }}</p>
     </div>
-
+    <div class="masthead-title small">
+      <span class="sidebar-nav-item">Stable Version: {{ site.version }}</span>
+      <span class="sidebar-nav-item">Development Version: {{ site.dev_version }}
+    </div>
+    <hr />
     <div id="menu">
       <nav class="sidebar-nav" id="mutlilevelpushmenu_wrapper">
        {% include nav.html context=page.url %}
       </nav>
     </div>
-
-    <hr />
-
-    <div>
-      <span class="sidebar-nav-item">Stable Version: {{ site.version }}</span>
-      <span class="sidebar-nav-item">Development Version: {{ site.dev_version }}
+    <div class="masthead-title small">
+      All content on this site is open source under the <a href="http://apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>
     </div>
-    
-    <p>All content on this site is open source under the <a href="http://apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
-    
-    <p>    
   </div>
 </div>
