@@ -5,9 +5,9 @@ title: Partials Annotation
 
 ## `@Partials` and `@Partial`
 
-These special annotations are used in conjunction with fields annotated with [`@Option`](option.html)/[`@Arguments`](arguments.html) to limit the effect of applied restriction annotations to only certain values.  This is only useful when you have options/arguments with arity > 1 i.e. multiple values can be specified.
+These special annotations are used in conjunction with fields annotated with [`@Option`](option.html)/[`@Arguments`](arguments.html) to limit the effect of applied restriction annotations to only certain values.  This is only useful when you have options/arguments with arity &gt; 1 i.e. multiple values can be specified.
 
-### `@Partial`
+###  `@Partial`
 
 For example consider the case of an option that takes in a key value pair, we might want to restrict the keys but still allow arbitrary values e.g.
 
