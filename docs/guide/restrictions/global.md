@@ -15,7 +15,13 @@ These provide useful default behaviours that most developers will expect from th
 
 For CLIs you can set the desired restrictions via the `restrictions` field of the [`@Cli`](../annotations/cli.html) annotation and control whether the defaults are included via its `includeDefaultRestrictions` field.
 
-For single commands it is not currently possible to customise the global restrictions.
+Or you can add the relevant annotations to the class that has the `@Cli` annotation and they will be automatically detected.
+
+#### Global Restrictions for Single Commands
+
+{% include req-ver.md version="2.5.1" %} 
+
+For single commands you can specify global restrictions directly on [`@Command`](../annotations/command.html) annotated classes and these will be automatically detected appropriately.
 
 ### Custom Global Restrictions
 

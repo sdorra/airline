@@ -3,7 +3,7 @@ layout: page
 title: Alias Annotation
 ---
 
-# `@Alias`
+## `@Alias`
 
 The `@Alias` annotation is used as an argument to the `aliases` field of the [`@Parser`](parser.html) annotation.  It is used to define a command alias in the same manner as users can provide aliases via the [User Defined Aliases](../practise/aliases.html) feature.
 
