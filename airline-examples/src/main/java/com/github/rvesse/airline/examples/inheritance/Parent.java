@@ -31,7 +31,7 @@ import com.github.rvesse.airline.examples.ExampleRunnable;
 public class Parent implements ExampleRunnable {
 
     @Inject
-    protected HelpOption help;
+    protected HelpOption<ExampleRunnable> help;
 
     @Option(name = "--parent", description = "An option provided by the parent")
     private boolean parent;

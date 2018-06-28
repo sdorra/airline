@@ -20,7 +20,7 @@ package com.github.rvesse.airline.help.cli.bash;
  */
 public enum CompletionBehaviour {
     /**
-     * None, either this is a flag option (i.e. arity zero) or you want to limit
+     * None, either this is a flag option i.e. arity zero or you want to limit
      * completions to those specified by the option meta-data
      */
     NONE,
@@ -45,7 +45,7 @@ public enum CompletionBehaviour {
     AS_DIRECTORIES,
             
     /**
-     * Commands from the CLI for which we are provided completions
+     * Commands from the CLI for which we are providing completions
      */
     CLI_COMMANDS,
     
