@@ -2,27 +2,23 @@
 
 Airline is a Java library providing an annotation-based framework for parsing command line interfaces.
 
-It supports both simple single commands through to complex git style interfaces with groups.
+It supports both simple single commands through to complex git style interfaces with groups and sub-groups.
 
-This is a substantially rewritten fork of the original [airline library](https://github.com/airlift/airline) created based on improvements predominantly developed by myself plus some minor improvements taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork.
+Additionally it provides many powerful features including, but not limited to, the following:
 
-## Breaking Changes versus 1.x
-
-Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) for more details on how to migrate code forward.
-
-Airline 2.1 contains some further minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) for more details on how to migrate code forward.  Some users may need to add additional Maven dependencies if they were using help formats other than the basic CLI help.
-
-Airline 2.2 has some minor breaking changes that may affect users of the `@Arguments` annotation, again please see [Migrating.md](Migrating.md) for more details.
+- Highly customisable [Parser](http://rvesse.github.io/airline/guide/parser/)
+- [User Defined Aliases](http://rvesse.github.io/airline/guide/practise/aliases.html)
+- Annotation driven [restrictions](http://rvesse.github.io/airline/guide/restrictions/) framework to reduce boilerplate
+- Extensible [Help](http://rvesse.github.io/airline/guide/help) system supporting multiple output formats including generating Man pages and Bash completion scripts
+- [Maven Plugin](http://rvesse.github.io/airline/guide/maven-plugin/) for validation and help generation during builds
 
 ## User Guide
 
-We're currently working on our new website which will eventually include a comprehensive user guide though is currently a work in progress.
-
-You can find the website at [http://rvesse.github.io/airline/](http://rvesse.github.io/airline/)
+Our project website at [http://rvesse.github.io/airline/](http://rvesse.github.io/airline/) contains a fairly comprehensive user guide.  Some portions are still under development but it covers the vast majority of the features of the library.
 
 ## Usage
 
-To use airline you need to add a dependency to it to your own code, the Maven artifacts are described later in this file.
+To use airline you need to add a dependency to it to your own code, the Maven artifacts are described later in this ReadMe.
 
 You then need to use the various annotations to annotate your command classes:
 
@@ -33,7 +29,11 @@ You then need to use the various annotations to annotate your command classes:
 
 Please see the [examples](airline-examples/) module for a range of examples that show off the many features of this library and practical examples of using the annotations.
 
-### Single Commands
+Or for a quick tutorial why not read our [Introduction to Airline](http://rvesse.github.io/airline/guide/) in our User Guide.
+
+### Quick Examples
+
+#### Single Commands
 
 Simply create a parser instance via `SingleCommand.singleCommand()` passing in a class that is annotated with the `@Command` annotation e.g.
 
@@ -47,11 +47,11 @@ Simply create a parser instance via `SingleCommand.singleCommand()` passing in a
     }
 ```
 
-### Multiple Commands
+#### Multiple Commands
 
-Create an instance of a `Cli`, this can be done either using the `CliBuilder` or by annotating a class with the `@Cli` annotation.  This is somewhat more complicated so please see the [examples](examples/) module for proper examples.
+Create an instance of a `Cli`, this can be done either using the `CliBuilder` or by annotating a class with the `@Cli` annotation.  This is somewhat more involved so please see the [User Guide](http://rvesse.github.io/airline/guide/#building-a-cli) or the [examples module](examples/) for proper examples.
 
-### Executable JAR
+#### Executable JAR
 
 Note that typically you will want to create an executable JAR for your CLI using something like the Maven Shade plugin.  This will then allow you to create a simple wrapper script that invokes your CLI.
 
@@ -72,9 +72,9 @@ Or:
     
 ## License
 
-Airline is licensed under the Apache Software License Version 2.0, see provided **License.txt**
+Airline is licensed under the Apache Software License Version 2.0, see provided **LICENSE**
 
-See provided **Notice.md** for Copyright Holders
+See provided **NOTICE** for Copyright Holders
 
 ## Maven Artifacts
 
@@ -95,3 +95,15 @@ Snapshot artifacts of the latest source are also available using the version `2.
 ## Build Status
 
 CI builds are run on [Travis CI](http://travis-ci.org/) ![Build Status](https://travis-ci.org/rvesse/airline.png), see build information and history at https://travis-ci.org/rvesse/airline
+
+# Historical Information
+
+This is a substantially rewritten fork of the original [airline library](https://github.com/airlift/airline) created based on improvements predominantly developed by myself plus some minor improvements taken from the [Clark & Parsia](https://github.com/clarkparsia/airline) fork.  It has significantly deviated from the original library and gained many powerful features that differentiate it from both the original and other libraries with similar goals.
+
+## Breaking Changes versus 1.x
+
+Airline 2 contains significant breaking changes from Airline 1.x, please see [Migrating.md](Migrating.md) for more details on how to migrate code forward.
+
+Airline 2.1 contains some further minor breaking changes that should only affect advanced users, again please see [Migrating.md](Migrating.md) for more details on how to migrate code forward.  Some users may need to add additional Maven dependencies if they were using help formats other than the basic CLI help.
+
+Airline 2.2 has some minor breaking changes that may affect users of the `@Arguments` annotation, again please see [Migrating.md](Migrating.md) for more details.
