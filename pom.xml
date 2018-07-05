@@ -360,6 +360,9 @@
                   <sourceDirectories>
                     <sourceDirectory>airline-maven-plugin/target/generated-sources/</sourceDirectory>
                   </sourceDirectories>
+                  <jacocoReports>
+		    <jacocoReport>${project.outputDirectory}/jacoco-it/jacoco.xml</jacocoReport>
+                  </jacocoReports>
                 </configuration>
               </execution>
             </executions>
