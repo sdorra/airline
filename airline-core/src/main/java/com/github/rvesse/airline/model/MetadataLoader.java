@@ -120,6 +120,7 @@ public class MetadataLoader {
         if (parserConfig.aliasesMayChain()) {
             builder = builder.withAliasesChaining();
         }
+        builder = builder.withAliasForceBuiltInPrefix(parserConfig.userAliasesForceBuiltIn());
         for (Alias alias : parserConfig.aliases()) {
             builder.withAlias(alias.name()).withArguments(alias.arguments());
         }

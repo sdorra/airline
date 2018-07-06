@@ -39,6 +39,7 @@ import com.github.rvesse.airline.builder.CliBuilder;
 import com.github.rvesse.airline.help.cli.CliGlobalUsageGenerator;
 import com.github.rvesse.airline.model.AliasMetadata;
 import com.github.rvesse.airline.parser.errors.ParseAliasCircularReferenceException;
+import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
 import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 import com.github.rvesse.airline.parser.resources.ClasspathLocator;
 import com.github.rvesse.airline.parser.resources.EnvVarLocator;
@@ -1010,5 +1011,75 @@ public class TestAliases {
 
         // Check parsing
         cli.parse("a");
+    }
+    
+    @Test
+    public void user_aliases_chained_05() throws IOException {
+        // Override a built-in but break the circular reference with the ! specifier
+        prepareConfig(f, "Args1=a", "a=b", "b=!Args1 -debug");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withAliasesOverridingBuiltIns()
+               .withAliasesChaining()
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        Args1 args = cli.parse("Args1");
+        Assert.assertTrue(args.debug);
+    }
+    
+    @Test(expectedExceptions = ParseCommandUnrecognizedException.class)
+    public void user_aliases_chained_06() throws IOException {
+        // Override a built-in but break the circular reference with the force specifier
+        // however specifier is configured so still fails with a command not found instead
+        prepareConfig(f, "Args1=a", "a=b", "b=!Args1 -debug");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withAliasesOverridingBuiltIns()
+               .withAliasesChaining()
+               .withAliasForceBuiltInPrefix('@')
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        Args1 args = cli.parse("Args1");
+        Assert.assertTrue(args.debug);
+    }
+    
+    @Test
+    public void user_aliases_chained_07() throws IOException {
+        // Override a built-in but break the circular reference with the force specifier
+        // however specifier is configured so still fails with a command not found instead
+        prepareConfig(f, "Args1=a", "a=b", "b=@Args1 -debug");
+
+        //@formatter:off
+        CliBuilder<Args1> builder = Cli.<Args1>builder("test")
+                                       .withCommand(Args1.class);
+        builder.withParser()
+               .withAliasesOverridingBuiltIns()
+               .withAliasesChaining()
+               .withAliasForceBuiltInPrefix('@')
+               .withUserAliases()
+                   .withProgramName("test")
+                   .withSearchLocation("target/");
+        Cli<Args1> cli = builder.build();
+        //@formatter:on
+
+        // Check parsing
+        Args1 args = cli.parse("Args1");
+        Assert.assertTrue(args.debug);
     }
 }
