@@ -24,10 +24,11 @@ package com.github.rvesse.airline;
 public interface CommandFactory<T> {
     /**
      * Creates an instance of the given type
-     * 
+     *
+     * @param context context of command to be instantiated
      * @param type
      *            Type
      * @return Instance
      */
-    public abstract T createInstance(Class<?> type);
+    public abstract T createInstance(CommandContext<T> context, Class<?> type);
 }
