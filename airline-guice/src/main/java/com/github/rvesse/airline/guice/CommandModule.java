@@ -54,12 +54,21 @@ final class CommandModule<T> extends AbstractModule {
 
     private <I> void bindBinding(Class<I> bindingType, Object instance) {
         ParameterizedType parameterizedType = Types.newParameterizedType(bindingType, type);
-        bindBinding(Key.get(parameterizedType), instance);
-        bind(bindingType).toInstance((I) instance);
+        if (instance != null) {
+            bindBinding(Key.get(parameterizedType), instance);
+            bind(bindingType).toInstance((I) instance);
+        } else {
+            bindNullBinding(Key.get(parameterizedType));
+            bind(bindingType).toProvider(Providers.<I>of(null));
+        }
     }
 
     private <I> void bindBinding(Key<I> key, Object value) {
         bind(key).toInstance((I) value);
+    }
+
+    private <I> void bindNullBinding(Key<I> key) {
+        bind(key).toProvider(Providers.<I>of(null));
     }
 
 }

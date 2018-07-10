@@ -39,6 +39,7 @@ import com.github.rvesse.airline.parser.errors.ParseException;
  */
 public class HelpOption<C> {
     @Inject
+    @Nullable // required for guice module, can occur with single command
     private GlobalMetadata<C> globalMetadata;
 
     @Inject
